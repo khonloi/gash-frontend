@@ -1,9 +1,17 @@
-import React, { useState, useEffect, useCallback, useContext, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import Api from '../common/SummaryAPI';
-import '../styles/Profile.css';
-import { useToast } from '../components/Toast';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import Api from "../common/SummaryAPI";
+import { useToast } from "../components/Toast";
+
+// Import modal
+import EditProfileModal from "../components/EditProfileModal";
 
 const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -16,14 +24,14 @@ const Profile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    image: '',
-    password: '',
-    repeatPassword: '',
+    username: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    image: "",
+    password: "",
+    repeatPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +39,7 @@ const Profile = () => {
   const firstInputRef = useRef(null);
   const { showToast } = useToast();
 
-  //  Handle chọn file
+  // Handle chọn file
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -56,23 +64,22 @@ const Profile = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const response = await Api.accounts.getProfile(user._id);
       setProfile(response.data);
       setIsDeleted(response.data.is_deleted === true);
       setFormData({
         username: response.data.username,
-        name: response.data.name || '',
+        name: response.data.name || "",
         email: response.data.email,
-        phone: response.data.phone || '',
-        address: response.data.address || '',
-        image: response.data.image || '',
-        password: '',
-        repeatPassword: '',
+        phone: response.data.phone || "",
+        address: response.data.address || "",
+        image: response.data.image || "",
+        password: "",
+        repeatPassword: "",
       });
-      showToast('Profile loaded successfully!', 'success', 2000);
+      showToast("Profile loaded successfully!", "success", 2000);
     } catch {
-      showToast('Failed to fetch profile', 'error', 4000);
+      showToast("Failed to fetch profile", "error", 4000);
     } finally {
       setLoading(false);
     }
@@ -85,7 +92,7 @@ const Profile = () => {
   useEffect(() => {
     if (editMode) {
       firstInputRef.current?.focus();
-      if (!selectedFile && profile && profile.image) {
+      if (!selectedFile && profile?.image) {
         setPreviewUrl(profile.image);
       }
     } else {
@@ -95,57 +102,41 @@ const Profile = () => {
 
   const validateForm = useCallback(() => {
     const newErrors = {};
-    const username = formData.username.trim();
-    const name = formData.name.trim();
-    const email = formData.email.trim();
-    const phone = formData.phone.trim();
-    const address = formData.address.trim();
-    const password = formData.password.trim();
-    const repeatPassword = formData.repeatPassword.trim();
+    const { username, name, email, phone, address, password, repeatPassword } =
+      formData;
 
-    if (!username) newErrors.username = 'Username cannot be blank';
-    if (!name) newErrors.name = 'Full name cannot be blank';
-    if (!email) newErrors.email = 'Email cannot be blank';
-    if (!phone) newErrors.phone = 'Phone cannot be blank';
+    if (!username.trim()) newErrors.username = "Username cannot be blank";
+    if (!name.trim()) newErrors.name = "Full name cannot be blank";
+    if (!email.trim()) newErrors.email = "Email cannot be blank";
+    if (!phone.trim()) newErrors.phone = "Phone cannot be blank";
+    if (!address.trim()) newErrors.address = "Address cannot be blank";
 
-    if (!address) newErrors.address = 'Address cannot be blank';
-    const hasImage = Boolean(
-      (formData.image && formData.image.trim()) || selectedFile || (profile && profile.image)
-    );
-    if (!hasImage) {
-      newErrors.image = 'Image cannot be blank';
-    }
+    const hasImage = Boolean(formData.image?.trim() || selectedFile || profile?.image);
+    if (!hasImage) newErrors.image = "Image cannot be blank";
 
     if (username && (username.length < 3 || username.length > 30)) {
-      newErrors.username = 'Username must be 3-30 characters';
+      newErrors.username = "Username must be 3-30 characters";
     }
-    if (name && name.length > 50) {
-      newErrors.name = 'Name cannot exceed 50 characters';
-    }
-    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-      newErrors.email = 'Valid email is required';
-    }
-    if (phone && !/^\d{10}$/.test(phone)) {
-      newErrors.phone = 'Phone must be exactly 10 digits';
-    }
-    if (address && address.length > 100) {
-      newErrors.address = 'Address cannot exceed 100 characters';
-    }
-    if (password && password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-    if (password && password !== repeatPassword) {
-      newErrors.repeatPassword = 'Passwords do not match';
-    }
-
-
+    if (name && name.length > 50) newErrors.name = "Name cannot exceed 50 characters";
+    if (email && !/^\S+@\S+\.\S+$/.test(email))
+      newErrors.email = "Valid email is required";
+    if (phone && !/^\d{10}$/.test(phone))
+      newErrors.phone = "Phone must be exactly 10 digits";
+    if (address && address.length > 100)
+      newErrors.address = "Address cannot exceed 100 characters";
+    if (password && password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
+    if (password && password !== repeatPassword)
+      newErrors.repeatPassword = "Passwords do not match";
 
     if (Object.keys(newErrors).length > 0) {
-      Object.values(newErrors).forEach((msg) => showToast(msg, 'error', 3000));
+      Object.values(newErrors).forEach((msg) =>
+        showToast(msg, "error", 3000)
+      );
       return false;
     }
     return true;
-  }, [formData, showToast, profile, selectedFile]);
+  }, [formData, profile, selectedFile, showToast]);
 
   const updateProfile = useCallback(async () => {
     setLoading(true);
@@ -159,21 +150,20 @@ const Profile = () => {
         image: formData.image,
         ...(formData.password && { password: formData.password }),
       };
-      const token = localStorage.getItem('token');
       const response = await Api.accounts.updateProfile(user._id, updateData);
       setProfile(response.data.account);
       setEditMode(false);
-      showToast('Profile updated successfully!', 'success', 2000);
+      showToast("Profile updated successfully!", "success", 2000);
     } catch (err) {
-      const errorMessage = err.response?.status === 409
-        ? 'Username or email already exists'
-        : err.response?.data?.errors?.[0]?.msg || 'Failed to update profile';
-      showToast(errorMessage, 'error', 4000);
+      const errorMessage =
+        err.response?.status === 409
+          ? "Username or email already exists"
+          : err.response?.data?.errors?.[0]?.msg || "Failed to update profile";
+      showToast(errorMessage, "error", 4000);
     } finally {
       setLoading(false);
     }
   }, [formData, user, showToast]);
-
 
   const updateProfileWithImage = useCallback(
     (imageUrl) => {
@@ -183,26 +173,26 @@ const Profile = () => {
         image: imageUrl,
         password: formData.password || undefined,
       };
-      Api.accounts.updateProfile(user._id, updateData)
+      Api.accounts
+        .updateProfile(user._id, updateData)
         .then((response) => {
           setProfile(response.data.account);
           setEditMode(false);
-          showToast('Profile updated successfully!', 'success', 2000);
+          showToast("Profile updated successfully!", "success", 2000);
         })
         .catch((err) => {
-          const errorMessage = err.response?.status === 409
-            ? 'Username or email already exists'
-            : err.response?.data?.errors?.[0]?.msg || 'Failed to update profile';
-          showToast(errorMessage, 'error', 4000);
+          const errorMessage =
+            err.response?.status === 409
+              ? "Username or email already exists"
+              : err.response?.data?.errors?.[0]?.msg ||
+              "Failed to update profile";
+          showToast(errorMessage, "error", 4000);
         })
-        .finally(() => {
-          setLoading(false);
-        });
+        .finally(() => setLoading(false));
     },
     [formData, user, showToast]
   );
 
-  //  Chặn update nếu file invalid
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -214,42 +204,52 @@ const Profile = () => {
       }
 
       if (selectedFile) {
-        Api.upload.image(selectedFile)
+        Api.upload
+          .image(selectedFile)
           .then((response) => {
-            console.log("Upload response:", response.data);
             const imageUrl = response.data?.url;
             if (imageUrl) {
               showToast("Image uploaded successfully!", "success", 2000);
               updateProfileWithImage(imageUrl);
             } else {
-              showToast("Upload completed but server did not return URL.", "error", 3000);
+              showToast(
+                "Upload completed but server did not return URL.",
+                "error",
+                3000
+              );
             }
           })
-          .catch((err) => {
-            showToast("An error occurred during upload.", "error", 3000);
-            console.error("Upload error:", err, err?.response?.data);
-          });
+          .catch(() =>
+            showToast("An error occurred during upload.", "error", 3000)
+          );
       } else {
         updateProfile();
       }
     },
-    [validateForm, selectedFile, invalidFile, updateProfile, updateProfileWithImage, showToast]
+    [
+      validateForm,
+      selectedFile,
+      invalidFile,
+      updateProfile,
+      updateProfileWithImage,
+      showToast,
+    ]
   );
 
   const handleCancel = useCallback(() => {
     setEditMode(false);
     setFormData({
-      username: profile?.username || '',
-      name: profile?.name || '',
-      email: profile?.email || '',
-      phone: profile?.phone || '',
-      address: profile?.address || '',
-      image: profile && profile.image ? profile.image : '',
-      password: '',
-      repeatPassword: '',
+      username: profile?.username || "",
+      name: profile?.name || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+      address: profile?.address || "",
+      image: profile?.image || "",
+      password: "",
+      repeatPassword: "",
     });
     setSelectedFile(null);
-    setPreviewUrl('');
+    setPreviewUrl("");
     setInvalidFile(false);
   }, [profile]);
 
@@ -259,10 +259,10 @@ const Profile = () => {
       await Api.accounts.softDeleteAccount(user._id);
       setIsDeleted(true);
       logout();
-      showToast('Account soft deleted successfully!', 'success', 2000);
-      navigate('/login');
+      showToast("Account soft deleted successfully!", "success", 2000);
+      navigate("/login");
     } catch {
-      showToast('Failed to soft delete account', 'error', 4000);
+      showToast("Failed to soft delete account", "error", 4000);
     } finally {
       setLoading(false);
       setShowDeleteConfirm(false);
@@ -270,127 +270,85 @@ const Profile = () => {
   }, [user, logout, navigate, showToast]);
 
   if (!user) {
-    return <div className="profile-container"></div>;
+    return <div className="w-full h-full"></div>;
   }
 
   return (
-    <div className="profile-container">
+    <div className="flex justify-center items-center py-10 bg-gray-50 min-h-screen">
       {loading ? (
-        <div className="profile-loading" role="status">Loading...</div>
+        <div className="text-gray-500 text-sm p-4">Loading...</div>
       ) : profile ? (
-        <div className="profile-box">
-          <h1 className="profile-title">Your Profile</h1>
-          {!editMode && (
-            <div className="profile-main">
-              {profile.image && (
-                <div className="profile-image-section">
-                  <img
-                    src={profile.image}
-                    alt={profile.username ? `${profile.username}` : "Profile"}
-                    className="profile-image"
-                  />
-                </div>
-              )}
-              <div className="profile-details">
-                <div className="profile-info-group">
-                  <p><strong>Username:</strong> {profile.username}</p>
-                  <p><strong>Name:</strong> {profile.name || 'N/A'}</p>
-                  <p><strong>Email:</strong> {profile.email}</p>
-                  <p><strong>Phone:</strong> {profile.phone || 'N/A'}</p>
-                  <p><strong>Address:</strong> {profile.address || 'N/A'}</p>
-                </div>
-                <div className="profile-actions">
-                  {/* Hide Edit and Delete if soft-deleted */}
-                  {!isDeleted && (
-                    <>
-                      <button className="edit-button" onClick={() => setEditMode(true)}>
-                        Edit Profile
-                      </button>
-                      <button className="delete-button" onClick={() => setShowDeleteConfirm(true)}>
-                        Close Account
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
+        <div className="w-full max-w-md bg-white rounded-lg shadow p-10 text-center">
+          {/* Title */}
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Profile</h1>
+
+          {/* Avatar */}
+          {profile.image && (
+            <div className="flex justify-center mb-8">
+              <img
+                src={profile.image}
+                alt={profile.username || "Profile"}
+                className="w-32 h-32 rounded-full object-cover border-4 border-gray-300"
+              />
             </div>
           )}
-          {editMode && (
-            <form className="profile-form" onSubmit={handleSubmit}>
-              {[
-                { id: 'username', label: 'Username', type: 'text' },
-                { id: 'name', label: 'Full Name', type: 'text' },
-                { id: 'email', label: 'Email', type: 'email' },
-                { id: 'phone', label: 'Phone', type: 'text' },
-                { id: 'address', label: 'Address', type: 'text' },
-                { id: 'image', label: 'Upload', type: 'file' },
-                { id: 'password', label: 'Password (leave blank to keep current)', type: 'password' },
-                { id: 'repeatPassword', label: 'Repeat Password', type: 'password' },
-              ].map((item) => (
-                <div className="profile-form-group" key={item.id}>
-                  <label htmlFor={item.id} className="profile-form-label">{item.label}</label>
-                  {item.id === 'image' ? (
-                    <div className="profile-upload-group">
-                      <input
-                        id="profile-image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="profile-form-input"
-                      />
-                      {previewUrl && (
-                        <div className="profile-image-preview">
-                          <img src={previewUrl} alt="Preview" style={{ maxWidth: 120, maxHeight: 120, marginTop: 8 }} />
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <input
-                      id={item.id}
-                      type={item.type}
-                      name={item.id}
-                      value={formData[item.id]}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, [item.id]: e.target.value }))}
-                      ref={item.id === 'username' ? firstInputRef : undefined}
-                      className="profile-form-input"
-                    />
-                  )}
-                </div>
-              ))}
-              <div className="profile-form-actions">
-                <button type="submit" className="update-button" disabled={loading}>
-                  {loading ? 'Updating...' : 'Confirm'}
-                </button>
-                <button type="button" className="cancel-button" onClick={handleCancel} disabled={loading}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
-          {showDeleteConfirm && (
-            <div className="confirmation-dialog" role="dialog">
-              <div className="dialog-content">
-                <h2 className="dialog-title">Confirm Account Deletion</h2>
-                <p className="dialog-message">
-                  Are you sure you want to permanently delete your Gash account? This action cannot be undone.
-                </p>
-                <div className="profile-dialog-actions">
-                  <button className="confirm-button" onClick={handleDeleteConfirm} disabled={loading}>
-                    {loading ? 'Deleting...' : 'Confirm'}
-                  </button>
-                  <button className="cancel-button" onClick={() => setShowDeleteConfirm(false)} disabled={loading}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
+
+          {/* Info */}
+          <div className="space-y-3 text-gray-800 mb-8 text-lg">
+            <p>
+              <span className="font-semibold">Username:</span> {profile.username}
+            </p>
+            <p>
+              <span className="font-semibold">Name:</span>{" "}
+              {profile.name || "N/A"}
+            </p>
+            <p>
+              <span className="font-semibold">Email:</span> {profile.email}
+            </p>
+            <p>
+              <span className="font-semibold">Phone:</span>{" "}
+              {profile.phone || "N/A"}
+            </p>
+            <p>
+              <span className="font-semibold">Address:</span>{" "}
+              {profile.address || "N/A"}
+            </p>
+          </div>
+
+          {/* Buttons */}
+          {!isDeleted && (
+            <div className="flex justify-center gap-6">
+              <button
+                className="px-6 py-3 rounded-full bg-yellow-400 hover:bg-yellow-500 text-base font-semibold"
+                onClick={() => setEditMode(true)}
+              >
+                Edit Profile
+              </button>
+              <button
+                className="px-6 py-3 rounded-full bg-red-600 hover:bg-red-700 text-white text-base font-semibold"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Close Account
+              </button>
             </div>
           )}
         </div>
       ) : (
-        <div className="profile-no-profile" role="alert">
-          <span className="profile-error-icon">⚠</span>
-          Profile not found
+        <div className="bg-red-50 text-red-600 border border-red-300 p-3 rounded text-sm flex items-center gap-2">
+          ⚠ Profile not found
         </div>
+      )}
+
+      {/* Modal Edit Profile */}
+      {editMode && (
+        <EditProfileModal
+          formData={formData}
+          setFormData={setFormData}
+          previewUrl={previewUrl}
+          handleFileChange={handleFileChange}
+          handleSubmit={handleSubmit}
+          handleCancel={handleCancel}
+        />
       )}
     </div>
   );
