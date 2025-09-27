@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import axiosClient from "../common/axiosClient";
+import Api from "../common/SummaryAPI";
 import gashLogo from "../assets/image/gash-logo.svg";
 import { SEARCH_DEBOUNCE_DELAY } from "../constants/constants";
+
+// Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -11,8 +13,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import IconButton from "./IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+
+import IconButton from "./IconButton";
 
 export default function Header() {
     const { user, logout } = useContext(AuthContext);
@@ -53,10 +56,7 @@ export default function Header() {
         }
         try {
             setLoading(true);
-            const sanitizedQuery = query.trim().replace(/[<>]/g, "");
-            const res = await axiosClient.get("/products/search", {
-                params: { q: sanitizedQuery },
-            });
+            const res = await Api.products.search(query);
             setSearchResults(res.data || []);
             setShowDropdown(true);
         } catch (err) {
@@ -105,43 +105,96 @@ export default function Header() {
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
             <div className="max-w-7xl mx-auto h-16 sm:h-20 flex items-center px-4 sm:px-6 lg:px-12">
-
                 {/* ==== MOBILE HEADER ==== */}
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
-                        // Khi bật search thì input tràn ngang
-                        <form
-                            onSubmit={handleSearchSubmit}
-                            className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden"
-                        >
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search..."
-                                autoFocus
-                                className="flex-1 pl-4 pr-12 py-2 text-sm text-gray-900 focus:outline-none"
-                            />
-                            {search && (
-                                <button
-                                    type="button"
-                                    onClick={() => setSearch("")}
-                                    className="absolute right-12 p-2 text-gray-500 hover:text-red-500"
-                                >
-                                    <CloseIcon fontSize="small" />
-                                </button>
-                            )}
-                            <button type="submit" className="p-2 text-gray-600 hover:text-amber-500">
-                                <SearchIcon fontSize="small" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMobileSearchOpen(false)}
-                                className="p-2 text-gray-600 hover:text-red-500"
+                        <div className="relative w-full">
+                            {/* Search form */}
+                            <form
+                                onSubmit={handleSearchSubmit}
+                                className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden relative"
                             >
-                                <CloseIcon fontSize="small" />
-                            </button>
-                        </form>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search..."
+                                    autoFocus
+                                    className="flex-1 pl-4 pr-12 py-2 text-sm text-gray-900 focus:outline-none"
+                                />
+
+                                {search ? (
+                                    // X để clear text
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearch("")}
+                                        className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </button>
+                                ) : (
+                                    // X để đóng search bar
+                                    <button
+                                        type="button"
+                                        onClick={() => setMobileSearchOpen(false)}
+                                        className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </button>
+                                )}
+                            </form>
+
+
+                            {/* Dropdown search (mobile) */}
+                            {showDropdown && (
+                                <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
+                        border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
+                        max-h-96 overflow-y-auto">
+                                    {loading ? (
+                                        <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
+                                            <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
+                                            Searching...
+                                        </div>
+                                    ) : searchResults.length > 0 ? (
+                                        <>
+                                            {searchResults.map((item) => (
+                                                <Link
+                                                    key={item._id}
+                                                    to={`/product/${item._id}`}
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b last:border-0"
+                                                    onClick={() => setShowDropdown(false)}
+                                                >
+                                                    <img
+                                                        src={item.imageURL || "/placeholder.png"}
+                                                        alt={item.pro_name}
+                                                        className="w-14 h-14 rounded-lg object-cover shadow-sm"
+                                                    />
+                                                    <div className="flex flex-col">
+                                                        <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                                                            {item.pro_name}
+                                                        </p>
+                                                        <p className="text-sm text-red-600 font-semibold mt-1">
+                                                            {formatPrice(item.pro_price)}
+                                                        </p>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                            <button
+                                                onClick={() => {
+                                                    navigate(`/search?q=${encodeURIComponent(search)}`);
+                                                    setShowDropdown(false);
+                                                }}
+                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-amber-50 transition-colors"
+                                            >
+                                                View all results
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="px-4 py-4 text-gray-500 text-center">No products found</div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <>
                             {/* Search icon trái */}
@@ -154,56 +207,21 @@ export default function Header() {
                                 <img src={gashLogo} alt="Gash Logo" className="h-8" />
                             </Link>
 
-                            {/* Menu phải (dropdown) */}
+                            {/* Menu phải */}
                             <div className="relative">
-                                <IconButton onClick={() => setShowUserMenu((prev) => !prev)} title="Menu">
+                                <IconButton
+                                    onClick={() => setShowUserMenu((prev) => !prev)}
+                                    title="Menu"
+                                >
                                     <MenuIcon />
                                 </IconButton>
-
-                                {showUserMenu && (
-                                    <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                        <button
-                                            onClick={() => navigate("/favorites")}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            <FavoriteIcon fontSize="small" /> Favorites
-                                        </button>
-                                        <button
-                                            onClick={() => navigate("/cart")}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            <ShoppingCartIcon fontSize="small" /> Cart
-                                        </button>
-                                        <button
-                                            onClick={() => alert('Coming soon!')}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            <ChatBubbleIcon fontSize="small" /> Messages
-                                        </button>
-                                        <button
-                                            onClick={() => alert('Coming soon!')}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            <NotificationsIcon fontSize="small" /> Notifications
-                                        </button>
-                                        <button
-                                            onClick={() => navigate("/profile")}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            <AccountCircleIcon fontSize="small" /> My Account
-                                        </button>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
-                                        >
-                                            Sign Out
-                                        </button>
-                                    </div>
-                                )}
+                                {/* ...dropdown menu... */}
                             </div>
                         </>
                     )}
                 </div>
+
+
                 {/* ==== DESKTOP HEADER ==== */}
                 <div className="hidden sm:flex w-full items-center justify-between">
                     {/* Logo trái */}
@@ -231,7 +249,9 @@ export default function Header() {
 
                         {/* Dropdown search (desktop) */}
                         {showDropdown && (
-                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
+                              border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
+                              max-h-96 overflow-y-auto">
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
                                         <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
@@ -252,12 +272,8 @@ export default function Header() {
                                                     className="w-14 h-14 rounded-lg object-cover shadow-sm"
                                                 />
                                                 <div className="flex flex-col">
-                                                    <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                                                        {item.pro_name}
-                                                    </p>
-                                                    <p className="text-sm text-red-600 font-semibold mt-1">
-                                                        {formatPrice(item.pro_price)}
-                                                    </p>
+                                                    <p className="text-sm font-medium text-gray-900 line-clamp-1">{item.pro_name}</p>
+                                                    <p className="text-sm text-red-600 font-semibold mt-1">{formatPrice(item.pro_price)}</p>
                                                 </div>
                                             </Link>
                                         ))}
@@ -305,28 +321,16 @@ export default function Header() {
                         </div>
                         {showUserMenu && (
                             <div className="absolute right-4 top-20 sm:top-16 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out]">
-                                <button
-                                    onClick={() => navigate("/profile")}
-                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                                >
+                                <button onClick={() => navigate("/profile")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
                                     My Account
                                 </button>
-                                <button
-                                    onClick={() => alert("My Orders")}
-                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                                >
+                                <button onClick={() => alert("My Orders")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
                                     My Orders
                                 </button>
-                                <button
-                                    onClick={() => alert("Coming soon!")}
-                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                                >
+                                <button onClick={() => alert("Coming soon!")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
                                     My Vouchers
                                 </button>
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
-                                >
+                                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
                                     Sign Out
                                 </button>
                             </div>

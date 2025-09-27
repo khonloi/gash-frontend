@@ -46,6 +46,16 @@ const Api = {
         headers: { Authorization: `Bearer ${token}` },
       }),
   },
+
+  // ==== Products ====
+  products: {
+    search: (query) => {
+      const sanitizedQuery = query.trim().replace(/[<>]/g, "");
+      return axiosClient.get("/products/search", {
+        params: { q: sanitizedQuery },
+      });
+    },
+  },
 };
 
 export default Api;
