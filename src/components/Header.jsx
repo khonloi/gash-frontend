@@ -371,8 +371,8 @@ export default function Header() {
                                 <button onClick={() => navigate("/profile")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
                                     My Account
                                 </button>
-                                <button onClick={() => alert("My Orders")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
-                                    My Orders
+                                <button onClick={() => navigate("/orders")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                    My Account
                                 </button>
                                 <button onClick={() => alert("Coming soon!")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
                                     My Vouchers
