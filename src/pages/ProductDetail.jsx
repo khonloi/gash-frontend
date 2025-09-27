@@ -8,7 +8,7 @@ import React, {
 import { useToast } from "../components/Toast";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import axiosClient from "../common/axiosClient";
+import axiosClient from '../common/axiosClient';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "../styles/ProductDetail.css";
@@ -19,11 +19,9 @@ import {
   TOAST_TIMEOUT,
 } from "../constants/constants";
 
-// Constants
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const THUMBNAILS_PER_PAGE = 4;
 
-// Use shared axiosClient
+
+const THUMBNAILS_PER_PAGE = 4;
 
 // Custom hooks
 const useLocalStorage = (key, defaultValue) => {
@@ -51,6 +49,23 @@ const useLocalStorage = (key, defaultValue) => {
 
   return [value, setStoredValue];
 };
+
+
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+    const message =
+      status === 401
+        ? "Unauthorized access - please log in"
+        : status === 404
+          ? "Resource not found"
+          : status >= 500
+            ? "Server error - please try again later"
+            : "Network error - please check your connection";
+    return Promise.reject({ ...error, message, status });
+  }
+);
 
 // API functions
 const fetchWithRetry = async (
@@ -105,7 +120,7 @@ const ProductDetail = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
 
   // Local storage
-  const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
+  const [storedState, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
 
   // Pre-index variants
   const variantIndex = useMemo(() => {
@@ -156,7 +171,7 @@ const ProductDetail = () => {
       let imagesResponse = [];
       try {
         imagesResponse = await fetchWithRetry(`/specifications/image/product/${id}`);
-      } catch {
+      } catch (imgErr) {
         imagesResponse = [];
       }
 
@@ -186,7 +201,13 @@ const ProductDetail = () => {
         setAvailableColors(uniqueColors);
         setAvailableSizes(uniqueSizes);
 
-        // ...existing code...
+        const currentStored = window.localStorage.getItem(DETAIL_STORAGE_KEY);
+        let parsedStored = {};
+        try {
+          parsedStored = currentStored ? JSON.parse(currentStored) : {};
+        } catch {
+          parsedStored = {};
+        }
         setSelectedColor(null);
         setSelectedSize(null);
         setQuantity(1);
@@ -304,7 +325,7 @@ const ProductDetail = () => {
         [id]: { ...prev[id], selectedColor: color, selectedSize: null },
       }));
     },
-    [id, setStoredState]
+    [variantIndex, id, setStoredState]
   );
 
   const handleSizeClick = useCallback(
@@ -419,15 +440,15 @@ const ProductDetail = () => {
         showToast("Product added to favorites successfully!", "success", TOAST_TIMEOUT);
       }
     } catch (err) {
-      const message = err.message || (isFavorited
+      const message = err.message || isFavorited
         ? "Failed to remove from favorites"
-        : "Failed to add to favorites");
+        : "Failed to add to favorites";
       setError(message);
       showToast(message, "error", TOAST_TIMEOUT);
     } finally {
       setIsAddingToFavorites(false);
     }
-  }, [user, id, navigate, isFavorited, favoriteId, showToast]);
+  }, [user, id, navigate, isFavorited, favoriteId]);
 
   const handleAddToCart = useCallback(async () => {
     if (!user) {
@@ -472,7 +493,7 @@ const ProductDetail = () => {
     } finally {
       setIsAddingToCart(false);
     }
-  }, [user, selectedVariant, product, navigate, isInStock, quantity, showToast]);
+  }, [user, selectedVariant, product, navigate, isInStock, quantity]);
 
   const handleBuyNow = useCallback(() => {
     if (!user) {

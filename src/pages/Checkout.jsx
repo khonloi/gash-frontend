@@ -1,34 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import axiosClient from '../common/axiosClient';
 import '../styles/Checkout.css';
-
-// API client with interceptors
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
-
-apiClient.interceptors.response.use(
-  response => response,
-  error => {
-    const status = error.response?.status;
-    const message = status === 401 ? 'Unauthorized access - please log in' :
-      status === 404 ? 'Resource not found' :
-        status >= 500 ? 'Server error - please try again later' :
-          'Network error - please check your connection';
-    return Promise.reject({ ...error, message });
-  }
-);
 
 // API functions
 const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await apiClient.get(url, options);
+      const response = await axiosClient.get(url, options);
       return response.data;
     } catch (error) {
       console.error(`Attempt ${i + 1} failed for ${url}:`, error.message);
@@ -41,6 +21,8 @@ const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
 const Checkout = () => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
+  const selectedItems = location.state?.selectedItems || [];
   const buyNowState = location.state && location.state.product && location.state.variant && location.state.quantity
     ? {
       product: location.state.product,
@@ -54,11 +36,10 @@ const Checkout = () => {
     phone: '',
     username: user?.username || '',
   });
-  const [paymentMethod, setPaymentMethod] = useState('cash'); // New state
+  const [paymentMethod, setPaymentMethod] = useState('COD'); // Updated to match backend enum
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
-  const navigate = useNavigate();
 
   // Fetch cart items (only if not Buy Now)
   const fetchCartItems = useCallback(async () => {
@@ -99,12 +80,12 @@ const Checkout = () => {
     if (buyNowState) {
       return (buyNowState.variant?.pro_price || buyNowState.product?.pro_price || 0) * (buyNowState.quantity || 1);
     }
-    return cartItems.reduce((total, item) => {
+    return selectedItems.reduce((total, item) => {
       const price = item.pro_price || 0;
       const quantity = item.pro_quantity || 0;
       return total + (price * quantity);
     }, 0);
-  }, [cartItems, buyNowState]);
+  }, [selectedItems, buyNowState]);
 
   // Handle form input changes
   const handleInputChange = useCallback((e) => {
@@ -128,7 +109,7 @@ const Checkout = () => {
         pro_quantity: buyNowState.quantity,
         pro_name: buyNowState.product.pro_name,
       }]
-      : cartItems;
+      : selectedItems;
 
     if (itemsToOrder.length === 0) {
       setError('Your cart is empty');
@@ -168,18 +149,18 @@ const Checkout = () => {
       if (!token) throw new Error('No authentication token found');
 
       // Create order
-      const orderResponse = await apiClient.post(
+      const orderResponse = await axiosClient.post(
         '/orders',
         {
           acc_id: user._id,
-          username: formData.username,
           addressReceive: formData.addressReceive,
           phone: formData.phone,
           totalPrice,
           order_status: 'pending',
           pay_status: 'unpaid',
-          shipping_status: 'not_shipped',
-          feedback_order: 'None',
+          payment_method: paymentMethod, // Added to match backend schema
+          refund_status: 'not_applicable',
+          feedback_order: '',
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -188,26 +169,26 @@ const Checkout = () => {
       // Create order details
       await Promise.all(
         itemsToOrder.map(async (item) => {
-          await apiClient.post(
+          await axiosClient.post(
             '/order-details',
             {
               order_id: orderId,
               variant_id: item.variant_id,
               UnitPrice: item.pro_price || 0,
               Quantity: item.pro_quantity || 1,
-              feedback_details: 'None',
+              feedback_details: '',
             },
             { headers: { Authorization: `Bearer ${token}` } }
           );
         })
       );
 
-      if (paymentMethod === 'cash') {
+      if (paymentMethod === 'COD') {
         // Clear cart if not Buy Now
         if (!isBuyNow) {
           await Promise.all(
             cartItems.map(async (item) => {
-              await apiClient.delete(`/carts/${item._id}`, {
+              await axiosClient.delete(`/carts/${item._id}`, {
                 headers: { Authorization: `Bearer ${token}` },
               });
             })
@@ -216,15 +197,15 @@ const Checkout = () => {
         setToast({ type: 'success', message: 'Order placed successfully!' });
         setTimeout(() => {
           setToast(null);
-          // navigate('/orders', { state: { forceFetch: true } }); // Removed redirect
+          navigate('/orders', { state: { forceFetch: true } });
         }, 3000);
-      } else if (paymentMethod === 'vnpay') {
-        // Call backend to get VNPay payment URL (POST with JSON body)
-        const paymentUrlRes = await apiClient.post(
+      } else if (paymentMethod === 'VNPAY') {
+        // Call backend to get VNPay payment URL
+        const paymentUrlRes = await axiosClient.post(
           '/orders/payment-url',
           {
             orderId,
-            bankCode: '', // Optionally, let user select bank
+            bankCode: '',
             language: 'vn',
           },
           { headers: { Authorization: `Bearer ${token}` } }
@@ -264,7 +245,9 @@ const Checkout = () => {
       pro_quantity: buyNowState.quantity,
       pro_name: buyNowState.product.pro_name,
     }]
-    : cartItems;
+    : selectedItems.length > 0
+      ? selectedItems
+      : cartItems;
 
   return (
     <div className="checkout-container">
@@ -398,18 +381,18 @@ const Checkout = () => {
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="cash"
-                      checked={paymentMethod === 'cash'}
+                      value="COD"
+                      checked={paymentMethod === 'COD'}
                       onChange={handlePaymentMethodChange}
                     />
-                    Pay by Cash
+                    Pay by Cash on Delivery
                   </label>
                   <label style={{ marginLeft: '1em' }}>
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="vnpay"
-                      checked={paymentMethod === 'vnpay'}
+                      value="VNPAY"
+                      checked={paymentMethod === 'VNPAY'}
                       onChange={handlePaymentMethodChange}
                     />
                     Pay by VNPay
@@ -422,7 +405,7 @@ const Checkout = () => {
                 className="checkout-place-order-button"
                 aria-label="Place order"
               >
-                {loading ? 'Placing Order...' : paymentMethod === 'cash' ? 'Place Order' : 'Pay with VNPay'}
+                {loading ? 'Placing Order...' : paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
               </button>
             </fieldset>
           </form>

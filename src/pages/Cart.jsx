@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback, useRef } from 'react';
-import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import axiosClient from '../common/axiosClient';
 import '../styles/Cart.css';
-
 
 const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
@@ -42,7 +41,6 @@ const Cart = () => {
   const fetchCartItems = useCallback(async (showLoading = true) => {
     if (!user?._id) return;
 
-    // Use cached data if it's less than 30 seconds old and not explicitly refreshing
     const now = Date.now();
     if (cartCache.current.items.length > 0 &&
       now - cartCache.current.timestamp < 30000 &&
@@ -59,9 +57,8 @@ const Cart = () => {
       const response = await fetchWithRetry(`/carts?acc_id=${user._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const items = Array.isArray(response) ? response : [];
+      const items = Array.isArray(response) ? response.map(i => ({ ...i, checked: true })) : [];
       setCartItems(items);
-      // Update cache
       cartCache.current = { items, timestamp: now };
     } catch (err) {
       setError(err.message || 'Failed to load cart items');
@@ -78,7 +75,6 @@ const Cart = () => {
     }
   }, [user, navigate, fetchCartItems]);
 
-  // Debounced quantity update with optimistic UI updates
   const debouncedUpdateQuantity = useDebouncedCallback(async (itemId, newQuantity, originalQuantity) => {
     if (!user?._id || newQuantity < 1) return;
     setActionInProgress(true);
@@ -86,27 +82,23 @@ const Cart = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
-      const item = cartItems.find(item => item._id === itemId);
-      if (!item?.pro_price) throw new Error('Product price not available');
-      const response = await axiosClient.put(
+      await axiosClient.put(
         `/carts/${itemId}`,
-        { pro_quantity: newQuantity, pro_price: item.pro_price },
+        { pro_quantity: newQuantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update the cache with the server response
       const updatedItems = cartItems.map(item =>
         item._id === itemId
-          ? { ...item, pro_quantity: newQuantity, pro_price: response.data.cartItem.pro_price, Total_price: response.data.cartItem.Total_price }
+          ? { ...item, pro_quantity: newQuantity }
           : item
       );
+      setCartItems(updatedItems);
       cartCache.current = { items: updatedItems, timestamp: Date.now() };
 
     } catch (err) {
       const errorMessage = err.message || 'Failed to update quantity';
       setError(errorMessage);
-
-      // Revert to original quantity on error
       setCartItems(prev =>
         prev.map(item =>
           item._id === itemId
@@ -114,7 +106,6 @@ const Cart = () => {
             : item
         )
       );
-
       setToast({ type: 'error', message: errorMessage });
       setTimeout(() => setToast(null), 3000);
     } finally {
@@ -122,38 +113,26 @@ const Cart = () => {
     }
   }, 500);
 
-  // Remove item from cart with optimistic UI update
   const handleRemoveItem = useCallback(async (itemId) => {
     if (!user?._id) return;
     setActionInProgress(true);
     setError('');
-
-    // Store the current items for rollback if needed
     const previousItems = [...cartItems];
-
-    // Optimistic UI update
     setCartItems(prev => prev.filter(item => item._id !== itemId));
-
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
       await axiosClient.delete(`/carts/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Update cache after successful deletion
       cartCache.current = {
         items: cartItems.filter(item => item._id !== itemId),
         timestamp: Date.now()
       };
-
     } catch (err) {
       const errorMessage = err.message || 'Failed to remove item';
       setError(errorMessage);
-
-      // Rollback on error
       setCartItems(previousItems);
-
       setToast({ type: 'error', message: errorMessage });
       setTimeout(() => setToast(null), 3000);
     } finally {
@@ -161,45 +140,46 @@ const Cart = () => {
     }
   }, [cartItems, user]);
 
-  // Format price
   const formatPrice = useCallback((price) => {
     if (typeof price !== 'number' || isNaN(price)) return 'N/A';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   }, []);
 
-  // Total price
+  // ✅ chỉ tính tổng những item có checked = true
   const totalPrice = useMemo(() => {
-    return cartItems.reduce((total, item) => {
-      const price = item.pro_price || 0;
-      const quantity = item.pro_quantity || 0;
-      return total + (price * quantity);
-    }, 0);
+    return cartItems
+      .filter(item => item.checked)
+      .reduce((total, item) => {
+        const price = item.variant_id?.pro_id?.pro_price || 0;
+        const quantity = item.pro_quantity || 0;
+        return total + (price * quantity);
+      }, 0);
   }, [cartItems]);
 
-  // Handle quantity change with optimistic UI update
   const handleQuantityChange = useCallback((itemId, value) => {
     const newQuantity = parseInt(value, 10);
     if (!isNaN(newQuantity) && newQuantity >= 1) {
-      // Find the current item to store its original quantity
       const currentItem = cartItems.find(item => item._id === itemId);
       const originalQuantity = currentItem ? currentItem.pro_quantity : 1;
-
-      // Optimistic UI update
       setCartItems(prev => prev.map(item =>
         item._id === itemId ? { ...item, pro_quantity: newQuantity } : item
       ));
-
-      // Send the update to the server with the original quantity for rollback if needed
       debouncedUpdateQuantity(itemId, newQuantity, originalQuantity);
     }
   }, [cartItems, debouncedUpdateQuantity]);
 
-  // Retry
   const handleRetry = useCallback(() => {
     fetchCartItems();
   }, [fetchCartItems]);
 
-  // Unified error/loading markup (ProductList style)
+  const toggleChecked = (itemId) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item._id === itemId ? { ...item, checked: !item.checked } : item
+      )
+    );
+  };
+
   if (loading) {
     return (
       <div className="cart-container">
@@ -213,12 +193,13 @@ const Cart = () => {
 
   return (
     <div className="cart-container">
+      <h2 className="cart-title">Shopping Cart</h2>
+
       {toast && (
         <div className={`cart-toast ${toast.type === 'success' ? 'cart-toast-success' : 'cart-toast-error'}`} role="alert">
           {toast.message}
         </div>
       )}
-      {/* <h1 className="cart-title">Your Cart</h1> */}
       {error && (
         <div className="product-list-error" role="alert" tabIndex={0} aria-live="polite">
           <span className="product-list-error-icon" aria-hidden="true">⚠</span>
@@ -248,11 +229,28 @@ const Cart = () => {
           <section className="cart-items" aria-label="Cart items">
             {cartItems.map((item) => (
               <article key={item._id} className="cart-item" tabIndex={0} aria-label={`Cart item: ${item.variant_id?.pro_id?.pro_name || 'Unnamed Product'}`}>
+                <input
+                  type="checkbox"
+                  checked={item.checked || false}
+                  onChange={() => toggleChecked(item._id)}
+                  className="cart-item-checkbox"
+                />
+                <img
+                  src={item.variant_id?.pro_id?.imageURL || '/default.png'}
+                  alt={item.variant_id?.pro_id?.pro_name || 'Product'}
+                  className="cart-item-image"
+                  style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                />
                 <div className="cart-item-info">
                   <p className="cart-item-name">{item.variant_id?.pro_id?.pro_name || 'Unnamed Product'}</p>
-                  <p className="cart-item-variant">Color: {item.variant_id?.color_id?.color_name || 'N/A'}, Size: {item.variant_id?.size_id?.size_name || 'N/A'}</p>
-                  <p className="cart-item-price">Price: {formatPrice(item.pro_price)}</p>
-                  <p className="cart-item-total">{formatPrice((item.pro_price || 0) * (item.pro_quantity || 0))}</p>
+                  <p className="cart-item-variant">
+                    Color: {item.variant_id?.color_id?.color_name || 'N/A'},
+                    Size: {item.variant_id?.size_id?.size_name || 'N/A'}
+                  </p>
+                  <p className="cart-item-price">Price: {formatPrice(item.variant_id?.pro_id?.pro_price)}</p>
+                  <p className="cart-item-total">
+                    Total: {formatPrice((item.variant_id?.pro_id?.pro_price || 0) * (item.pro_quantity || 0))}
+                  </p>
                 </div>
                 <div className="cart-item-action">
                   <div className="cart-item-quantity">
@@ -287,8 +285,12 @@ const Cart = () => {
               <p className="cart-total">Total: {formatPrice(totalPrice)}</p>
               <button
                 className="cart-checkout-button"
-                onClick={() => navigate('/checkout')}
-                disabled={cartItems.length === 0 || loading || actionInProgress}
+                onClick={() => {
+                  const selectedItems = cartItems.filter(i => i.checked); // chỉ lấy sp đã tick
+                  navigate('/checkout', { state: { selectedItems } });
+                }}
+
+                disabled={cartItems.filter(i => i.checked).length === 0 || loading || actionInProgress}
                 aria-label="Proceed to checkout"
               >
                 Proceed to Checkout
