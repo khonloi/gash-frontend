@@ -12,6 +12,7 @@ import { useToast } from "../components/Toast";
 
 // Import modal
 import EditProfileModal from "../components/EditProfileModal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,6 +23,7 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -30,8 +32,6 @@ const Profile = () => {
     phone: "",
     address: "",
     image: "",
-    password: "",
-    repeatPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ const Profile = () => {
   };
 
   const fetchProfile = useCallback(async () => {
-    if (!user) return;
+    if (!user || !user._id) return;
     setLoading(true);
     try {
       const response = await Api.accounts.getProfile(user._id);
@@ -74,11 +74,10 @@ const Profile = () => {
         phone: response.data.phone || "",
         address: response.data.address || "",
         image: response.data.image || "",
-        password: "",
-        repeatPassword: "",
       });
       showToast("Profile loaded successfully!", "success", 2000);
-    } catch {
+    } catch (err) {
+      console.error("Fetch profile error:", err.response || err.message);
       showToast("Failed to fetch profile", "error", 4000);
     } finally {
       setLoading(false);
@@ -102,8 +101,7 @@ const Profile = () => {
 
   const validateForm = useCallback(() => {
     const newErrors = {};
-    const { username, name, email, phone, address, password, repeatPassword } =
-      formData;
+    const { username, name, email, phone, address } = formData;
 
     if (!username.trim()) newErrors.username = "Username cannot be blank";
     if (!name.trim()) newErrors.name = "Full name cannot be blank";
@@ -124,10 +122,6 @@ const Profile = () => {
       newErrors.phone = "Phone must be exactly 10 digits";
     if (address && address.length > 100)
       newErrors.address = "Address cannot exceed 100 characters";
-    if (password && password.length < 8)
-      newErrors.password = "Password must be at least 8 characters";
-    if (password && password !== repeatPassword)
-      newErrors.repeatPassword = "Passwords do not match";
 
     if (Object.keys(newErrors).length > 0) {
       Object.values(newErrors).forEach((msg) =>
@@ -148,13 +142,13 @@ const Profile = () => {
         phone: formData.phone,
         address: formData.address,
         image: formData.image,
-        ...(formData.password && { password: formData.password }),
       };
       const response = await Api.accounts.updateProfile(user._id, updateData);
       setProfile(response.data.account);
       setEditMode(false);
       showToast("Profile updated successfully!", "success", 2000);
     } catch (err) {
+      console.error("Update profile error:", err.response || err.message);
       const errorMessage =
         err.response?.status === 409
           ? "Username or email already exists"
@@ -171,7 +165,6 @@ const Profile = () => {
       const updateData = {
         ...formData,
         image: imageUrl,
-        password: formData.password || undefined,
       };
       Api.accounts
         .updateProfile(user._id, updateData)
@@ -181,6 +174,7 @@ const Profile = () => {
           showToast("Profile updated successfully!", "success", 2000);
         })
         .catch((err) => {
+          console.error("Update profile with image error:", err.response || err.message);
           const errorMessage =
             err.response?.status === 409
               ? "Username or email already exists"
@@ -204,10 +198,11 @@ const Profile = () => {
       }
 
       if (selectedFile) {
+        // gọi API upload ảnh
         Api.upload
           .image(selectedFile)
           .then((response) => {
-            const imageUrl = response.data?.url;
+            const imageUrl = response.data?.url || response.data?.imageUrl;
             if (imageUrl) {
               showToast("Image uploaded successfully!", "success", 2000);
               updateProfileWithImage(imageUrl);
@@ -219,9 +214,10 @@ const Profile = () => {
               );
             }
           })
-          .catch(() =>
-            showToast("An error occurred during upload.", "error", 3000)
-          );
+          .catch((err) => {
+            console.error("Upload failed:", err.response?.data || err.message);
+            showToast("An error occurred during upload.", "error", 3000);
+          });
       } else {
         updateProfile();
       }
@@ -245,8 +241,6 @@ const Profile = () => {
       phone: profile?.phone || "",
       address: profile?.address || "",
       image: profile?.image || "",
-      password: "",
-      repeatPassword: "",
     });
     setSelectedFile(null);
     setPreviewUrl("");
@@ -317,12 +311,18 @@ const Profile = () => {
 
           {/* Buttons */}
           {!isDeleted && (
-            <div className="flex justify-center gap-6">
+            <div className="flex flex-col gap-3">
               <button
                 className="px-6 py-3 rounded-full bg-yellow-400 hover:bg-yellow-500 text-base font-semibold"
                 onClick={() => setEditMode(true)}
               >
                 Edit Profile
+              </button>
+              <button
+                className="px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold"
+                onClick={() => setShowChangePassword(true)}
+              >
+                Change Password
               </button>
               <button
                 className="px-6 py-3 rounded-full bg-red-600 hover:bg-red-700 text-white text-base font-semibold"
@@ -349,6 +349,12 @@ const Profile = () => {
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
         />
+
+      )}
+
+      {/* Modal Change Password */}
+      {showChangePassword && (
+        <ChangePasswordModal handleCancel={() => setShowChangePassword(false)} />
       )}
     </div>
   );

@@ -23,13 +23,31 @@ const Api = {
   },
 
   // ==== Accounts ====
+  // accounts: {
+  //   getProfile: (userId) => axiosClient.get(`/accounts/${userId}`),
+  //   updateProfile: (userId, data) =>
+  //     axiosClient.put(`/accounts/${userId}`, data),
+  //   deleteAccount: (userId) => axiosClient.delete(`/accounts/${userId}`),
+  //   softDeleteAccount: (userId) => axiosClient.delete(`/accounts/soft/${userId}`),
+  // },
+
   accounts: {
     getProfile: (userId) => axiosClient.get(`/accounts/${userId}`),
+
+    // update profile mới
     updateProfile: (userId, data) =>
-      axiosClient.put(`/accounts/${userId}`, data),
+      axiosClient.put(`/accounts/change-profile/${userId}`, data),
+
+    // đổi mật khẩu mới
+    changePassword: (userId, data) =>
+      axiosClient.put(`/accounts/change-password/${userId}`, data),
+
     deleteAccount: (userId) => axiosClient.delete(`/accounts/${userId}`),
-    softDeleteAccount: (userId) => axiosClient.delete(`/accounts/soft/${userId}`),
+
+    softDeleteAccount: (userId) =>
+      axiosClient.delete(`/accounts/soft/${userId}`),
   },
+
 
   // ==== Cart ====
   cart: {
