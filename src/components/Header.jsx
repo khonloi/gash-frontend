@@ -102,6 +102,13 @@ export default function Header() {
         return `${price.toLocaleString()} ₫`;
     };
 
+    // helper cho menu mobile
+    const handleMenuClick = (path, callback) => {
+        if (path) navigate(path);
+        if (callback) callback();
+        setShowUserMenu(false);
+    };
+
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
             <div className="max-w-7xl mx-auto h-16 sm:h-20 flex items-center px-4 sm:px-6 lg:px-12">
@@ -143,7 +150,6 @@ export default function Header() {
                                     </button>
                                 )}
                             </form>
-
 
                             {/* Dropdown search (mobile) */}
                             {showDropdown && (
@@ -208,15 +214,56 @@ export default function Header() {
                             </Link>
 
                             {/* Menu phải */}
-                            <div className="relative">
+                            <div className="relative" ref={userMenuRef}>
                                 <IconButton
                                     onClick={() => setShowUserMenu((prev) => !prev)}
                                     title="Menu"
                                 >
                                     <MenuIcon />
                                 </IconButton>
-                                {/* ...dropdown menu... */}
+
+                                {showUserMenu && (
+                                    <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                        <button
+                                            onClick={() => handleMenuClick("/favorites")}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            <FavoriteIcon fontSize="small" /> Favorites
+                                        </button>
+                                        <button
+                                            onClick={() => handleMenuClick("/cart")}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            <ShoppingCartIcon fontSize="small" /> Cart
+                                        </button>
+                                        <button
+                                            onClick={() => handleMenuClick(null, () => alert("Coming soon!"))}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            <ChatBubbleIcon fontSize="small" /> Messages
+                                        </button>
+                                        <button
+                                            onClick={() => handleMenuClick(null, () => alert("Coming soon!"))}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            <NotificationsIcon fontSize="small" /> Notifications
+                                        </button>
+                                        <button
+                                            onClick={() => handleMenuClick("/profile")}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            <AccountCircleIcon fontSize="small" /> My Account
+                                        </button>
+                                        <button
+                                            onClick={() => handleMenuClick(null, handleLogout)}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                                        >
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                )}
                             </div>
+
                         </>
                     )}
                 </div>
