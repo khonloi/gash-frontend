@@ -13,8 +13,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import MenuIcon from "@mui/icons-material/Menu";
-
 import IconButton from "./IconButton";
 
 export default function Header() {
@@ -102,12 +100,12 @@ export default function Header() {
         return `${price.toLocaleString()} ₫`;
     };
 
-    // helper cho menu mobile
-    const handleMenuClick = (path, callback) => {
-        if (path) navigate(path);
-        if (callback) callback();
-        setShowUserMenu(false);
-    };
+    // // helper cho menu mobile
+    // const handleMenuClick = (path, callback) => {
+    //     if (path) navigate(path);
+    //     if (callback) callback();
+    //     setShowUserMenu(false);
+    // };
 
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
@@ -151,7 +149,7 @@ export default function Header() {
                                 )}
                             </form>
 
-                            {/* Dropdown search (mobile) */}
+                            {/* Dropdown search*/}
                             {showDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
                         border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
@@ -167,7 +165,7 @@ export default function Header() {
                                                 <Link
                                                     key={item._id}
                                                     to={`/product/${item._id}`}
-                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b last:border-0"
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                     onClick={() => setShowDropdown(false)}
                                                 >
                                                     <img
@@ -190,7 +188,7 @@ export default function Header() {
                                                     navigate(`/search?q=${encodeURIComponent(search)}`);
                                                     setShowDropdown(false);
                                                 }}
-                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-amber-50 transition-colors"
+                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                             >
                                                 View all results
                                             </button>
@@ -216,46 +214,86 @@ export default function Header() {
                             {/* Menu phải */}
                             <div className="relative" ref={userMenuRef}>
                                 <IconButton
-                                    onClick={() => setShowUserMenu((prev) => !prev)}
-                                    title="Menu"
+                                    onClick={() => {
+                                        if (!user) {
+                                            navigate("/login");
+                                        } else {
+                                            setShowUserMenu((prev) => !prev);
+                                        }
+                                    }}
+                                    title="My Account"
                                 >
-                                    <MenuIcon />
+                                    <AccountCircleIcon />
                                 </IconButton>
 
-                                {showUserMenu && (
+                                {/* Dropdown menu */}
+                                {user && showUserMenu && (
                                     <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
                                         <button
-                                            onClick={() => handleMenuClick("/favorites")}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                navigate('/favorites');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
                                             <FavoriteIcon fontSize="small" /> Favorites
                                         </button>
+
                                         <button
-                                            onClick={() => handleMenuClick("/cart")}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                navigate('/cart');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
                                             <ShoppingCartIcon fontSize="small" /> Cart
                                         </button>
+
                                         <button
-                                            onClick={() => handleMenuClick(null, () => alert("Coming soon!"))}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                alert("Coming soon!");
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
                                             <ChatBubbleIcon fontSize="small" /> Messages
                                         </button>
                                         <button
-                                            onClick={() => handleMenuClick(null, () => alert("Coming soon!"))}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                alert("Coming soon!");
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
                                             <NotificationsIcon fontSize="small" /> Notifications
                                         </button>
-                                        <button
-                                            onClick={() => handleMenuClick("/profile")}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+
+                                        <Link
+                                            to="/profile"
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
-                                            <AccountCircleIcon fontSize="small" /> My Account
-                                        </button>
+                                            <button
+                                                onMouseDown={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate('/profile');
+                                                    setShowUserMenu(false);
+                                                }}
+                                                className="flex items-center gap-2 w-full text-left"
+                                            >
+                                                <AccountCircleIcon fontSize="small" /> My Account
+                                            </button>
+                                        </Link>
+
                                         <button
-                                            onClick={() => handleMenuClick(null, handleLogout)}
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                handleLogout();
+                                                setShowUserMenu(false);
+                                            }}
                                             className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
                                         >
                                             Sign Out
@@ -263,7 +301,6 @@ export default function Header() {
                                     </div>
                                 )}
                             </div>
-
                         </>
                     )}
                 </div>
@@ -293,12 +330,9 @@ export default function Header() {
                                 <SearchIcon fontSize="small" />
                             </button>
                         </form>
-
-                        {/* Dropdown search (desktop) */}
+                        {/* Dropdown search */}
                         {showDropdown && (
-                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
-                              border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
-                              max-h-96 overflow-y-auto">
+                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out] max-h-96 overflow-y-auto">
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
                                         <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
@@ -310,7 +344,7 @@ export default function Header() {
                                             <Link
                                                 key={item._id}
                                                 to={`/product/${item._id}`}
-                                                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b last:border-0"
+                                                className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                 onClick={() => setShowDropdown(false)}
                                             >
                                                 <img
@@ -329,7 +363,7 @@ export default function Header() {
                                                 navigate(`/search?q=${encodeURIComponent(search)}`);
                                                 setShowDropdown(false);
                                             }}
-                                            className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-amber-50 transition-colors"
+                                            className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                         >
                                             View all results
                                         </button>
@@ -343,45 +377,72 @@ export default function Header() {
 
                     {/* Icon phải */}
                     <div className="flex items-center gap-4 sm:gap-6" ref={userMenuRef}>
-                        <IconButton onClick={() => navigate("/favorites")} title="Favorites">
+                        <IconButton onClick={() => user ? navigate("/favorites") : navigate("/login")} title="Favorites">
                             <FavoriteIcon />
                         </IconButton>
-                        <IconButton onClick={() => navigate("/cart")} title="Cart">
+                        <IconButton onClick={() => user ? navigate("/cart") : navigate("/login")} title="Cart">
                             <ShoppingCartIcon />
                         </IconButton>
-                        <IconButton onClick={() => alert("Coming soon!")} title="Messages">
+                        <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Messages">
                             <ChatBubbleIcon />
                         </IconButton>
-                        <IconButton onClick={() => alert("Coming soon!")} title="Notifications">
+                        <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Notifications">
                             <NotificationsIcon />
                         </IconButton>
-                        <div
-                            className="flex items-center gap-2 cursor-pointer"
-                            onClick={() => setShowUserMenu((prev) => !prev)}
-                        >
+                        <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => user ? setShowUserMenu((prev) => !prev) : navigate("/login")}>
                             <IconButton title="My Account">
                                 <AccountCircleIcon />
                             </IconButton>
-                            <span className="hidden sm:block text-sm text-gray-200">
-                                Hello, <span className="font-semibold text-white">{user?.name || "User"}</span>
-                            </span>
+                            {user && (
+                                <span className="hidden sm:block text-sm text-gray-200">
+                                    Hello, <span className="font-semibold text-white">{user?.name || "User"}</span>
+                                </span>
+                            )}
+                            {user && showUserMenu && (
+                                <div className="absolute right-0 top-full mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate("/profile");
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                    >
+                                        My Account
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            alert("My Orders");
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                    >
+                                        My Orders
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            alert("Coming soon!");
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                    >
+                                        My Vouchers
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleLogout();
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                                    >
+                                        Sign Out
+                                    </button>
+                                </div>
+                            )}
                         </div>
-                        {showUserMenu && (
-                            <div className="absolute right-4 top-20 sm:top-16 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out]">
-                                <button onClick={() => navigate("/profile")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
-                                    My Account
-                                </button>
-                                <button onClick={() => alert("My Orders")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
-                                    My Orders
-                                </button>
-                                <button onClick={() => alert("Coming soon!")} className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
-                                    My Vouchers
-                                </button>
-                                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
-                                    Sign Out
-                                </button>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
