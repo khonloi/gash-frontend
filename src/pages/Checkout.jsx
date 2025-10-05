@@ -3,21 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axiosClient from '../common/axiosClient';
 import '../styles/Checkout.css';
-import Api from "../common/SummaryAPI"; // ✅ thêm API voucher
-
-// API functions
-const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await axiosClient.get(url, options);
-      return response.data;
-    } catch (error) {
-      console.error(`Attempt ${i + 1} failed for ${url}:`, error.message);
-      if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-    }
-  }
-};
+import Api from "../common/SummaryAPI";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
@@ -35,16 +21,16 @@ const Checkout = () => {
   const [formData, setFormData] = useState({
     addressReceive: '',
     phone: '',
-    username: user?.username || '',
+    name: user?.name || user?.username || '',
   });
   const [paymentMethod, setPaymentMethod] = useState('COD'); // Updated to match backend enum
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   // ✅ Voucher state
-const [voucherCode, setVoucherCode] = useState('');
-const [discount, setDiscount] = useState(0);
-const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [voucherCode, setVoucherCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
 
   // Fetch cart items (only if not Buy Now)
   const fetchCartItems = useCallback(async () => {
@@ -59,7 +45,7 @@ const [appliedVoucher, setAppliedVoucher] = useState(null);
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
 
-      const response = await fetchWithRetry(`/carts?acc_id=${user._id}`, {
+      const response = await Api.utils.fetchWithRetry(`/carts?acc_id=${user._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCartItems(Array.isArray(response) ? response : []);
@@ -72,13 +58,13 @@ const [appliedVoucher, setAppliedVoucher] = useState(null);
   }, [user]);
 
   // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    } else if (!buyNowState) {
-      fetchCartItems();
-    }
-  }, [user, navigate, fetchCartItems, buyNowState]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate('/login');
+  //   } else if (!buyNowState) {
+  //     fetchCartItems();
+  //   }
+  // }, [user, navigate, fetchCartItems, buyNowState]);
 
   // Calculate total price
   const totalPrice = useMemo(() => {
@@ -93,46 +79,46 @@ const [appliedVoucher, setAppliedVoucher] = useState(null);
   }, [selectedItems, buyNowState]);
 
   // ==== Handle voucher apply ====
-const handleApplyVoucher = async () => {
-  try {
-    const voucher = await Api.voucher.validateCode(voucherCode, totalPrice);
-    // Kiểm tra đơn hàng có đạt minOrderValue không
-    if (totalPrice < voucher.minOrderValue) {
-      setToast({
-        type: 'error',
-        message: `Đơn hàng tối thiểu phải đạt ${voucher.minOrderValue.toLocaleString()}₫ để dùng voucher này.`,
-      });
+  const handleApplyVoucher = async () => {
+    try {
+      const voucher = await Api.voucher.validateCode(voucherCode, totalPrice);
+      // Check min order value
+      if (totalPrice < voucher.minOrderValue) {
+        setToast({
+          type: 'error',
+          message: `Minimum order value is ${voucher.minOrderValue.toLocaleString()}₫ to use this voucher.`,
+        });
+        setTimeout(() => setToast(null), 3000);
+        return;
+      }
+
+      // Calculate discount
+      let discountValue = 0;
+      if (voucher.discountType === 'percentage') {
+        discountValue = (totalPrice * voucher.discountValue) / 100;
+        if (voucher.maxDiscount && discountValue > voucher.maxDiscount)
+          discountValue = voucher.maxDiscount;
+      } else {
+        discountValue = voucher.discountValue;
+      }
+
+      setAppliedVoucher(voucher);
+      setDiscount(discountValue);
+      setToast({ type: 'success', message: `Voucher applied: -${discountValue.toLocaleString()}₫` });
+      console.log("✅ Voucher applied:", voucher);
       setTimeout(() => setToast(null), 3000);
-      return;
+    } catch (err) {
+      setToast({ type: 'error', message: err.message || 'Invalid or expired voucher code.' });
+      setTimeout(() => setToast(null), 3000);
     }
+  };
 
-    // Tính giá trị giảm
-    let discountValue = 0;
-    if (voucher.discountType === 'percentage') {
-      discountValue = (totalPrice * voucher.discountValue) / 100;
-      if (voucher.maxDiscount && discountValue > voucher.maxDiscount)
-        discountValue = voucher.maxDiscount;
-    } else {
-      discountValue = voucher.discountValue;
-    }
-
-    setAppliedVoucher(voucher);
-    setDiscount(discountValue);
-    setToast({ type: 'success', message: `Áp dụng voucher thành công: -${discountValue.toLocaleString()}₫` });
-    console.log("✅ Voucher applied:", voucher);
-    setTimeout(() => setToast(null), 3000);
-  } catch (err) {
-    setToast({ type: 'error', message: err.message || 'Mã voucher không hợp lệ hoặc đã hết hạn.' });
-    setTimeout(() => setToast(null), 3000);
-  }
-};
-
-// Xóa voucher đã áp dụng
-const handleRemoveVoucher = () => {
-  setAppliedVoucher(null);
-  setDiscount(0);
-  setVoucherCode('');
-};
+  // Xóa voucher đã áp dụng
+  const handleRemoveVoucher = () => {
+    setAppliedVoucher(null);
+    setDiscount(0);
+    setVoucherCode('');
+  };
 
 
   // Handle form input changes
@@ -167,12 +153,12 @@ const handleRemoveVoucher = () => {
     }
 
     // Trim and validate fields
-    const username = formData.username.trim();
+    const name = formData.name.trim();
     const addressReceive = formData.addressReceive.trim();
     const phone = formData.phone.trim();
-    if (!username || username.length < 3 || username.length > 30) {
-      setError('Username must be 3-30 characters');
-      setToast({ type: 'error', message: 'Username must be 3-30 characters' });
+    if (!name || name.length < 3 || name.length > 30) {
+      setError('Name must be between 3 and 30 characters');
+      setToast({ type: 'error', message: 'Name must be between 3 and 30 characters' });
       setTimeout(() => setToast(null), 3000);
       return;
     }
@@ -193,76 +179,126 @@ const handleRemoveVoucher = () => {
     setError('');
 
     try {
+
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
 
-      // Create order
-      const orderResponse = await axiosClient.post(
-  '/orders',
-  {
-    acc_id: user._id,
-    addressReceive: formData.addressReceive,
-    phone: formData.phone,
-    totalPrice: Math.max(totalPrice - discount, 0), // ✅ tổng sau giảm
-    voucherCode: appliedVoucher?.code || null,      // ✅ lưu mã nếu có
-    order_status: 'pending',
-    pay_status: 'unpaid',
-    payment_method: paymentMethod,
-    refund_status: 'not_applicable',
-    feedback_order: '',
-  },
-  { headers: { Authorization: `Bearer ${token}` } }
-);
-
-      const orderId = orderResponse.data.order._id;
-
-      // Create order details
-      await Promise.all(
-        itemsToOrder.map(async (item) => {
-          await axiosClient.post(
-            '/order-details',
-            {
-              order_id: orderId,
-              variant_id: item.variant_id,
-              UnitPrice: item.pro_price || 0,
-              Quantity: item.pro_quantity || 1,
-              feedback_details: '',
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-        })
-      );
+      // Gọi API checkout qua SummaryAPI
+      const checkoutRes = await Api.order.checkout({
+        acc_id: user._id,
+        addressReceive: formData.addressReceive,
+        phone: formData.phone,
+        name: formData.name,
+        payment_method: paymentMethod,
+        voucherCode: appliedVoucher?.code || null,
+        items: itemsToOrder.map(item => ({
+          variant_id: item.variant_id._id || item.variant_id,
+          UnitPrice: item.pro_price,
+          Quantity: item.pro_quantity
+        })),
+        totalPrice: Math.max(totalPrice - discount, 0),
+      }, token);
 
       if (paymentMethod === 'COD') {
-        // Clear cart if not Buy Now
-        if (!isBuyNow) {
-          await Promise.all(
-            cartItems.map(async (item) => {
-              await axiosClient.delete(`/carts/${item._id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-            })
-          );
+        // Chỉ xóa các sản phẩm đã mua khỏi cart nếu không phải Buy Now
+        if (!isBuyNow && itemsToOrder.length > 0) {
+          try {
+            const boughtCartIds = itemsToOrder
+              .map(item => {
+                const variantId = item.variant_id._id || item.variant_id;
+                const cartItem = cartItems.find(ci => (ci.variant_id._id || ci.variant_id) === variantId);
+                return cartItem?._id;
+              })
+              .filter(Boolean);
+            if (boughtCartIds.length > 0) {
+              await Api.cart.batchRemove(boughtCartIds, token);
+            }
+          } catch (e) {
+            console.error('Clear cart error:', e);
+          }
         }
         setToast({ type: 'success', message: 'Order placed successfully!' });
+        // Gọi lại fetchCartItems để đồng bộ cart
+        if (typeof fetchCartItems === 'function') {
+          await fetchCartItems();
+        }
         setTimeout(() => {
           setToast(null);
           navigate('/orders', { state: { forceFetch: true } });
-        }, 3000);
+        }, 300);
       } else if (paymentMethod === 'VNPAY') {
-        // Call backend to get VNPay payment URL
-        const paymentUrlRes = await axiosClient.post(
-          '/orders/payment-url',
-          {
-            orderId,
-            bankCode: '',
-            language: 'vn',
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        // Redirect to VNPay payment page
-        window.location.href = paymentUrlRes.data.paymentUrl;
-        return;
+        // Nếu backend trả về paymentUrl trong checkoutRes, chuyển hướng luôn
+        if (checkoutRes.data && checkoutRes.data.paymentUrl) {
+          // Chỉ xóa các sản phẩm đã mua khỏi cart nếu không phải Buy Now trước khi chuyển hướng
+          if (!isBuyNow && itemsToOrder.length > 0) {
+            try {
+              const boughtCartIds = itemsToOrder
+                .map(item => {
+                  const variantId = item.variant_id._id || item.variant_id;
+                  const cartItem = cartItems.find(ci => (ci.variant_id._id || ci.variant_id) === variantId);
+                  return cartItem?._id;
+                })
+                .filter(Boolean);
+              if (boughtCartIds.length > 0) {
+                await Api.cart.batchRemove(boughtCartIds, token);
+              }
+            } catch (e) {
+              console.error('Clear cart error:', e);
+            }
+          }
+          // Gọi lại fetchCartItems để đồng bộ cart
+          if (typeof fetchCartItems === 'function') {
+            await fetchCartItems();
+          }
+          window.location.href = checkoutRes.data.paymentUrl;
+          return;
+        }
+        // Nếu backend chỉ trả về orderId, gọi tiếp API lấy paymentUrl
+        if (checkoutRes.data && (checkoutRes.data.orderId || checkoutRes.data.order_id)) {
+          const orderId = checkoutRes.data.orderId || checkoutRes.data.order_id;
+          try {
+            const paymentUrlRes = await axiosClient.post(
+              '/orders/payment-url',
+              {
+                orderId,
+                bankCode: '',
+                language: 'vn',
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (paymentUrlRes.data && paymentUrlRes.data.paymentUrl) {
+              // Chỉ xóa các sản phẩm đã mua khỏi cart nếu không phải Buy Now trước khi chuyển hướng
+              if (!isBuyNow && itemsToOrder.length > 0) {
+                try {
+                  const boughtCartIds = itemsToOrder
+                    .map(item => {
+                      const variantId = item.variant_id._id || item.variant_id;
+                      const cartItem = cartItems.find(ci => (ci.variant_id._id || ci.variant_id) === variantId);
+                      return cartItem?._id;
+                    })
+                    .filter(Boolean);
+                  if (boughtCartIds.length > 0) {
+                    await Api.cart.batchRemove(boughtCartIds, token);
+                  }
+                } catch (e) {
+                  console.error('Clear cart error:', e);
+                }
+              }
+              // Gọi lại fetchCartItems để đồng bộ cart
+              if (typeof fetchCartItems === 'function') {
+                await fetchCartItems();
+              }
+              window.location.href = paymentUrlRes.data.paymentUrl;
+              return;
+            } else {
+              setToast({ type: 'error', message: 'Không nhận được link thanh toán từ VNPay!' });
+            }
+          } catch (e) {
+            setToast({ type: 'error', message: 'Lỗi lấy link thanh toán VNPay!' });
+          }
+        } else {
+          setToast({ type: 'error', message: 'Không nhận được link thanh toán từ VNPay!' });
+        }
       }
     } catch (err) {
       const errorMessage = err.message || 'Failed to place order';
@@ -373,50 +409,50 @@ const handleRemoveVoucher = () => {
                 <p>Total: {formatPrice(totalPrice)}</p>
               </div>
               {/* Voucher input */}
-<div className="checkout-voucher-section">
-  <label htmlFor="voucher" className="checkout-form-label">Mã giảm giá</label>
-  {!appliedVoucher ? (
-    <div className="flex gap-2 mt-1">
-      <input
-        type="text"
-        id="voucher"
-        placeholder="Nhập mã voucher..."
-        value={voucherCode}
-        onChange={(e) => setVoucherCode(e.target.value)}
-        className="checkout-form-input"
-      />
-      <button
-        type="button"
-        onClick={handleApplyVoucher}
-        className="checkout-apply-voucher-button"
-      >
-        Áp dụng
-      </button>
-    </div>
-  ) : (
-    <div className="voucher-applied-card">
-  <div className="voucher-info">
-    <span className="voucher-icon">🎟️</span>
-    <div className="voucher-text">
-      <p className="voucher-label">Đã áp dụng</p>
-      <p className="voucher-code">
-        {appliedVoucher.code} <span className="voucher-discount">(-{formatPrice(discount)})</span>
-      </p>
-    </div>
-  </div>
-  <button onClick={handleRemoveVoucher} className="voucher-remove-btn">
-    ✕
-  </button>
-</div>
+              <div className="checkout-voucher-section">
+                <label htmlFor="voucher" className="checkout-form-label">Voucher code</label>
+                {!appliedVoucher ? (
+                  <div className="flex gap-2 mt-1">
+                    <input
+                      type="text"
+                      id="voucher"
+                      placeholder="Enter voucher code..."
+                      value={voucherCode}
+                      onChange={(e) => setVoucherCode(e.target.value)}
+                      className="checkout-form-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyVoucher}
+                      className="checkout-apply-voucher-button"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                ) : (
+                  <div className="voucher-applied-card">
+                    <div className="voucher-info">
+                      <span className="voucher-icon">🎟️</span>
+                      <div className="voucher-text">
+                        <p className="voucher-label">Applied</p>
+                        <p className="voucher-code">
+                          {appliedVoucher.code} <span className="voucher-discount">(-{formatPrice(discount)})</span>
+                        </p>
+                      </div>
+                    </div>
+                    <button onClick={handleRemoveVoucher} className="voucher-remove-btn">
+                      ✕
+                    </button>
+                  </div>
 
-  )}
-</div>
+                )}
+              </div>
 
-{/* Tổng sau giảm */}
-<div className="checkout-cart-total">
-  <p>Giảm giá: {discount > 0 ? `- ${formatPrice(discount)}` : '0₫'}</p>
-  <p><strong>Tổng thanh toán: {formatPrice(Math.max(totalPrice - discount, 0))}</strong></p>
-</div>
+              {/* Discount and total after discount */}
+              <div className="checkout-cart-total">
+                <p>Discount: {discount > 0 ? `- ${formatPrice(discount)}` : '0₫'}</p>
+                <p><strong>Total payment: {formatPrice(Math.max(totalPrice - discount, 0))}</strong></p>
+              </div>
 
             </div>
           )}
@@ -426,18 +462,18 @@ const handleRemoveVoucher = () => {
             <fieldset className="checkout-form-group">
               <legend className="checkout-form-title">Shipping Information</legend>
               <div className="checkout-form-field">
-                <label htmlFor="username" className="checkout-form-label">
-                  Username
+                <label htmlFor="name" className="checkout-form-label">
+                  Name
                 </label>
                 <input
                   type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
                   className="checkout-form-input"
                   required
-                  aria-describedby="username-description"
+                  aria-describedby="name-description"
                 />
               </div>
               <div className="checkout-form-field">
@@ -481,7 +517,7 @@ const handleRemoveVoucher = () => {
                       checked={paymentMethod === 'COD'}
                       onChange={handlePaymentMethodChange}
                     />
-                    Pay by Cash on Delivery
+                    Cash on Delivery
                   </label>
                   <label style={{ marginLeft: '1em' }}>
                     <input
@@ -491,7 +527,7 @@ const handleRemoveVoucher = () => {
                       checked={paymentMethod === 'VNPAY'}
                       onChange={handlePaymentMethodChange}
                     />
-                    Pay by VNPay
+                    Pay with VNPay
                   </label>
                 </div>
               </div>
