@@ -624,7 +624,7 @@ const Orders = () => {
                       </div>
                     )}
                   <p className="orders-order-total">
-                    Total: {formatPrice(order.totalPrice)}
+                    Total: {formatPrice(order.finalPrice)}
                   </p>
                 </div>
                 <div className="orders-order-actions">

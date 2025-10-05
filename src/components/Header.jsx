@@ -413,7 +413,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            alert("My Orders");
+                                            navigate("/orders");
                                             setShowUserMenu(false);
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
@@ -423,7 +423,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            alert("Coming soon!");
+                                            alert("My Vouchers");
                                             setShowUserMenu(false);
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
