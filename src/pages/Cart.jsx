@@ -53,7 +53,7 @@ const Cart = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      if (!token) throw new Error('No authentication token found');
+  if (!token) throw new Error('No authentication token found');
       const response = await fetchWithRetry(`/carts?acc_id=${user._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -97,7 +97,7 @@ const Cart = () => {
       cartCache.current = { items: updatedItems, timestamp: Date.now() };
 
     } catch (err) {
-      const errorMessage = err.message || 'Failed to update quantity';
+  const errorMessage = err.message || 'Failed to update quantity';
       setError(errorMessage);
       setCartItems(prev =>
         prev.map(item =>
@@ -116,7 +116,7 @@ const Cart = () => {
   const handleRemoveItem = useCallback(async (itemId) => {
     if (!user?._id) return;
     setActionInProgress(true);
-    setError('');
+  setError('');
     const previousItems = [...cartItems];
     setCartItems(prev => prev.filter(item => item._id !== itemId));
     try {
@@ -286,7 +286,7 @@ const Cart = () => {
               <button
                 className="cart-checkout-button"
                 onClick={() => {
-                  const selectedItems = cartItems.filter(i => i.checked); // chỉ lấy sp đã tick
+                  const selectedItems = cartItems.filter(i => i.checked); // only checked items
                   navigate('/checkout', { state: { selectedItems } });
                 }}
 
