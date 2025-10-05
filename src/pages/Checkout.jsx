@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axiosClient from '../common/axiosClient';
 import '../styles/Checkout.css';
+import Api from "../common/SummaryAPI"; // ✅ thêm API voucher
 
 // API functions
 const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
@@ -40,6 +41,10 @@ const Checkout = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  // ✅ Voucher state
+const [voucherCode, setVoucherCode] = useState('');
+const [discount, setDiscount] = useState(0);
+const [appliedVoucher, setAppliedVoucher] = useState(null);
 
   // Fetch cart items (only if not Buy Now)
   const fetchCartItems = useCallback(async () => {
@@ -86,6 +91,49 @@ const Checkout = () => {
       return total + (price * quantity);
     }, 0);
   }, [selectedItems, buyNowState]);
+
+  // ==== Handle voucher apply ====
+const handleApplyVoucher = async () => {
+  try {
+    const voucher = await Api.voucher.validateCode(voucherCode, totalPrice);
+    // Kiểm tra đơn hàng có đạt minOrderValue không
+    if (totalPrice < voucher.minOrderValue) {
+      setToast({
+        type: 'error',
+        message: `Đơn hàng tối thiểu phải đạt ${voucher.minOrderValue.toLocaleString()}₫ để dùng voucher này.`,
+      });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
+
+    // Tính giá trị giảm
+    let discountValue = 0;
+    if (voucher.discountType === 'percentage') {
+      discountValue = (totalPrice * voucher.discountValue) / 100;
+      if (voucher.maxDiscount && discountValue > voucher.maxDiscount)
+        discountValue = voucher.maxDiscount;
+    } else {
+      discountValue = voucher.discountValue;
+    }
+
+    setAppliedVoucher(voucher);
+    setDiscount(discountValue);
+    setToast({ type: 'success', message: `Áp dụng voucher thành công: -${discountValue.toLocaleString()}₫` });
+    console.log("✅ Voucher applied:", voucher);
+    setTimeout(() => setToast(null), 3000);
+  } catch (err) {
+    setToast({ type: 'error', message: err.message || 'Mã voucher không hợp lệ hoặc đã hết hạn.' });
+    setTimeout(() => setToast(null), 3000);
+  }
+};
+
+// Xóa voucher đã áp dụng
+const handleRemoveVoucher = () => {
+  setAppliedVoucher(null);
+  setDiscount(0);
+  setVoucherCode('');
+};
+
 
   // Handle form input changes
   const handleInputChange = useCallback((e) => {
@@ -150,20 +198,22 @@ const Checkout = () => {
 
       // Create order
       const orderResponse = await axiosClient.post(
-        '/orders',
-        {
-          acc_id: user._id,
-          addressReceive: formData.addressReceive,
-          phone: formData.phone,
-          totalPrice,
-          order_status: 'pending',
-          pay_status: 'unpaid',
-          payment_method: paymentMethod, // Added to match backend schema
-          refund_status: 'not_applicable',
-          feedback_order: '',
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  '/orders',
+  {
+    acc_id: user._id,
+    addressReceive: formData.addressReceive,
+    phone: formData.phone,
+    totalPrice: Math.max(totalPrice - discount, 0), // ✅ tổng sau giảm
+    voucherCode: appliedVoucher?.code || null,      // ✅ lưu mã nếu có
+    order_status: 'pending',
+    pay_status: 'unpaid',
+    payment_method: paymentMethod,
+    refund_status: 'not_applicable',
+    feedback_order: '',
+  },
+  { headers: { Authorization: `Bearer ${token}` } }
+);
+
       const orderId = orderResponse.data.order._id;
 
       // Create order details
@@ -322,6 +372,52 @@ const Checkout = () => {
               <div className="checkout-cart-total">
                 <p>Total: {formatPrice(totalPrice)}</p>
               </div>
+              {/* Voucher input */}
+<div className="checkout-voucher-section">
+  <label htmlFor="voucher" className="checkout-form-label">Mã giảm giá</label>
+  {!appliedVoucher ? (
+    <div className="flex gap-2 mt-1">
+      <input
+        type="text"
+        id="voucher"
+        placeholder="Nhập mã voucher..."
+        value={voucherCode}
+        onChange={(e) => setVoucherCode(e.target.value)}
+        className="checkout-form-input"
+      />
+      <button
+        type="button"
+        onClick={handleApplyVoucher}
+        className="checkout-apply-voucher-button"
+      >
+        Áp dụng
+      </button>
+    </div>
+  ) : (
+    <div className="voucher-applied-card">
+  <div className="voucher-info">
+    <span className="voucher-icon">🎟️</span>
+    <div className="voucher-text">
+      <p className="voucher-label">Đã áp dụng</p>
+      <p className="voucher-code">
+        {appliedVoucher.code} <span className="voucher-discount">(-{formatPrice(discount)})</span>
+      </p>
+    </div>
+  </div>
+  <button onClick={handleRemoveVoucher} className="voucher-remove-btn">
+    ✕
+  </button>
+</div>
+
+  )}
+</div>
+
+{/* Tổng sau giảm */}
+<div className="checkout-cart-total">
+  <p>Giảm giá: {discount > 0 ? `- ${formatPrice(discount)}` : '0₫'}</p>
+  <p><strong>Tổng thanh toán: {formatPrice(Math.max(totalPrice - discount, 0))}</strong></p>
+</div>
+
             </div>
           )}
         </div>
