@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import OrderSuccessModal from '../components/OrderSuccessModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axiosClient from '../common/axiosClient';
@@ -6,6 +7,9 @@ import '../styles/Checkout.css';
 import Api from "../common/SummaryAPI";
 
 const Checkout = () => {
+  // Shared success modal state
+  const [successInfo, setSuccessInfo] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { user } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
@@ -200,7 +204,7 @@ const Checkout = () => {
       }, token);
 
       if (paymentMethod === 'COD') {
-        // Chỉ xóa các sản phẩm đã mua khỏi cart nếu không phải Buy Now
+        // Remove purchased items from cart if not Buy Now
         if (!isBuyNow && itemsToOrder.length > 0) {
           try {
             const boughtCartIds = itemsToOrder
@@ -217,89 +221,48 @@ const Checkout = () => {
             console.error('Clear cart error:', e);
           }
         }
-        setToast({ type: 'success', message: 'Order placed successfully!' });
-        // Gọi lại fetchCartItems để đồng bộ cart
         if (typeof fetchCartItems === 'function') {
           await fetchCartItems();
         }
-        setTimeout(() => {
-          setToast(null);
-          navigate('/orders', { state: { forceFetch: true } });
-        }, 300);
-      } else if (paymentMethod === 'VNPAY') {
-        // Nếu backend trả về paymentUrl trong checkoutRes, chuyển hướng luôn
-        if (checkoutRes.data && checkoutRes.data.paymentUrl) {
-          // Chỉ xóa các sản phẩm đã mua khỏi cart nếu không phải Buy Now trước khi chuyển hướng
-          if (!isBuyNow && itemsToOrder.length > 0) {
-            try {
-              const boughtCartIds = itemsToOrder
-                .map(item => {
-                  const variantId = item.variant_id._id || item.variant_id;
-                  const cartItem = cartItems.find(ci => (ci.variant_id._id || ci.variant_id) === variantId);
-                  return cartItem?._id;
-                })
-                .filter(Boolean);
-              if (boughtCartIds.length > 0) {
-                await Api.cart.batchRemove(boughtCartIds, token);
-              }
-            } catch (e) {
-              console.error('Clear cart error:', e);
-            }
-          }
-          // Gọi lại fetchCartItems để đồng bộ cart
-          if (typeof fetchCartItems === 'function') {
-            await fetchCartItems();
-          }
-          window.location.href = checkoutRes.data.paymentUrl;
+        setSuccessInfo({
+          status: 'success',
+          message: 'Your order will be promptly prepared and sent to you.',
+          orderId: checkoutRes?.data?.data?.order?._id || checkoutRes?.data?.data?.order?.id || checkoutRes?.data?.data?.orderId,
+          amount: Math.max(totalPrice - discount, 0),
+          paymentMethod: 'COD',
+        });
+        return;
+      } else if (paymentMethod === "VNPAY") {
+        const orderId =
+          checkoutRes?.data?.data?.order?._id ||
+          checkoutRes?.data?.data?.order?.id ||
+          checkoutRes?.data?.data?.orderId;
+
+        if (!orderId) {
+          console.error("checkoutRes.data:", checkoutRes.data);
+          setToast({ type: "error", message: "No orderId returned from checkout!" });
           return;
         }
-        // Nếu backend chỉ trả về orderId, gọi tiếp API lấy paymentUrl
-        if (checkoutRes.data && (checkoutRes.data.orderId || checkoutRes.data.order_id)) {
-          const orderId = checkoutRes.data.orderId || checkoutRes.data.order_id;
-          try {
-            const paymentUrlRes = await axiosClient.post(
-              '/orders/payment-url',
-              {
-                orderId,
-                bankCode: '',
-                language: 'vn',
-              },
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-            if (paymentUrlRes.data && paymentUrlRes.data.paymentUrl) {
-              // Chỉ xóa các sản phẩm đã mua khỏi cart nếu không phải Buy Now trước khi chuyển hướng
-              if (!isBuyNow && itemsToOrder.length > 0) {
-                try {
-                  const boughtCartIds = itemsToOrder
-                    .map(item => {
-                      const variantId = item.variant_id._id || item.variant_id;
-                      const cartItem = cartItems.find(ci => (ci.variant_id._id || ci.variant_id) === variantId);
-                      return cartItem?._id;
-                    })
-                    .filter(Boolean);
-                  if (boughtCartIds.length > 0) {
-                    await Api.cart.batchRemove(boughtCartIds, token);
-                  }
-                } catch (e) {
-                  console.error('Clear cart error:', e);
-                }
-              }
-              // Gọi lại fetchCartItems để đồng bộ cart
-              if (typeof fetchCartItems === 'function') {
-                await fetchCartItems();
-              }
-              window.location.href = paymentUrlRes.data.paymentUrl;
-              return;
-            } else {
-              setToast({ type: 'error', message: 'Không nhận được link thanh toán từ VNPay!' });
-            }
-          } catch (e) {
-            setToast({ type: 'error', message: 'Lỗi lấy link thanh toán VNPay!' });
+
+        try {
+          const paymentUrlRes = await axiosClient.post(
+            "/orders/payment-url",
+            { orderId, bankCode: "", language: "vn" },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          const paymentUrl = paymentUrlRes?.data?.paymentUrl;
+          if (paymentUrl && paymentUrl.startsWith("http")) {
+            window.location.href = paymentUrl;
+          } else {
+            setToast({ type: "error", message: "Could not get VNPay payment link!" });
           }
-        } else {
-          setToast({ type: 'error', message: 'Không nhận được link thanh toán từ VNPay!' });
+        } catch (error) {
+          console.error("payment-url error:", error);
+          setToast({ type: "error", message: "Error getting VNPay payment link!" });
         }
       }
+
     } catch (err) {
       const errorMessage = err.message || 'Failed to place order';
       setError(errorMessage);
@@ -337,6 +300,7 @@ const Checkout = () => {
 
   return (
     <div className="checkout-container">
+      <OrderSuccessModal open={!!successInfo} info={{ ...successInfo, message: undefined }} onClose={() => setSuccessInfo(null)} />
       {/* Toast Notification */}
       {toast && (
         <div
