@@ -1,4 +1,3 @@
-
 import axiosClient from "./axiosClient";
 
 const Api = {
@@ -23,22 +22,12 @@ const Api = {
   },
 
   // ==== Accounts ====
-  // accounts: {
-  //   getProfile: (userId) => axiosClient.get(`/accounts/${userId}`),
-  //   updateProfile: (userId, data) =>
-  //     axiosClient.put(`/accounts/${userId}`, data),
-  //   deleteAccount: (userId) => axiosClient.delete(`/accounts/${userId}`),
-  //   softDeleteAccount: (userId) => axiosClient.delete(`/accounts/soft/${userId}`),
-  // },
-
   accounts: {
     getProfile: (userId) => axiosClient.get(`/accounts/${userId}`),
 
-    // update profile mới
     updateProfile: (userId, data) =>
       axiosClient.put(`/accounts/change-profile/${userId}`, data),
 
-    // đổi mật khẩu mới
     changePassword: (userId, data) =>
       axiosClient.put(`/accounts/change-password/${userId}`, data),
 
@@ -47,7 +36,6 @@ const Api = {
     softDeleteAccount: (userId) =>
       axiosClient.delete(`/accounts/soft/${userId}`),
   },
-
 
   // ==== Cart ====
   cart: {
@@ -73,6 +61,42 @@ const Api = {
         params: { q: sanitizedQuery },
       });
     },
+  },
+
+  // ==== Voucher ====
+  voucher: {
+    /**
+     * Lấy tất cả voucher (dùng cho "Ví voucher")
+     */
+    getAll: () => axiosClient.get("/vouchers/get-all"),
+
+
+    /**
+     * Kiểm tra mã voucher thủ công (nhập tại trang thanh toán)
+     * Nếu hợp lệ => trả về object voucher
+     * Nếu không => throw error
+     */
+    validateCode: async (code) => {
+  if (!code || !code.trim()) {
+    throw new Error("Vui lòng nhập mã voucher.");
+  }
+
+  // Lấy danh sách voucher public từ backend (route user)
+  const res = await axiosClient.get("/vouchers/get-all");
+  const vouchers = res.data?.data || [];
+
+  const found = vouchers.find(
+    (v) =>
+      v.code === code.toUpperCase() &&
+      v.status === "active" &&
+      new Date(v.endDate) >= new Date() &&
+      v.usedCount < v.usageLimit
+  );
+
+  if (!found) throw new Error("Mã voucher không hợp lệ hoặc đã hết hạn.");
+
+  return found;
+},
   },
 };
 
