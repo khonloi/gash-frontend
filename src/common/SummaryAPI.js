@@ -124,6 +124,42 @@ const Api = {
         headers: { Authorization: `Bearer ${token}` },
       }),
 
+    // Get single order detail by ID
+    getOrderDetailById: (orderDetailId, token) =>
+      axiosClient.get(`/order-detail/get-order-detail-by-id/${orderDetailId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Create new order detail
+    createOrderDetail: (data, token) =>
+      axiosClient.post('/order-detail/create-order-detail', data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Update order detail
+    updateOrderDetail: (orderDetailId, data, token) =>
+      axiosClient.put(`/order-detail/update-order-detail/${orderDetailId}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Delete order detail
+    deleteOrderDetail: (orderDetailId, token) =>
+      axiosClient.delete(`/order-detail/delete-order-detail/${orderDetailId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Search order details
+    searchOrderDetails: (queryParams, token) =>
+      axiosClient.get('/order-detail/search', {
+        params: queryParams,
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get order details by product
+    getOrderDetailsByProduct: (productId) =>
+      axiosClient.get(`/order-detail/get-order-details-by-product/${productId}`),
+
+
     checkout: (data, token) => axiosClient.post('/orders/checkout', data, {
       headers: { Authorization: `Bearer ${token}` },
     }),
@@ -141,13 +177,21 @@ const Api = {
 
   // ==== Feedback ====
   feedback: {
-    // Get all feedback for a product variant
-    getAllFeedback: (variantId) =>
-      axiosClient.get(`/orders/get-all-feedback/${variantId}`),
+    // Get all feedback for a product variant (with pagination)
+    getAllFeedback: (variantId, page = 1, limit = 10) =>
+      axiosClient.get(`/orders/get-all-feedback/${variantId}`, {
+        params: { page, limit }
+      }),
 
-    // Get existing feedback for a product variant
+    // Get existing feedback for a product variant in a specific order
     getUserFeedback: (orderId, variantId, token) =>
       axiosClient.get(`/orders/get-user-feedback/${orderId}/${variantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get all feedbacks for an order
+    getOrderFeedbacks: (orderId, token) =>
+      axiosClient.get(`/orders/get-feedback-by-order/${orderId}/feedbacks`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
 
@@ -163,7 +207,7 @@ const Api = {
         headers: { Authorization: `Bearer ${token}` },
       }),
 
-    // Delete feedback
+    // Delete feedback (soft delete)
     deleteFeedback: (orderId, variantId, token) =>
       axiosClient.delete(`/orders/${orderId}/delete-feedback/${variantId}`, {
         headers: { Authorization: `Bearer ${token}` },

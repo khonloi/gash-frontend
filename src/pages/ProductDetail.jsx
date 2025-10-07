@@ -221,15 +221,15 @@ const ProductDetail = () => {
     }
   }, [id, user]);
 
-  const fetchFeedbacks = useCallback(async (variantId = null) => {
+  const fetchFeedbacks = useCallback(async (variantId = null, page = 1, limit = 10) => {
     setFeedbackLoading(true);
     setFeedbackError(null);
 
     try {
       let feedbackResponse;
       if (variantId) {
-        // Fetch feedbacks for specific variant
-        feedbackResponse = await Api.feedback.getAllFeedback(variantId);
+        // Fetch feedbacks for specific variant with pagination (limit to 10 for preview)
+        feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
 
         // Handle the exact API response structure
         if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
@@ -925,66 +925,69 @@ const ProductDetail = () => {
         {!feedbackLoading && !feedbackError && feedbacks.length > 0 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
-            {feedbacks.slice(0, 2).map((feedback) => (
-              <div key={feedback._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                      {feedback.customer?.image ? (
-                        <img
-                          src={feedback.customer.image}
-                          alt={feedback.customer?.username || 'User'}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className={`w-full h-full flex items-center justify-center text-white font-bold ${feedback.customer?.image ? 'hidden' : 'flex'}`}
-                      >
-                        {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">
-                        {feedback.customer?.username || "Anonymous"}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
-                      </div>
-                    </div>
-                  </div>
-                  {feedback.feedback?.has_rating && (
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <svg
-                          key={i}
-                          className={`w-4 h-4 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
+            {feedbacks
+              .filter(feedback => !feedback.feedback?.is_deleted) // Filter out deleted feedbacks
+              .slice(0, 2)
+              .map((feedback) => (
+                <div key={feedback._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        {feedback.customer?.image ? (
+                          <img
+                            src={feedback.customer.image}
+                            alt={feedback.customer?.username || 'User'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div
+                          className={`w-full h-full flex items-center justify-center text-white font-bold ${feedback.customer?.image ? 'hidden' : 'flex'}`}
                         >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
+                          {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">
+                          {feedback.customer?.username || "Anonymous"}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
+                        </div>
+                      </div>
                     </div>
+                    {feedback.feedback?.has_rating && (
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <svg
+                            key={i}
+                            className={`w-4 h-4 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {feedback.feedback?.has_content && (
+                    <p className="text-gray-700 text-sm line-clamp-2">
+                      "{feedback.feedback.content}"
+                    </p>
                   )}
                 </div>
-                {feedback.feedback?.has_content && (
-                  <p className="text-gray-700 text-sm line-clamp-2">
-                    "{feedback.feedback.content}"
-                  </p>
-                )}
-              </div>
-            ))}
-            {feedbacks.length > 2 && (
+              ))}
+            {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length > 2 && (
               <div className="text-center">
                 <Link
                   to={selectedVariant ? `/product/${id}/feedback/${selectedVariant._id}` : `/product/${id}/feedback`}
                   className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  View {feedbacks.length - 2} more reviews
+                  View {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length - 2} more reviews
                   <i className="lni lni-arrow-right ml-1"></i>
                 </Link>
               </div>
@@ -993,26 +996,12 @@ const ProductDetail = () => {
         )}
 
         {/* No Feedback State */}
-        {!feedbackLoading && !feedbackError && feedbacks.length === 0 && (
+        {!feedbackLoading && !feedbackError && feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length === 0 && (
           <div className="text-center py-12">
             <div className="mb-6">
               <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
               <h3 className="text-xl font-medium text-gray-900 mb-2">No Reviews Yet</h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                {selectedVariant
-                  ? `Be the first to review ${selectedVariant.color_id?.color_name} - ${selectedVariant.size_id?.size_name}`
-                  : "Select a variant to see reviews"
-                }
-              </p>
             </div>
-            <Link
-              to={selectedVariant ? `/product/${id}/feedback/${selectedVariant._id}` : `/product/${id}/feedback`}
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-            >
-              <i className="lni lni-comments mr-2"></i>
-              View All Reviews
-              <i className="lni lni-arrow-right ml-2"></i>
-            </Link>
           </div>
         )}
       </div>

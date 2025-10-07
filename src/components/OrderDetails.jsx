@@ -26,13 +26,40 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const fetchOrderDetails = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
-            const [orderRes, detailsRes] = await Promise.all([
-                Api.order.getOrder(orderId, token),
-                Api.order.getOrderDetails(orderId, token),
-            ]);
+            console.log('🔍 Fetching order details for orderId:', orderId);
+            console.log('🔑 Token present:', token ? 'Yes' : 'No');
+
+            const orderRes = await Api.order.getOrder(orderId, token);
+            let detailsRes;
+
+            try {
+                detailsRes = await Api.order.getOrderDetails(orderId, token);
+                console.log('✅ Primary endpoint successful');
+            } catch (detailsError) {
+                console.log('❌ Primary endpoint failed:', detailsError);
+                // Fallback: try to get details from order response
+                if (orderRes.data?.orderDetails) {
+                    console.log('✅ Using orderDetails from order response');
+                    detailsRes = { data: orderRes.data.orderDetails };
+                } else {
+                    console.log('❌ No fallback available');
+                    detailsRes = { data: [] };
+                }
+            }
+
+            console.log('📦 Order response:', orderRes);
+            console.log('📋 Details response:', detailsRes);
+            console.log('📋 Details response data:', detailsRes.data);
+
+            // Based on backend getAllOrderDetails function, data is returned directly
+            const detailsData = Array.isArray(detailsRes.data) ? detailsRes.data : [];
+            console.log('📋 Processed details array:', detailsData);
+            console.log('📋 Details count:', detailsData.length);
+
             setOrder(orderRes.data);
-            setDetails(detailsRes.data || []);
+            setDetails(detailsData);
         } catch (err) {
+            console.error('❌ Error fetching order details:', err);
             showToast(err.message || "Failed to load order details", "error");
         } finally {
             setLoading(false);
@@ -101,12 +128,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         const isEditing = editingFeedback[variantId];
 
         return (
-            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-3 p-3 bg-grey border border-black rounded-lg">
                 {/* ===== Your Feedback Section ===== */}
                 <div className="space-y-3">
                     {/* --- Your Feedback --- */}
                     <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-green-700">Your Feedback</h4>
+                        <h4 className="font-semibold text-black">Your Feedback</h4>
                         <div className="flex items-center gap-2">
                             {/* Edit & Delete buttons */}
                             <button
@@ -512,7 +539,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 mb-6">
                             <p>
                                 <strong>Order Status:</strong> {getStatusBadge(order.order_status, "order")}
-                                <span className="text-xs text-gray-500 ml-2">({order.order_status})</span>
+                                {/* <span className="text-xs text-gray-500 ml-2">({order.order_status})</span> */}
                             </p>
                             <p>
                                 <strong>Payment Status:</strong> {getStatusBadge(order.pay_status, "pay")}
@@ -621,6 +648,23 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             <div className="text-center py-8 text-gray-500">
                                 <p>No product details available</p>
                                 <p className="text-sm mt-2">Order total: {formatPrice(order.finalPrice)}</p>
+
+                                {/* Debug Information */}
+                                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-left">
+                                    <h4 className="font-semibold text-yellow-800 mb-2">🔍 Debug Information</h4>
+                                    <p className="text-sm text-yellow-700">
+                                        <strong>Details array length:</strong> {details.length}
+                                    </p>
+                                    <p className="text-sm text-yellow-700">
+                                        <strong>Order ID:</strong> {orderId}
+                                    </p>
+                                    <p className="text-sm text-yellow-700">
+                                        <strong>Order has orderDetails:</strong> {order?.orderDetails ? 'Yes' : 'No'}
+                                    </p>
+                                    <p className="text-xs text-yellow-600 mt-2">
+                                        Check browser console for detailed API response information.
+                                    </p>
+                                </div>
                             </div>
                         )}
 

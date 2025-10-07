@@ -54,15 +54,15 @@ const ProductFeedback = () => {
     }, [id, variantId, showToast]);
 
     // Fetch feedbacks for the selected variant
-    const fetchFeedbacks = useCallback(async (variantId = null) => {
+    const fetchFeedbacks = useCallback(async (variantId = null, page = 1, limit = 50) => {
         setFeedbackLoading(true);
         setFeedbackError(null);
 
         try {
             let feedbackResponse;
             if (variantId) {
-                // Fetch feedbacks for specific variant
-                feedbackResponse = await Api.feedback.getAllFeedback(variantId);
+                // Fetch feedbacks for specific variant with pagination
+                feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
 
                 // Handle the exact API response structure
                 if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
@@ -241,7 +241,7 @@ const ProductFeedback = () => {
                     )}
 
                     {/* No Feedback State */}
-                    {!feedbackLoading && !feedbackError && feedbacks.length === 0 && (
+                    {!feedbackLoading && !feedbackError && feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length === 0 && (
                         <div className="text-center py-12">
                             <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">No Feedback Yet</h3>
@@ -255,7 +255,7 @@ const ProductFeedback = () => {
                     )}
 
                     {/* Feedback Statistics */}
-                    {!feedbackLoading && !feedbackError && feedbackStats && (
+                    {!feedbackLoading && !feedbackError && feedbackStats && feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length > 0 && (
                         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-8">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
@@ -313,101 +313,104 @@ const ProductFeedback = () => {
                             {/* Note: Feedbacks are sorted by backend with current user's feedback first, then by date */}
                             <AnimatePresence>
                                 <div className="space-y-6">
-                                    {feedbacks.slice(0, feedbacksToShow).map((feedback) => (
-                                        <div
-                                            key={feedback._id}
-                                            className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
-                                        >
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="relative">
-                                                        <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                                                            {feedback.customer?.image ? (
-                                                                <img
-                                                                    src={feedback.customer.image}
-                                                                    alt={feedback.customer?.username || 'User'}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={(e) => {
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'flex';
-                                                                    }}
-                                                                />
-                                                            ) : null}
-                                                            <div
-                                                                className={`w-full h-full flex items-center justify-center text-white font-bold text-xl ${feedback.customer?.image ? 'hidden' : 'flex'}`}
-                                                            >
-                                                                {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                                    {feedbacks
+                                        .filter(feedback => !feedback.feedback?.is_deleted) // Filter out deleted feedbacks
+                                        .slice(0, feedbacksToShow)
+                                        .map((feedback) => (
+                                            <div
+                                                key={feedback._id}
+                                                className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+                                            >
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="relative">
+                                                            <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                                                                {feedback.customer?.image ? (
+                                                                    <img
+                                                                        src={feedback.customer.image}
+                                                                        alt={feedback.customer?.username || 'User'}
+                                                                        className="w-full h-full object-cover"
+                                                                        onError={(e) => {
+                                                                            e.target.style.display = 'none';
+                                                                            e.target.nextSibling.style.display = 'flex';
+                                                                        }}
+                                                                    />
+                                                                ) : null}
+                                                                <div
+                                                                    className={`w-full h-full flex items-center justify-center text-white font-bold text-xl ${feedback.customer?.image ? 'hidden' : 'flex'}`}
+                                                                >
+                                                                    {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        {/* Current user indicator */}
-                                                        {feedback.customer?.is_current_user && (
-                                                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                                                <i className="lni lni-check text-white text-xs"></i>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="font-semibold text-gray-900 text-lg">
-                                                                {feedback.customer?.username || "Anonymous"}
-                                                            </div>
+                                                            {/* Current user indicator */}
                                                             {feedback.customer?.is_current_user && (
-                                                                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                                                    You
-                                                                </span>
+                                                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                                                    <i className="lni lni-check text-white text-xs"></i>
+                                                                </div>
                                                             )}
                                                         </div>
-                                                        {feedback.customer?.name && (
-                                                            <div className="text-sm text-gray-600">
-                                                                {feedback.customer.name}
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="font-semibold text-gray-900 text-lg">
+                                                                    {feedback.customer?.username || "Anonymous"}
+                                                                </div>
+                                                                {feedback.customer?.is_current_user && (
+                                                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                                                        You
+                                                                    </span>
+                                                                )}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-sm text-gray-500">
-                                                        {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
-                                                    </div>
-
-                                                </div>
-                                            </div>
-
-                                            {/* Rating Display */}
-                                            {feedback.feedback?.has_rating && (
-                                                <div className="flex items-center mb-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex">
-                                                            {[...Array(5)].map((_, i) => (
-                                                                <svg
-                                                                    key={i}
-                                                                    className={`w-6 h-6 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                                                    fill="currentColor"
-                                                                    viewBox="0 0 20 20"
-                                                                >
-                                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                </svg>
-                                                            ))}
+                                                            {feedback.customer?.name && (
+                                                                <div className="text-sm text-gray-600">
+                                                                    {feedback.customer.name}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                    <div className="text-right">
+                                                        <div className="text-sm text-gray-500">
+                                                            {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
+                                                        </div>
 
-                                            {/* Feedback Content */}
-                                            {feedback.feedback?.has_content && (
-                                                <div className="mb-4">
-                                                    <p className="text-gray-800 text-lg leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-400">
-                                                        {feedback.feedback.content}
-                                                    </p>
+                                                    </div>
                                                 </div>
-                                            )}
 
-                                        </div>
-                                    ))}
+                                                {/* Rating Display */}
+                                                {feedback.feedback?.has_rating && (
+                                                    <div className="flex items-center mb-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex">
+                                                                {[...Array(5)].map((_, i) => (
+                                                                    <svg
+                                                                        key={i}
+                                                                        className={`w-6 h-6 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                                        fill="currentColor"
+                                                                        viewBox="0 0 20 20"
+                                                                    >
+                                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                    </svg>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Feedback Content */}
+                                                {feedback.feedback?.has_content && (
+                                                    <div className="mb-4">
+                                                        <p className="text-gray-800 text-lg leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-400">
+                                                            {feedback.feedback.content}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                            </div>
+                                        ))}
                                 </div>
                             </AnimatePresence>
 
                             {/* Show More Button */}
-                            {feedbacks.length > feedbacksToShow && (
+                            {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length > feedbacksToShow && (
                                 <div className="text-center mt-8">
                                     <button
                                         onClick={handleShowMore}
