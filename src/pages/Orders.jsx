@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
 import axiosClient from "../common/axiosClient";
 import OrderDetailsModal from "../components/OrderDetails";
+import LoadingSpinner, { LoadingCard, LoadingSkeleton, LoadingButton } from "../components/LoadingSpinner";
 
 const Orders = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -11,21 +12,22 @@ const Orders = () => {
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchType, setSearchType] = useState("phone"); // phone or address
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
 
   const fetchOrders = useCallback(
-    async (query = "") => {
+    async () => {
       if (!user?._id) return;
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        let url = `/orders?acc_id=${user._id}`;
-        if (query.trim()) {
-          url = `/orders/search?acc_id=${user._id}&q=${encodeURIComponent(query)}`;
-        }
+        const url = `/orders?acc_id=${user._id}`;
         const res = await axiosClient.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -34,6 +36,7 @@ const Orders = () => {
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
         setOrders(sorted);
+        setFilteredOrders(sorted);
       } catch (err) {
         setError(err.message);
         showToast("Failed to load orders", "error");
@@ -47,6 +50,37 @@ const Orders = () => {
   useEffect(() => {
     if (!isAuthLoading && user) fetchOrders();
   }, [isAuthLoading, user, fetchOrders]);
+
+  // Frontend search and filter function
+  const handleSearchAndFilter = useCallback(() => {
+    let filtered = [...orders];
+
+    // Search by phone or address
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(order => {
+        if (searchType === "phone") {
+          return order.phone?.toLowerCase().includes(query);
+        } else {
+          return order.addressReceive?.toLowerCase().includes(query);
+        }
+      });
+    }
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(order =>
+        order.order_status?.toLowerCase() === statusFilter.toLowerCase()
+      );
+    }
+
+    setFilteredOrders(filtered);
+  }, [orders, searchQuery, searchType, statusFilter]);
+
+  // Apply search and filter when dependencies change
+  useEffect(() => {
+    handleSearchAndFilter();
+  }, [handleSearchAndFilter]);
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-GB", {
@@ -66,16 +100,22 @@ const Orders = () => {
               Pending
             </span>
           );
-        case "shipping":
+        case "confirmed":
           return (
             <span className={`${base} bg-blue-100 text-blue-700 border-blue-300`}>
+              Confirmed
+            </span>
+          );
+        case "shipping":
+          return (
+            <span className={`${base} bg-indigo-100 text-indigo-700 border-indigo-300`}>
               Shipping
             </span>
           );
-        case "completed":
+        case "delivered":
           return (
             <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
-              Completed
+              Delivered
             </span>
           );
         case "cancelled":
@@ -123,7 +163,7 @@ const Orders = () => {
   };
 
   if (isAuthLoading)
-    return <div className="text-center py-8 text-gray-600">Loading...</div>;
+    return <LoadingSpinner fullScreen text="Loading user data..." />;
 
   if (!user) {
     navigate("/login");
@@ -131,46 +171,206 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-yellow-100 to-white py-10 px-6">
+    <div className="min-h-screen bg-white py-10 px-6">
       <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-yellow-200">
         <h1 className="text-3xl font-bold text-yellow-600 text-center mb-8">
           My Orders
         </h1>
 
-        {/* 🔍 Search Form */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchOrders(searchQuery);
-          }}
-          className="flex items-center justify-center gap-3 mb-6"
-        >
-          <input
-            type="text"
-            placeholder="Search orders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 max-w-sm px-4 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
-          />
-          <button
-            type="submit"
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium px-5 py-2 rounded-lg transition"
-          >
-            Search
-          </button>
-        </form>
+        {/* 🔍 Search Bar */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={`Search by ${searchType}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 pl-10 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Search Type Toggle */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setSearchType("phone")}
+                className={`px-3 py-1 text-sm font-medium rounded-md transition ${searchType === "phone"
+                  ? "bg-white text-yellow-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+                  }`}
+              >
+                Phone
+              </button>
+              <button
+                onClick={() => setSearchType("address")}
+                className={`px-3 py-1 text-sm font-medium rounded-md transition ${searchType === "address"
+                  ? "bg-white text-yellow-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+                  }`}
+              >
+                Address
+              </button>
+            </div>
+
+            {/* Filter Button */}
+            <button
+              onClick={() => setShowFilterPanel(!showFilterPanel)}
+              className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${showFilterPanel || statusFilter !== "all"
+                ? "bg-yellow-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+              </svg>
+              Filter
+              {statusFilter !== "all" && (
+                <span className="bg-white text-yellow-600 text-xs px-1.5 py-0.5 rounded-full">
+                  {statusFilter}
+                </span>
+              )}
+            </button>
+
+            {/* Clear Button */}
+            {(searchQuery || statusFilter !== "all") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("all");
+                  setSearchType("phone");
+                }}
+                className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition text-sm"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 📊 Results Summary */}
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+          <span>
+            Showing {filteredOrders.length} of {orders.length} orders
+          </span>
+          {(searchQuery || statusFilter !== "all") && (
+            <span className="text-yellow-600 font-medium">
+              Filters applied
+            </span>
+          )}
+        </div>
+
+        {/* 🔧 Collapsible Filter Panel */}
+        {showFilterPanel && (
+          <div className="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200 animate-fadeIn">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Order Status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="shipping">Shipping</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              {/* Quick Status Buttons */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quick Filter
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {["pending", "confirmed", "shipping", "delivered", "cancelled"].map(status => {
+                    const count = orders.filter(order => order.order_status?.toLowerCase() === status).length;
+                    return count > 0 ? (
+                      <button
+                        key={status}
+                        onClick={() => setStatusFilter(statusFilter === status ? "all" : status)}
+                        className={`px-3 py-1 text-xs font-medium rounded-full transition ${statusFilter === status
+                          ? 'bg-yellow-200 text-yellow-800'
+                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                          }`}
+                      >
+                        {status.charAt(0).toUpperCase() + status.slice(1)} ({count})
+                      </button>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+
+              {/* Stats Display */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Order Statistics
+                </label>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <div>Total Orders: {orders.length}</div>
+                  <div>Filtered Results: {filteredOrders.length}</div>
+                  {searchQuery && (
+                    <div className="text-yellow-600">
+                      Searching: "{searchQuery}" in {searchType}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {error && (
           <p className="text-red-600 text-center mb-4 font-medium">{error}</p>
         )}
 
         {loading ? (
-          <p className="text-center text-gray-600">Loading orders...</p>
-        ) : orders.length === 0 ? (
-          <p className="text-center text-gray-500 italic">No orders found</p>
+          <LoadingSkeleton count={3} />
+        ) : filteredOrders.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            {orders.length === 0 ? (
+              <>
+                <p className="text-gray-500 italic text-lg">No orders found</p>
+                <p className="text-gray-400 text-sm mt-2">Your orders will appear here once you make a purchase</p>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-500 italic text-lg">No orders match your search</p>
+                <p className="text-gray-400 text-sm mt-2">Try adjusting your search criteria or filters</p>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("all");
+                    setSearchType("phone");
+                  }}
+                  className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition"
+                >
+                  Clear Filters
+                </button>
+              </>
+            )}
+          </div>
         ) : (
           <div className="space-y-5">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <article
                 key={order._id}
                 className="border border-yellow-200 rounded-xl p-5 bg-white hover:shadow-lg transition transform hover:-translate-y-1"
@@ -187,10 +387,34 @@ const Orders = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
                   <p>
-                    <strong>Address:</strong> {order.addressReceive}
+                    <strong>Address:</strong>
+                    {searchType === "address" && searchQuery ? (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: order.addressReceive?.replace(
+                            new RegExp(`(${searchQuery})`, 'gi'),
+                            '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
+                          )
+                        }}
+                      />
+                    ) : (
+                      <span>{order.addressReceive}</span>
+                    )}
                   </p>
                   <p>
-                    <strong>Phone:</strong> {order.phone}
+                    <strong>Phone:</strong>
+                    {searchType === "phone" && searchQuery ? (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: order.phone?.replace(
+                            new RegExp(`(${searchQuery})`, 'gi'),
+                            '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
+                          )
+                        }}
+                      />
+                    ) : (
+                      <span>{order.phone}</span>
+                    )}
                   </p>
                   <p>
                     <strong>Payment:</strong> {order.payment_method}

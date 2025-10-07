@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 // ==== Pages ====
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
+import ProductFeedback from "./pages/ProductFeedback";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
@@ -44,6 +45,8 @@ const App = () => {
                 {/* 🛍️ Sản phẩm */}
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/product/:id/feedback" element={<ProductFeedback />} />
+                <Route path="/product/:id/feedback/:variantId" element={<ProductFeedback />} />
 
                 {/* 👤 Tài khoản */}
                 <Route path="/login" element={<Login />} />

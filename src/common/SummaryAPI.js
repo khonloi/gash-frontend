@@ -7,7 +7,7 @@ const Api = {
     fetchWithRetry: async (url, options = {}, retries = 3, delay = 1000) => {
       for (let i = 0; i < retries; i++) {
         try {
-          const response = await axiosClient.get(url, options);
+          const response = await axiosClient(url, options);
           return response.data;
         } catch (error) {
           if (i === retries - 1) throw error;
@@ -61,6 +61,10 @@ const Api = {
       axiosClient.get(`/carts?acc_id=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
+    addItem: (cartItem, token) =>
+      axiosClient.post("/carts", cartItem, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
     updateItem: (itemId, data, token) =>
       axiosClient.put(`/carts/${itemId}`, data, {
         headers: { Authorization: `Bearer ${token}` },
@@ -90,8 +94,36 @@ const Api = {
     },
   },
 
+  // ==== Favorites ====
+  favorites: {
+    fetch: (token) =>
+      axiosClient.get("/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    add: (favoriteItem, token) =>
+      axiosClient.post("/favorites", favoriteItem, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    remove: (favoriteId, token) =>
+      axiosClient.delete(`/favorites/${favoriteId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+  },
+
   // ==== Order/Checkout ====
   order: {
+    // Get single order details
+    getOrder: (orderId, token) =>
+      axiosClient.get(`/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get order details (products in order)
+    getOrderDetails: (orderId, token) =>
+      axiosClient.get(`/order-details?order_id=${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
     checkout: (data, token) => axiosClient.post('/orders/checkout', data, {
       headers: { Authorization: `Bearer ${token}` },
     }),
@@ -107,8 +139,51 @@ const Api = {
       ),
   },
 
+  // ==== Feedback ====
+  feedback: {
+    // Get all feedback for a product variant
+    getAllFeedback: (variantId) =>
+      axiosClient.get(`/orders/get-all-feedback/${variantId}`),
+
+    // Get existing feedback for a product variant
+    getUserFeedback: (orderId, variantId, token) =>
+      axiosClient.get(`/orders/get-user-feedback/${orderId}/${variantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Add new feedback
+    addFeedback: (orderId, variantId, data, token) =>
+      axiosClient.patch(`/orders/${orderId}/add-feedback/${variantId}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Edit existing feedback
+    editFeedback: (orderId, variantId, data, token) =>
+      axiosClient.put(`/orders/${orderId}/edit-feedback/${variantId}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Delete feedback
+    deleteFeedback: (orderId, variantId, token) =>
+      axiosClient.delete(`/orders/${orderId}/delete-feedback/${variantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+  },
+
   // ==== Products ====
   products: {
+    // Get single product
+    getProduct: (productId) => axiosClient.get(`/products/${productId}`),
+
+    // Get product variants
+    getVariants: (productId) => axiosClient.get(`/variants?pro_id=${productId}`),
+
+    // Get product images
+    getImages: (productId) => axiosClient.get(`/specifications/image/product/${productId}`),
+
+    // Get product feedbacks
+    getFeedbacks: (productId) => axiosClient.get(`/order-details/product/${productId}`),
+
     search: (query) => {
       const sanitizedQuery = query.trim().replace(/[<>]/g, "");
       return axiosClient.get("/products/search", {
