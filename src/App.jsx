@@ -28,6 +28,7 @@ import Contact from "./pages/Contact";
 import VNPayReturn from "./pages/VNPayReturn";
 import ScrollToTop from "./pages/ScrollToTop";
 import UserVoucherPage from "./pages/UserVoucherPage";
+import Bill from "./pages/Bill";
 
 // ==== App Component ====
 const App = () => {
@@ -61,7 +62,8 @@ const App = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<Orders />} />
-                <Route path="/orders/:id" element={<OrderDetails />} /> {/* ✅ thêm route chi tiết đơn */}
+                <Route path="/orders/:id" element={<OrderDetails />} />
+                <Route path="/bills/:orderId" element={<Bill />} />
                 <Route path="/favorites" element={<ProductFavorite />} />
                 <Route path="/search" element={<Search />} />
 

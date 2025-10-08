@@ -114,13 +114,13 @@ const Api = {
   order: {
     // Get single order details
     getOrder: (orderId, token) =>
-      axiosClient.get(`/orders/${orderId}`, {
+      axiosClient.get(`/orders/get-order-by-id/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
 
     // Get order details (products in order)
     getOrderDetails: (orderId, token) =>
-      axiosClient.get(`/order-details?order_id=${orderId}`, {
+      axiosClient.get(`/order-details/get-all-order-details/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
 
@@ -259,6 +259,14 @@ const Api = {
       if (!found) throw new Error("Mã voucher không hợp lệ hoặc đã hết hạn.");
       return found;
     },
+  },
+
+  // ==== Bills ====
+  bills: {
+    export: (orderId, token) =>
+      axiosClient.get(`/bills/export-bill/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 };
 

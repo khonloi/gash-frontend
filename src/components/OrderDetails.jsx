@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import { useToast } from "../components/Toast";
 import FeedbackForm from "./FeedbackForm";
@@ -6,9 +7,9 @@ import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
+    const navigate = useNavigate();
 
     const [order, setOrder] = useState(null);
-    const [details, setDetails] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmAction, setConfirmAction] = useState(null);
@@ -16,48 +17,26 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [existingFeedbacks, setExistingFeedbacks] = useState({});
     const [editingFeedback, setEditingFeedback] = useState({});
     const [loadingStates, setLoadingStates] = useState({
-        feedbacks: false,
         submitting: {},
         editing: {},
         deleting: {}
     });
 
-    // 🧭 Fetch order + details
+    // 🧭 Fetch order with all details
     const fetchOrderDetails = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
             console.log('🔍 Fetching order details for orderId:', orderId);
             console.log('🔑 Token present:', token ? 'Yes' : 'No');
 
-            const orderRes = await Api.order.getOrder(orderId, token);
-            let detailsRes;
+            const response = await Api.order.getOrder(orderId, token);
+            console.log('📦 Order API Response:', response);
 
-            try {
-                detailsRes = await Api.order.getOrderDetails(orderId, token);
-                console.log('✅ Primary endpoint successful');
-            } catch (detailsError) {
-                console.log('❌ Primary endpoint failed:', detailsError);
-                // Fallback: try to get details from order response
-                if (orderRes.data?.orderDetails) {
-                    console.log('✅ Using orderDetails from order response');
-                    detailsRes = { data: orderRes.data.orderDetails };
-                } else {
-                    console.log('❌ No fallback available');
-                    detailsRes = { data: [] };
-                }
-            }
+            // The new API returns the complete order data in response.data.data
+            const orderData = response.data.data || response.data;
+            console.log('📋 Order data:', orderData);
 
-            console.log('📦 Order response:', orderRes);
-            console.log('📋 Details response:', detailsRes);
-            console.log('📋 Details response data:', detailsRes.data);
-
-            // Based on backend getAllOrderDetails function, data is returned directly
-            const detailsData = Array.isArray(detailsRes.data) ? detailsRes.data : [];
-            console.log('📋 Processed details array:', detailsData);
-            console.log('📋 Details count:', detailsData.length);
-
-            setOrder(orderRes.data);
-            setDetails(detailsData);
+            setOrder(orderData);
         } catch (err) {
             console.error('❌ Error fetching order details:', err);
             showToast(err.message || "Failed to load order details", "error");
@@ -66,57 +45,31 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         }
     }, [orderId, showToast]);
 
-    // Fetch existing feedback for a product variant
-    const fetchExistingFeedback = useCallback(async (variantId) => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await Api.feedback.getUserFeedback(orderId, variantId, token);
-            // Extract feedback from the nested response structure
-            return response.data.feedback || response.data.orderDetail?.feedback;
-        } catch {
-            // If no feedback exists, API might return 404, which is fine
-            return null;
-        }
-    }, [orderId]);
+    // 🔍 Extract feedbacks from order data
+    const extractFeedbacksFromOrder = useCallback(() => {
+        if (!order?.orderDetails?.length) return;
 
-    // 🔍 Fetch all existing feedbacks for order products
-    const fetchAllExistingFeedbacks = useCallback(async () => {
-        if (!details.length) return;
+        const feedbackMap = {};
 
-        setLoadingStates(prev => ({ ...prev, feedbacks: true }));
-        try {
-            const feedbackPromises = details.map(async (detail) => {
-                if (detail.variant_id?._id) {
-                    const feedback = await fetchExistingFeedback(detail.variant_id._id);
-                    return { variantId: detail.variant_id._id, feedback };
-                }
-                return null;
-            });
+        // Extract feedbacks from orderDetails
+        order.orderDetails.forEach(detail => {
+            if (detail.variant?._id && detail.feedback && !detail.feedback.is_deleted) {
+                feedbackMap[detail.variant._id] = detail.feedback;
+            }
+        });
 
-            const feedbackResults = await Promise.all(feedbackPromises);
-            const feedbackMap = {};
-
-            feedbackResults.forEach(result => {
-                if (result && result.feedback) {
-                    feedbackMap[result.variantId] = result.feedback;
-                }
-            });
-
-            setExistingFeedbacks(feedbackMap);
-        } finally {
-            setLoadingStates(prev => ({ ...prev, feedbacks: false }));
-        }
-    }, [details, fetchExistingFeedback]);
+        setExistingFeedbacks(feedbackMap);
+    }, [order?.orderDetails]);
 
     useEffect(() => {
         if (orderId) fetchOrderDetails();
     }, [orderId, fetchOrderDetails]);
 
     useEffect(() => {
-        if (details.length > 0) {
-            fetchAllExistingFeedbacks();
+        if (order?.orderDetails?.length > 0) {
+            extractFeedbacksFromOrder();
         }
-    }, [details, fetchAllExistingFeedbacks]);
+    }, [order?.orderDetails, extractFeedbacksFromOrder]);
 
     const formatPrice = (p) =>
         p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -276,7 +229,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await Api.feedback.addFeedback(
+            await Api.feedback.addFeedback(
                 orderId,
                 variantId,
                 {
@@ -287,14 +240,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             );
             showToast("Feedback created successfully!", "success");
 
-            // Extract feedback from response and update state immediately
-            const newFeedback = response.data.feedback || response.data.orderDetail?.feedback;
-            if (newFeedback) {
-                setExistingFeedbacks(prev => ({
-                    ...prev,
-                    [variantId]: newFeedback
-                }));
-            }
+            // Refresh order data to get updated feedback
+            await fetchOrderDetails();
         } catch (err) {
             console.error("Feedback error:", err);
             showToast("Failed to create feedback", "error");
@@ -327,7 +274,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await Api.feedback.editFeedback(
+            await Api.feedback.editFeedback(
                 orderId,
                 variantId,
                 {
@@ -340,19 +287,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             // Show success notification in top-right corner
             showToast("Feedback updated successfully!", "success");
 
-            // Extract feedback from response and update state immediately
-            const updatedFeedback = response.data.feedback || response.data.orderDetail?.feedback;
-            if (updatedFeedback) {
-                setExistingFeedbacks(prev => ({
-                    ...prev,
-                    [variantId]: updatedFeedback
-                }));
-                // Exit edit mode
-                setEditingFeedback(prev => ({
-                    ...prev,
-                    [variantId]: false
-                }));
-            }
+            // Refresh order data to get updated feedback
+            await fetchOrderDetails();
+
+            // Exit edit mode
+            setEditingFeedback(prev => ({
+                ...prev,
+                [variantId]: false
+            }));
         } catch (err) {
             console.error("Edit feedback error:", err);
             showToast("Failed to update feedback", "error");
@@ -394,18 +336,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 await Api.feedback.deleteFeedback(orderId, variantId, token);
                 showToast("Feedback deleted successfully!", "success");
 
-                // Remove feedback from state
-                setExistingFeedbacks(prev => {
-                    const newFeedbacks = { ...prev };
-                    delete newFeedbacks[variantId];
-                    return newFeedbacks;
-                });
-
                 // Refresh order details to get updated data
                 await fetchOrderDetails();
-
-                // Refresh existing feedbacks for all products
-                await fetchAllExistingFeedbacks();
 
                 setShowConfirmModal(false);
             } catch (err) {
@@ -532,141 +464,144 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </div>
                 ) : (
                     <div className="p-6">
-                        <h2 className="text-2xl font-bold text-yellow-600 mb-4">
-                            Order #{order._id}
-                        </h2>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 mb-6">
-                            <p>
-                                <strong>Order Status:</strong> {getStatusBadge(order.order_status, "order")}
-                                {/* <span className="text-xs text-gray-500 ml-2">({order.order_status})</span> */}
-                            </p>
-                            <p>
-                                <strong>Payment Status:</strong> {getStatusBadge(order.pay_status, "pay")}
-                            </p>
-                            <p>
-                                <strong>Customer:</strong> {order.acc_id?.name || order.acc_id?.username}
-                            </p>
-                            <p>
-                                <strong>Address:</strong> {order.addressReceive}
-                            </p>
-                            <p>
-                                <strong>Phone:</strong> {order.phone}
-                            </p>
-                            <p>
-                                <strong>Payment Method:</strong> {order.payment_method}
-                            </p>
-                            <p>
-                                <strong>Order Date:</strong> {new Date(order.orderDate || order.createdAt).toLocaleDateString('vi-VN')}
-                            </p>
-                            <p>
-                                <strong>Total Price:</strong>{" "}
-                                <span className="text-yellow-700 font-semibold">
-                                    {formatPrice(order.totalPrice)}
-                                </span>
-                            </p>
-                            {order.discountAmount > 0 && (
-                                <p>
-                                    <strong>Discount:</strong>{" "}
-                                    <span className="text-green-600 font-semibold">
-                                        -{formatPrice(order.discountAmount)}
-                                    </span>
-                                </p>
-                            )}
-                            <p>
-                                <strong>Final Price:</strong>{" "}
-                                <span className="text-yellow-700 font-semibold text-lg">
-                                    {formatPrice(order.finalPrice)}
-                                </span>
-                            </p>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold text-yellow-600">
+                                Order #{order._id}
+                            </h2>
+                            {/* Only show View Bill button if order is not cancelled and not pending */}
+                            {order.order_status?.toLowerCase() !== 'cancelled' &&
+                                order.order_status?.toLowerCase() !== 'pending' && (
+                                    <button
+                                        onClick={() => {
+                                            onClose(); // Close the modal first
+                                            navigate(`/bills/${orderId}`); // Then navigate to bill
+                                        }}
+                                        className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
+                                        title="View Bill"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        View Bill
+                                    </button>
+                                )}
                         </div>
 
-                        <h3 className="text-xl font-semibold text-yellow-700 mb-3">
-                            Products
-                        </h3>
-
-                        {details.length > 0 ? (
-                            <div className="space-y-4">
-                                {details.map((d) => (
-                                    <div
-                                        key={d._id}
-                                        className="flex items-center justify-between border rounded-lg p-3 hover:shadow-md transition"
-                                    >
-                                        <div className="flex items-center space-x-4">
-                                            <img
-                                                src={
-                                                    d.variant_id?.pro_id?.fullImageURL ||
-                                                    d.variant_id?.pro_id?.imageURL ||
-                                                    "/placeholder.png"
-                                                }
-                                                alt={d.variant_id?.pro_id?.pro_name}
-                                                className="w-20 h-20 object-cover rounded-md border"
-                                            />
-                                            <div>
-                                                <p className="font-medium text-gray-900">
-                                                    {d.variant_id?.pro_id?.pro_name}
-                                                </p>
-                                                <p className="text-gray-500 text-sm">
-                                                    Color: {d.variant_id?.color_id?.color_name} | Size:{" "}
-                                                    {d.variant_id?.size_id?.size_name}
-                                                </p>
-                                                <p className="text-gray-500 text-sm">
-                                                    Quantity: {d.Quantity}
-                                                </p>
-                                                <p className="text-yellow-700 font-semibold">
-                                                    Price: {formatPrice(d.UnitPrice)}
-                                                </p>
-                                                {order.order_status?.toLowerCase() === "delivered" && (
-                                                    <>
-                                                        {loadingStates.feedbacks ? (
-                                                            <LoadingForm
-                                                                text="Loading feedback..."
-                                                                height="h-20"
-                                                                className="mt-3"
-                                                                size="sm"
-                                                            />
-                                                        ) : existingFeedbacks[d.variant_id?._id] ? (
-                                                            renderExistingFeedback(existingFeedbacks[d.variant_id._id], d.variant_id._id)
-                                                        ) : (
-                                                            <FeedbackForm
-                                                                variantId={d.variant_id?._id}
-                                                                onSubmit={handleFeedback}
-                                                                isSubmitting={loadingStates.submitting[d.variant_id?._id]}
-                                                            />
-                                                        )}
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <p className="font-semibold text-yellow-600 text-right w-32">
-                                            {formatPrice(d.UnitPrice * d.Quantity)}
-                                        </p>
-                                    </div>
-                                ))}
+                        {/* Order Status */}
+                        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center space-x-4">
+                                <span className="text-gray-600 font-medium">Order Status:</span>
+                                {getStatusBadge(order.order_status, "order")}
+                                <span className="text-gray-600 font-medium ml-2">Payment:</span>
+                                {getStatusBadge(order.pay_status, "pay")}
                             </div>
-                        ) : (
-                            <div className="text-center py-8 text-gray-500">
-                                <p>No product details available</p>
-                                <p className="text-sm mt-2">Order total: {formatPrice(order.finalPrice)}</p>
+                            <span className="text-sm text-gray-500">
+                                Order Date: {new Date(order.orderDate || order.createdAt).toLocaleDateString('vi-VN')}
+                            </span>
+                        </div>
 
-                                {/* Debug Information */}
-                                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-left">
-                                    <h4 className="font-semibold text-yellow-800 mb-2">🔍 Debug Information</h4>
-                                    <p className="text-sm text-yellow-700">
-                                        <strong>Details array length:</strong> {details.length}
+                        {/* Customer & Payment Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
+                                <h4 className="font-semibold text-blue-800 mb-2">Customer Information</h4>
+                                <div className="space-y-1">
+                                    <p className="text-gray-700">
+                                        <span className="font-medium">Name:</span> {order.customer?.name || order.customer?.username}
                                     </p>
-                                    <p className="text-sm text-yellow-700">
-                                        <strong>Order ID:</strong> {orderId}
+                                    <p className="text-sm text-gray-600">
+                                        <span className="font-medium">Phone:</span> {order.phone}
                                     </p>
-                                    <p className="text-sm text-yellow-700">
-                                        <strong>Order has orderDetails:</strong> {order?.orderDetails ? 'Yes' : 'No'}
-                                    </p>
-                                    <p className="text-xs text-yellow-600 mt-2">
-                                        Check browser console for detailed API response information.
+                                    <p className="text-sm text-gray-600">
+                                        <span className="font-medium">Address:</span> {order.addressReceive}
                                     </p>
                                 </div>
                             </div>
-                        )}
+                            <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
+                                <h4 className="font-semibold text-green-800 mb-2">Payment Information</h4>
+                                <div className="space-y-1">
+                                    <p className="text-gray-700">
+                                        <span className="font-medium">Method:</span> {order.payment_method}
+                                    </p>
+                                    {order.voucher && (
+                                        <p className="text-sm text-blue-600">
+                                            <span className="font-medium">Voucher Applied:</span> {order.voucher.code}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Price Summary */}
+                        <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
+                            <h4 className="font-semibold text-yellow-800 mb-3">Order Summary</h4>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-700 font-medium">Subtotal (before discount):</span>
+                                    <span className="font-semibold text-gray-900">{formatPrice(order.totalPrice)}</span>
+                                </div>
+                                {order.discountAmount > 0 && (
+                                    <div className="flex justify-between items-center text-green-600">
+                                        <span className="font-medium">Discount Applied:</span>
+                                        <span className="font-semibold">-{formatPrice(order.discountAmount)}</span>
+                                    </div>
+                                )}
+                                <hr className="border-gray-300 my-2" />
+                                <div className="flex justify-between items-center">
+                                    <span className="text-lg font-bold text-gray-900">Total Amount to Pay:</span>
+                                    <span className="text-xl font-bold text-yellow-600">{formatPrice(order.finalPrice)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Products */}
+                        <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-800 mb-3">Order Items</h4>
+                            {order.orderDetails && order.orderDetails.length > 0 ? (
+                                order.orderDetails.map((d) => (
+                                    <div key={d._id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                                        <img
+                                            src={d.variant?.product?.image || "/placeholder.png"}
+                                            alt={d.variant?.product?.name}
+                                            className="w-16 h-16 object-cover rounded border"
+                                        />
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-900">{d.variant?.product?.name}</p>
+                                            <p className="text-sm text-gray-500">
+                                                <span className="font-medium">Color:</span> {d.variant?.color?.name || 'N/A'} |
+                                                <span className="font-medium"> Size:</span> {d.variant?.size?.name || 'N/A'} |
+                                                <span className="font-medium"> Quantity:</span> {d.quantity}
+                                            </p>
+                                            {order.order_status?.toLowerCase() === "delivered" && (
+                                                <div className="mt-2">
+                                                    {existingFeedbacks[d.variant?._id] ? (
+                                                        renderExistingFeedback(existingFeedbacks[d.variant._id], d.variant._id)
+                                                    ) : (
+                                                        <FeedbackForm
+                                                            variantId={d.variant?._id}
+                                                            onSubmit={handleFeedback}
+                                                            isSubmitting={loadingStates.submitting[d.variant?._id]}
+                                                        />
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-gray-500">
+                                                <span className="font-medium">Unit Price:</span> {formatPrice(d.unitPrice)}
+                                            </p>
+                                            <p className="font-semibold text-yellow-600">
+                                                <span className="font-medium">Total:</span> {formatPrice(d.totalPrice)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p>No product details available</p>
+                                    <p className="text-sm mt-2">Order total: {formatPrice(order.finalPrice)}</p>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Refund Status */}
                         {order.refund_status && order.refund_status !== "not_applicable" && (

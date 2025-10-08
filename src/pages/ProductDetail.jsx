@@ -226,48 +226,40 @@ const ProductDetail = () => {
     setFeedbackError(null);
 
     try {
-      let feedbackResponse;
       if (variantId) {
         // Fetch feedbacks for specific variant with pagination (limit to 10 for preview)
-        feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
+        const feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
 
         // Handle the exact API response structure
         if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
           setFeedbacks(feedbackResponse.data.feedbacks);
-          // setFeedbackStats(feedbackResponse.data.statistics || null); // Removed as not used
         } else if (feedbackResponse.data && Array.isArray(feedbackResponse.data)) {
           setFeedbacks(feedbackResponse.data);
-          // setFeedbackStats(null); // Removed as not used
         } else {
           setFeedbacks([]);
-          // setFeedbackStats(null); // Removed as not used
         }
       } else {
-        // Fetch feedbacks for entire product
-        feedbackResponse = await Api.products.getFeedbacks(id);
-        setFeedbacks(Array.isArray(feedbackResponse.data) ? feedbackResponse.data : []);
-        // setFeedbackStats(null); // Removed as not used
+        // No variant selected, set empty feedbacks
+        setFeedbacks([]);
       }
     } catch (err) {
       console.error('Feedback fetch error:', err);
       if (err.status === 404) {
         setFeedbacks([]);
-        // setFeedbackStats(null); // Removed as not used
       } else {
         setFeedbackError(err.message || "Failed to fetch feedback");
       }
     } finally {
       setFeedbackLoading(false);
     }
-  }, [id]);
+  }, []);
 
   // Initial fetch
   useEffect(() => {
     fetchProductAndVariants();
-    fetchFeedbacks();
     fetchFavorites();
     // setFeedbacksToShow(5); // Removed as no longer needed
-  }, [id, fetchFeedbacks, fetchFavorites, fetchProductAndVariants]);
+  }, [id, fetchFavorites, fetchProductAndVariants]);
 
   // Fetch feedbacks when variant is selected
   useEffect(() => {
@@ -419,9 +411,8 @@ const ProductDetail = () => {
 
   const handleRetry = useCallback(() => {
     fetchProductAndVariants();
-    fetchFeedbacks();
     fetchFavorites();
-  }, [fetchProductAndVariants, fetchFeedbacks, fetchFavorites]);
+  }, [fetchProductAndVariants, fetchFavorites]);
 
   const handleAddToFavorites = useCallback(async () => {
     if (!user) {
