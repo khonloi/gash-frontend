@@ -11,14 +11,16 @@ export default function MyVoucherList() {
 
   const fetchVouchers = async () => {
     try {
-      const res = await Api.voucher.getAll();
-      const valid = res.data.filter(
-        (v) =>
-          v.status === "active" &&
-          new Date(v.endDate) >= new Date() &&
-          v.usedCount < v.usageLimit
-      );
-      setVouchers(valid);
+      // TODO: Backend chưa có API get-all, tạm thời comment out
+      // const res = await Api.voucher.getAll();
+      // const valid = res.data.filter(
+      //   (v) =>
+      //     v.status === "active" &&
+      //     new Date(v.endDate) >= new Date() &&
+      //     v.usedCount < v.usageLimit
+      // );
+      // setVouchers(valid);
+      setVouchers([]); // Tạm thời set empty array
     } catch (err) {
       console.error("Error fetching vouchers:", err);
     }

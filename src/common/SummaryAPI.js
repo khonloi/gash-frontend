@@ -238,27 +238,11 @@ const Api = {
 
   // ==== Voucher ====
   voucher: {
-    getAll: () => axiosClient.get("/vouchers/get-all"),
-
-    validateCode: async (code) => {
-      if (!code || !code.trim()) {
-        throw new Error("Vui lòng nhập mã voucher.");
-      }
-
-      const res = await axiosClient.get("/vouchers/get-all");
-      const vouchers = res.data?.data || [];
-
-      const found = vouchers.find(
-        (v) =>
-          v.code === code.toUpperCase() &&
-          v.status === "active" &&
-          new Date(v.endDate) >= new Date() &&
-          v.usedCount < v.usageLimit
-      );
-
-      if (!found) throw new Error("Mã voucher không hợp lệ hoặc đã hết hạn.");
-      return found;
-    },
+    // Apply voucher to order (backend handles all validation)
+    applyVoucher: (data, token) =>
+      axiosClient.post("/vouchers/apply-voucher", data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 
   // ==== Bills ====
