@@ -18,7 +18,6 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import OrderDetails from "./components/OrderDetails";
-import Layout from "./pages/Layout";
 import ProductFavorite from "./pages/ProductFavorite";
 import Search from "./pages/Search";
 import OTPVerification from "./pages/OTPVerification";
@@ -28,8 +27,6 @@ import Register from "./pages/Register";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import VNPayReturn from "./pages/VNPayReturn";
-import ScrollToTop from "./pages/ScrollToTop";
-import UserVoucherPage from "./pages/UserVoucherPage";
 import Bill from "./pages/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
 
@@ -62,16 +59,16 @@ const App = () => {
             <ScrollToTop />
             <Layout>
               <Routes>
-                {/* 🌐 Trang chính */}
+                {/* Trang chính */}
                 <Route path="/" element={<Home />} />
 
-                {/* 🛍️ Sản phẩm */}
+                {/* Sản phẩm */}
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/product/:id/feedback" element={<ProductFeedback />} />
                 <Route path="/product/:id/feedback/:variantId" element={<ProductFeedback />} />
 
-                {/* 👤 Tài khoản */}
+                {/* Tài khoản */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/otp-verification" element={<OTPVerification />} />
@@ -80,7 +77,7 @@ const App = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
 
-                {/* 🛒 Giỏ hàng & thanh toán */}
+                {/* Giỏ hàng & thanh toán */}
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<Orders />} />
@@ -89,19 +86,19 @@ const App = () => {
                 <Route path="/favorites" element={<ProductFavorite />} />
                 <Route path="/search" element={<Search />} />
 
-                {/* 📰 Blog, liên hệ, thanh toán */}
+                {/* Blog, liên hệ, thanh toán */}
                 <Route path="/news" element={<BlogPost />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/vnpay-return" element={<VNPayReturn />} />
 
 
-                {/* 🎟️ Ví Voucher */}
+                {/* Ví Voucher */}
 
                 {/* Ví Voucher cho user */}
                 <Route path="/vouchers" element={<UserVoucherPage />} />
               </Routes>
 
-              {/* ✅ Chỉ hiển thị chat khi user đã đăng nhập */}
+              {/* Chỉ hiển thị chat khi user đã đăng nhập */}
               <ChatIfLoggedIn />
             </Layout>
           </ToastProvider>

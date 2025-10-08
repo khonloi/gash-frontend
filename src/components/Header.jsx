@@ -251,7 +251,7 @@ export default function Header() {
                                             <ShoppingCartIcon fontSize="small" /> Cart
                                         </button>
 
-                                        <button
+                                        {/* <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 alert("Coming soon!");
@@ -260,7 +260,7 @@ export default function Header() {
                                             className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
                                             <ChatBubbleIcon fontSize="small" /> Messages
-                                        </button>
+                                        </button> */}
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -383,9 +383,9 @@ export default function Header() {
                         <IconButton onClick={() => user ? navigate("/cart") : navigate("/login")} title="Cart">
                             <ShoppingCartIcon />
                         </IconButton>
-                        <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Messages">
+                        {/* <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Messages">
                             <ChatBubbleIcon />
-                        </IconButton>
+                        </IconButton> */}
                         <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Notifications">
                             <NotificationsIcon />
                         </IconButton>
