@@ -1,3 +1,4 @@
+// src/api/Api.js
 import axiosClient from "./axiosClient";
 
 const Api = {
@@ -6,11 +7,13 @@ const Api = {
     fetchWithRetry: async (url, options = {}, retries = 3, delay = 1000) => {
       for (let i = 0; i < retries; i++) {
         try {
-          const response = await axiosClient.get(url, options);
+          const response = await axiosClient(url, options);
           return response.data;
         } catch (error) {
           if (i === retries - 1) throw error;
-          await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+          await new Promise((resolve) =>
+            setTimeout(resolve, delay * Math.pow(2, i))
+          );
         }
       }
     },
@@ -58,6 +61,10 @@ const Api = {
       axiosClient.get(`/carts?acc_id=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
+    addItem: (cartItem, token) =>
+      axiosClient.post("/carts", cartItem, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
     updateItem: (itemId, data, token) =>
       axiosClient.put(`/carts/${itemId}`, data, {
         headers: { Authorization: `Bearer ${token}` },
@@ -66,29 +73,18 @@ const Api = {
       axiosClient.delete(`/carts/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
-    /**
-     * Xóa nhiều item khỏi cart (batch)
-     * @param {string[]} ids - Danh sách cart item _id
-     * @param {string} token
-     */
     batchRemove: (ids, token) =>
       axiosClient.delete(`/carts/batch`, {
         data: { ids },
         headers: { Authorization: `Bearer ${token}` },
       }),
-    /**
-     * Xóa toàn bộ cart của user (FE: lặp qua từng item và xóa)
-     * @param {string} userId
-     * @param {string} token
-     */
     clearCart: async (userId, token) => {
-      // Lấy toàn bộ cart
       const res = await axiosClient.get(`/carts?acc_id=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const items = Array.isArray(res.data) ? res.data : [];
       await Promise.all(
-        items.map(item =>
+        items.map((item) =>
           axiosClient.delete(`/carts/${item._id}`, {
             headers: { Authorization: `Bearer ${token}` },
           })
@@ -98,18 +94,140 @@ const Api = {
     },
   },
 
+  // ==== Favorites ====
+  favorites: {
+    fetch: (token) =>
+      axiosClient.get("/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    add: (favoriteItem, token) =>
+      axiosClient.post("/favorites", favoriteItem, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    remove: (favoriteId, token) =>
+      axiosClient.delete(`/favorites/${favoriteId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+  },
+
   // ==== Order/Checkout ====
   order: {
+    // Get single order details
+    getOrder: (orderId, token) =>
+      axiosClient.get(`/orders/get-order-by-id/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get order details (products in order)
+    getOrderDetails: (orderId, token) =>
+      axiosClient.get(`/order-details/get-all-order-details/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get single order detail by ID
+    getOrderDetailById: (orderDetailId, token) =>
+      axiosClient.get(`/order-detail/get-order-detail-by-id/${orderDetailId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Create new order detail
+    createOrderDetail: (data, token) =>
+      axiosClient.post('/order-detail/create-order-detail', data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Update order detail
+    updateOrderDetail: (orderDetailId, data, token) =>
+      axiosClient.put(`/order-detail/update-order-detail/${orderDetailId}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Delete order detail
+    deleteOrderDetail: (orderDetailId, token) =>
+      axiosClient.delete(`/order-detail/delete-order-detail/${orderDetailId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Search order details
+    searchOrderDetails: (queryParams, token) =>
+      axiosClient.get('/order-detail/search', {
+        params: queryParams,
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get order details by product
+    getOrderDetailsByProduct: (productId) =>
+      axiosClient.get(`/order-detail/get-order-details-by-product/${productId}`),
+
+
     checkout: (data, token) => axiosClient.post('/orders/checkout', data, {
       headers: { Authorization: `Bearer ${token}` },
     }),
     deleteCartItem: (cartId, token) => axiosClient.delete(`/carts/${cartId}`, {
       headers: { Authorization: `Bearer ${token}` },
     }),
+
+    cancel: (orderId, token) =>
+      axiosClient.patch(
+        `/orders/${orderId}/cancel`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      ),
+  },
+
+  // ==== Feedback ====
+  feedback: {
+    // Get all feedback for a product variant (with pagination)
+    getAllFeedback: (variantId, page = 1, limit = 10) =>
+      axiosClient.get(`/orders/get-all-feedback/${variantId}`, {
+        params: { page, limit }
+      }),
+
+    // Get existing feedback for a product variant in a specific order
+    getUserFeedback: (orderId, variantId, token) =>
+      axiosClient.get(`/orders/get-user-feedback/${orderId}/${variantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Get all feedbacks for an order
+    getOrderFeedbacks: (orderId, token) =>
+      axiosClient.get(`/orders/get-feedback-by-order/${orderId}/feedbacks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Add new feedback
+    addFeedback: (orderId, variantId, data, token) =>
+      axiosClient.patch(`/orders/${orderId}/add-feedback/${variantId}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Edit existing feedback
+    editFeedback: (orderId, variantId, data, token) =>
+      axiosClient.put(`/orders/${orderId}/edit-feedback/${variantId}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
+    // Delete feedback (soft delete)
+    deleteFeedback: (orderId, variantId, token) =>
+      axiosClient.delete(`/orders/${orderId}/delete-feedback/${variantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 
   // ==== Products ====
   products: {
+    // Get single product
+    getProduct: (productId) => axiosClient.get(`/products/${productId}`),
+
+    // Get product variants
+    getVariants: (productId) => axiosClient.get(`/variants?pro_id=${productId}`),
+
+    // Get product images
+    getImages: (productId) => axiosClient.get(`/specifications/image/product/${productId}`),
+
+    // Get product feedbacks
+    getFeedbacks: (productId) => axiosClient.get(`/order-details/product/${productId}`),
+
     search: (query) => {
       const sanitizedQuery = query.trim().replace(/[<>]/g, "");
       return axiosClient.get("/products/search", {
@@ -120,23 +238,13 @@ const Api = {
 
   // ==== Voucher ====
   voucher: {
-    /**
-     * Lấy tất cả voucher (dùng cho "Ví voucher")
-     */
     getAll: () => axiosClient.get("/vouchers/get-all"),
 
-
-    /**
-     * Kiểm tra mã voucher thủ công (nhập tại trang thanh toán)
-     * Nếu hợp lệ => trả về object voucher
-     * Nếu không => throw error
-     */
     validateCode: async (code) => {
       if (!code || !code.trim()) {
         throw new Error("Vui lòng nhập mã voucher.");
       }
 
-      // Lấy danh sách voucher public từ backend (route user)
       const res = await axiosClient.get("/vouchers/get-all");
       const vouchers = res.data?.data || [];
 
@@ -149,9 +257,16 @@ const Api = {
       );
 
       if (!found) throw new Error("Mã voucher không hợp lệ hoặc đã hết hạn.");
-
       return found;
     },
+  },
+
+  // ==== Bills ====
+  bills: {
+    export: (orderId, token) =>
+      axiosClient.get(`/bills/export-bill/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 };
 

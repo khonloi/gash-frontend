@@ -10,12 +10,14 @@ import ScrollToTop from "./pages/ScrollToTop";
 import Home from "./pages/Home";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
+import ProductFeedback from "./pages/ProductFeedback";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
+import OrderDetails from "./components/OrderDetails";
 import ProductFavorite from "./pages/ProductFavorite";
 import Search from "./pages/Search";
 import OTPVerification from "./pages/OTPVerification";
@@ -25,6 +27,7 @@ import Register from "./pages/Register";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import VNPayReturn from "./pages/VNPayReturn";
+import Bill from "./pages/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
 
 // ==== Components ====
@@ -62,6 +65,8 @@ const App = () => {
                 {/* Sản phẩm */}
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/product/:id/feedback" element={<ProductFeedback />} />
+                <Route path="/product/:id/feedback/:variantId" element={<ProductFeedback />} />
 
                 {/* Tài khoản */}
                 <Route path="/login" element={<Login />} />
@@ -76,19 +81,24 @@ const App = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/orders/:id" element={<OrderDetails />} />
+                <Route path="/bills/:orderId" element={<Bill />} />
                 <Route path="/favorites" element={<ProductFavorite />} />
                 <Route path="/search" element={<Search />} />
 
-                {/* Blog, liên hệ, VNPay */}
+                {/* Blog, liên hệ, thanh toán */}
                 <Route path="/news" element={<BlogPost />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/vnpay-return" element={<VNPayReturn />} />
+
+
+                {/* Ví Voucher */}
 
                 {/* Ví Voucher cho user */}
                 <Route path="/vouchers" element={<UserVoucherPage />} />
               </Routes>
 
-              {/* ✅ Chỉ hiển thị chat khi user đã đăng nhập */}
+              {/* Chỉ hiển thị chat khi user đã đăng nhập */}
               <ChatIfLoggedIn />
             </Layout>
           </ToastProvider>
