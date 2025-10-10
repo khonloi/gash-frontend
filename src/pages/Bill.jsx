@@ -15,6 +15,7 @@ const Bill = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isExporting, setIsExporting] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
     const billRef = useRef(null);
 
     const fetchBillData = useCallback(async () => {
@@ -24,7 +25,16 @@ const Bill = () => {
 
             const token = localStorage.getItem('token');
             const response = await Api.bills.export(orderId, token);
-            setBillData(response.data.data);
+            const orderData = response.data.data;
+
+            // Check if order is paid before allowing bill access
+            if (orderData?.order?.paymentStatus?.toLowerCase() !== 'paid') {
+                setError('Bill is only available for paid orders');
+                showToast('Bill is only available for paid orders', 'error');
+                return;
+            }
+
+            setBillData(orderData);
             showToast('Bill exported successfully!', 'success');
         } catch (err) {
             setError(err.response?.data?.message || 'Unable to load invoice');
@@ -160,16 +170,16 @@ const Bill = () => {
                             <h3 style="font-size: 18px; font-weight: bold; color: #7B542F; margin: 0 0 16px 0;">PAYMENT INFORMATION</h3>
                             <div style="color: #374151;">
                                 <p style="margin: 0 0 8px 0;"><span style="font-weight: 600;">Method:</span> ${billData.order?.paymentMethod || 'N/A'}</p>
-                                <p style="margin: 0 0 8px 0;"><span style="font-weight: 600;">Status:</span>
+                                <p style="margin: 0 0 8px 0;"><span style="font-weight: 600;">Payment Status:</span>
                                     <span style="margin-left: 8px; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 500; 
-                                        ${billData.order?.orderStatus === 'delivered' ? 'background: #dcfce7; color: #065f46;' :
-                    billData.order?.orderStatus === 'pending' ? 'background: #fef3c7; color: #92400e;' :
-                        billData.order?.orderStatus === 'cancelled' ? 'background: #fee2e2; color: #991b1b;' :
+                                        ${billData.order?.paymentStatus === 'paid' ? 'background: #dcfce7; color: #065f46;' :
+                    billData.order?.paymentStatus === 'unpaid' ? 'background: #fef3c7; color: #92400e;' :
+                        billData.order?.paymentStatus === 'refunded' ? 'background: #fee2e2; color: #991b1b;' :
                             'background: #f3f4f6; color: #1f2937;'}">
-                                        ${billData.order?.orderStatus === 'delivered' ? 'Delivered' :
-                    billData.order?.orderStatus === 'pending' ? 'Processing' :
-                        billData.order?.orderStatus === 'cancelled' ? 'Cancelled' :
-                            billData.order?.orderStatus || 'N/A'}
+                                        ${billData.order?.paymentStatus === 'paid' ? 'Paid' :
+                    billData.order?.paymentStatus === 'unpaid' ? 'Unpaid' :
+                        billData.order?.paymentStatus === 'refunded' ? 'Refunded' :
+                            billData.order?.paymentStatus || 'N/A'}
                                     </span>
                                 </p>
                                 ${billData.discount?.voucher ? `
@@ -255,7 +265,6 @@ const Bill = () => {
 
             showToast('PDF exported successfully!', 'success');
         } catch (err) {
-            console.error('PDF export error:', err);
             showToast('Failed to export PDF', 'error');
         } finally {
             setIsExporting(false);
@@ -378,6 +387,7 @@ const Bill = () => {
                             <table className="w-full border-collapse border border-gray-300">
                                 <thead>
                                     <tr className="bg-gray-50">
+                                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Image</th>
                                         <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Product</th>
                                         <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Color</th>
                                         <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Size</th>
@@ -421,16 +431,16 @@ const Bill = () => {
                                 <h3 className="text-lg font-bold mb-4" style={{ color: '#7B542F' }}>PAYMENT INFORMATION</h3>
                                 <div className="text-gray-700 space-y-2">
                                     <p><span className="font-semibold">Method:</span> {billData.order?.paymentMethod || 'N/A'}</p>
-                                    <p><span className="font-semibold">Status:</span>
-                                        <span className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${billData.order?.orderStatus === 'delivered' ? 'bg-green-100 text-green-800' :
-                                            billData.order?.orderStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                billData.order?.orderStatus === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                    <p><span className="font-semibold">Payment Status:</span>
+                                        <span className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${billData.order?.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                                            billData.order?.paymentStatus === 'unpaid' ? 'bg-yellow-100 text-yellow-800' :
+                                                billData.order?.paymentStatus === 'refunded' ? 'bg-red-100 text-red-800' :
                                                     'bg-gray-100 text-gray-800'
                                             }`}>
-                                            {billData.order?.orderStatus === 'delivered' ? 'Delivered' :
-                                                billData.order?.orderStatus === 'pending' ? 'Processing' :
-                                                    billData.order?.orderStatus === 'cancelled' ? 'Cancelled' :
-                                                        billData.order?.orderStatus || 'N/A'}
+                                            {billData.order?.paymentStatus === 'paid' ? 'Paid' :
+                                                billData.order?.paymentStatus === 'unpaid' ? 'Unpaid' :
+                                                    billData.order?.paymentStatus === 'refunded' ? 'Refunded' :
+                                                        billData.order?.paymentStatus || 'N/A'}
                                         </span>
                                     </p>
                                     {billData.discount?.voucher && (
