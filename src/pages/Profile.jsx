@@ -171,6 +171,8 @@ const Profile = () => {
       const updateData = {
         ...formData,
         image: imageUrl,
+        gender: formData.gender,
+        dob: formData.dob,
       };
       Api.accounts
         .updateProfile(user._id, updateData)
@@ -342,6 +344,10 @@ const Profile = () => {
                 {profile.acc_status?.toUpperCase() || "ACTIVE"}
               </span>
             </p>
+            <p>
+              <span className="font-semibold">Created:</span>{" "}
+              {new Date(profile.createdAt).toLocaleDateString()}
+            </p>
             {profile.gender && (
               <p>
                 <span className="font-semibold">Gender:</span>{" "}
@@ -354,10 +360,6 @@ const Profile = () => {
                 {new Date(profile.dob).toLocaleDateString()}
               </p>
             )}
-            <p>
-              <span className="font-semibold">Created:</span>{" "}
-              {new Date(profile.createdAt).toLocaleDateString()}
-            </p>
             <p>
               <span className="font-semibold">Last Updated:</span>{" "}
               {new Date(profile.updatedAt).toLocaleDateString()}
