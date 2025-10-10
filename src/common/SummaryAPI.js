@@ -183,18 +183,6 @@ const Api = {
         params: { page, limit }
       }),
 
-    // Get existing feedback for a product variant in a specific order
-    getUserFeedback: (orderId, variantId, token) =>
-      axiosClient.get(`/orders/get-user-feedback/${orderId}/${variantId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-
-    // Get all feedbacks for an order
-    getOrderFeedbacks: (orderId, token) =>
-      axiosClient.get(`/orders/get-feedback-by-order/${orderId}/feedbacks`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-
     // Add new feedback
     addFeedback: (orderId, variantId, data, token) =>
       axiosClient.patch(`/orders/${orderId}/add-feedback/${variantId}`, data, {
