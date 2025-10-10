@@ -563,7 +563,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             <h2 className="text-2xl font-bold text-yellow-600">
                                 Order #{order._id}
                             </h2>
-                            {/* Only show View Bill button if order is not cancelled and not pending */}
+                            {/* View Bill button in header - only show if order is not cancelled and not pending */}
                             {order.order_status?.toLowerCase() !== 'cancelled' &&
                                 order.order_status?.toLowerCase() !== 'pending' && (
                                     <button

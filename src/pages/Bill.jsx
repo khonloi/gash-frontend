@@ -116,20 +116,42 @@ const Bill = () => {
 
                 <div style="padding: 24px;">
                     <h3 style="font-size: 18px; font-weight: bold; color: #1f2937; margin: 0 0 16px 0;">ORDER ITEMS</h3>
-                    <div>
-                        ${billData.items?.map(item => `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px;">
-                                <div>
-                                    <p style="font-weight: 600; color: #1f2937; margin: 0;">${item.productName || 'Product'}</p>
-                                    <p style="font-size: 14px; color: #4b5563; margin: 0;">${item.color || 'N/A'} | ${item.size || 'N/A'}</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <p style="font-size: 14px; color: #6b7280; margin: 0;">Qty: ${item.quantity || 0} × ${formatPrice(item.unitPrice || 0)}</p>
-                                    <p style="font-weight: 600; margin: 0;">${formatPrice(item.totalPrice || 0)}</p>
-                                </div>
-                            </div>
-                        `).join('') || '<p>No items available</p>'}
-                    </div>
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #d1d5db;">
+                        <thead>
+                            <tr style="background-color: #f9fafb;">
+                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; font-weight: 600; color: #374151;">Product</th>
+                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 600; color: #374151;">Color</th>
+                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 600; color: #374151;">Size</th>
+                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 600; color: #374151;">Quantity</th>
+                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: right; font-weight: 600; color: #374151;">Unit Price</th>
+                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: right; font-weight: 600; color: #374151;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${billData.items?.map(item => `
+                                <tr>
+                                    <td style="border: 1px solid #d1d5db; padding: 12px;">
+                                        <p style="font-weight: 600; color: #1f2937; margin: 0;">${item.productName || 'Product'}</p>
+                                    </td>
+                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: center; color: #6b7280;">
+                                        ${item.color || 'N/A'}
+                                    </td>
+                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: center; color: #6b7280;">
+                                        ${item.size || 'N/A'}
+                                    </td>
+                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 500;">
+                                        ${item.quantity || 0}
+                                    </td>
+                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: right; color: #6b7280;">
+                                        ${formatPrice(item.unitPrice || 0)}
+                                    </td>
+                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: right; font-weight: 600; color: #1f2937;">
+                                        ${formatPrice(item.totalPrice || 0)}
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="6" style="border: 1px solid #d1d5db; padding: 12px; text-align: center; color: #6b7280;">No items available</td></tr>'}
+                        </tbody>
+                    </table>
                 </div>
 
                 <div style="padding: 32px; background: #FFCF71; border-top: 1px solid #e5e7eb;">
@@ -233,6 +255,7 @@ const Bill = () => {
 
             showToast('PDF exported successfully!', 'success');
         } catch (err) {
+            console.error('PDF export error:', err);
             showToast('Failed to export PDF', 'error');
         } finally {
             setIsExporting(false);
@@ -348,22 +371,46 @@ const Bill = () => {
                         </div>
                     </div>
 
-                    {/* Items List */}
+                    {/* Items Table */}
                     <div className="p-6">
                         <h3 className="text-lg font-bold text-gray-800 mb-4">ORDER ITEMS</h3>
-                        <div className="space-y-3">
-                            {billData.items?.map((item, index) => (
-                                <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
-                                    <div>
-                                        <p className="font-semibold text-gray-800">{item.productName || 'Product'}</p>
-                                        <p className="text-sm text-gray-600">{item.color || 'N/A'} | {item.size || 'N/A'}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-gray-500">Qty: {item.quantity || 0} × {formatPrice(item.unitPrice || 0)}</p>
-                                        <p className="font-semibold">{formatPrice(item.totalPrice || 0)}</p>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border border-gray-300">
+                                <thead>
+                                    <tr className="bg-gray-50">
+                                        <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Product</th>
+                                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Color</th>
+                                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Size</th>
+                                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Quantity</th>
+                                        <th className="border border-gray-300 px-4 py-3 text-right font-semibold text-gray-700">Unit Price</th>
+                                        <th className="border border-gray-300 px-4 py-3 text-right font-semibold text-gray-700">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {billData.items?.map((item, index) => (
+                                        <tr key={index} className="hover:bg-gray-50">
+                                            <td className="border border-gray-300 px-4 py-3">
+                                                <p className="font-semibold text-gray-800">{item.productName || 'Product'}</p>
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-3 text-center text-gray-600">
+                                                {item.color || 'N/A'}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-3 text-center text-gray-600">
+                                                {item.size || 'N/A'}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-3 text-center font-medium">
+                                                {item.quantity || 0}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-3 text-right text-gray-600">
+                                                {formatPrice(item.unitPrice || 0)}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-3 text-right font-semibold text-gray-800">
+                                                {formatPrice(item.totalPrice || 0)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
