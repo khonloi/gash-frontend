@@ -4,6 +4,7 @@ import Api from "../common/SummaryAPI";
 import { useToast } from "../components/Toast";
 import FeedbackForm from "./FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
+import ImageModal from "./ImageModal";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
@@ -16,6 +17,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [confirmMessage, setConfirmMessage] = useState("");
     const [existingFeedbacks, setExistingFeedbacks] = useState({});
     const [editingFeedback, setEditingFeedback] = useState({});
+    const [selectedImage, setSelectedImage] = useState(null);
     const [loadingStates, setLoadingStates] = useState({
         submitting: {},
         editing: {},
@@ -461,6 +463,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         if (type === "order") {
             // Clean the status string
             const cleanStatus = status?.toString().trim().toLowerCase();
+            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
             switch (cleanStatus) {
                 case "pending":
                     return (
@@ -495,11 +499,13 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 default:
                     return (
                         <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
-                            Unknown ({status})
+                            {capitalizeFirst(status || 'Unknown')}
                         </span>
                     );
             }
-        } else {
+        } else if (type === "pay") {
+            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
             switch (status?.toLowerCase()) {
                 case "unpaid":
                     return (
@@ -522,7 +528,36 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 default:
                     return (
                         <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
-                            Unknown
+                            {capitalizeFirst(status || 'Unknown')}
+                        </span>
+                    );
+            }
+        } else if (type === "refund") {
+            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+            switch (status?.toLowerCase()) {
+                case "pending_refund":
+                    return (
+                        <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-300`}>
+                            Pending Refund
+                        </span>
+                    );
+                case "refunded":
+                    return (
+                        <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
+                            Refunded
+                        </span>
+                    );
+                case "not_applicable":
+                    return (
+                        <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+                            Not Applicable
+                        </span>
+                    );
+                default:
+                    return (
+                        <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+                            {capitalizeFirst(status || '')}
                         </span>
                     );
             }
@@ -563,23 +598,22 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             <h2 className="text-2xl font-bold text-yellow-600">
                                 Order #{order._id}
                             </h2>
-                            {/* View Bill button in header - only show if order is not cancelled and not pending */}
-                            {order.order_status?.toLowerCase() !== 'cancelled' &&
-                                order.order_status?.toLowerCase() !== 'pending' && (
-                                    <button
-                                        onClick={() => {
-                                            onClose(); // Close the modal first
-                                            navigate(`/bills/${orderId}`); // Then navigate to bill
-                                        }}
-                                        className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
-                                        title="View Bill"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        View Bill
-                                    </button>
-                                )}
+                            {/* View Bill button in header - only show if order is paid */}
+                            {(order.pay_status?.toLowerCase() === 'paid' || order.paymentStatus?.toLowerCase() === 'paid') && (
+                                <button
+                                    onClick={() => {
+                                        onClose(); // Close the modal first
+                                        navigate(`/bills/${orderId}`); // Then navigate to bill
+                                    }}
+                                    className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
+                                    title="View Bill"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    View Bill
+                                </button>
+                            )}
                         </div>
 
                         {/* Order Status */}
@@ -657,7 +691,11 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                         <img
                                             src={d.variant?.product?.image || "/placeholder.png"}
                                             alt={d.variant?.product?.name}
-                                            className="w-16 h-16 object-cover rounded border"
+                                            className="w-16 h-16 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage({
+                                                src: d.variant?.product?.image || "/placeholder.png",
+                                                alt: d.variant?.product?.name
+                                            })}
                                         />
                                         <div className="flex-1">
                                             <p className="font-medium text-gray-900">{d.variant?.product?.name}</p>
@@ -702,9 +740,23 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         {order.refund_status && order.refund_status !== "not_applicable" && (
                             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                                 <h4 className="font-semibold text-gray-700 mb-2">Refund Information</h4>
-                                <p><strong>Status:</strong> {order.refund_status}</p>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-gray-600 font-medium">Status:</span>
+                                    {getStatusBadge(order.refund_status, "refund")}
+                                </div>
                                 {order.refund_proof && (
-                                    <p><strong>Proof:</strong> {order.refund_proof}</p>
+                                    <div className="mt-3">
+                                        <p className="font-semibold text-gray-700 mb-2">Refund Proof:</p>
+                                        <img
+                                            src={order.refund_proof}
+                                            alt="Refund Proof"
+                                            className="w-32 h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage({
+                                                src: order.refund_proof,
+                                                alt: "Refund Proof"
+                                            })}
+                                        />
+                                    </div>
                                 )}
                             </div>
                         )}
@@ -729,6 +781,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </div>
                 )}
             </div>
+
+            {/* Image Modal */}
+            <ImageModal
+                selectedImage={selectedImage}
+                onClose={() => setSelectedImage(null)}
+            />
 
             {/* Confirmation Modal */}
             {showConfirmModal && (
