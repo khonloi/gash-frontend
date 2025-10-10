@@ -24,10 +24,9 @@ const Bill = () => {
 
             const token = localStorage.getItem('token');
             const response = await Api.bills.export(orderId, token);
-            console.log('Bill API Response:', response);
             setBillData(response.data.data);
+            showToast('Bill exported successfully!', 'success');
         } catch (err) {
-            console.error('Error fetching bill data:', err);
             setError(err.response?.data?.message || 'Unable to load invoice');
             showToast('Unable to load invoice', 'error');
         } finally {
@@ -233,8 +232,7 @@ const Bill = () => {
             pdf.save(fileName);
 
             showToast('PDF exported successfully!', 'success');
-        } catch (error) {
-            console.error('PDF export error:', error);
+        } catch (err) {
             showToast('Failed to export PDF', 'error');
         } finally {
             setIsExporting(false);

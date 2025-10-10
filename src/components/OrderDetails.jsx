@@ -26,19 +26,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const fetchOrderDetails = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
-            console.log('🔍 Fetching order details for orderId:', orderId);
-            console.log('🔑 Token present:', token ? 'Yes' : 'No');
 
             const response = await Api.order.getOrder(orderId, token);
-            console.log('📦 Order API Response:', response);
 
             // The new API returns the complete order data in response.data.data
             const orderData = response.data.data || response.data;
-            console.log('📋 Order data:', orderData);
 
             setOrder(orderData);
         } catch (err) {
-            console.error('❌ Error fetching order details:', err);
             showToast(err.message || "Failed to load order details", "error");
         } finally {
             setLoading(false);
@@ -53,8 +48,11 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Extract feedbacks from orderDetails
         order.orderDetails.forEach(detail => {
-            if (detail.variant?._id && detail.feedback && !detail.feedback.is_deleted) {
-                feedbackMap[detail.variant._id] = detail.feedback;
+            if (detail.variant?._id && detail.feedback) {
+                // Only include feedback if it has content or rating and is not deleted
+                if ((detail.feedback.content || detail.feedback.rating) && !detail.feedback.is_deleted) {
+                    feedbackMap[detail.variant._id] = detail.feedback;
+                }
             }
         });
 
@@ -145,24 +143,26 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </div>
 
                     {/* --- Rating --- */}
-                    <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                            <svg
-                                key={i}
-                                className={`w-4 h-4 ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 
-        0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 
-        2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 
-        1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 
-        0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292
-        a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461
-        a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                        ))}
-                    </div>
+                    {feedback.rating && (
+                        <div className="flex items-center">
+                            {[...Array(5)].map((_, i) => (
+                                <svg
+                                    key={i}
+                                    className={`w-4 h-4 ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 
+            0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 
+            2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 
+            1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 
+            0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292
+            a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461
+            a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 {feedback.content && (
                     <p className="text-gray-700 text-sm">{feedback.content}</p>
@@ -212,7 +212,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
     // 📝 Send feedback
     const handleFeedback = async (variantId, comment, rating) => {
-        console.log('handleFeedback called:', { variantId, comment, rating });
         setLoadingStates(prev => ({
             ...prev,
             submitting: { ...prev.submitting, [variantId]: true }
@@ -220,7 +219,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Add timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
-            console.log('Feedback timeout, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 submitting: { ...prev.submitting, [variantId]: false }
@@ -229,25 +227,69 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
+
+            // Validate parameters before making API call
+            if (!orderId) {
+                throw new Error("Order ID is missing");
+            }
+            if (!variantId) {
+                throw new Error("Variant ID is missing");
+            }
+            if (!token) {
+                throw new Error("Authentication token is missing");
+            }
+            // Backend now requires rating to be mandatory
+            if (!rating) {
+                throw new Error("Rating is required");
+            }
+            if (rating < 1 || rating > 5) {
+                throw new Error("Rating must be between 1 and 5");
+            }
+            if (comment && comment.trim() === '') {
+                throw new Error("Comment cannot be empty");
+            }
+            if (comment && comment.length > 500) {
+                throw new Error("Comment cannot exceed 500 characters");
+            }
+
+            const feedbackData = {
+                rating: parseInt(rating)
+            };
+            if (comment && comment.trim()) {
+                feedbackData.content = comment.trim();
+            }
+
             await Api.feedback.addFeedback(
                 orderId,
                 variantId,
-                {
-                    content: comment,
-                    rating: parseInt(rating),
-                },
+                feedbackData,
                 token
             );
+
+            // Show success message after API call succeeds
             showToast("Feedback created successfully!", "success");
 
             // Refresh order data to get updated feedback
             await fetchOrderDetails();
         } catch (err) {
-            console.error("Feedback error:", err);
-            showToast("Failed to create feedback", "error");
+            // Show more specific error message
+            let errorMessage = "Failed to create feedback";
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.status === 500) {
+                errorMessage = "Server error - please try again later";
+            } else if (err.response?.status === 400) {
+                errorMessage = "Invalid request - please check your input";
+            } else if (err.response?.status === 404) {
+                errorMessage = "Order or product not found";
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            showToast(errorMessage, "error");
         } finally {
             clearTimeout(timeoutId);
-            console.log('handleFeedback completed, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 submitting: { ...prev.submitting, [variantId]: false }
@@ -257,7 +299,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
     // Edit feedback
     const handleEditFeedback = async (variantId, comment, rating) => {
-        console.log('handleEditFeedback called:', { variantId, comment, rating });
         setLoadingStates(prev => ({
             ...prev,
             editing: { ...prev.editing, [variantId]: true }
@@ -265,7 +306,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Add timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
-            console.log('Edit feedback timeout, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 editing: { ...prev.editing, [variantId]: false }
@@ -274,17 +314,46 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
+
+            // Validate parameters before making API call
+            if (!orderId) {
+                throw new Error("Order ID is missing");
+            }
+            if (!variantId) {
+                throw new Error("Variant ID is missing");
+            }
+            if (!token) {
+                throw new Error("Authentication token is missing");
+            }
+            // Backend now requires rating to be mandatory
+            if (!rating) {
+                throw new Error("Rating is required");
+            }
+            if (rating < 1 || rating > 5) {
+                throw new Error("Rating must be between 1 and 5");
+            }
+            if (comment && comment.trim() === '') {
+                throw new Error("Comment cannot be empty");
+            }
+            if (comment && comment.length > 500) {
+                throw new Error("Comment cannot exceed 500 characters");
+            }
+
+            const feedbackData = {
+                rating: parseInt(rating)
+            };
+            if (comment && comment.trim()) {
+                feedbackData.content = comment.trim();
+            }
+
             await Api.feedback.editFeedback(
                 orderId,
                 variantId,
-                {
-                    content: comment,
-                    rating: parseInt(rating),
-                },
+                feedbackData,
                 token
             );
 
-            // Show success notification in top-right corner
+            // Show success notification after API call succeeds
             showToast("Feedback updated successfully!", "success");
 
             // Refresh order data to get updated feedback
@@ -296,11 +365,24 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 [variantId]: false
             }));
         } catch (err) {
-            console.error("Edit feedback error:", err);
-            showToast("Failed to update feedback", "error");
+            // Show more specific error message
+            let errorMessage = "Failed to update feedback";
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.status === 500) {
+                errorMessage = "Server error - please try again later";
+            } else if (err.response?.status === 400) {
+                errorMessage = "Invalid request - please check your input";
+            } else if (err.response?.status === 404) {
+                errorMessage = "Order or product not found";
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            showToast(errorMessage, "error");
         } finally {
             clearTimeout(timeoutId);
-            console.log('handleEditFeedback completed, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 editing: { ...prev.editing, [variantId]: false }
@@ -333,16 +415,32 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             }));
             try {
                 const token = localStorage.getItem("token");
+
+                // Validate parameters before making API call
+                if (!orderId) {
+                    throw new Error("Order ID is missing");
+                }
+                if (!variantId) {
+                    throw new Error("Variant ID is missing");
+                }
+                if (!token) {
+                    throw new Error("Authentication token is missing");
+                }
+
+
                 await Api.feedback.deleteFeedback(orderId, variantId, token);
+
+                // Show success message after API call succeeds
                 showToast("Feedback deleted successfully!", "success");
 
-                // Refresh order details to get updated data
-                await fetchOrderDetails();
-
                 setShowConfirmModal(false);
+
+                // Close OrderDetails modal after successful deletion
+                onClose();
             } catch (err) {
-                console.error("Delete feedback error:", err);
-                showToast("Failed to delete feedback", "error");
+                // Show more specific error message
+                const errorMessage = err.response?.data?.message || err.message || "Failed to delete feedback";
+                showToast(errorMessage, "error");
             } finally {
                 setLoadingStates(prev => ({
                     ...prev,
@@ -359,13 +457,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             "px-3 py-1 rounded-full text-xs font-semibold border inline-block";
 
         // Debug logging
-        console.log("getStatusBadge called with:", { status, type, lowerStatus: status?.toLowerCase() });
 
         if (type === "order") {
             // Clean the status string
             const cleanStatus = status?.toString().trim().toLowerCase();
-            console.log("Clean status:", cleanStatus);
-
             switch (cleanStatus) {
                 case "pending":
                     return (
