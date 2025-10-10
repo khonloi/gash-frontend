@@ -104,16 +104,21 @@ const Signup = () => {
           throw new Error('OTP is missing');
         }
 
-        // Send OTP email via EmailJS
-        const emailjsResponse = await emailjs.send(
-          emailJsServiceId,
-          emailJsTemplateId,
-          templateParams
-        );
-        console.log('EmailJS Success:', emailjsResponse);
-
-        // Navigate to OTP verification
-        showToast('OTP sent successfully!', 'success', 3000);
+        // For development: Skip EmailJS and show OTP in console
+        if (!emailJsPublicKey || emailJsPublicKey === 'your_emailjs_public_key_here') {
+          console.log('📧 OTP for development:', otp);
+          showToast(`OTP sent successfully! Check console for OTP: ${otp}`, 'success', 5000);
+        } else {
+          // Send OTP email via EmailJS
+          const emailjsResponse = await emailjs.send(
+            emailJsServiceId,
+            emailJsTemplateId,
+            templateParams
+          );
+          console.log('EmailJS Success:', emailjsResponse);
+          showToast('OTP sent successfully!', 'success', 3000);
+        }
+        
         navigate('/otp-verification', {
           state: { email: formData.email, type: 'register', formData },
         });

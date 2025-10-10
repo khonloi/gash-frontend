@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
+    const interceptor = axiosClient.interceptors.response.use(
       (response) => response,
       (error) => {
         // Only trigger session expired if user is logged in (token exists)
@@ -51,12 +51,12 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    return () => axios.interceptors.response.eject(interceptor);
+    return () => axiosClient.interceptors.response.eject(interceptor);
   }, []);
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', {
+      const response = await axiosClient.post('/auth/login', {
         username,
         password,
       });
@@ -107,9 +107,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const endpoint =
         type === 'register'
-          ? 'http://localhost:5000/auth/register/request-otp'
-          : 'http://localhost:5000/auth/forgot-password/request-otp';
-      const response = await axios.post(endpoint, { email });
+          ? '/auth/register/request-otp'
+          : '/auth/forgot-password/request-otp';
+      const response = await axiosClient.post(endpoint, { email });
       return response;
     } catch (error) {
       throw error;
@@ -121,20 +121,20 @@ export const AuthProvider = ({ children }) => {
       if (resend) {
         const endpoint =
           type === 'register'
-            ? 'http://localhost:5000/auth/register/request-otp'
-            : 'http://localhost:5000/auth/forgot-password/request-otp';
-        const response = await axios.post(endpoint, { email });
+            ? '/auth/register/request-otp'
+            : '/auth/forgot-password/request-otp';
+        const response = await axiosClient.post(endpoint, { email });
         return response;
       }
 
       if (type === 'register') {
-        const response = await axios.post('http://localhost:5000/auth/register/verify-otp', {
+        const response = await axiosClient.post('/auth/register/verify-otp', {
           email,
           otp,
         });
         return response;
       } else if (type === 'forgot-password') {
-        const response = await axios.post('http://localhost:5000/auth/forgot-password/verify-otp', {
+        const response = await axiosClient.post('/auth/forgot-password/verify-otp', {
           email,
           otp,
         });
@@ -147,9 +147,11 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (formData) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/register', {
+      console.log('🚀 Sending signup request to backend:', formData);
+      const response = await axiosClient.post('/auth/register', {
         ...formData,
       });
+      console.log('✅ Backend response:', response.data);
       const { token, account } = response.data;
       const loginTime = Date.now().toString();
 
@@ -164,13 +166,14 @@ export const AuthProvider = ({ children }) => {
 
       navigate('/');
     } catch (error) {
+      console.error('❌ Signup error:', error.response?.data || error.message);
       throw error;
     }
   };
 
   const resetPassword = async ({ email, newPassword }) => {
     try {
-      await axios.post('http://localhost:5000/auth/forgot-password/reset', {
+      await axiosClient.post('/auth/forgot-password/reset', {
         email,
         newPassword,
       });
