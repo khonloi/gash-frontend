@@ -1,13 +1,33 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axiosClient from "../common/axiosClient";
+import Api from "../common/SummaryAPI";
 import "../styles/ProductList.css";
 
+// Helper function to get minimum price from product variants
+const getMinPrice = (product) => {
+  if (!product.productVariantIds || product.productVariantIds.length === 0) {
+    return 0;
+  }
+  const prices = product.productVariantIds
+    .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
+    .map(v => v.variantPrice);
+  return prices.length > 0 ? Math.min(...prices) : 0;
+};
+
+// Helper function to get main image URL
+const getMainImageUrl = (product) => {
+  if (!product.productImageIds || product.productImageIds.length === 0) {
+    return "/placeholder-image.png";
+  }
+  const mainImage = product.productImageIds.find(img => img.isMain);
+  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
+};
+
 // Interceptors are set in axiosClient.js
-const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
+const fetchWithRetry = async (apiCall, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await axiosClient({ url, ...options });
+      const response = await apiCall();
       return response.data;
     } catch (error) {
       if (i === retries - 1) throw error;
@@ -35,13 +55,20 @@ const Search = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchWithRetry("/products/search", {
-        method: "GET",
-        params: { q: searchQuery.trim() },
-      });
-      setProducts(data);
+      // Fetch all products and filter by search query
+      const response = await fetchWithRetry(() => Api.newProducts.getAll());
+      const allProducts = response?.data || response || [];
+      
+      // Filter products by name matching search query (case-insensitive)
+      const filteredProducts = allProducts.filter(product => 
+        product.productStatus === 'active' &&
+        product.productVariantIds?.length > 0 &&
+        product.productName?.toLowerCase().includes(searchQuery.trim().toLowerCase())
+      );
+      
+      setProducts(filteredProducts);
     } catch (err) {
-      setError(err.message || "Failed to fetch search results");
+      setError(err.response?.data?.message || err.message || "Failed to fetch search results");
       setProducts([]);
     } finally {
       setLoading(false);
@@ -111,33 +138,37 @@ const Search = () => {
         )}
         {!loading && !error && products.length > 0 && (
           <div className="product-list-product-grid" role="grid" aria-label={`${products.length} products`}>
-            {products.map((product) => (
-              <article
-                key={product._id}
-                className="product-list-product-card"
-                onClick={() => handleProductClick(product._id)}
-                onKeyDown={(e) => handleKeyDown(e, product._id)}
-                role="gridcell"
-                tabIndex={0}
-                aria-label={`View ${product.pro_name || "product"} details`}
-              >
-                <div className="product-list-image-container">
-                  <img
-                    src={product.imageURL || "/placeholder-image.png"}
-                    alt={product.pro_name || "Product image"}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.target.src = "/placeholder-image.png";
-                      e.target.alt = `Image not available for ${product.pro_name || "product"}`;
-                    }}
-                  />
-                </div>
-                <div className="product-list-content">
-                  <h2 title={product.pro_name}>{product.pro_name || "Unnamed Product"}</h2>
-                  <p className="product-list-price">{formatPrice(product.pro_price)}</p>
-                </div>
-              </article>
-            ))}
+            {products.map((product) => {
+              const minPrice = getMinPrice(product);
+              const imageUrl = getMainImageUrl(product);
+              return (
+                <article
+                  key={product._id}
+                  className="product-list-product-card"
+                  onClick={() => handleProductClick(product._id)}
+                  onKeyDown={(e) => handleKeyDown(e, product._id)}
+                  role="gridcell"
+                  tabIndex={0}
+                  aria-label={`View ${product.productName || "product"} details`}
+                >
+                  <div className="product-list-image-container">
+                    <img
+                      src={imageUrl}
+                      alt={product.productName || "Product image"}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-image.png";
+                        e.target.alt = `Image not available for ${product.productName || "product"}`;
+                      }}
+                    />
+                  </div>
+                  <div className="product-list-content">
+                    <h2 title={product.productName}>{product.productName || "Unnamed Product"}</h2>
+                    <p className="product-list-price">{formatPrice(minPrice)}</p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </main>
