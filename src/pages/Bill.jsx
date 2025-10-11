@@ -387,7 +387,6 @@ const Bill = () => {
                             <table className="w-full border-collapse border border-gray-300">
                                 <thead>
                                     <tr className="bg-gray-50">
-                                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Image</th>
                                         <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Product</th>
                                         <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Color</th>
                                         <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Size</th>
