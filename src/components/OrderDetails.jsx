@@ -247,19 +247,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             if (rating < 1 || rating > 5) {
                 throw new Error("Rating must be between 1 and 5");
             }
-            if (comment && comment.trim() === '') {
-                throw new Error("Comment cannot be empty");
-            }
             if (comment && comment.length > 500) {
                 throw new Error("Comment cannot exceed 500 characters");
             }
 
             const feedbackData = {
-                rating: parseInt(rating)
+                rating: parseInt(rating),
+                content: comment ? comment.trim() : null
             };
-            if (comment && comment.trim()) {
-                feedbackData.content = comment.trim();
-            }
 
             await Api.feedback.addFeedback(
                 orderId,
@@ -334,19 +329,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             if (rating < 1 || rating > 5) {
                 throw new Error("Rating must be between 1 and 5");
             }
-            if (comment && comment.trim() === '') {
-                throw new Error("Comment cannot be empty");
-            }
             if (comment && comment.length > 500) {
                 throw new Error("Comment cannot exceed 500 characters");
             }
 
             const feedbackData = {
-                rating: parseInt(rating)
+                rating: parseInt(rating),
+                content: comment ? comment.trim() : null
             };
-            if (comment && comment.trim()) {
-                feedbackData.content = comment.trim();
-            }
 
             await Api.feedback.editFeedback(
                 orderId,
