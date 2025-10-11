@@ -204,13 +204,13 @@ const Api = {
 
   // ==== Products ====
   products: {
-    // Get single product (old API - deprecated)
+    // Get single product
     getProduct: (productId) => axiosClient.get(`/products/${productId}`),
 
-    // Get product variants (old API - deprecated)
+    // Get product variants
     getVariants: (productId) => axiosClient.get(`/variants?pro_id=${productId}`),
 
-    // Get product images (old API - deprecated)
+    // Get product images
     getImages: (productId) => axiosClient.get(`/specifications/image/product/${productId}`),
 
     // Get product feedbacks
@@ -222,92 +222,6 @@ const Api = {
         params: { q: sanitizedQuery },
       });
     },
-  },
-
-  // ==== New Products ====
-  newProducts: {
-    // Get all products
-    getAll: (filters = {}) => axiosClient.get('/new-products', { params: filters }),
-
-    // Get single product by ID
-    getById: (productId) => axiosClient.get(`/new-products/${productId}`),
-
-    // Create product (admin/manager only)
-    create: (data, token) => axiosClient.post('/new-products', data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Update product (admin/manager only)
-    update: (productId, data, token) => axiosClient.put(`/new-products/${productId}`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Delete product (admin/manager only)
-    delete: (productId, token) => axiosClient.delete(`/new-products/${productId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Add product image (admin/manager only)
-    addImage: (productId, data, token) => axiosClient.post(`/new-products/${productId}/images`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Delete product image (admin/manager only)
-    deleteImage: (productId, imageId, token) => axiosClient.delete(`/new-products/${productId}/images/${imageId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-  },
-
-  // ==== New Product Variants ====
-  newVariants: {
-    // Get all variants (with optional filters)
-    getAll: (filters = {}) => axiosClient.get('/new-variants', { params: filters }),
-
-    // Get single variant by ID
-    getById: (variantId) => axiosClient.get(`/new-variants/${variantId}`),
-
-    // Create variant (admin/manager only)
-    create: (data, token) => axiosClient.post('/new-variants', data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Update variant (admin/manager only)
-    update: (variantId, data, token) => axiosClient.put(`/new-variants/${variantId}`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Delete variant (admin/manager only)
-    delete: (variantId, token) => axiosClient.delete(`/new-variants/${variantId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-  },
-
-  // ==== New Cart ====
-  newCart: {
-    // Create cart item
-    create: (data, token) => axiosClient.post('/new-carts', data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Get cart by account
-    getByAccount: (accountId, token) => axiosClient.get(`/new-carts/account/${accountId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Get cart item by ID
-    getById: (cartId, token) => axiosClient.get(`/new-carts/${cartId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Update cart item
-    update: (cartId, data, token) => axiosClient.put(`/new-carts/${cartId}`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-
-    // Delete cart item
-    delete: (cartId, token) => axiosClient.delete(`/new-carts/${cartId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
   },
 
   // ==== Voucher ====

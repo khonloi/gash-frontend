@@ -107,17 +107,12 @@ const ProductDetail = () => {
   // Local storage
   const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
 
-  // Pre-index variants (only active variants)
+  // Pre-index variants
   const variantIndex = useMemo(() => {
     const index = { byColor: {}, bySize: {}, byColorSize: {} };
-    // Get all active variants (variantStatus === 'active' or variantStatus is undefined/null - default is active)
-    const activeVariants = variants.filter(v => 
-      !v.variantStatus || v.variantStatus === 'active'
-    );
-    
-    activeVariants.forEach((variant) => {
-      const color = variant.productColorId?.color_name;
-      const size = variant.productSizeId?.size_name;
+    variants.forEach((variant) => {
+      const color = variant.color_id?.color_name;
+      const size = variant.size_id?.size_name;
       if (color) {
         index.byColor[color] = index.byColor[color] || [];
         index.byColor[color].push(variant);
@@ -133,59 +128,14 @@ const ProductDetail = () => {
     return index;
   }, [variants]);
 
-  // Get all thumbnails: main product image + active variant images
+  // Combine product.imageURL and additional images
   const allThumbnails = useMemo(() => {
     const thumbnails = [];
-    
-    // Add main product image first (from productImageIds)
-    const mainImage = images.find(img => img.isMain);
-    if (mainImage) {
-      thumbnails.push({
-        _id: mainImage._id,
-        imageUrl: mainImage.imageUrl,
-        isMain: true,
-        variant: null
-      });
-    } else if (images.length > 0) {
-      thumbnails.push({
-        _id: images[0]._id,
-        imageUrl: images[0].imageUrl,
-        isMain: true,
-        variant: null
-      });
+    if (product?.imageURL) {
+      thumbnails.push({ _id: "default", imageURL: product.imageURL });
     }
-    
-    // Add active variant images (filter duplicates by imageUrl)
-    const seenImages = new Set([thumbnails[0]?.imageUrl]);
-    variants
-      .filter(v => (!v.variantStatus || v.variantStatus === 'active') && v.variantImage)
-      .forEach(variant => {
-        if (!seenImages.has(variant.variantImage)) {
-          thumbnails.push({
-            _id: variant._id,
-            imageUrl: variant.variantImage,
-            isMain: false,
-            variant: variant
-          });
-          seenImages.add(variant.variantImage);
-        }
-      });
-    
-    return thumbnails;
-  }, [images, variants]);
-
-  // Get lowest price variant (only from active variants)
-  const lowestPriceVariant = useMemo(() => {
-    const activeVariants = variants.filter(v => !v.variantStatus || v.variantStatus === 'active');
-    if (activeVariants.length === 0) return null;
-    
-    return activeVariants.reduce((lowest, variant) => {
-      if (!lowest || variant.variantPrice < lowest.variantPrice) {
-        return variant;
-      }
-      return lowest;
-    }, null);
-  }, [variants]);
+    return [...thumbnails, ...images];
+  }, [product?.imageURL, images]);
 
   // Data fetching
   const fetchProductAndVariants = useCallback(async () => {
@@ -198,67 +148,54 @@ const ProductDetail = () => {
     setError(null);
 
     try {
-      const productResponse = await Api.newProducts.getById(id);
+      const [productResponse, variantsResponse] = await Promise.all([
+        Api.products.getProduct(id),
+        Api.products.getVariants(id),
+      ]);
+
+      let imagesResponse = [];
+      try {
+        imagesResponse = await Api.products.getImages(id);
+      } catch {
+        imagesResponse = [];
+      }
 
       if (!productResponse) {
         throw new Error("Product not found");
       }
 
-      // Handle both response.data.data and response.data structures
-      const productData = productResponse.data?.data || productResponse.data;
-      
-      if (!productData) {
-        throw new Error("Product data is empty");
-      }
+      setProduct(productResponse.data);
+      setVariants(variantsResponse.data || []);
+      setImages(imagesResponse.data || []);
 
-      setProduct(productData);
-      
-      // Get variants from productVariantIds (already populated)
-      const productVariants = productData.productVariantIds || [];
-      setVariants(productVariants);
-
-      // Get images from productImageIds (already populated)
-      const productImages = productData.productImageIds || [];
-      setImages(productImages);
-
-      if (!Array.isArray(productVariants) || productVariants.length === 0) {
+      if (!Array.isArray(variantsResponse.data) || variantsResponse.data.length === 0) {
         setAvailableColors([]);
         setAvailableSizes([]);
         setSelectedVariant(null);
-        console.warn("Product has no variants");
       } else {
-        // Get all active variants (variantStatus === 'active' or variantStatus is undefined/null - default is active)
-        const activeVariants = productVariants.filter(v => 
-          !v.variantStatus || v.variantStatus === 'active'
-        );
-        
         const uniqueColors = [
           ...new Set(
-            activeVariants.map((v) => v.productColorId?.color_name).filter(Boolean)
+            variantsResponse.data.map((v) => v.color_id?.color_name).filter(Boolean)
           ),
         ].sort();
         const uniqueSizes = [
           ...new Set(
-            activeVariants.map((v) => v.productSizeId?.size_name).filter(Boolean)
+            variantsResponse.data.map((v) => v.size_id?.size_name).filter(Boolean)
           ),
         ].sort();
         setAvailableColors(uniqueColors);
         setAvailableSizes(uniqueSizes);
 
-        // Reset to initial state: no color/size selected
+        // Reset local storage state for new product
         setSelectedColor(null);
         setSelectedSize(null);
         setQuantity(1);
         setSelectedVariant(null);
       }
 
-      // Set selected image to main product image
-      const mainImage = productImages.find(img => img.isMain);
-      const defaultImageUrl = mainImage?.imageUrl || productImages[0]?.imageUrl || "/placeholder-image.png";
-      setSelectedImage(defaultImageUrl);
+      setSelectedImage(productResponse.data.imageURL || "/placeholder-image.png");
     } catch (err) {
-      console.error("Error fetching product:", err);
-      setError(err.response?.data?.message || err.message || "Failed to fetch product details");
+      setError(err.message || "Failed to fetch product details");
     } finally {
       setLoading(false);
     }
@@ -331,8 +268,12 @@ const ProductDetail = () => {
     }
   }, [selectedVariant, fetchFeedbacks]);
 
-  // Don't auto-select variant - let user choose
-  // useEffect removed
+  // Auto-select first variant if none selected (like in ProductFeedback.jsx)
+  useEffect(() => {
+    if (variants.length > 0 && !selectedVariant) {
+      setSelectedVariant(variants[0]);
+    }
+  }, [variants, selectedVariant]);
 
   // Focus error
   useEffect(() => {
@@ -342,13 +283,10 @@ const ProductDetail = () => {
     }
   }, [error]);
 
-  // Stock status - based on selected variant (include inactive variants with stock)
+  // Stock status
   const isInStock = useMemo(
-    () => {
-      if (!selectedVariant) return false;
-      return selectedVariant.variantStatus !== "discontinued" && selectedVariant.stockQuantity > 0;
-    },
-    [selectedVariant]
+    () => product?.status_product === "active",
+    [product]
   );
 
   // Quantity validation
@@ -360,8 +298,8 @@ const ProductDetail = () => {
         setQuantity(1);
         setError("Quantity must be at least 1");
       } else {
-        const maxQuantity = selectedVariant?.stockQuantity
-          ? Math.min(selectedVariant.stockQuantity, 99)
+        const maxQuantity = selectedVariant?.quantity
+          ? Math.min(selectedVariant.quantity, 99)
           : 99;
         if (parsedValue > maxQuantity) {
           setQuantity(maxQuantity);
@@ -386,19 +324,12 @@ const ProductDetail = () => {
       setSelectedColor(color);
       setSelectedSize(null);
       setSelectedVariant(null);
-      
-      // When selecting color only, try to find a variant with this color to show its image
-      const colorVariants = variantIndex.byColor[color];
-      if (colorVariants && colorVariants.length > 0 && colorVariants[0].variantImage) {
-        setSelectedImage(colorVariants[0].variantImage);
-      }
-      
       setStoredState((prev) => ({
         ...prev,
         [id]: { ...prev[id], selectedColor: color, selectedSize: null },
       }));
     },
-    [id, setStoredState, variantIndex]
+    [id, setStoredState]
   );
 
   const handleSizeClick = useCallback(
@@ -411,11 +342,6 @@ const ProductDetail = () => {
         : variantIndex.bySize[size]?.[0] || null;
       setSelectedVariant(variant);
 
-      // Update selected image to variant's image
-      if (variant?.variantImage) {
-        setSelectedImage(variant.variantImage);
-      }
-
       setStoredState((prev) => ({
         ...prev,
         [id]: { ...prev[id], selectedSize: size },
@@ -425,40 +351,18 @@ const ProductDetail = () => {
   );
 
   const handleImageClick = useCallback(
-    (thumbnail) => {
-      setSelectedImage(thumbnail.imageUrl);
-      
-      // If clicking on a variant image, auto-select its color and size
-      if (thumbnail.variant) {
-        const variant = thumbnail.variant;
-        const color = variant.productColorId?.color_name;
-        const size = variant.productSizeId?.size_name;
-        
-        setSelectedColor(color);
-        setSelectedSize(size);
-        setSelectedVariant(variant);
-        
-        setStoredState((prev) => ({
-          ...prev,
-          [id]: { ...prev[id], selectedColor: color, selectedSize: size },
-        }));
+    (imageURL) => {
+      if (selectedImage === imageURL) {
+        setSelectedImage(product?.imageURL || "/placeholder-image.png");
       } else {
-        // Clicking on main product image - reset selection
-        setSelectedColor(null);
-        setSelectedSize(null);
-        setSelectedVariant(null);
-        
-        setStoredState((prev) => ({
-          ...prev,
-          [id]: { ...prev[id], selectedColor: null, selectedSize: null },
-        }));
+        setSelectedImage(imageURL);
       }
     },
-    [id, setStoredState]
+    [selectedImage, product?.imageURL]
   );
 
   const handleOpenLightbox = useCallback(() => {
-    const allImages = allThumbnails.map((thumb) => thumb.imageUrl);
+    const allImages = allThumbnails.map((thumb) => thumb.imageURL);
     const index = allImages.indexOf(selectedImage);
     setLightboxIndex(index !== -1 ? index : 0);
     setIsLightboxOpen(true);
@@ -562,8 +466,8 @@ const ProductDetail = () => {
       return;
     }
 
-    if (selectedVariant.stockQuantity && quantity > selectedVariant.stockQuantity) {
-      setError(`Only ${selectedVariant.stockQuantity} items available in stock`);
+    if (selectedVariant.quantity && quantity > selectedVariant.quantity) {
+      setError(`Only ${selectedVariant.quantity} items available in stock`);
       return;
     }
 
@@ -571,24 +475,24 @@ const ProductDetail = () => {
 
     try {
       const cartItem = {
-        accountId: user._id,
-        variantId: selectedVariant._id,
-        productQuantity: quantity.toString(),
-        productPrice: selectedVariant.variantPrice,
+        acc_id: user._id,
+        variant_id: selectedVariant._id,
+        pro_quantity: quantity,
+        pro_price: product.pro_price,
       };
 
       const token = localStorage.getItem("token");
-      await Api.newCart.create(cartItem, token);
+      await Api.cart.addItem(cartItem, token);
 
       showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully!`, "success", TOAST_TIMEOUT);
     } catch (err) {
-      const message = err.response?.data?.message || err.message || "Failed to add item to cart";
+      const message = err.message || "Failed to add item to cart";
       setError(message);
       showToast(message, "error", TOAST_TIMEOUT);
     } finally {
       setIsAddingToCart(false);
     }
-  }, [user, selectedVariant, navigate, isInStock, quantity, showToast]);
+  }, [user, selectedVariant, product, navigate, isInStock, quantity, showToast]);
 
   const handleBuyNow = useCallback(() => {
     if (!user) {
@@ -606,8 +510,8 @@ const ProductDetail = () => {
       return;
     }
 
-    if (selectedVariant.stockQuantity && quantity > selectedVariant.stockQuantity) {
-      setError(`Only ${selectedVariant.stockQuantity} items available in stock`);
+    if (selectedVariant.quantity && quantity > selectedVariant.quantity) {
+      setError(`Only ${selectedVariant.quantity} items available in stock`);
       return;
     }
 
@@ -715,25 +619,31 @@ const ProductDetail = () => {
               <i className="lni lni-chevron-up"></i>
             </button>
             <div className="product-detail-thumbnails">
-              {visibleThumbnails.map((thumbnail, index) => (
+              {visibleThumbnails.map((image, index) => (
                 <div
-                  key={thumbnail._id || index}
-                  className={`product-detail-thumbnail ${selectedImage === thumbnail.imageUrl ? "selected" : ""
+                  key={image._id || index}
+                  className={`product-detail-thumbnail ${selectedImage === image.imageURL ? "selected" : ""
                     }`}
-                  onClick={() => handleImageClick(thumbnail)}
+                  onClick={() => handleImageClick(image.imageURL)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Select thumbnail ${thumbnailIndex + index + 1} for ${product.productName || "Product"}`}
+                  aria-label={`Select ${image._id === "default"
+                    ? "default"
+                    : `thumbnail ${thumbnailIndex + index + 1}`
+                    } for ${product.pro_name || "Product"}`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      handleImageClick(thumbnail);
+                      handleImageClick(image.imageURL);
                       e.preventDefault();
                     }
                   }}
                 >
                   <img
-                    src={thumbnail.imageUrl}
-                    alt={`${product.productName || "Product"} thumbnail ${thumbnailIndex + index + 1}`}
+                    src={image.imageURL}
+                    alt={`${product.pro_name || "Product"} ${image._id === "default"
+                      ? "default"
+                      : `thumbnail ${thumbnailIndex + index + 1}`
+                      }`}
                     loading="lazy"
                   />
                 </div>
@@ -753,16 +663,17 @@ const ProductDetail = () => {
           <div className="product-detail-image">
             <img
               src={selectedImage || "/placeholder-image.png"}
-              alt={`${product.productName || "Product"}`}
+              alt={`${product.pro_name || "Product"}`}
               onClick={handleOpenLightbox}
               onError={(e) => {
                 e.target.src = "/placeholder-image.png";
-                e.target.alt = `Not available for ${product.productName || "product"}`;
+                e.target.alt = `Not available for ${product.pro_name || "product"
+                  }`;
               }}
               loading="lazy"
               role="button"
               tabIndex={0}
-              aria-label={`Open lightbox for ${product.productName || "Product"} image`}
+              aria-label={`Open lightbox for ${product.pro_name || "Product"} image`}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   handleOpenLightbox();
@@ -774,23 +685,18 @@ const ProductDetail = () => {
         </div>
 
         <div className="product-detail-info">
-          <h1>{product?.productName || "Unnamed Product"}</h1>
+          <h1>{product.pro_name || "Unnamed Product"}</h1>
           <div className="product-detail-price">
-            {selectedVariant && selectedVariant.variantPrice 
-              ? formatPrice(selectedVariant.variantPrice) 
-              : lowestPriceVariant 
-                ? `From ${formatPrice(lowestPriceVariant.variantPrice)}`
-                : "No variants available"}
+            {formatPrice(product.pro_price)}
           </div>
           <div className="product-detail-stock-status">
             <span
-              className={`product-detail-stock ${isInStock ? "in-stock" : "out-of-stock"}`}
+              className={`product-detail-stock ${isInStock ? "in-stock" : "out-of-stock"
+                }`}
             >
-              {selectedVariant 
-                ? (isInStock ? "In Stock" : "Out of Stock")
-                : "Select a variant to check stock"}
-              {selectedVariant?.stockQuantity > 0 &&
-                ` (${selectedVariant.stockQuantity} available)`}
+              {isInStock ? "In Stock" : "Out of Stock"}
+              {selectedVariant?.quantity &&
+                ` (${selectedVariant.quantity} available)`}
             </span>
           </div>
           <div className="product-detail-variants">
@@ -930,12 +836,12 @@ const ProductDetail = () => {
             </button>
             <div className="product-detail-lightbox-image-container">
               <img
-                src={allThumbnails[lightboxIndex]?.imageUrl || "/placeholder-image.png"}
-                alt={`${product.productName || "Product"} image ${lightboxIndex + 1}`}
+                src={allThumbnails[lightboxIndex]?.imageURL || "/placeholder-image.png"}
+                alt={`${product.pro_name || "Product"} image ${lightboxIndex + 1}`}
                 style={{ transform: `scale(${zoomLevel})` }}
                 onError={(e) => {
                   e.target.src = "/placeholder-image.png";
-                  e.target.alt = `Not available for ${product.productName || "product"}`;
+                  e.target.alt = `Not available for ${product.pro_name || "product"}`;
                 }}
               />
             </div>
@@ -964,7 +870,7 @@ const ProductDetail = () => {
         </div>
       )}
 
-      {product?.description && (
+      {product.description && (
         <div className="product-detail-description">
           <h2>Product Description</h2>
           <div className="markdown-content">
