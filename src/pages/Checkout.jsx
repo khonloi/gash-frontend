@@ -190,78 +190,136 @@ const Checkout = () => {
   };
 
   // Handle place order
-  const handlePlaceOrder = async (e) => {
+  const handlePlaceOrder = useCallback(async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Validate form
+    const isBuyNow = !!buyNowState;
+    const itemsToOrder = isBuyNow
+      ? [{
+        variant_id: buyNowState.variant._id,
+        pro_price: buyNowState.variant.variantPrice || 0,
+        pro_quantity: buyNowState.quantity,
+        pro_name: buyNowState.product.productName,
+      }]
+      : selectedItems;
+
+    if (itemsToOrder.length === 0) {
+      showToast('Your cart is empty', 'error');
+      setLoading(false);
+      return;
+    }
+
+    // Validate all fields
     const nameError = validateName(formData.name);
     const addressError = validateAddress(formData.addressReceive);
     const phoneError = validatePhone(formData.phone);
 
     if (nameError || addressError || phoneError) {
-      showToast(nameError || addressError || phoneError, 'error');
+      // Show first error in toast
+      const firstError = nameError || addressError || phoneError;
+      showToast(firstError, 'error');
       setLoading(false);
       return;
     }
 
+    // Trim fields for submission
+    const trimmedName = formData.name.trim();
+    const trimmedAddress = formData.addressReceive.trim();
+    const trimmedPhone = formData.phone.trim();
+
     try {
-      let orderData;
-      if (buyNowState) {
-        orderData = {
-          accountId: user._id,
-          addressReceive: formData.addressReceive,
-          phone: formData.phone,
-          name: formData.name,
-          paymentMethod,
-          orderDetails: [{
-            productId: buyNowState.product._id,
-            variantId: buyNowState.variant._id,
-            quantity: buyNowState.quantity,
-            price: buyNowState.variant?.variantPrice || 0,
-          }],
-          voucherId: appliedVoucher?._id || null,
-          discount: discount,
-          totalPrice: totalPrice - discount,
-        };
-      } else {
-        orderData = {
-          accountId: user._id,
-          addressReceive: formData.addressReceive,
-          phone: formData.phone,
-          name: formData.name,
-          paymentMethod,
-          orderDetails: selectedItems.map(item => ({
-            productId: item.variantId?.productId?._id || item.variantId?.productId || item.product?._id,
-            variantId: item.variantId?._id || item.variantId,
-            quantity: item.productQuantity || item.quantity,
-            price: item.productPrice || item.variantId?.variantPrice || 0,
-          })),
-          voucherId: appliedVoucher?._id || null,
-          discount: discount,
-          totalPrice: totalPrice - discount,
-        };
-      }
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No authentication token found');
 
-      const response = await axiosClient.post('/orders', orderData);
+      // Prepare order data for API call
+      const orderData = {
+        acc_id: user._id,
+        addressReceive: trimmedAddress,
+        phone: trimmedPhone,
+        name: trimmedName,
+        payment_method: paymentMethod,
+        voucherCode: appliedVoucher?.code || null,
+        items: itemsToOrder.map(item => ({
+          variant_id: item.variantId?._id || item.variant_id || item.variant?._id,
+          UnitPrice: item.productPrice || item.pro_price || item.variantId?.variantPrice || item.variant?.variantPrice || 0,
+          Quantity: item.productQuantity || item.quantity || item.pro_quantity,
+        })),
+        totalPrice: totalPrice,
+      };
 
-      if (response.data?.order?._id) {
+      // Gọi API checkout qua SummaryAPI
+      const checkoutRes = await Api.order.checkout(orderData, token);
+
+      if (paymentMethod === 'COD') {
+        // Remove purchased items from cart if not Buy Now
+        if (!isBuyNow && itemsToOrder.length > 0) {
+          try {
+            const boughtCartIds = itemsToOrder
+              .map(item => {
+                const variantId = item.variantId?._id || item.variant_id || item.variant?._id;
+                const cartItem = cartItems.find(ci => (ci.variantId?._id || ci.variant_id || ci.variant?._id) === variantId);
+                return cartItem?._id;
+              })
+              .filter(Boolean);
+            if (boughtCartIds.length > 0) {
+              await Api.cart.batchRemove(boughtCartIds, token);
+            }
+          } catch (e) {
+            console.error('Clear cart error:', e);
+          }
+        }
+        if (typeof fetchCartItems === 'function') {
+          await fetchCartItems();
+        }
         setSuccessInfo({
-          orderId: response.data.order._id,
-          totalPrice: totalPrice - discount,
-          paymentMethod,
+          status: 'success',
+          message: 'Your order will be promptly prepared and sent to you.',
+          orderId: checkoutRes?.data?.data?.order?._id || checkoutRes?.data?.data?.order?.id || checkoutRes?.data?.data?.orderId,
+          amount: Math.max(totalPrice - discount, 0),
+          paymentMethod: 'COD',
         });
         showToast('Order placed successfully!', 'success');
-      } else {
-        showToast('Failed to place order', 'error');
+      } else if (paymentMethod === "VNPAY") {
+        const orderId =
+          checkoutRes?.data?.data?.order?._id ||
+          checkoutRes?.data?.data?.order?.id ||
+          checkoutRes?.data?.data?.orderId;
+
+        if (!orderId) {
+          console.error("checkoutRes.data:", checkoutRes.data);
+          showToast("No orderId returned from checkout!", "error");
+          setLoading(false);
+          return;
+        }
+
+        try {
+          const paymentUrlRes = await axiosClient.post(
+            "/orders/payment-url",
+            { orderId, bankCode: "", language: "vn" },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          const paymentUrl = paymentUrlRes?.data?.paymentUrl;
+          if (paymentUrl && paymentUrl.startsWith("http")) {
+            window.location.href = paymentUrl;
+          } else {
+            showToast("Could not get VNPay payment link!", "error");
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error("payment-url error:", error);
+          showToast("Error getting VNPay payment link!", "error");
+          setLoading(false);
+        }
       }
     } catch (err) {
-      showToast(err.message || 'Failed to place order', 'error');
+      const errorMessage = err.message || 'Failed to place order';
+      showToast(errorMessage, 'error');
       console.error('Place order error:', err);
-    } finally {
       setLoading(false);
     }
-  };
+  }, [cartItems, user, formData, totalPrice, paymentMethod, buyNowState, showToast, appliedVoucher, discount, selectedItems, fetchCartItems, validateName, validateAddress, validatePhone]);
 
   // Handle field blur (for validation)
   const handleFieldBlur = (e) => {
@@ -289,7 +347,7 @@ const Checkout = () => {
             navigate('/');
           }}
           orderId={successInfo.orderId}
-          totalPrice={successInfo.totalPrice}
+          totalPrice={successInfo.amount}
           paymentMethod={successInfo.paymentMethod}
         />
       )}
