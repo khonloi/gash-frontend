@@ -4,6 +4,7 @@ import Api from "../common/SummaryAPI";
 import { useToast } from "../components/Toast";
 import FeedbackForm from "./FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
+import ImageModal from "./ImageModal";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
@@ -16,6 +17,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [confirmMessage, setConfirmMessage] = useState("");
     const [existingFeedbacks, setExistingFeedbacks] = useState({});
     const [editingFeedback, setEditingFeedback] = useState({});
+    const [selectedImage, setSelectedImage] = useState(null);
     const [loadingStates, setLoadingStates] = useState({
         submitting: {},
         editing: {},
@@ -26,19 +28,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const fetchOrderDetails = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
-            console.log('🔍 Fetching order details for orderId:', orderId);
-            console.log('🔑 Token present:', token ? 'Yes' : 'No');
 
             const response = await Api.order.getOrder(orderId, token);
-            console.log('📦 Order API Response:', response);
 
             // The new API returns the complete order data in response.data.data
             const orderData = response.data.data || response.data;
-            console.log('📋 Order data:', orderData);
 
             setOrder(orderData);
         } catch (err) {
-            console.error('❌ Error fetching order details:', err);
             showToast(err.message || "Failed to load order details", "error");
         } finally {
             setLoading(false);
@@ -53,8 +50,11 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Extract feedbacks from orderDetails
         order.orderDetails.forEach(detail => {
-            if (detail.variant?._id && detail.feedback && !detail.feedback.is_deleted) {
-                feedbackMap[detail.variant._id] = detail.feedback;
+            if (detail.variant?._id && detail.feedback) {
+                // Only include feedback if it has content or rating and is not deleted
+                if ((detail.feedback.content || detail.feedback.rating) && !detail.feedback.is_deleted) {
+                    feedbackMap[detail.variant._id] = detail.feedback;
+                }
             }
         });
 
@@ -145,24 +145,26 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </div>
 
                     {/* --- Rating --- */}
-                    <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                            <svg
-                                key={i}
-                                className={`w-4 h-4 ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 
-        0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 
-        2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 
-        1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 
-        0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292
-        a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461
-        a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                        ))}
-                    </div>
+                    {feedback.rating && (
+                        <div className="flex items-center">
+                            {[...Array(5)].map((_, i) => (
+                                <svg
+                                    key={i}
+                                    className={`w-4 h-4 ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 
+            0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 
+            2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 
+            1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 
+            0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292
+            a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461
+            a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 {feedback.content && (
                     <p className="text-gray-700 text-sm">{feedback.content}</p>
@@ -212,7 +214,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
     // 📝 Send feedback
     const handleFeedback = async (variantId, comment, rating) => {
-        console.log('handleFeedback called:', { variantId, comment, rating });
         setLoadingStates(prev => ({
             ...prev,
             submitting: { ...prev.submitting, [variantId]: true }
@@ -220,7 +221,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Add timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
-            console.log('Feedback timeout, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 submitting: { ...prev.submitting, [variantId]: false }
@@ -229,25 +229,64 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
+
+            // Validate parameters before making API call
+            if (!orderId) {
+                throw new Error("Order ID is missing");
+            }
+            if (!variantId) {
+                throw new Error("Variant ID is missing");
+            }
+            if (!token) {
+                throw new Error("Authentication token is missing");
+            }
+            // Backend now requires rating to be mandatory
+            if (!rating) {
+                throw new Error("Rating is required");
+            }
+            if (rating < 1 || rating > 5) {
+                throw new Error("Rating must be between 1 and 5");
+            }
+            if (comment && comment.length > 500) {
+                throw new Error("Comment cannot exceed 500 characters");
+            }
+
+            const feedbackData = {
+                rating: parseInt(rating),
+                content: comment ? comment.trim() : null
+            };
+
             await Api.feedback.addFeedback(
                 orderId,
                 variantId,
-                {
-                    content: comment,
-                    rating: parseInt(rating),
-                },
+                feedbackData,
                 token
             );
+
+            // Show success message after API call succeeds
             showToast("Feedback created successfully!", "success");
 
             // Refresh order data to get updated feedback
             await fetchOrderDetails();
         } catch (err) {
-            console.error("Feedback error:", err);
-            showToast("Failed to create feedback", "error");
+            // Show more specific error message
+            let errorMessage = "Failed to create feedback";
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.status === 500) {
+                errorMessage = "Server error - please try again later";
+            } else if (err.response?.status === 400) {
+                errorMessage = "Invalid request - please check your input";
+            } else if (err.response?.status === 404) {
+                errorMessage = "Order or product not found";
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            showToast(errorMessage, "error");
         } finally {
             clearTimeout(timeoutId);
-            console.log('handleFeedback completed, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 submitting: { ...prev.submitting, [variantId]: false }
@@ -257,7 +296,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
     // Edit feedback
     const handleEditFeedback = async (variantId, comment, rating) => {
-        console.log('handleEditFeedback called:', { variantId, comment, rating });
         setLoadingStates(prev => ({
             ...prev,
             editing: { ...prev.editing, [variantId]: true }
@@ -265,7 +303,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Add timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
-            console.log('Edit feedback timeout, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 editing: { ...prev.editing, [variantId]: false }
@@ -274,17 +311,41 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
+
+            // Validate parameters before making API call
+            if (!orderId) {
+                throw new Error("Order ID is missing");
+            }
+            if (!variantId) {
+                throw new Error("Variant ID is missing");
+            }
+            if (!token) {
+                throw new Error("Authentication token is missing");
+            }
+            // Backend now requires rating to be mandatory
+            if (!rating) {
+                throw new Error("Rating is required");
+            }
+            if (rating < 1 || rating > 5) {
+                throw new Error("Rating must be between 1 and 5");
+            }
+            if (comment && comment.length > 500) {
+                throw new Error("Comment cannot exceed 500 characters");
+            }
+
+            const feedbackData = {
+                rating: parseInt(rating),
+                content: comment ? comment.trim() : null
+            };
+
             await Api.feedback.editFeedback(
                 orderId,
                 variantId,
-                {
-                    content: comment,
-                    rating: parseInt(rating),
-                },
+                feedbackData,
                 token
             );
 
-            // Show success notification in top-right corner
+            // Show success notification after API call succeeds
             showToast("Feedback updated successfully!", "success");
 
             // Refresh order data to get updated feedback
@@ -296,11 +357,24 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 [variantId]: false
             }));
         } catch (err) {
-            console.error("Edit feedback error:", err);
-            showToast("Failed to update feedback", "error");
+            // Show more specific error message
+            let errorMessage = "Failed to update feedback";
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.status === 500) {
+                errorMessage = "Server error - please try again later";
+            } else if (err.response?.status === 400) {
+                errorMessage = "Invalid request - please check your input";
+            } else if (err.response?.status === 404) {
+                errorMessage = "Order or product not found";
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            showToast(errorMessage, "error");
         } finally {
             clearTimeout(timeoutId);
-            console.log('handleEditFeedback completed, resetting loading state');
             setLoadingStates(prev => ({
                 ...prev,
                 editing: { ...prev.editing, [variantId]: false }
@@ -333,16 +407,32 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             }));
             try {
                 const token = localStorage.getItem("token");
+
+                // Validate parameters before making API call
+                if (!orderId) {
+                    throw new Error("Order ID is missing");
+                }
+                if (!variantId) {
+                    throw new Error("Variant ID is missing");
+                }
+                if (!token) {
+                    throw new Error("Authentication token is missing");
+                }
+
+
                 await Api.feedback.deleteFeedback(orderId, variantId, token);
+
+                // Show success message after API call succeeds
                 showToast("Feedback deleted successfully!", "success");
 
-                // Refresh order details to get updated data
-                await fetchOrderDetails();
-
                 setShowConfirmModal(false);
+
+                // Close OrderDetails modal after successful deletion
+                onClose();
             } catch (err) {
-                console.error("Delete feedback error:", err);
-                showToast("Failed to delete feedback", "error");
+                // Show more specific error message
+                const errorMessage = err.response?.data?.message || err.message || "Failed to delete feedback";
+                showToast(errorMessage, "error");
             } finally {
                 setLoadingStates(prev => ({
                     ...prev,
@@ -359,12 +449,11 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             "px-3 py-1 rounded-full text-xs font-semibold border inline-block";
 
         // Debug logging
-        console.log("getStatusBadge called with:", { status, type, lowerStatus: status?.toLowerCase() });
 
         if (type === "order") {
             // Clean the status string
             const cleanStatus = status?.toString().trim().toLowerCase();
-            console.log("Clean status:", cleanStatus);
+            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
             switch (cleanStatus) {
                 case "pending":
@@ -400,11 +489,13 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 default:
                     return (
                         <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
-                            Unknown ({status})
+                            {capitalizeFirst(status || 'Unknown')}
                         </span>
                     );
             }
-        } else {
+        } else if (type === "pay") {
+            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
             switch (status?.toLowerCase()) {
                 case "unpaid":
                     return (
@@ -427,7 +518,36 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 default:
                     return (
                         <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
-                            Unknown
+                            {capitalizeFirst(status || 'Unknown')}
+                        </span>
+                    );
+            }
+        } else if (type === "refund") {
+            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+            switch (status?.toLowerCase()) {
+                case "pending_refund":
+                    return (
+                        <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-300`}>
+                            Pending Refund
+                        </span>
+                    );
+                case "refunded":
+                    return (
+                        <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
+                            Refunded
+                        </span>
+                    );
+                case "not_applicable":
+                    return (
+                        <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+                            Not Applicable
+                        </span>
+                    );
+                default:
+                    return (
+                        <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+                            {capitalizeFirst(status || '')}
                         </span>
                     );
             }
@@ -468,23 +588,22 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             <h2 className="text-2xl font-bold text-yellow-600">
                                 Order #{order._id}
                             </h2>
-                            {/* Only show View Bill button if order is not cancelled and not pending */}
-                            {order.order_status?.toLowerCase() !== 'cancelled' &&
-                                order.order_status?.toLowerCase() !== 'pending' && (
-                                    <button
-                                        onClick={() => {
-                                            onClose(); // Close the modal first
-                                            navigate(`/bills/${orderId}`); // Then navigate to bill
-                                        }}
-                                        className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
-                                        title="View Bill"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        View Bill
-                                    </button>
-                                )}
+                            {/* View Bill button in header - only show if order is paid */}
+                            {(order.pay_status?.toLowerCase() === 'paid' || order.paymentStatus?.toLowerCase() === 'paid') && (
+                                <button
+                                    onClick={() => {
+                                        onClose(); // Close the modal first
+                                        navigate(`/bills/${orderId}`); // Then navigate to bill
+                                    }}
+                                    className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
+                                    title="View Bill"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    View Bill
+                                </button>
+                            )}
                         </div>
 
                         {/* Order Status */}
@@ -562,7 +681,11 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                         <img
                                             src={d.variant?.product?.image || "/placeholder.png"}
                                             alt={d.variant?.product?.name}
-                                            className="w-16 h-16 object-cover rounded border"
+                                            className="w-16 h-16 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage({
+                                                src: d.variant?.product?.image || "/placeholder.png",
+                                                alt: d.variant?.product?.name
+                                            })}
                                         />
                                         <div className="flex-1">
                                             <p className="font-medium text-gray-900">{d.variant?.product?.name}</p>
@@ -607,9 +730,23 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         {order.refund_status && order.refund_status !== "not_applicable" && (
                             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                                 <h4 className="font-semibold text-gray-700 mb-2">Refund Information</h4>
-                                <p><strong>Status:</strong> {order.refund_status}</p>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-gray-600 font-medium">Status:</span>
+                                    {getStatusBadge(order.refund_status, "refund")}
+                                </div>
                                 {order.refund_proof && (
-                                    <p><strong>Proof:</strong> {order.refund_proof}</p>
+                                    <div className="mt-3">
+                                        <p className="font-semibold text-gray-700 mb-2">Refund Proof:</p>
+                                        <img
+                                            src={order.refund_proof}
+                                            alt="Refund Proof"
+                                            className="w-32 h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage({
+                                                src: order.refund_proof,
+                                                alt: "Refund Proof"
+                                            })}
+                                        />
+                                    </div>
                                 )}
                             </div>
                         )}
@@ -634,6 +771,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </div>
                 )}
             </div>
+
+            {/* Image Modal */}
+            <ImageModal
+                selectedImage={selectedImage}
+                onClose={() => setSelectedImage(null)}
+            />
 
             {/* Confirmation Modal */}
             {showConfirmModal && (

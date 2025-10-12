@@ -21,6 +21,10 @@ const Orders = () => {
   const [searchType, setSearchType] = useState("phone"); // phone or address
   const [showFilterPanel, setShowFilterPanel] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
   const fetchOrders = useCallback(
     async () => {
       if (!user?._id) return;
@@ -80,7 +84,25 @@ const Orders = () => {
   // Apply search and filter when dependencies change
   useEffect(() => {
     handleSearchAndFilter();
+    setCurrentPage(1); // Reset to first page when filters change
   }, [handleSearchAndFilter]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentOrders = filteredOrders.slice(startIndex, endIndex);
+
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
+  };
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-GB", {
@@ -257,13 +279,31 @@ const Orders = () => {
         {/* 📊 Results Summary */}
         <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
           <span>
-            Showing {filteredOrders.length} of {orders.length} orders
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length} orders
+            {filteredOrders.length !== orders.length && ` (${orders.length} total)`}
           </span>
-          {(searchQuery || statusFilter !== "all") && (
-            <span className="text-yellow-600 font-medium">
-              Filters applied
-            </span>
-          )}
+          <div className="flex items-center gap-4">
+            {(searchQuery || statusFilter !== "all") && (
+              <span className="text-yellow-600 font-medium">
+                Filters applied
+              </span>
+            )}
+            {/* Items per page selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">Show:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span className="text-gray-500">per page</span>
+            </div>
+          </div>
         </div>
 
         {/* 🔧 Collapsible Filter Panel */}
@@ -370,7 +410,7 @@ const Orders = () => {
           </div>
         ) : (
           <div className="space-y-5">
-            {filteredOrders.map((order) => (
+            {currentOrders.map((order) => (
               <article
                 key={order._id}
                 className="border border-yellow-200 rounded-xl p-5 bg-white hover:shadow-lg transition transform hover:-translate-y-1"
@@ -436,20 +476,19 @@ const Orders = () => {
                 </div>
 
                 <div className="flex justify-end gap-3 mt-4">
-                  {/* Only show View Bill button if order is not cancelled and not pending */}
-                  {order.order_status?.toLowerCase() !== 'cancelled' &&
-                    order.order_status?.toLowerCase() !== 'pending' && (
-                      <button
-                        onClick={() => navigate(`/bills/${order._id}`)}
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
-                        title="View Bill"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        View Bill
-                      </button>
-                    )}
+                  {/* View Bill button - only show if order is paid */}
+                  {(order.pay_status?.toLowerCase() === 'paid' || order.paymentStatus?.toLowerCase() === 'paid') && (
+                    <button
+                      onClick={() => navigate(`/bills/${order._id}`)}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
+                      title="View Bill"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      View Bill
+                    </button>
+                  )}
                   <button
                     onClick={() => setSelectedOrderId(order._id)}
                     className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition flex items-center gap-2"
@@ -464,6 +503,83 @@ const Orders = () => {
                 </div>
               </article>
             ))}
+          </div>
+        )}
+
+        {/* 📄 Pagination */}
+        {filteredOrders.length > itemsPerPage && (
+          <div className="mt-8 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Previous button */}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${currentPage === 1
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-yellow-500 text-white hover:bg-yellow-600"
+                  }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Previous
+              </button>
+
+              {/* Page numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  // Show first page, last page, current page, and pages around current page
+                  const shouldShow =
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1);
+
+                  if (!shouldShow) {
+                    // Show ellipsis for gaps
+                    if (page === currentPage - 2 || page === currentPage + 2) {
+                      return (
+                        <span key={page} className="px-2 py-1 text-gray-400">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
+                  }
+
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-2 rounded-lg font-medium transition ${page === currentPage
+                        ? "bg-yellow-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Next button */}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${currentPage === totalPages
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-yellow-500 text-white hover:bg-yellow-600"
+                  }`}
+              >
+                Next
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Font"; /* Choose a name for your font family */
+  src: url("./assets/fonts/Lexend-VariableFont_wght.ttf") format("truetype"),
+}
+
+body {
+  font-family: "Font", sans-serif;
+}

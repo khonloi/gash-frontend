@@ -19,6 +19,13 @@ const FeedbackForm = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Validate that rating is selected
+        if (!rating || rating < 1) {
+            alert("Please select a rating before submitting.");
+            return;
+        }
+
         onSubmit(variantId, comment, rating);
         setOpen(false);
         setComment(initialComment);
@@ -77,10 +84,9 @@ const FeedbackForm = ({
                                 </div>
 
                                 <textarea
-                                    placeholder="Share your thoughts about this product..."
+                                    placeholder="Share your thoughts about this product... (Optional)"
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
-                                    required
                                     className="w-full border rounded-xl p-3 mb-4 resize-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition outline-none"
                                     rows={4}
                                 />
