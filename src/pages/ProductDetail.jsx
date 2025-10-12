@@ -6,11 +6,13 @@ import React, {
   useCallback,
 } from "react";
 import { useToast } from "../components/Toast";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import axiosClient from '../common/axiosClient';
+import Api from '../common/SummaryAPI';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import LoadingSpinner, { LoadingForm, LoadingSkeleton } from "../components/LoadingSpinner";
 import "../styles/ProductDetail.css";
 import {
   DETAIL_STORAGE_KEY,
@@ -67,25 +69,7 @@ axiosClient.interceptors.response.use(
   }
 );
 
-// API functions
-const fetchWithRetry = async (
-  url,
-  options = {},
-  retries = API_RETRY_COUNT,
-  delay = API_RETRY_DELAY
-) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await axiosClient(url, options);
-      return response.data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise((resolve) =>
-        setTimeout(resolve, delay * Math.pow(2, i))
-      );
-    }
-  }
-};
+// Use centralized fetchWithRetry from Api.utils
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -111,16 +95,17 @@ const ProductDetail = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState(null);
+  // const [feedbackStats, setFeedbackStats] = useState(null); // Removed as not used in preview
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
-  const [feedbacksToShow, setFeedbacksToShow] = useState(5);
+  // Removed feedbacksToShow as it's no longer needed in the preview
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
 
   // Local storage
-  const [storedState, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
+  const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
 
   // Pre-index variants
   const variantIndex = useMemo(() => {
@@ -164,14 +149,14 @@ const ProductDetail = () => {
 
     try {
       const [productResponse, variantsResponse] = await Promise.all([
-        fetchWithRetry(`/products/${id}`),
-        fetchWithRetry(`/variants?pro_id=${id}`),
+        Api.products.getProduct(id),
+        Api.products.getVariants(id),
       ]);
 
       let imagesResponse = [];
       try {
-        imagesResponse = await fetchWithRetry(`/specifications/image/product/${id}`);
-      } catch (imgErr) {
+        imagesResponse = await Api.products.getImages(id);
+      } catch {
         imagesResponse = [];
       }
 
@@ -179,42 +164,36 @@ const ProductDetail = () => {
         throw new Error("Product not found");
       }
 
-      setProduct(productResponse);
-      setVariants(variantsResponse || []);
-      setImages(imagesResponse || []);
+      setProduct(productResponse.data);
+      setVariants(variantsResponse.data || []);
+      setImages(imagesResponse.data || []);
 
-      if (!Array.isArray(variantsResponse) || variantsResponse.length === 0) {
+      if (!Array.isArray(variantsResponse.data) || variantsResponse.data.length === 0) {
         setAvailableColors([]);
         setAvailableSizes([]);
         setSelectedVariant(null);
       } else {
         const uniqueColors = [
           ...new Set(
-            variantsResponse.map((v) => v.color_id?.color_name).filter(Boolean)
+            variantsResponse.data.map((v) => v.color_id?.color_name).filter(Boolean)
           ),
         ].sort();
         const uniqueSizes = [
           ...new Set(
-            variantsResponse.map((v) => v.size_id?.size_name).filter(Boolean)
+            variantsResponse.data.map((v) => v.size_id?.size_name).filter(Boolean)
           ),
         ].sort();
         setAvailableColors(uniqueColors);
         setAvailableSizes(uniqueSizes);
 
-        const currentStored = window.localStorage.getItem(DETAIL_STORAGE_KEY);
-        let parsedStored = {};
-        try {
-          parsedStored = currentStored ? JSON.parse(currentStored) : {};
-        } catch {
-          parsedStored = {};
-        }
+        // Reset local storage state for new product
         setSelectedColor(null);
         setSelectedSize(null);
         setQuantity(1);
         setSelectedVariant(null);
       }
 
-      setSelectedImage(productResponse.imageURL || "/placeholder-image.png");
+      setSelectedImage(productResponse.data.imageURL || "/placeholder-image.png");
     } catch (err) {
       setError(err.message || "Failed to fetch product details");
     } finally {
@@ -230,10 +209,9 @@ const ProductDetail = () => {
     }
 
     try {
-      const favorites = await fetchWithRetry("/favorites", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      const favorite = favorites.find((f) => f.pro_id?._id === id);
+      const token = localStorage.getItem("token");
+      const favorites = await Api.favorites.fetch(token);
+      const favorite = favorites.data.find((f) => f.pro_id?._id === id);
       setIsFavorited(!!favorite);
       setFavoriteId(favorite?._id || null);
     } catch (err) {
@@ -243,16 +221,29 @@ const ProductDetail = () => {
     }
   }, [id, user]);
 
-  const fetchFeedbacks = useCallback(async () => {
+  const fetchFeedbacks = useCallback(async (variantId = null, page = 1, limit = 10) => {
     setFeedbackLoading(true);
     setFeedbackError(null);
 
     try {
-      const feedbackResponse = await fetchWithRetry(
-        `/order-details/product/${id}`
-      );
-      setFeedbacks(feedbackResponse || []);
+      if (variantId) {
+        // Fetch feedbacks for specific variant with pagination (limit to 10 for preview)
+        const feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
+
+        // Handle the exact API response structure
+        if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
+          setFeedbacks(feedbackResponse.data.feedbacks);
+        } else if (feedbackResponse.data && Array.isArray(feedbackResponse.data)) {
+          setFeedbacks(feedbackResponse.data);
+        } else {
+          setFeedbacks([]);
+        }
+      } else {
+        // No variant selected, set empty feedbacks
+        setFeedbacks([]);
+      }
     } catch (err) {
+      console.error('Feedback fetch error:', err);
       if (err.status === 404) {
         setFeedbacks([]);
       } else {
@@ -261,15 +252,28 @@ const ProductDetail = () => {
     } finally {
       setFeedbackLoading(false);
     }
-  }, [id]);
+  }, []);
 
   // Initial fetch
   useEffect(() => {
     fetchProductAndVariants();
-    fetchFeedbacks();
     fetchFavorites();
-    setFeedbacksToShow(5);
-  }, [id, fetchFeedbacks, fetchFavorites, fetchProductAndVariants]);
+    // setFeedbacksToShow(5); // Removed as no longer needed
+  }, [id, fetchFavorites, fetchProductAndVariants]);
+
+  // Fetch feedbacks when variant is selected
+  useEffect(() => {
+    if (selectedVariant?._id) {
+      fetchFeedbacks(selectedVariant._id);
+    }
+  }, [selectedVariant, fetchFeedbacks]);
+
+  // Auto-select first variant if none selected (like in ProductFeedback.jsx)
+  useEffect(() => {
+    if (variants.length > 0 && !selectedVariant) {
+      setSelectedVariant(variants[0]);
+    }
+  }, [variants, selectedVariant]);
 
   // Focus error
   useEffect(() => {
@@ -325,7 +329,7 @@ const ProductDetail = () => {
         [id]: { ...prev[id], selectedColor: color, selectedSize: null },
       }));
     },
-    [variantIndex, id, setStoredState]
+    [id, setStoredState]
   );
 
   const handleSizeClick = useCallback(
@@ -343,7 +347,7 @@ const ProductDetail = () => {
         [id]: { ...prev[id], selectedSize: size },
       }));
     },
-    [variantIndex, selectedColor, id, setStoredState]
+    [selectedColor, id, setStoredState, variantIndex]
   );
 
   const handleImageClick = useCallback(
@@ -407,9 +411,8 @@ const ProductDetail = () => {
 
   const handleRetry = useCallback(() => {
     fetchProductAndVariants();
-    fetchFeedbacks();
     fetchFavorites();
-  }, [fetchProductAndVariants, fetchFeedbacks, fetchFavorites]);
+  }, [fetchProductAndVariants, fetchFavorites]);
 
   const handleAddToFavorites = useCallback(async () => {
     if (!user) {
@@ -420,10 +423,9 @@ const ProductDetail = () => {
     setIsAddingToFavorites(true);
 
     try {
+      const token = localStorage.getItem("token");
       if (isFavorited) {
-        await axiosClient.delete(`/favorites/${favoriteId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        await Api.favorites.remove(favoriteId, token);
         setIsFavorited(false);
         setFavoriteId(null);
         showToast("Product removed from favorites successfully!", "success", TOAST_TIMEOUT);
@@ -432,9 +434,7 @@ const ProductDetail = () => {
           acc_id: user._id,
           pro_id: id,
         };
-        const response = await axiosClient.post("/favorites", favoriteItem, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const response = await Api.favorites.add(favoriteItem, token);
         setIsFavorited(true);
         setFavoriteId(response.data.favorite._id);
         showToast("Product added to favorites successfully!", "success", TOAST_TIMEOUT);
@@ -448,7 +448,7 @@ const ProductDetail = () => {
     } finally {
       setIsAddingToFavorites(false);
     }
-  }, [user, id, navigate, isFavorited, favoriteId]);
+  }, [user, id, navigate, isFavorited, favoriteId, showToast]);
 
   const handleAddToCart = useCallback(async () => {
     if (!user) {
@@ -481,9 +481,8 @@ const ProductDetail = () => {
         pro_price: product.pro_price,
       };
 
-      await axiosClient.post("/carts", cartItem, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const token = localStorage.getItem("token");
+      await Api.cart.addItem(cartItem, token);
 
       showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully!`, "success", TOAST_TIMEOUT);
     } catch (err) {
@@ -493,7 +492,7 @@ const ProductDetail = () => {
     } finally {
       setIsAddingToCart(false);
     }
-  }, [user, selectedVariant, product, navigate, isInStock, quantity]);
+  }, [user, selectedVariant, product, navigate, isInStock, quantity, showToast]);
 
   const handleBuyNow = useCallback(() => {
     if (!user) {
@@ -562,11 +561,13 @@ const ProductDetail = () => {
   // Render
   if (loading) {
     return (
-      <div className="product-detail-container">
-        <div className="product-list-loading" role="status" aria-live="polite">
-          <div className="product-list-loading-spinner" aria-hidden="true"></div>
-          Loading product details...
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner
+          size="xl"
+          color="blue"
+          text="Loading product details..."
+          fullScreen={false}
+        />
       </div>
     );
   }
@@ -880,101 +881,119 @@ const ProductDetail = () => {
         </div>
       )}
 
+      {/* Customer Feedback Section */}
       <div className="product-detail-feedback">
-        <h2>Customer Feedback</h2>
+        {/* Loading State for Feedback */}
         {feedbackLoading && (
-          <div className="product-list-loading" role="status">
-            <div
-              className="product-detail-loading-spinner"
-              aria-hidden="true"
-            ></div>
-            Loading feedback...
-          </div>
+          <LoadingForm
+            text="Loading reviews..."
+            height="h-32"
+            className="mb-6"
+            size="lg"
+          />
         )}
+
+        {/* Error State for Feedback */}
         {feedbackError && (
-          <div
-            className="product-detail-feedback-error"
-            role="alert"
-            tabIndex={0}
-          >
-            <span className="product-detail-error-icon" aria-hidden="true">
-              ⚠
-            </span>
-            {feedbackError}
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <i className="lni lni-warning text-red-500 text-xl mr-3"></i>
+              <div>
+                <h3 className="text-red-800 font-medium">Error Loading Reviews</h3>
+                <p className="text-red-600 text-sm mt-1">{feedbackError}</p>
+              </div>
+            </div>
             <button
-              className="product-detail-retry-button"
-              onClick={fetchFeedbacks}
-              disabled={feedbackLoading}
-              type="button"
-              aria-label="Retry loading feedback"
+              onClick={() => fetchFeedbacks(selectedVariant?._id)}
+              className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
               Retry
             </button>
           </div>
         )}
-        {!feedbackLoading && !feedbackError && feedbacks.length === 0 && (
-          <p className="product-detail-feedback-empty">No Feedback Available</p>
-        )}
+
+        {/* Recent Feedback Preview */}
         {!feedbackLoading && !feedbackError && feedbacks.length > 0 && (
-          <>
-            <div className="product-detail-feedback-list" role="list">
-              {feedbacks.slice(0, feedbacksToShow).map((feedback) => (
-                <div
-                  key={feedback._id}
-                  className="product-detail-feedback-item"
-                  role="listitem"
-                >
-                  <div className="product-detail-feedback-header">
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <img
-                        src={feedback.order_id?.acc_id?.image}
-                        alt={
-                          feedback.order_id?.acc_id?.username
-                            ? `${feedback.order_id.acc_id.username}'s profile picture`
-                            : 'Default profile picture'
-                        }
-                        style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #d5d9d9' }}
-                      />
-                      <span className="product-detail-feedback-username" style={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                        {feedback.order_id?.acc_id?.username || "Anonymous"}
-                      </span>
-                    </span>
-                    <span className="product-detail-feedback-date" style={{ alignSelf: 'center', display: 'flex', alignItems: 'center', height: '100%' }}>
-                      {formatDate(feedback.order_id?.orderDate)}
-                    </span>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
+            {feedbacks
+              .filter(feedback => !feedback.feedback?.is_deleted) // Filter out deleted feedbacks
+              .slice(0, 2)
+              .map((feedback) => (
+                <div key={feedback._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        {feedback.customer?.image ? (
+                          <img
+                            src={feedback.customer.image}
+                            alt={feedback.customer?.username || 'User'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div
+                          className={`w-full h-full flex items-center justify-center text-white font-bold ${feedback.customer?.image ? 'hidden' : 'flex'}`}
+                        >
+                          {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">
+                          {feedback.customer?.username || "Anonymous"}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
+                        </div>
+                      </div>
+                    </div>
+                    {feedback.feedback?.has_rating && (
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <svg
+                            key={i}
+                            className={`w-4 h-4 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="product-detail-feedback-details">
-                    <p>
-                      <strong>Product:</strong>{' '}
-                      {feedback.variant_id?.pro_id?.pro_name || 'N/A'}
+                  {feedback.feedback?.has_content && (
+                    <p className="text-gray-700 text-sm line-clamp-2">
+                      "{feedback.feedback.content}"
                     </p>
-                    <p>
-                      <strong>Color:</strong>{' '}
-                      {feedback.variant_id?.color_id?.color_name || 'N/A'}
-                    </p>
-                    <p>
-                      <strong>Size:</strong>{' '}
-                      {feedback.variant_id?.size_id?.size_name || 'N/A'}
-                    </p>
-                  </div>
-                  <p className="product-detail-feedback-text">
-                    {feedback.feedback_details || 'No feedback provided'}
-                  </p>
+                  )}
                 </div>
               ))}
-            </div>
-            {feedbacks.length > feedbacksToShow && (
-              <div className="product-detail-view-more-container">
-                <button
-                  className="product-detail-add-to-favorites product-detail-view-more-btn"
-                  onClick={() => setFeedbacksToShow((prev) => prev + 5)}
-                  type="button"
+            {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length > 2 && (
+              <div className="text-center">
+                <Link
+                  to={selectedVariant ? `/product/${id}/feedback/${selectedVariant._id}` : `/product/${id}/feedback`}
+                  className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  View More
-                </button>
+                  View {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length - 2} more reviews
+                  <i className="lni lni-arrow-right ml-1"></i>
+                </Link>
               </div>
             )}
-          </>
+          </div>
+        )}
+
+        {/* No Feedback State */}
+        {!feedbackLoading && !feedbackError && feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length === 0 && (
+          <div className="text-center py-12">
+            <div className="mb-6">
+              <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
+              <h3 className="text-xl font-medium text-gray-900 mb-2">No Reviews Yet</h3>
+            </div>
+          </div>
         )}
       </div>
     </div>

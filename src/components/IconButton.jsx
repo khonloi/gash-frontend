@@ -14,7 +14,7 @@ export default function IconButton({
       title={title}
       className={`relative p-2 rounded-full bg-gray-800 text-white 
         transition-all duration-200 
-        hover:bg-gray-700 hover:scale-110 hover:shadow-md 
+        hover:bg-[#ffb300]/20 hover:scale-125 hover:shadow-lg 
         active:scale-95 ${className}`}
     >
       {children}
