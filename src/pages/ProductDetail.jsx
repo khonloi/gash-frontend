@@ -21,8 +21,6 @@ import {
   TOAST_TIMEOUT,
 } from "../constants/constants";
 
-
-
 const THUMBNAILS_PER_PAGE = 4;
 
 // Custom hooks
@@ -52,7 +50,6 @@ const useLocalStorage = (key, defaultValue) => {
   return [value, setStoredValue];
 };
 
-
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -75,6 +72,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const { showToast } = useToast();
 
   // State management
   const [product, setProduct] = useState(null);
@@ -91,15 +89,12 @@ const ProductDetail = () => {
   const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
-  const { showToast } = useToast();
   const [feedbacks, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState(null);
-  // const [feedbackStats, setFeedbackStats] = useState(null); // Removed as not used in preview
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
-  // Removed feedbacksToShow as it's no longer needed in the preview
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -107,12 +102,16 @@ const ProductDetail = () => {
   // Local storage
   const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
 
-  // Pre-index variants
+  // Pre-index variants (only active variants)
   const variantIndex = useMemo(() => {
     const index = { byColor: {}, bySize: {}, byColorSize: {} };
-    variants.forEach((variant) => {
-      const color = variant.color_id?.color_name;
-      const size = variant.size_id?.size_name;
+    const activeVariants = variants.filter(v => 
+      !v.variantStatus || v.variantStatus === 'active'
+    );
+    
+    activeVariants.forEach((variant) => {
+      const color = variant.productColorId?.color_name;
+      const size = variant.productSizeId?.size_name;
       if (color) {
         index.byColor[color] = index.byColor[color] || [];
         index.byColor[color].push(variant);
@@ -128,19 +127,62 @@ const ProductDetail = () => {
     return index;
   }, [variants]);
 
-  // Combine product.imageURL and additional images
+  // Get all thumbnails: main product image + active variant images
   const allThumbnails = useMemo(() => {
     const thumbnails = [];
-    if (product?.imageURL) {
-      thumbnails.push({ _id: "default", imageURL: product.imageURL });
+    
+    const mainImage = images.find(img => img.isMain);
+    if (mainImage) {
+      thumbnails.push({
+        _id: mainImage._id,
+        imageUrl: mainImage.imageUrl,
+        isMain: true,
+        variant: null
+      });
+    } else if (images.length > 0) {
+      thumbnails.push({
+        _id: images[0]._id,
+        imageUrl: images[0].imageUrl,
+        isMain: true,
+        variant: null
+      });
     }
-    return [...thumbnails, ...images];
-  }, [product?.imageURL, images]);
+    
+    const seenImages = new Set([thumbnails[0]?.imageUrl]);
+    variants
+      .filter(v => (!v.variantStatus || v.variantStatus === 'active') && v.variantImage)
+      .forEach(variant => {
+        if (!seenImages.has(variant.variantImage)) {
+          thumbnails.push({
+            _id: variant._id,
+            imageUrl: variant.variantImage,
+            isMain: false,
+            variant: variant
+          });
+          seenImages.add(variant.variantImage);
+        }
+      });
+    
+    return thumbnails;
+  }, [images, variants]);
+
+  // Get lowest price variant (only from active variants)
+  const lowestPriceVariant = useMemo(() => {
+    const activeVariants = variants.filter(v => !v.variantStatus || v.variantStatus === 'active');
+    if (activeVariants.length === 0) return null;
+    
+    return activeVariants.reduce((lowest, variant) => {
+      if (!lowest || variant.variantPrice < lowest.variantPrice) {
+        return variant;
+      }
+      return lowest;
+    }, null);
+  }, [variants]);
 
   // Data fetching
   const fetchProductAndVariants = useCallback(async () => {
     if (!id) {
-      setError("Product ID is required");
+      showToast("Product ID is required", "error", TOAST_TIMEOUT);
       return;
     }
 
@@ -148,58 +190,65 @@ const ProductDetail = () => {
     setError(null);
 
     try {
-      const [productResponse, variantsResponse] = await Promise.all([
-        Api.products.getProduct(id),
-        Api.products.getVariants(id),
-      ]);
-
-      let imagesResponse = [];
-      try {
-        imagesResponse = await Api.products.getImages(id);
-      } catch {
-        imagesResponse = [];
-      }
+      const productResponse = await Api.newProducts.getById(id);
 
       if (!productResponse) {
         throw new Error("Product not found");
       }
 
-      setProduct(productResponse.data);
-      setVariants(variantsResponse.data || []);
-      setImages(imagesResponse.data || []);
+      const productData = productResponse.data?.data || productResponse.data;
+      
+      if (!productData) {
+        throw new Error("Product data is empty");
+      }
 
-      if (!Array.isArray(variantsResponse.data) || variantsResponse.data.length === 0) {
+      setProduct(productData);
+      
+      const productVariants = productData.productVariantIds || [];
+      setVariants(productVariants);
+
+      const productImages = productData.productImageIds || [];
+      setImages(productImages);
+
+      if (!Array.isArray(productVariants) || productVariants.length === 0) {
         setAvailableColors([]);
         setAvailableSizes([]);
         setSelectedVariant(null);
+        console.warn("Product has no variants");
       } else {
+        const activeVariants = productVariants.filter(v => 
+          !v.variantStatus || v.variantStatus === 'active'
+        );
+        
         const uniqueColors = [
           ...new Set(
-            variantsResponse.data.map((v) => v.color_id?.color_name).filter(Boolean)
+            activeVariants.map((v) => v.productColorId?.color_name).filter(Boolean)
           ),
         ].sort();
         const uniqueSizes = [
           ...new Set(
-            variantsResponse.data.map((v) => v.size_id?.size_name).filter(Boolean)
+            activeVariants.map((v) => v.productSizeId?.size_name).filter(Boolean)
           ),
         ].sort();
         setAvailableColors(uniqueColors);
         setAvailableSizes(uniqueSizes);
 
-        // Reset local storage state for new product
         setSelectedColor(null);
         setSelectedSize(null);
         setQuantity(1);
         setSelectedVariant(null);
       }
 
-      setSelectedImage(productResponse.data.imageURL || "/placeholder-image.png");
+      const mainImage = productImages.find(img => img.isMain);
+      const defaultImageUrl = mainImage?.imageUrl || productImages[0]?.imageUrl || "/placeholder-image.png";
+      setSelectedImage(defaultImageUrl);
     } catch (err) {
-      setError(err.message || "Failed to fetch product details");
+      console.error("Error fetching product:", err);
+      showToast(err.response?.data?.message || err.message || "Failed to fetch product details", "error", TOAST_TIMEOUT);
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, showToast]);
 
   const fetchFavorites = useCallback(async () => {
     if (!user || !localStorage.getItem("token")) {
@@ -215,11 +264,11 @@ const ProductDetail = () => {
       setIsFavorited(!!favorite);
       setFavoriteId(favorite?._id || null);
     } catch (err) {
-      setError(err.message || "Failed to fetch favorites");
+      showToast(err.message || "Failed to fetch favorites", "error", TOAST_TIMEOUT);
       setIsFavorited(false);
       setFavoriteId(null);
     }
-  }, [id, user]);
+  }, [id, user, showToast]);
 
   const fetchFeedbacks = useCallback(async (variantId = null, page = 1, limit = 10) => {
     setFeedbackLoading(true);
@@ -227,10 +276,8 @@ const ProductDetail = () => {
 
     try {
       if (variantId) {
-        // Fetch feedbacks for specific variant with pagination (limit to 10 for preview)
         const feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
 
-        // Handle the exact API response structure
         if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
           setFeedbacks(feedbackResponse.data.feedbacks);
         } else if (feedbackResponse.data && Array.isArray(feedbackResponse.data)) {
@@ -239,7 +286,6 @@ const ProductDetail = () => {
           setFeedbacks([]);
         }
       } else {
-        // No variant selected, set empty feedbacks
         setFeedbacks([]);
       }
     } catch (err) {
@@ -247,18 +293,17 @@ const ProductDetail = () => {
       if (err.status === 404) {
         setFeedbacks([]);
       } else {
-        setFeedbackError(err.message || "Failed to fetch feedback");
+        showToast(err.message || "Failed to fetch feedback", "error", TOAST_TIMEOUT);
       }
     } finally {
       setFeedbackLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   // Initial fetch
   useEffect(() => {
     fetchProductAndVariants();
     fetchFavorites();
-    // setFeedbacksToShow(5); // Removed as no longer needed
   }, [id, fetchFavorites, fetchProductAndVariants]);
 
   // Fetch feedbacks when variant is selected
@@ -268,25 +313,13 @@ const ProductDetail = () => {
     }
   }, [selectedVariant, fetchFeedbacks]);
 
-  // Auto-select first variant if none selected (like in ProductFeedback.jsx)
-  useEffect(() => {
-    if (variants.length > 0 && !selectedVariant) {
-      setSelectedVariant(variants[0]);
-    }
-  }, [variants, selectedVariant]);
-
-  // Focus error
-  useEffect(() => {
-    if (error) {
-      const errorElement = document.querySelector(".product-detail-error");
-      errorElement?.focus();
-    }
-  }, [error]);
-
-  // Stock status
+  // Stock status - based on selected variant (include inactive variants with stock)
   const isInStock = useMemo(
-    () => product?.status_product === "active",
-    [product]
+    () => {
+      if (!selectedVariant) return false;
+      return selectedVariant.variantStatus !== "discontinued" && selectedVariant.stockQuantity > 0;
+    },
+    [selectedVariant]
   );
 
   // Quantity validation
@@ -296,25 +329,19 @@ const ProductDetail = () => {
       const parsedValue = parseInt(value, 10);
       if (isNaN(parsedValue) || parsedValue < 1) {
         setQuantity(1);
-        setError("Quantity must be at least 1");
+        showToast("Quantity must be at least 1", "error", TOAST_TIMEOUT);
+      } else if (selectedVariant?.stockQuantity && parsedValue > selectedVariant.stockQuantity) {
+        setQuantity(selectedVariant.stockQuantity);
+        showToast(`Quantity cannot exceed ${selectedVariant.stockQuantity}`, "error", TOAST_TIMEOUT);
       } else {
-        const maxQuantity = selectedVariant?.quantity
-          ? Math.min(selectedVariant.quantity, 99)
-          : 99;
-        if (parsedValue > maxQuantity) {
-          setQuantity(maxQuantity);
-          setError(`Quantity cannot exceed ${maxQuantity}`);
-        } else {
-          setQuantity(parsedValue);
-          setError(null);
-        }
+        setQuantity(parsedValue);
       }
       setStoredState((prev) => ({
         ...prev,
         [id]: { ...prev[id], quantity: parsedValue },
       }));
     },
-    [id, selectedVariant, setStoredState]
+    [id, selectedVariant, setStoredState, showToast]
   );
 
   // Event handlers
@@ -324,12 +351,18 @@ const ProductDetail = () => {
       setSelectedColor(color);
       setSelectedSize(null);
       setSelectedVariant(null);
+      
+      const colorVariants = variantIndex.byColor[color];
+      if (colorVariants && colorVariants.length > 0 && colorVariants[0].variantImage) {
+        setSelectedImage(colorVariants[0].variantImage);
+      }
+      
       setStoredState((prev) => ({
         ...prev,
         [id]: { ...prev[id], selectedColor: color, selectedSize: null },
       }));
     },
-    [id, setStoredState]
+    [id, setStoredState, variantIndex]
   );
 
   const handleSizeClick = useCallback(
@@ -342,6 +375,10 @@ const ProductDetail = () => {
         : variantIndex.bySize[size]?.[0] || null;
       setSelectedVariant(variant);
 
+      if (variant?.variantImage) {
+        setSelectedImage(variant.variantImage);
+      }
+
       setStoredState((prev) => ({
         ...prev,
         [id]: { ...prev[id], selectedSize: size },
@@ -351,18 +388,38 @@ const ProductDetail = () => {
   );
 
   const handleImageClick = useCallback(
-    (imageURL) => {
-      if (selectedImage === imageURL) {
-        setSelectedImage(product?.imageURL || "/placeholder-image.png");
+    (thumbnail) => {
+      setSelectedImage(thumbnail.imageUrl);
+      
+      if (thumbnail.variant) {
+        const variant = thumbnail.variant;
+        const color = variant.productColorId?.color_name;
+        const size = variant.productSizeId?.size_name;
+        
+        setSelectedColor(color);
+        setSelectedSize(size);
+        setSelectedVariant(variant);
+        
+        setStoredState((prev) => ({
+          ...prev,
+          [id]: { ...prev[id], selectedColor: color, selectedSize: size },
+        }));
       } else {
-        setSelectedImage(imageURL);
+        setSelectedColor(null);
+        setSelectedSize(null);
+        setSelectedVariant(null);
+        
+        setStoredState((prev) => ({
+          ...prev,
+          [id]: { ...prev[id], selectedColor: null, selectedSize: null },
+        }));
       }
     },
-    [selectedImage, product?.imageURL]
+    [id, setStoredState]
   );
 
   const handleOpenLightbox = useCallback(() => {
-    const allImages = allThumbnails.map((thumb) => thumb.imageURL);
+    const allImages = allThumbnails.map((thumb) => thumb.imageUrl);
     const index = allImages.indexOf(selectedImage);
     setLightboxIndex(index !== -1 ? index : 0);
     setIsLightboxOpen(true);
@@ -443,7 +500,6 @@ const ProductDetail = () => {
       const message = err.message || isFavorited
         ? "Failed to remove from favorites"
         : "Failed to add to favorites";
-      setError(message);
       showToast(message, "error", TOAST_TIMEOUT);
     } finally {
       setIsAddingToFavorites(false);
@@ -457,17 +513,17 @@ const ProductDetail = () => {
     }
 
     if (!selectedVariant) {
-      setError("Please select a valid color and size combination");
+      showToast("Please select a valid color and size combination", "error", TOAST_TIMEOUT);
       return;
     }
 
     if (!isInStock) {
-      setError("Product is out of stock");
+      showToast("Product is out of stock", "error", TOAST_TIMEOUT);
       return;
     }
 
-    if (selectedVariant.quantity && quantity > selectedVariant.quantity) {
-      setError(`Only ${selectedVariant.quantity} items available in stock`);
+    if (selectedVariant.stockQuantity && quantity > selectedVariant.stockQuantity) {
+      showToast(`Only ${selectedVariant.stockQuantity} items available in stock`, "error", TOAST_TIMEOUT);
       return;
     }
 
@@ -475,24 +531,23 @@ const ProductDetail = () => {
 
     try {
       const cartItem = {
-        acc_id: user._id,
-        variant_id: selectedVariant._id,
-        pro_quantity: quantity,
-        pro_price: product.pro_price,
+        accountId: user._id,
+        variantId: selectedVariant._id,
+        productQuantity: quantity.toString(),
+        productPrice: selectedVariant.variantPrice,
       };
 
       const token = localStorage.getItem("token");
-      await Api.cart.addItem(cartItem, token);
+      await Api.newCart.create(cartItem, token);
 
       showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully!`, "success", TOAST_TIMEOUT);
     } catch (err) {
-      const message = err.message || "Failed to add item to cart";
-      setError(message);
+      const message = err.response?.data?.message || err.message || "Failed to add item to cart";
       showToast(message, "error", TOAST_TIMEOUT);
     } finally {
       setIsAddingToCart(false);
     }
-  }, [user, selectedVariant, product, navigate, isInStock, quantity, showToast]);
+  }, [user, selectedVariant, navigate, isInStock, quantity, showToast]);
 
   const handleBuyNow = useCallback(() => {
     if (!user) {
@@ -501,17 +556,17 @@ const ProductDetail = () => {
     }
 
     if (!selectedVariant) {
-      setError("Please select a valid color and size combination");
+      showToast("Please select a valid color and size combination", "error", TOAST_TIMEOUT);
       return;
     }
 
     if (!isInStock) {
-      setError("Product is out of stock");
+      showToast("Product is out of stock", "error", TOAST_TIMEOUT);
       return;
     }
 
-    if (selectedVariant.quantity && quantity > selectedVariant.quantity) {
-      setError(`Only ${selectedVariant.quantity} items available in stock`);
+    if (selectedVariant.stockQuantity && quantity > selectedVariant.stockQuantity) {
+      showToast(`Only ${selectedVariant.stockQuantity} items available in stock`, "error", TOAST_TIMEOUT);
       return;
     }
 
@@ -522,7 +577,7 @@ const ProductDetail = () => {
         quantity,
       },
     });
-  }, [user, selectedVariant, isInStock, navigate, quantity, product]);
+  }, [user, selectedVariant, isInStock, navigate, quantity, product, showToast]);
 
   // Get visible thumbnails
   const visibleThumbnails = useMemo(() => {
@@ -598,15 +653,6 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail-container">
-      {error && (
-        <div className="product-detail-error" role="alert" tabIndex={0}>
-          <span className="product-detail-error-icon" aria-hidden="true">
-            ⚠
-          </span>
-          {error}
-        </div>
-      )}
-
       <div className="product-detail-main">
         <div className="product-detail-image-section">
           <div className="product-detail-thumbnails-container">
@@ -619,31 +665,25 @@ const ProductDetail = () => {
               <i className="lni lni-chevron-up"></i>
             </button>
             <div className="product-detail-thumbnails">
-              {visibleThumbnails.map((image, index) => (
+              {visibleThumbnails.map((thumbnail, index) => (
                 <div
-                  key={image._id || index}
-                  className={`product-detail-thumbnail ${selectedImage === image.imageURL ? "selected" : ""
+                  key={thumbnail._id || index}
+                  className={`product-detail-thumbnail ${selectedImage === thumbnail.imageUrl ? "selected" : ""
                     }`}
-                  onClick={() => handleImageClick(image.imageURL)}
+                  onClick={() => handleImageClick(thumbnail)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Select ${image._id === "default"
-                    ? "default"
-                    : `thumbnail ${thumbnailIndex + index + 1}`
-                    } for ${product.pro_name || "Product"}`}
+                  aria-label={`Select thumbnail ${thumbnailIndex + index + 1} for ${product.productName || "Product"}`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      handleImageClick(image.imageURL);
+                      handleImageClick(thumbnail);
                       e.preventDefault();
                     }
                   }}
                 >
                   <img
-                    src={image.imageURL}
-                    alt={`${product.pro_name || "Product"} ${image._id === "default"
-                      ? "default"
-                      : `thumbnail ${thumbnailIndex + index + 1}`
-                      }`}
+                    src={thumbnail.imageUrl}
+                    alt={`${product.productName || "Product"} thumbnail ${thumbnailIndex + index + 1}`}
                     loading="lazy"
                   />
                 </div>
@@ -663,17 +703,16 @@ const ProductDetail = () => {
           <div className="product-detail-image">
             <img
               src={selectedImage || "/placeholder-image.png"}
-              alt={`${product.pro_name || "Product"}`}
+              alt={`${product.productName || "Product"}`}
               onClick={handleOpenLightbox}
               onError={(e) => {
                 e.target.src = "/placeholder-image.png";
-                e.target.alt = `Not available for ${product.pro_name || "product"
-                  }`;
+                e.target.alt = `Not available for ${product.productName || "product"}`;
               }}
               loading="lazy"
               role="button"
               tabIndex={0}
-              aria-label={`Open lightbox for ${product.pro_name || "Product"} image`}
+              aria-label={`Open lightbox for ${product.productName || "Product"} image`}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   handleOpenLightbox();
@@ -685,18 +724,23 @@ const ProductDetail = () => {
         </div>
 
         <div className="product-detail-info">
-          <h1>{product.pro_name || "Unnamed Product"}</h1>
+          <h1>{product?.productName || "Unnamed Product"}</h1>
           <div className="product-detail-price">
-            {formatPrice(product.pro_price)}
+            {selectedVariant && selectedVariant.variantPrice 
+              ? formatPrice(selectedVariant.variantPrice) 
+              : lowestPriceVariant 
+                ? `From ${formatPrice(lowestPriceVariant.variantPrice)}`
+                : "No variants available"}
           </div>
           <div className="product-detail-stock-status">
             <span
-              className={`product-detail-stock ${isInStock ? "in-stock" : "out-of-stock"
-                }`}
+              className={`product-detail-stock ${isInStock ? "in-stock" : "out-of-stock"}`}
             >
-              {isInStock ? "In Stock" : "Out of Stock"}
-              {selectedVariant?.quantity &&
-                ` (${selectedVariant.quantity} available)`}
+              {selectedVariant 
+                ? (isInStock ? "In Stock" : "Out of Stock")
+                : "Select a variant to check stock"}
+              {selectedVariant?.stockQuantity > 0 &&
+                ` (${selectedVariant.stockQuantity} available)`}
             </span>
           </div>
           <div className="product-detail-variants">
@@ -752,7 +796,6 @@ const ProductDetail = () => {
                 value={quantity}
                 onChange={handleQuantityChange}
                 min="1"
-                max={selectedVariant?.quantity || 99}
                 disabled={!selectedVariant || !isInStock}
                 aria-label="Select quantity"
               />
@@ -836,12 +879,12 @@ const ProductDetail = () => {
             </button>
             <div className="product-detail-lightbox-image-container">
               <img
-                src={allThumbnails[lightboxIndex]?.imageURL || "/placeholder-image.png"}
-                alt={`${product.pro_name || "Product"} image ${lightboxIndex + 1}`}
+                src={allThumbnails[lightboxIndex]?.imageUrl || "/placeholder-image.png"}
+                alt={`${product.productName || "Product"} image ${lightboxIndex + 1}`}
                 style={{ transform: `scale(${zoomLevel})` }}
                 onError={(e) => {
                   e.target.src = "/placeholder-image.png";
-                  e.target.alt = `Not available for ${product.pro_name || "product"}`;
+                  e.target.alt = `Not available for ${product.productName || "product"}`;
                 }}
               />
             </div>
@@ -870,7 +913,7 @@ const ProductDetail = () => {
         </div>
       )}
 
-      {product.description && (
+      {product?.description && (
         <div className="product-detail-description">
           <h2>Product Description</h2>
           <div className="markdown-content">
@@ -883,7 +926,6 @@ const ProductDetail = () => {
 
       {/* Customer Feedback Section */}
       <div className="product-detail-feedback">
-        {/* Loading State for Feedback */}
         {feedbackLoading && (
           <LoadingForm
             text="Loading reviews..."
@@ -893,7 +935,6 @@ const ProductDetail = () => {
           />
         )}
 
-        {/* Error State for Feedback */}
         {feedbackError && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <div className="flex items-center">
@@ -912,12 +953,11 @@ const ProductDetail = () => {
           </div>
         )}
 
-        {/* Recent Feedback Preview */}
         {!feedbackLoading && !feedbackError && feedbacks.length > 0 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
             {feedbacks
-              .filter(feedback => !feedback.feedback?.is_deleted) // Filter out deleted feedbacks
+              .filter(feedback => !feedback.feedback?.is_deleted)
               .slice(0, 2)
               .map((feedback) => (
                 <div key={feedback._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
@@ -986,7 +1026,6 @@ const ProductDetail = () => {
           </div>
         )}
 
-        {/* No Feedback State */}
         {!feedbackLoading && !feedbackError && feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length === 0 && (
           <div className="text-center py-12">
             <div className="mb-6">
