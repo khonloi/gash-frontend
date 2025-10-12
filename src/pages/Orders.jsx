@@ -29,34 +29,8 @@ const Orders = () => {
     async () => {
       if (!user?._id) return;
       setLoading(true);
-      setError("");
-      let fetched = false;
       try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
-        let url = "";
-        const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-        if (query && dateRegex.test(query.trim())) {
-          url = `/orders/search?acc_id=${user?._id}&q=${encodeURIComponent(query.trim())}`;
-        } else if (query && query.trim() !== "") {
-          url = `/orders/search?acc_id=${user?._id}&q=${encodeURIComponent(query)}`;
-        } else {
-          url = `/orders?acc_id=${user?._id}`;
-        }
-        const headers = { Authorization: `Bearer ${token}` };
-        const response = await fetchWithRetry(url, { method: "GET", headers });
-        const ordersData = Array.isArray(response) ? response : [];
-        const sortedOrders = ordersData.sort((a, b) => {
-          const dateA = a.orderDate ? new Date(a.orderDate) : new Date(0);
-          const dateB = b.orderDate ? new Date(b.orderDate) : new Date(0);
-          return dateB - dateA;
-        });
-        setOrders(sortedOrders);
-        if (!query || query.trim() === "") {
-          localStorage.setItem(`orders_cache_${user._id}`, JSON.stringify(sortedOrders));
-          localStorage.setItem("user_id", user._id);
-        }
-        fetched = true;
         const url = `/orders?acc_id=${user._id}`;
         const res = await axiosClient.get(url, {
           headers: { Authorization: `Bearer ${token}` },
@@ -73,55 +47,6 @@ const Orders = () => {
       } finally {
         setLoading(false);
       }
-      if (!fetched && (!query || query.trim() === "")) {
-        const userId = user?._id || localStorage.getItem("user_id");
-        if (userId) {
-          const cached = localStorage.getItem(`orders_cache_${userId}`);
-          if (cached) {
-            const cachedOrders = JSON.parse(cached);
-            const sortedCachedOrders = cachedOrders.sort((a, b) => {
-              const dateA = a.orderDate ? new Date(a.orderDate) : new Date(0);
-              const dateB = b.orderDate ? new Date(b.orderDate) : new Date(0);
-              return dateB - dateA;
-            });
-            setOrders(sortedCachedOrders);
-          }
-        }
-      }
-    },
-    [user]
-  );
-
-  const fetchOrderDetails = useCallback(
-    async (orderId) => {
-      if (
-        orderDetailsCache[orderId] &&
-        orderDetailsCache[orderId].every(
-          (detail) => detail?.variant_id?.pro_id?.imageURL || detail?.variant_id?.pro_id?.fullImageURL
-        )
-      ) {
-        setOrderDetails(orderDetailsCache[orderId]);
-        return;
-      }
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetchWithRetry(`/order-details?order_id=${orderId}`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const details = Array.isArray(response) ? response : [];
-        setOrderDetails(details);
-        if (
-          details.every(
-            (detail) => detail?.variant_id?.pro_id?.imageURL || detail?.variant_id?.pro_id?.fullImageURL
-          )
-        ) {
-          setOrderDetailsCache((prev) => ({ ...prev, [orderId]: details }));
-          localStorage.setItem(
-            "order_details_cache",
-            JSON.stringify({ ...orderDetailsCache, [orderId]: details })
-          );
     },
     [user, showToast]
   );
@@ -168,16 +93,6 @@ const Orders = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentOrders = filteredOrders.slice(startIndex, endIndex);
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
   // Pagination handlers
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -360,16 +275,6 @@ const Orders = () => {
             )}
           </div>
         </div>
-      ) : orders.length === 0 ? (
-        <div className="text-center p-8 bg-white border-2 border-gray-300 rounded-xl mb-4">
-          <p className="text-sm text-gray-600 mb-3">No orders found.</p>
-          <button
-            className="px-4 py-2.5 bg-transparent border-2 border-gray-300 rounded-full text-sm font-semibold text-blue-600 hover:bg-gray-100 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
-            onClick={() => navigate("/")}
-            aria-label="Continue shopping"
-          >
-            Continue Shopping
-          </button>
 
         {/* 📊 Results Summary */}
         <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
@@ -400,35 +305,6 @@ const Orders = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {orders.map((order) => (
-            <article
-              key={order._id}
-              className="border-2 border-gray-300 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition"
-            >
-              <div className="flex justify-between items-center mb-3 md:flex-row flex-col gap-2">
-                <div>
-                  <p className="text-base font-semibold text-blue-600 hover:text-orange-700 hover:underline">
-                    Order ID: {order._id}
-                    <div className="flex md:flex-row flex-col items-start gap-2 mt-1">
-                      <span
-                        className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border-1.5 ${
-                          order.order_status === "delivered"
-                            ? "bg-green-100 text-green-800 border-green-200"
-                            : order.order_status === "pending"
-                            ? "bg-yellow-50 text-yellow-800 border-yellow-200"
-                            : "bg-red-50 text-red-600 border-red-200"
-                        }`}
-                      >
-                        {order.order_status.charAt(0).toUpperCase() + order.order_status.slice(1)}
-                      </span>
-                      <span
-                        className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border-1.5 ${
-                          order.pay_status === "paid"
-                            ? "bg-green-100 text-green-800 border-green-200"
-                            : "bg-yellow-50 text-yellow-800 border-yellow-200"
-                        }`}
 
         {/* 🔧 Collapsible Filter Panel */}
         {showFilterPanel && (
@@ -470,8 +346,6 @@ const Orders = () => {
                           : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                           }`}
                       >
-                        {order.pay_status.charAt(0).toUpperCase() + order.pay_status.slice(1)}
-                      </span>
                         {status.charAt(0).toUpperCase() + status.slice(1)} ({count})
                       </button>
                     ) : null;
@@ -493,25 +367,7 @@ const Orders = () => {
                     </div>
                   )}
                 </div>
-                <p className="text-sm text-gray-600">Date: {formatDate(order.orderDate)}</p>
               </div>
-              <div className="flex md:flex-row flex-col justify-between items-start gap-4">
-                <div className="flex flex-col gap-1 flex-1">
-                  <p className="text-sm text-gray-600">Address: {order.addressReceive}</p>
-                  <p className="text-sm text-gray-600">Phone: {order.phone}</p>
-                  <p className="text-sm text-gray-600">Payment Method: {order.payment_method}</p>
-                  {order.order_status === "cancelled" &&
-                    order.payment_method === "VNPAY" &&
-                    order.pay_status === "paid" && (
-                      <p className="text-sm text-gray-600">Refund Status: {order.refund_status}</p>
-                    )}
-                  {order.feedback_order && order.feedback_order.trim() !== "" && (
-                    <div className="text-sm text-gray-600">
-                      <strong>Shipping Feedback:</strong>
-                      <div className="break-words whitespace-pre-line mt-1">{order.feedback_order}</div>
-                    </div>
-                  )}
-                  <p className="text-base font-semibold text-red-600">Total: {formatPrice(order.totalPrice)}</p>
             </div>
           </div>
         )}
@@ -618,27 +474,11 @@ const Orders = () => {
                     {getStatusBadge(order.pay_status, "pay")}
                   </p>
                 </div>
-                <div className="flex md:flex-col flex-row gap-2 md:items-end items-center min-w-[160px]">
-                  <button
-                    onClick={() => handleToggleDetails(order._id)}
-                    className={`px-3 py-1.5 text-sm border-2 border-gray-300 rounded-md bg-white text-blue-600 hover:bg-gray-100 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition w-[130px] text-center ${
-                      selectedOrderId === order._id ? "border-yellow-400 bg-yellow-50 font-semibold" : ""
-                    }`}
-                    aria-label={selectedOrderId === order._id ? "Hide details" : "View details"}
-                  >
-                    {selectedOrderId === order._id ? "Hide Details" : "View Details"}
-                  </button>
-                  {canCancelOrder(order) ? (
 
                 <div className="flex justify-end gap-3 mt-4">
                   {/* View Bill button - only show if order is paid */}
                   {(order.pay_status?.toLowerCase() === 'paid' || order.paymentStatus?.toLowerCase() === 'paid') && (
                     <button
-                      className="px-3 py-1.5 text-sm border-2 border-red-600 rounded-md bg-white text-red-600 hover:bg-red-50 hover:border-red-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition w-[130px] text-center"
-                      onClick={() => openCancelModal(order)}
-                      aria-label="Cancel Order"
-                    >
-                      Cancel Order
                       onClick={() => navigate(`/bills/${order._id}`)}
                       className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
                       title="View Bill"
@@ -648,84 +488,6 @@ const Orders = () => {
                       </svg>
                       View Bill
                     </button>
-                  ) : (
-                    canProvideFeedback(order) && (
-                      <button
-                        className="px-3 py-1.5 text-sm border-2 border-gray-300 rounded-md bg-white text-blue-600 hover:bg-gray-100 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition w-[130px] text-center"
-                        onClick={() => openOrderFeedbackModal(order)}
-                        aria-label={
-                          order.feedback_order && order.feedback_order.trim() !== ""
-                            ? "Edit Shipping Feedback"
-                            : "Add Shipping Feedback"
-                        }
-                      >
-                        {order.feedback_order && order.feedback_order.trim() !== ""
-                          ? "Edit Shipping Feedback"
-                          : "Add Shipping Feedback"}
-                      </button>
-                    )
-                  )}
-                </div>
-              </div>
-              {selectedOrderId === order._id && (
-                <div className="mt-3 p-4 bg-gray-50 rounded-xl">
-                  {orderDetailsCache[order._id]?.length === 0 || !orderDetailsCache[order._id] ? (
-                    <p className="text-sm text-gray-600 p-3">No details available for this order.</p>
-                  ) : (
-                    <div className="flex flex-col gap-3">
-                      {orderDetails.map((detail) => {
-                        const imageSrc =
-                          detail?.variant_id?.pro_id?.fullImageURL ||
-                          detail?.variant_id?.pro_id?.imageURL ||
-                          "/placeholder.png";
-                        return (
-                          <div key={detail._id} className="flex md:flex-row flex-col justify-between p-2 gap-2">
-                            <div className="flex-shrink-0">
-                              <img
-                                src={imageSrc}
-                                alt={detail?.variant_id?.pro_id?.pro_name || "Product Image"}
-                                className="w-16 h-16 object-cover rounded-lg border border-gray-300"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-[0.9375rem] text-blue-600 hover:text-orange-700 hover:underline">
-                                {detail?.variant_id?.pro_id?.pro_name || "Unnamed Product"}
-                              </p>
-                              <p className="text-[0.8125rem] text-gray-600">
-                                Color: {detail?.variant_id?.color_id?.color_name || "N/A"}, Size:{" "}
-                                {detail?.variant_id?.size_id?.size_name || "N/A"}
-                              </p>
-                              <p className="text-[0.8125rem] text-gray-600">Quantity: {detail?.Quantity || 0}</p>
-                              <p className="text-[0.8125rem] text-gray-600">
-                                Unit Price: {formatPrice(detail?.UnitPrice)}
-                              </p>
-                              {detail?.feedback_details && detail.feedback_details.trim() !== "" && (
-                                <div className="text-[0.8125rem] text-gray-600">
-                                  <strong>Product Feedback:</strong>
-                                  <div className="break-words whitespace-pre-line">{detail.feedback_details}</div>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex flex-col items-center gap-2 mt-2">
-                              <p className="text-[0.9375rem] font-semibold text-gray-900">
-                                {formatPrice((detail?.UnitPrice || 0) * (detail?.Quantity || 0))}
-                              </p>
-                              {canProvideDetailFeedback(order) && (
-                                <button
-                                  className="px-3 py-1.5 text-sm border-2 border-gray-300 rounded-md bg-white text-blue-600 hover:bg-gray-100 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition min-w-[160px] max-w-[220px] w-full"
-                                  onClick={() => openDetailFeedbackModal(detail)}
-                                >
-                                  {detail?.feedback_details && detail.feedback_details.trim() !== ""
-                                    ? "Edit Product Feedback"
-                                    : "Add Product Feedback"}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
                   )}
                   <button
                     onClick={() => setSelectedOrderId(order._id)}
@@ -805,26 +567,6 @@ const Orders = () => {
 
               {/* Next button */}
               <button
-                onClick={handleCancelOrder}
-                disabled={cancelModalLoading}
-                className={`px-3 py-2 text-sm font-semibold border-2 rounded-full transition ${
-                  cancelModalLoading
-                    ? "bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-transparent border-red-600 text-red-600 hover:bg-red-50 hover:border-red-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }`}
-              >
-                {cancelModalLoading ? "Cancelling..." : "Yes, Cancel"}
-              </button>
-              <button
-                onClick={closeCancelModal}
-                disabled={cancelModalLoading}
-                className={`px-3 py-2 text-sm font-semibold border-2 rounded-full transition ${
-                  cancelModalLoading
-                    ? "bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-transparent border-gray-300 text-blue-600 hover:bg-gray-100 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }`}
-              >
-                No
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${currentPage === totalPages

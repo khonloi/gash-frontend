@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Api from "../common/SummaryAPI";
@@ -22,92 +16,89 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "./IconButton";
 
 export default function Header() {
-  const { user, logout } = useContext(AuthContext);
-  const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const { user, logout } = useContext(AuthContext);
+    const [search, setSearch] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const dropdownRef = useRef(null);
-  const userMenuRef = useRef(null);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const dropdownRef = useRef(null);
+    const userMenuRef = useRef(null);
 
-  useEffect(() => {
-    setSearch("");
-    setSearchResults([]);
-    setShowDropdown(false);
-    setShowUserMenu(false);
-    setMobileSearchOpen(false);
-  }, [location]);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchSearchResults = useCallback(async (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      setShowDropdown(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      const res = await Api.products.search(query);
-      setSearchResults(res.data || []);
-      setShowDropdown(true);
-    } catch (err) {
-      console.error(err);
-      setSearchResults([]);
-      setShowDropdown(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!search.trim()) {
-      setSearchResults([]);
-      setShowDropdown(false);
-      return;
-    }
-    const debounce = setTimeout(
-      () => fetchSearchResults(search),
-      SEARCH_DEBOUNCE_DELAY
-    );
-    return () => clearTimeout(debounce);
-  }, [search, fetchSearchResults]);
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (search.trim()) {
-      navigate(`/search?q=${encodeURIComponent(search)}`);
-      setShowDropdown(false);
-      setMobileSearchOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+    useEffect(() => {
+        setSearch("");
+        setSearchResults([]);
+        setShowDropdown(false);
         setShowUserMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+        setMobileSearchOpen(false);
+    }, [location]);
 
-  const formatPrice = (price) => {
-    if (!price) return "";
-    return `${price.toLocaleString()} ₫`;
-  };
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate("/");
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const fetchSearchResults = useCallback(async (query) => {
+        if (!query.trim()) {
+            setSearchResults([]);
+            setShowDropdown(false);
+            return;
+        }
+        try {
+            setLoading(true);
+            const res = await Api.products.search(query);
+            setSearchResults(res.data || []);
+            setShowDropdown(true);
+        } catch (err) {
+            console.error(err);
+            setSearchResults([]);
+            setShowDropdown(true);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!search.trim()) {
+            setSearchResults([]);
+            setShowDropdown(false);
+            return;
+        }
+        const debounce = setTimeout(() => fetchSearchResults(search), SEARCH_DEBOUNCE_DELAY);
+        return () => clearTimeout(debounce);
+    }, [search, fetchSearchResults]);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (search.trim()) {
+            navigate(`/search?q=${encodeURIComponent(search)}`);
+            setShowDropdown(false);
+            setMobileSearchOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+                setShowUserMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const formatPrice = (price) => {
+        if (!price) return "";
+        return `${price.toLocaleString()} ₫`;
+    };
 
     // // helper cho menu mobile
     // const handleMenuClick = (path, callback) => {
@@ -116,47 +107,47 @@ export default function Header() {
     //     setShowUserMenu(false);
     // };
 
-  return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
-      <div className="max-w-7xl mx-auto h-16 sm:h-20 flex items-center px-4 sm:px-6 lg:px-12">
-        {/* ==== MOBILE HEADER ==== */}
-        <div className="flex w-full items-center justify-between sm:hidden">
-          {mobileSearchOpen ? (
-            <div className="relative w-full">
-              {/* Search form */}
-              <form
-                onSubmit={handleSearchSubmit}
-                className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden relative"
-              >
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search..."
-                  autoFocus
-                  className="flex-1 pl-4 pr-12 py-2 text-sm text-gray-900 focus:outline-none"
-                />
+    return (
+        <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
+            <div className="max-w-7xl mx-auto h-16 sm:h-20 flex items-center px-4 sm:px-6 lg:px-12">
+                {/* ==== MOBILE HEADER ==== */}
+                <div className="flex w-full items-center justify-between sm:hidden">
+                    {mobileSearchOpen ? (
+                        <div className="relative w-full">
+                            {/* Search form */}
+                            <form
+                                onSubmit={handleSearchSubmit}
+                                className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden relative"
+                            >
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search..."
+                                    autoFocus
+                                    className="flex-1 pl-4 pr-12 py-2 text-sm text-gray-900 focus:outline-none"
+                                />
 
-                {search ? (
-                  // X để clear text
-                  <button
-                    type="button"
-                    onClick={() => setSearch("")}
-                    className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
-                  >
-                    <Icon icon="line-md:close" width="20" height="20" />
-                  </button>
-                ) : (
-                  // X để đóng search bar
-                  <button
-                    type="button"
-                    onClick={() => setMobileSearchOpen(false)}
-                    className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
-                  >
-                    <Icon icon="line-md:close" width="20" height="20" />
-                  </button>
-                )}
-              </form>
+                                {search ? (
+                                    // X để clear text
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearch("")}
+                                        className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </button>
+                                ) : (
+                                    // X để đóng search bar
+                                    <button
+                                        type="button"
+                                        onClick={() => setMobileSearchOpen(false)}
+                                        className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </button>
+                                )}
+                            </form>
 
                             {/* Dropdown search*/}
                             {showDropdown && (
@@ -215,10 +206,10 @@ export default function Header() {
                                 <SearchIcon />
                             </IconButton>
 
-              {/* Logo giữa */}
-              <Link to="/" className="flex items-center justify-center">
-                <img src={gashLogo} alt="Gash Logo" className="h-6" />
-              </Link>
+                            {/* Logo giữa */}
+                            <Link to="/" className="flex items-center justify-center">
+                                <img src={gashLogo} alt="Gash Logo" className="h-8" />
+                            </Link>
 
                             {/* Menu phải */}
                             <div className="relative" ref={userMenuRef}>
@@ -315,12 +306,12 @@ export default function Header() {
                 </div>
 
 
-        {/* ==== DESKTOP HEADER ==== */}
-        <div className="hidden sm:flex w-full items-center justify-between">
-          {/* Logo trái */}
-          <Link to="/" className="flex items-center gap-2">
-            <img src={gashLogo} alt="Gash Logo" className="h-8" />
-          </Link>
+                {/* ==== DESKTOP HEADER ==== */}
+                <div className="hidden sm:flex w-full items-center justify-between">
+                    {/* Logo trái */}
+                    <Link to="/" className="flex items-center gap-2">
+                        <img src={gashLogo} alt="Gash Logo" className="h-10" />
+                    </Link>
 
                     {/* Search giữa */}
                     <div className="relative flex-1 mx-12 max-w-2xl" ref={dropdownRef}>
