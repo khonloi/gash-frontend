@@ -120,6 +120,8 @@ const Profile = () => {
       newErrors.username = "Username must be 3-30 characters";
     }
     if (name && name.length > 50) newErrors.name = "Name cannot exceed 50 characters";
+    if (name && !/^[\p{L}\p{N}\s]+$/u.test(name))
+      newErrors.name = "Name can only contain letters, numbers, and spaces";
     if (email && !/^\S+@\S+\.\S+$/.test(email))
       newErrors.email = "Valid email is required";
     if (phone && !/^\d{10}$/.test(phone))
@@ -322,27 +324,6 @@ const Profile = () => {
             <p>
               <span className="font-semibold">Address:</span>{" "}
               {profile.address || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">Role:</span>{" "}
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                profile.role === 'admin' ? 'bg-red-100 text-red-800' :
-                profile.role === 'manager' ? 'bg-blue-100 text-blue-800' :
-                'bg-green-100 text-green-800'
-              }`}>
-                {profile.role?.toUpperCase() || "USER"}
-              </span>
-            </p>
-            <p>
-              <span className="font-semibold">Status:</span>{" "}
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                profile.acc_status === 'active' ? 'bg-green-100 text-green-800' :
-                profile.acc_status === 'inactive' ? 'bg-gray-100 text-gray-800' :
-                profile.acc_status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {profile.acc_status?.toUpperCase() || "ACTIVE"}
-              </span>
             </p>
             <p>
               <span className="font-semibold">Created:</span>{" "}
