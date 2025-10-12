@@ -5,6 +5,8 @@ import Api from "../common/SummaryAPI";
 import gashLogo from "../assets/image/gash-logo.svg";
 import { SEARCH_DEBOUNCE_DELAY } from "../constants/constants";
 
+
+
 // Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -14,6 +16,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "./IconButton";
+import NotificationsDropdown from "./NotificationsDropdown";
+
 
 export default function Header() {
     const { user, logout } = useContext(AuthContext);
@@ -229,16 +233,9 @@ export default function Header() {
                                 {/* Dropdown menu */}
                                 {user && showUserMenu && (
                                     <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                navigate('/favorites');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
-                                        >
-                                            <FavoriteIcon fontSize="small" /> Favorites
-                                        </button>
+                                        <div className="px-4 py-2 hover:bg-[#ffb300]/20">
+  <NotificationsDropdown user={user} />
+</div>
 
                                         <button
                                             onMouseDown={(e) => {
@@ -386,9 +383,14 @@ export default function Header() {
                         {/* <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Messages">
                             <ChatBubbleIcon />
                         </IconButton> */}
-                        <IconButton onClick={() => user ? alert("Coming soon!") : navigate("/login")} title="Notifications">
-                            <NotificationsIcon />
-                        </IconButton>
+                        {user ? (
+  <NotificationsDropdown user={user} />
+) : (
+  <IconButton onClick={() => navigate("/login")} title="Notifications">
+    <NotificationsIcon />
+  </IconButton>
+)}
+
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => user ? setShowUserMenu((prev) => !prev) : navigate("/login")}>
                             <IconButton title="My Account">
                                 <AccountCircleIcon />

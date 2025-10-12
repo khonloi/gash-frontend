@@ -29,6 +29,7 @@ import Contact from "./pages/Contact";
 import VNPayReturn from "./pages/VNPayReturn";
 import Bill from "./pages/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
+import Notifications from "./pages/Notifications";
 
 // ==== Components ====
 import UserChat from "./components/UserChat";
@@ -91,11 +92,12 @@ const App = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/vnpay-return" element={<VNPayReturn />} />
 
-
                 {/* Ví Voucher */}
-
-                {/* Ví Voucher cho user */}
                 <Route path="/vouchers" element={<UserVoucherPage />} />
+
+                {/* ✅ Trang thông báo */}
+                <Route path="/notifications" element={<Notifications />} />
+
               </Routes>
 
               {/* Chỉ hiển thị chat khi user đã đăng nhập */}
