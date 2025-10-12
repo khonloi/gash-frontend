@@ -1,3 +1,4 @@
+// src/pages/Contact.jsx
 import React, { useState, useCallback } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import "../styles/Contact.css";
@@ -10,6 +11,7 @@ const Contact = () => {
     message: "",
   });
   const [error, setError] = useState("");
+  const [showMap, setShowMap] = useState(false);
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -26,6 +28,7 @@ const Contact = () => {
       const email = formData.email.trim();
       const phone = formData.phone.trim();
       const message = formData.message.trim();
+
       if (!name || name.length > 50) {
         setError("Name is required and cannot exceed 50 characters");
         return;
@@ -42,9 +45,10 @@ const Contact = () => {
         setError("Message is required and cannot exceed 500 characters");
         return;
       }
+
       setError("");
       console.log("Form submitted:", { name, email, phone, message });
-      // Handle form submission here (e.g., API call)
+      alert("Message sent successfully!");
     },
     [formData]
   );
@@ -57,22 +61,25 @@ const Contact = () => {
           <div className="contact-header-underline"></div>
         </h1>
         <p>
-          Sed cursus eget risus non vestibulum. Sed in molestie elit, vitae leo metus, sed imperdiet lorem fermentum et
-          metus, sed imperdiet non vestibulum. Sed in molestie elit, vitae condimentum jusnean vulputate leo metus, sed
-          imperdiet lorem fermentum et metus, sed imperdiet ursus eget risus non vestibulum. Sed in molestie elit, vitae
-          condimentum justo. Aenean vulputate leo metus, sed imperdiet lorem fermentum et metus, sed imperdiet.
+          We'd love to hear from you! Please reach out via the form or use the
+          contact details below.
         </p>
       </header>
 
       <div className="contact-content">
-        <aside className="contact-info" role="complementary" aria-label="Contact information">
+        {/* --- Info Sidebar --- */}
+        <aside
+          className="contact-info"
+          role="complementary"
+          aria-label="Contact information"
+        >
           <div className="contact-info-item">
             <div className="contact-info-icon">
               <Mail size={24} color="var(--amazon-text)" />
             </div>
             <div>
-              <h3>Mail</h3>
-              <p>help@blogdesk.com</p>
+              <h3>Email</h3>
+              <p>fptuniversityct@gmail.com</p>
             </div>
           </div>
 
@@ -82,30 +89,65 @@ const Contact = () => {
             </div>
             <div>
               <h3>Phone</h3>
-              <p>+92 - 334 - 2797084</p>
+              <p>0292 730 1866</p>
             </div>
           </div>
 
-          <div className="contact-info-item">
+          <div
+            className="contact-info-item"
+            onMouseEnter={() => setShowMap(true)}
+            onMouseLeave={() => setShowMap(false)}
+            style={{ cursor: "pointer" }}
+          >
             <div className="contact-info-icon">
               <MapPin size={24} color="var(--amazon-text)" />
             </div>
             <div>
               <h3>Address</h3>
-              <p>30 Ab 1 Johar Town F2 Block D, USA</p>
+              <a
+                href="https://www.google.com/maps/place/FPT+University+Can+Tho,+Street+600+Nguyen+Van+Cu,+An+Binh+Ward,+Ninh+Kieu,+Can+Tho/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                FPT University Can Tho, Street 600 Nguyen Van Cu, An Binh Ward,
+                Ninh Kieu District, Can Tho City
+              </a>
             </div>
           </div>
+
+          {showMap && (
+            <div className="contact-map-preview">
+              <iframe
+                title="FPT University Can Tho Map"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.155949731023!2d105.75282477589588!3d10.034317692836636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a0883564fa8e47%3A0x36a8f273c2acb3c6!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBGUFQgQ8OibiBUaMah!5e0!3m2!1svi!2s!4v1734012345678!5m2!1svi!2s"
+              />
+            </div>
+          )}
         </aside>
 
+        {/* --- Form --- */}
         <main className="contact-form-section" role="main">
           <h2>
-            Leave Message
+            Leave a Message
             <div className="contact-form-underline"></div>
           </h2>
           <form onSubmit={handleSubmit} className="contact-form">
             {error && (
-              <div className="contact-error" role="alert" style={{ color: 'red', marginBottom: 8 }}>{error}</div>
+              <div
+                className="contact-error"
+                role="alert"
+                style={{ color: "red", marginBottom: 8 }}
+              >
+                {error}
+              </div>
             )}
+
             <div className="contact-form-grid">
               <input
                 type="text"
@@ -126,6 +168,7 @@ const Contact = () => {
                 required
               />
             </div>
+
             <input
               type="tel"
               name="phone"
@@ -134,6 +177,7 @@ const Contact = () => {
               onChange={handleInputChange}
               aria-label="Your Phone"
             />
+
             <textarea
               name="message"
               placeholder="Your Message"
@@ -143,7 +187,12 @@ const Contact = () => {
               aria-label="Your Message"
               required
             />
-            <button type="submit" className="contact-submit-button" aria-label="Send message">
+
+            <button
+              type="submit"
+              className="contact-submit-button"
+              aria-label="Send message"
+            >
               <Send size={18} />
               Send Us Now
             </button>
