@@ -1,4 +1,3 @@
-// src/api/Api.js
 import axiosClient from "./axiosClient";
 
 const Api = {
@@ -259,6 +258,9 @@ const Api = {
     deleteImage: (productId, imageId, token) => axiosClient.delete(`/new-products/${productId}/images/${imageId}`, {
       headers: { Authorization: `Bearer ${token}` },
     }),
+
+    // Search products
+    search: (params) => axiosClient.get('/new-products/search', { params }),
   },
 
   // ==== New Product Variants ====

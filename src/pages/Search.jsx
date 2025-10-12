@@ -12,8 +12,10 @@ const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RE
   for (let i = 0; i < retries; i++) {
     try {
       const response = await apiCall();
+      console.log("Search API response:", response.data); // Debug log
       return response.data;
     } catch (error) {
+      console.error("Fetch retry error:", error.message); // Debug log
       if (i === retries - 1) throw error;
       await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
     }
@@ -59,7 +61,7 @@ const Search = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchWithRetry(() => Api.newProducts.search({ q: searchQuery.trim() }));
+      const response = await fetchWithRetry(() => Api.newProducts.search({ name: searchQuery.trim(), status: "active" }));
       const productsData = response?.data || response || [];
       
       if (!Array.isArray(productsData)) {
@@ -68,14 +70,15 @@ const Search = () => {
         return;
       }
       
-      // Filter active products with variants
-      const activeProducts = productsData.filter(
-        (product) => product.productStatus === "active" && 
-        product.productVariantIds?.length > 0
+      // Filter products with variants
+      const filteredProducts = productsData.filter(
+        (product) => product.productVariantIds?.length > 0
       );
       
-      setProducts(activeProducts);
+      console.log("Filtered search results:", filteredProducts); // Debug log
+      setProducts(filteredProducts);
     } catch (err) {
+      console.error("Search fetch error:", err.response?.data || err.message); // Debug log
       setError(err.response?.data?.message || err.message || "Failed to fetch search results");
       setProducts([]);
     } finally {
@@ -86,6 +89,7 @@ const Search = () => {
   // Always fetch new results when query changes
   useEffect(() => {
     if (query) {
+      console.log("Fetching search results for query:", query); // Debug log
       fetchSearchResults(query);
     } else {
       setProducts([]);
@@ -98,8 +102,9 @@ const Search = () => {
   }, []);
 
   const handleProductClick = useCallback((id) => {
-    if (!id) {
-      setError("Invalid product selected");
+    console.log("Navigating to product with ID:", id); // Debug log
+    if (!id || typeof id !== 'string' || !/^[0-9a-fA-F]{24}$/.test(id)) {
+      setError("Invalid product ID");
       return;
     }
     navigate(`/product/${id}`);
