@@ -31,6 +31,8 @@ const Profile = () => {
     email: "",
     phone: "",
     address: "",
+    gender: "",
+    dob: "",
     image: "",
   });
 
@@ -73,6 +75,8 @@ const Profile = () => {
         email: response.data.email,
         phone: response.data.phone || "",
         address: response.data.address || "",
+        gender: response.data.gender || "",
+        dob: response.data.dob || "",
         image: response.data.image || "",
       });
       showToast("Profile loaded successfully!", "success", 2000);
@@ -116,6 +120,8 @@ const Profile = () => {
       newErrors.username = "Username must be 3-30 characters";
     }
     if (name && name.length > 50) newErrors.name = "Name cannot exceed 50 characters";
+    if (name && !/^[\p{L}\p{N}\s]+$/u.test(name))
+      newErrors.name = "Name can only contain letters, numbers, and spaces";
     if (email && !/^\S+@\S+\.\S+$/.test(email))
       newErrors.email = "Valid email is required";
     if (phone && !/^\d{10}$/.test(phone))
@@ -141,6 +147,8 @@ const Profile = () => {
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        gender: formData.gender,
+        dob: formData.dob,
         image: formData.image,
       };
       const response = await Api.accounts.updateProfile(user._id, updateData);
@@ -165,6 +173,8 @@ const Profile = () => {
       const updateData = {
         ...formData,
         image: imageUrl,
+        gender: formData.gender,
+        dob: formData.dob,
       };
       Api.accounts
         .updateProfile(user._id, updateData)
@@ -215,8 +225,13 @@ const Profile = () => {
             }
           })
           .catch((err) => {
-            console.error("Upload failed:", err.response?.data || err.message);
-            showToast("An error occurred during upload.", "error", 3000);
+            console.error("❌ Upload failed details:", {
+              message: err.message,
+              status: err.response?.status,
+              data: err.response?.data,
+              config: err.config
+            });
+            showToast(`Upload failed: ${err.response?.data?.message || err.message}`, "error", 5000);
           });
       } else {
         updateProfile();
@@ -240,6 +255,8 @@ const Profile = () => {
       email: profile?.email || "",
       phone: profile?.phone || "",
       address: profile?.address || "",
+      gender: profile?.gender || "",
+      dob: profile?.dob || "",
       image: profile?.image || "",
     });
     setSelectedFile(null);
@@ -277,15 +294,16 @@ const Profile = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Profile</h1>
 
           {/* Avatar */}
-          {profile.image && (
-            <div className="flex justify-center mb-8">
-              <img
-                src={profile.image}
-                alt={profile.username || "Profile"}
-                className="w-32 h-32 rounded-full object-cover border-4 border-gray-300"
-              />
-            </div>
-          )}
+          <div className="flex justify-center mb-8">
+            <img
+              src={profile.image || "https://via.placeholder.com/128x128?text=No+Image"}
+              alt={profile.username || "Profile"}
+              className="w-32 h-32 rounded-full object-cover border-4 border-gray-300"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/128x128?text=No+Image";
+              }}
+            />
+          </div>
 
           {/* Info */}
           <div className="space-y-3 text-gray-800 mb-8 text-lg">
@@ -307,10 +325,30 @@ const Profile = () => {
               <span className="font-semibold">Address:</span>{" "}
               {profile.address || "N/A"}
             </p>
+            <p>
+              <span className="font-semibold">Created:</span>{" "}
+              {new Date(profile.createdAt).toLocaleDateString()}
+            </p>
+            {profile.gender && (
+              <p>
+                <span className="font-semibold">Gender:</span>{" "}
+                {profile.gender}
+              </p>
+            )}
+            {profile.dob && (
+              <p>
+                <span className="font-semibold">Date of Birth:</span>{" "}
+                {new Date(profile.dob).toLocaleDateString()}
+              </p>
+            )}
+            <p>
+              <span className="font-semibold">Last Updated:</span>{" "}
+              {new Date(profile.updatedAt).toLocaleDateString()}
+            </p>
           </div>
 
           {/* Buttons */}
-          {!isDeleted && (
+          {!isDeleted ? (
             <div className="flex flex-col gap-3">
               <button
                 className="px-6 py-3 rounded-full bg-yellow-400 hover:bg-yellow-500 text-base font-semibold"
@@ -329,6 +367,26 @@ const Profile = () => {
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 Close Account
+              </button>
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-center mb-2">
+                  <svg className="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <span className="text-red-800 font-semibold">Account Deleted</span>
+                </div>
+                <p className="text-red-600 text-sm">
+                  This account has been soft deleted and is no longer active.
+                </p>
+              </div>
+              <button
+                className="px-6 py-3 rounded-full bg-gray-500 hover:bg-gray-600 text-white text-base font-semibold"
+                onClick={logout}
+              >
+                Return to Login
               </button>
             </div>
           )}

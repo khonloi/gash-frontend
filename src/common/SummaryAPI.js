@@ -53,6 +53,9 @@ const Api = {
 
     softDeleteAccount: (userId) =>
       axiosClient.delete(`/accounts/soft/${userId}`),
+
+    disableAccount: (userId) =>
+      axiosClient.put(`/accounts/disable/${userId}`),
   },
 
   // ==== Cart ====

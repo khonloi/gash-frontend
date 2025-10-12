@@ -13,6 +13,8 @@ const Register = () => {
     email: location.state?.email || '',
     phone: location.state?.formData?.phone || '',
     address: location.state?.formData?.address || '',
+    gender: location.state?.formData?.gender || '',
+    dob: location.state?.formData?.dob || '',
     password: location.state?.formData?.password || '',
     repeatPassword: location.state?.formData?.repeatPassword || '',
     role: 'user',
@@ -77,6 +79,17 @@ const Register = () => {
     const password = formData.password.trim();
     const repeatPassword = formData.repeatPassword.trim();
 
+    console.log('🔍 Form validation:', {
+      username: username.length,
+      name: name.length,
+      email: email,
+      phone: phone,
+      address: address.length,
+      password: password.length,
+      repeatPassword: repeatPassword.length,
+      invalidFile
+    });
+
     if (username.length < 3 || username.length > 30) return 'Username must be between 3 and 30 characters';
     if (name && name.length > 50) return 'Name cannot exceed 50 characters';
     if (!/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email address';
@@ -102,25 +115,38 @@ const Register = () => {
       setIsLoading(true);
 
       try {
+        // Skip image upload for now to debug register issue
         let imageUrl = '';
         if (selectedFile) {
-          const uploadResponse = await Api.upload.image(selectedFile);
-          imageUrl = uploadResponse.data?.url;
-          if (!imageUrl) {
-            throw new Error('Upload completed but server did not return URL');
-          }
-          showToast('Image uploaded successfully!', 'success', 2000);
+          console.log('⚠️ Skipping image upload for debugging');
+          // const uploadResponse = await Api.upload.image(selectedFile);
+          // imageUrl = uploadResponse.data?.url;
+          // if (!imageUrl) {
+          //   throw new Error('Upload completed but server did not return URL');
+          // }
+          // showToast('Image uploaded successfully!', 'success', 2000);
         }
 
+        // Filter out fields that backend doesn't expect
+        const { repeatPassword, role, acc_status, ...filteredFormData } = formData;
+        
         const signupData = {
-          ...formData,
+          ...filteredFormData,
           image: imageUrl,
         };
 
+        console.log('📝 Signup data being sent:', signupData);
         await signup(signupData);
         showToast('Account created successfully!', 'success', 2000);
         navigate('/');
       } catch (err) {
+        console.error('❌ Register error details:', {
+          message: err.message,
+          status: err.response?.status,
+          data: err.response?.data,
+          config: err.config
+        });
+        
         let errorMessage = 'Failed to create account. Please try again.';
         if (err.response?.status === 400) {
           errorMessage = err.response.data.message || 'Invalid input data';
@@ -130,6 +156,8 @@ const Register = () => {
           errorMessage = err.response.data.errors[0]?.msg || errorMessage;
         } else if (err.message === 'Upload completed but server did not return URL') {
           errorMessage = err.message;
+        } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
+          errorMessage = 'Network error. Please check if backend is running.';
         }
         setError(errorMessage);
         showToast(errorMessage, 'error', 4000);
@@ -158,10 +186,12 @@ const Register = () => {
             { id: 'email', label: 'Email', type: 'email', required: true, readOnly: true },
             { id: 'phone', label: 'Phone', type: 'text', required: true, maxLength: 10 },
             { id: 'address', label: 'Address', type: 'text', required: true, maxLength: 100 },
+            { id: 'gender', label: 'Gender', type: 'select', required: false, options: ['Male', 'Female', 'Other'] },
+            { id: 'dob', label: 'Date of Birth', type: 'date', required: false },
             { id: 'image', label: 'Profile Image (Optional)', type: 'file', required: false },
             { id: 'password', label: 'Password', type: 'password', required: true },
             { id: 'repeatPassword', label: 'Repeat Password', type: 'password', required: true },
-          ].map(({ id, label, type, required, maxLength, readOnly }) => (
+          ].map(({ id, label, type, required, maxLength, readOnly, options }) => (
             <div className="signup-form-group" key={id}>
               <label htmlFor={id} className="signup-form-label">{label}</label>
               {id === 'image' ? (
@@ -181,6 +211,23 @@ const Register = () => {
                     </div>
                   )}
                 </div>
+              ) : type === 'select' ? (
+                <select
+                  id={id}
+                  name={id}
+                  value={formData[id]}
+                  onChange={handleChange}
+                  className="signup-form-input"
+                  aria-required={required}
+                  aria-invalid={!!error}
+                >
+                  <option value="">Select {label}</option>
+                  {options.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <input
                   id={id}

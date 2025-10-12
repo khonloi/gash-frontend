@@ -102,18 +102,28 @@ const OTPVerification = () => {
           throw new Error('OTP is missing');
         }
 
-        const emailjsResponse = await emailjs.send(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          templateParams
-        );
-        console.log('EmailJS Success (Resend):', emailjsResponse);
+        // For development: Skip EmailJS and show OTP in console
+        if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY || import.meta.env.VITE_EMAILJS_PUBLIC_KEY === 'your_emailjs_public_key_here') {
+          console.log('📧 New OTP for development:', otp);
+          setSuccess(
+            type === 'forgot-password'
+              ? `New OTP for password reset: ${otp} (Check console)`
+              : `New OTP: ${otp} (Check console)`
+          );
+        } else {
+          const emailjsResponse = await emailjs.send(
+            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+            templateParams
+          );
+          console.log('EmailJS Success (Resend):', emailjsResponse);
 
-        setSuccess(
-          type === 'forgot-password'
-            ? 'A new OTP for password reset has been sent to your email.'
-            : 'A new OTP has been sent to your email.'
-        );
+          setSuccess(
+            type === 'forgot-password'
+              ? 'A new OTP for password reset has been sent to your email.'
+              : 'A new OTP has been sent to your email.'
+          );
+        }
         setOTP('');
         otpRef.current?.focus();
       } catch (err) {
