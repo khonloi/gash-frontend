@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import axiosClient from "../common/axiosClient";
+import Api from "../common/SummaryAPI";
 import "../styles/ProductList.css";
 import {
   FILTER_STORAGE_KEY,
@@ -50,16 +50,36 @@ const useDebounce = (value, delay) => {
 // Interceptors are set in axiosClient.js
 
 // API functions
-const fetchWithRetry = async (url, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
+const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await axiosClient.get(url);
+      const response = await apiCall();
       return response.data;
     } catch (error) {
       if (i === retries - 1) throw error;
       await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
     }
   }
+};
+
+// Helper function to get minimum price from product variants
+const getMinPrice = (product) => {
+  if (!product.productVariantIds || product.productVariantIds.length === 0) {
+    return 0;
+  }
+  const prices = product.productVariantIds
+    .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
+    .map(v => v.variantPrice);
+  return prices.length > 0 ? Math.min(...prices) : 0;
+};
+
+// Helper function to get main image URL
+const getMainImageUrl = (product) => {
+  if (!product.productImageIds || product.productImageIds.length === 0) {
+    return "/placeholder-image.png";
+  }
+  const mainImage = product.productImageIds.find(img => img.isMain);
+  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
 };
 
 const ProductList = () => {
@@ -105,20 +125,29 @@ const ProductList = () => {
     setLoading(true);
     setError(null);
     try {
-      const productsData = await fetchWithRetry("/products");
+      const response = await fetchWithRetry(() => Api.newProducts.getAll());
+      const productsData = response?.data || response || [];
+      
       if (!Array.isArray(productsData) || productsData.length === 0) {
         setError("No products available at this time");
         setProducts([]);
         setCategories([]);
         return;
       }
-      setProducts(productsData);
+      
+      // Filter active products with variants
+      const activeProducts = productsData.filter(
+        (product) => product.productStatus === "active" && 
+        product.productVariantIds?.length > 0
+      );
+      
+      setProducts(activeProducts);
       const uniqueCategories = [
-        ...new Set(productsData.map((product) => product.cat_id?.cat_name).filter(Boolean)),
+        ...new Set(activeProducts.map((product) => product.categoryId?.cat_name).filter(Boolean)),
       ].sort();
       setCategories(uniqueCategories);
     } catch (err) {
-      setError(err.message || "Failed to fetch products");
+      setError(err.response?.data?.message || err.message || "Failed to fetch products");
     } finally {
       setLoading(false);
     }
@@ -126,23 +155,26 @@ const ProductList = () => {
 
   const fetchVariants = useCallback(async () => {
     try {
-      const variantsData = await fetchWithRetry("/variants");
+      const response = await fetchWithRetry(() => Api.newVariants.getAll());
+      const variantsData = response?.data || response || [];
+      
       if (!Array.isArray(variantsData)) {
         console.warn("Invalid variants data received");
         setError("Failed to load product variants");
         return;
       }
+      
       setVariants(variantsData);
       const uniqueColors = [
-        ...new Set(variantsData.map((variant) => variant.color_id?.color_name).filter(Boolean)),
+        ...new Set(variantsData.map((variant) => variant.productColorId?.color_name).filter(Boolean)),
       ].sort();
       const uniqueSizes = [
-        ...new Set(variantsData.map((variant) => variant.size_id?.size_name).filter(Boolean)),
+        ...new Set(variantsData.map((variant) => variant.productSizeId?.size_name).filter(Boolean)),
       ].sort();
       setColors(uniqueColors);
       setSizes(uniqueSizes);
     } catch (err) {
-      setError(err.message || "Failed to fetch variants");
+      setError(err.response?.data?.message || err.message || "Failed to fetch variants");
     }
   }, []);
 
@@ -185,9 +217,13 @@ const ProductList = () => {
   const variantIndex = useMemo(() => {
     const index = {};
     variants.forEach((variant) => {
-      if (variant.pro_id?._id) {
-        index[variant.pro_id._id] = index[variant.pro_id._id] || [];
-        index[variant.pro_id._id].push(variant);
+      if (variant.productId?._id) {
+        index[variant.productId._id] = index[variant.productId._id] || [];
+        index[variant.productId._id].push(variant);
+      } else if (variant.productId && typeof variant.productId === 'string') {
+        // Handle case where productId is just a string ID
+        index[variant.productId] = index[variant.productId] || [];
+        index[variant.productId].push(variant);
       }
     });
     return index;
@@ -197,27 +233,28 @@ const ProductList = () => {
   const filteredProducts = useMemo(() => {
     if (!products.length) return [];
 
-    let filtered = products.filter((product) => product.status_product !== "discontinued");
+    let filtered = [...products];
 
     if (debouncedCategory !== "All Categories") {
-      filtered = filtered.filter((product) => product.cat_id?.cat_name === debouncedCategory);
+      filtered = filtered.filter((product) => product.categoryId?.cat_name === debouncedCategory);
     }
 
     if ((debouncedColor !== "All Colors" || debouncedSize !== "All Sizes") && variants.length) {
       filtered = filtered.filter((product) => {
-        const productVariants = variantIndex[product._id] || [];
+        // Check variants within the product's productVariantIds
+        const productVariants = product.productVariantIds || [];
         return productVariants.some((variant) => {
           const matchesColor =
-            debouncedColor === "All Colors" || variant.color_id?.color_name === debouncedColor;
+            debouncedColor === "All Colors" || variant.productColorId?.color_name === debouncedColor;
           const matchesSize =
-            debouncedSize === "All Sizes" || variant.size_id?.size_name === debouncedSize;
+            debouncedSize === "All Sizes" || variant.productSizeId?.size_name === debouncedSize;
           return matchesColor && matchesSize;
         });
       });
     }
 
-    return filtered.sort((a, b) => (a.pro_name || "").localeCompare(b.pro_name || ""));
-  }, [products, variantIndex, debouncedCategory, debouncedColor, debouncedSize, variants.length]);
+    return filtered.sort((a, b) => (a.productName || "").localeCompare(b.productName || ""));
+  }, [products, debouncedCategory, debouncedColor, debouncedSize, variants.length]);
 
   // Event handlers
   const handleFilterChange = useCallback((filterType, value) => {
@@ -400,44 +437,43 @@ const ProductList = () => {
             role="grid"
             aria-label={`${filteredProducts.length} products`}
           >
-            {filteredProducts.map((product) => (
-              <article
-                key={product._id}
-                className={`product-list-product-card ${product.status_product === "out_of_stock" ? "out-of-stock" : ""}`}
-                onClick={() => handleProductClick(product._id)}
-                onKeyDown={(e) => handleKeyDown(e, product._id)}
-                role="gridcell"
-                tabIndex={0}
-                aria-label={`View ${product.pro_name || "product"} details${product.status_product === "out_of_stock" ? ", currently out of stock" : ""}`}
-              >
-                <div className="product-list-image-container">
-                  <img
-                    src={product.imageURL || "/placeholder-image.png"}
-                    alt={product.pro_name || "Product image"}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.target.src = "/placeholder-image.png";
-                      e.target.alt = `Image not available for ${product.pro_name || "product"}`;
-                    }}
-                  />
-                </div>
+            {filteredProducts.map((product) => {
+              const minPrice = getMinPrice(product);
+              const imageUrl = getMainImageUrl(product);
+              return (
+                <article
+                  key={product._id}
+                  className="product-list-product-card"
+                  onClick={() => handleProductClick(product._id)}
+                  onKeyDown={(e) => handleKeyDown(e, product._id)}
+                  role="gridcell"
+                  tabIndex={0}
+                  aria-label={`View ${product.productName || "product"} details`}
+                >
+                  <div className="product-list-image-container">
+                    <img
+                      src={imageUrl}
+                      alt={product.productName || "Product image"}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-image.png";
+                        e.target.alt = `Image not available for ${product.productName || "product"}`;
+                      }}
+                    />
+                  </div>
 
-                <div className="product-list-content">
-                  <h2 title={product.pro_name}>{product.pro_name || "Unnamed Product"}</h2>
-                  <p
-                    className="product-list-price"
-                    aria-label={`Price: ${formatPrice(product.pro_price)}`}
-                  >
-                    {formatPrice(product.pro_price)}
-                  </p>
-                  {/* {product.status_product === "out_of_stock" && (
-                    <p className="product-list-status" aria-label="Out of stock">
-                      Out of Stock
+                  <div className="product-list-content">
+                    <h2 title={product.productName}>{product.productName || "Unnamed Product"}</h2>
+                    <p
+                      className="product-list-price"
+                      aria-label={`Price: ${formatPrice(minPrice)}`}
+                    >
+                      {formatPrice(minPrice)}
                     </p>
-                  )} */}
-                </div>
-              </article>
-            ))}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </main>
