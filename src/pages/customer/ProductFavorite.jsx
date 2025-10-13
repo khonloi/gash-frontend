@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import axiosClient from "../common/axiosClient";
-import "../styles/ProductList.css";
+import { AuthContext } from "../../context/AuthContext";
+import axiosClient from "../../common/axiosClient";
+import "../../styles/ProductList.css";
 
 // Constants
 // Use shared axiosClient

@@ -13,28 +13,28 @@ import ProductDetail from "./pages/ProductDetail";
 import AllProductFeedback from "./pages/AllProductFeedback";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Profile from "./pages/Profile";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import Orders from "./pages/Orders";
+import Profile from "./pages/customer/Profile";
+import Cart from "./pages/customer/Cart";
+import Checkout from "./pages/customer/Checkout";
+import Orders from "./pages/customer/Orders";
 import OrderDetails from "./components/OrderDetails";
-import ProductFavorite from "./pages/ProductFavorite";
+import ProductFavorite from "./pages/customer/ProductFavorite";
 import Search from "./pages/Search";
 import OTPVerification from "./pages/OTPVerification";
-import ForgotPassword from "./pages/ForgotPassword";
+import ForgotPassword from "./pages/customer/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import VNPayReturn from "./pages/VNPayReturn";
-import Bill from "./pages/Bill";
+import Bill from "./pages/customer/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
 import Notifications from "./pages/Notifications";
 
 // ==== Components ====
 import UserChat from "./components/UserChat";
 
-// ✅ Component: chỉ hiển thị chat nếu user đã đăng nhập
+// Component: chỉ hiển thị chat nếu user đã đăng nhập
 function ChatIfLoggedIn() {
   const auth = useContext(AuthContext);
 
@@ -94,7 +94,7 @@ const App = () => {
                 {/* Ví Voucher */}
                 <Route path="/vouchers" element={<UserVoucherPage />} />
 
-                {/* ✅ Trang thông báo */}
+                {/* Trang thông báo */}
                 <Route path="/notifications" element={<Notifications />} />
 
               </Routes>

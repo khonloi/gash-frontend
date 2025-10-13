@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 import emailjs from '@emailjs/browser';
-import '../styles/Signup.css';
+import '../../styles/Signup.css';
 
 // Initialize EmailJS with Public API Key
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -72,8 +72,8 @@ const ForgotPassword = () => {
         }
 
         const emailjsResponse = await emailjs.send(
-          process.env.REACT_APP_EMAILJS_SERVICE_ID,
-          process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
           templateParams
         );
         console.log('EmailJS Success:', emailjsResponse);

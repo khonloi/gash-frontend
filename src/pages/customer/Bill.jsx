@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import Api from '../common/SummaryAPI';
-import LoadingSpinner, { LoadingButton } from '../components/LoadingSpinner';
-import { useToast } from '../hooks/useToast';
-import gashLogo from '../assets/image/gash-logo.svg';
+import Api from '../../common/SummaryAPI';
+import LoadingSpinner, { LoadingButton } from '../../components/LoadingSpinner';
+import { useToast } from '../../hooks/useToast';
+import gashLogo from '../../assets/image/gash-logo.svg';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 

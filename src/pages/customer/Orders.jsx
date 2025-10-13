@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import { useToast } from "../hooks/useToast";
-import Api from "../common/SummaryAPI";
-import OrderDetailsModal from "../components/OrderDetails";
-import LoadingSpinner, { LoadingCard, LoadingSkeleton, LoadingButton } from "../components/LoadingSpinner";
+import { AuthContext } from "../../context/AuthContext";
+import { useToast } from "../../hooks/useToast";
+import Api from "../../common/SummaryAPI";
+import OrderDetailsModal from "../../components/OrderDetails";
+import LoadingSpinner, { LoadingCard, LoadingSkeleton, LoadingButton } from "../../components/LoadingSpinner";
 
 const Orders = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -581,7 +581,7 @@ const Orders = () => {
         )}
       </div>
 
-      {/* 🟡 Order Details Modal */}
+      {/* Order Details Modal */}
       {selectedOrderId && (
         <OrderDetailsModal
           orderId={selectedOrderId}

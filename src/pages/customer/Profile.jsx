@@ -6,13 +6,13 @@ import React, {
   useRef,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import Api from "../common/SummaryAPI";
-import { useToast } from "../hooks/useToast";
+import { AuthContext } from "../../context/AuthContext";
+import Api from "../../common/SummaryAPI";
+import { useToast } from "../../hooks/useToast";
 
 // Import modal
-import EditProfileModal from "../components/EditProfileModal";
-import ChangePasswordModal from "../components/ChangePasswordModal";
+import EditProfileModal from "../../components/EditProfileModal";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
 
 const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -413,6 +413,32 @@ const Profile = () => {
       {/* Modal Change Password */}
       {showChangePassword && (
         <ChangePasswordModal handleCancel={() => setShowChangePassword(false)} />
+      )}
+
+      {/* Modal Delete Confirmation */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Account Deletion</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete your account? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

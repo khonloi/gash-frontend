@@ -1,11 +1,11 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect } from 'react';
-import OrderSuccessModal from '../components/OrderSuccessModal';
+import OrderSuccessModal from '../../components/OrderSuccessModal';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { useToast } from '../hooks/useToast';
-import '../styles/Checkout.css';
-import Api from "../common/SummaryAPI";
-import LoadingSpinner, { LoadingForm, LoadingButton } from '../components/LoadingSpinner';
+import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../hooks/useToast';
+import '../../styles/Checkout.css';
+import Api from "../../common/SummaryAPI";
+import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/LoadingSpinner';
 
 const Checkout = () => {
   // Shared success modal state
