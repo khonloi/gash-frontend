@@ -8,7 +8,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Api from "../common/SummaryAPI";
-import { useToast } from "../components/Toast";
+import { useToast } from "../hooks/useToast";
 
 // Import modal
 import EditProfileModal from "../components/EditProfileModal";

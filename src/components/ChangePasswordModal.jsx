@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { motion } from "framer-motion";
 import Api from "../common/SummaryAPI";
-import { useToast } from "./Toast";
+import { useToast } from "../hooks/useToast";
 import { AuthContext } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
 

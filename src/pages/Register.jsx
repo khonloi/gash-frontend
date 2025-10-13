@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { useToast } from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import '../styles/Register.css';
 

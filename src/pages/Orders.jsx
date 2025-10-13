@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { useToast } from "../components/Toast";
-import axiosClient from "../common/axiosClient";
+import { useToast } from "../hooks/useToast";
+import Api from "../common/SummaryAPI";
 import OrderDetailsModal from "../components/OrderDetails";
 import LoadingSpinner, { LoadingCard, LoadingSkeleton, LoadingButton } from "../components/LoadingSpinner";
 
@@ -31,11 +31,8 @@ const Orders = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const url = `/orders?acc_id=${user._id}`;
-        const res = await axiosClient.get(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = Array.isArray(res.data) ? res.data : [];
+        const response = await Api.order.getOrders(user._id, token);
+        const data = Array.isArray(response.data) ? response.data : [];
         const sorted = data.sort(
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
@@ -477,7 +474,7 @@ const Orders = () => {
 
                 <div className="flex justify-end gap-3 mt-4">
                   {/* View Bill button - only show if order is paid */}
-                  {(order.pay_status?.toLowerCase() === 'paid' || order.paymentStatus?.toLowerCase() === 'paid') && (
+                  {order.pay_status?.toLowerCase() === 'paid' && (
                     <button
                       onClick={() => navigate(`/bills/${order._id}`)}
                       className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"

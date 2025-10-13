@@ -114,21 +114,15 @@ const Api = {
 
   // ==== Order/Checkout ====
   order: {
+    // Get all orders for a user
+    getOrders: (userId, token) =>
+      axiosClient.get(`/orders?acc_id=${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+
     // Get single order details
     getOrder: (orderId, token) =>
       axiosClient.get(`/orders/get-order-by-id/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-
-    // Get order details (products in order)
-    getOrderDetails: (orderId, token) =>
-      axiosClient.get(`/order-details/get-all-order-details/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-
-    // Get single order detail by ID
-    getOrderDetailById: (orderDetailId, token) =>
-      axiosClient.get(`/order-detail/get-order-detail-by-id/${orderDetailId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
 
@@ -161,7 +155,7 @@ const Api = {
     getOrderDetailsByProduct: (productId) =>
       axiosClient.get(`/order-detail/get-order-details-by-product/${productId}`),
 
-
+    // Checkout
     checkout: (data, token) => axiosClient.post('/orders/checkout', data, {
       headers: { Authorization: `Bearer ${token}` },
     }),
@@ -169,12 +163,23 @@ const Api = {
       headers: { Authorization: `Bearer ${token}` },
     }),
 
+    // Cancel order
     cancel: (orderId, token) =>
       axiosClient.patch(
         `/orders/${orderId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       ),
+
+    // VNPay return handler
+    vnpayReturn: (params) =>
+      axiosClient.get(`/orders/vnpay-return${params}`),
+
+    // VNPay payment URL
+    getPaymentUrl: (data, token) =>
+      axiosClient.post("/orders/payment-url", data, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 
   // ==== Feedback ====

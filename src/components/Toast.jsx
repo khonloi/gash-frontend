@@ -1,7 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-
-const ToastContext = createContext();
-export const useToast = () => useContext(ToastContext);
+import React, { useState, useCallback } from "react";
+import { ToastContext } from "../context/ToastContext";
 
 export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState({
@@ -20,6 +18,13 @@ export const ToastProvider = ({ children }) => {
         setToast({ message: "", type: "", visible: false, isClosing: false });
       }, 300); // thời gian fade-out
     }, timeout);
+  }, []);
+
+  const closeToast = useCallback(() => {
+    setToast((prev) => ({ ...prev, isClosing: true }));
+    setTimeout(() => {
+      setToast({ message: "", type: "", visible: false, isClosing: false });
+    }, 300);
   }, []);
 
   const toastStyles = {
@@ -74,7 +79,7 @@ export const ToastProvider = ({ children }) => {
   };
 
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={{ showToast, closeToast }}>
       {children}
 
       {toast.visible && (
@@ -90,7 +95,20 @@ export const ToastProvider = ({ children }) => {
         >
           <div className="flex items-center gap-3">
             {icons[toast.type] || icons.info}
-            <p className="text-sm font-medium">{toast.message}</p>
+            <p className="text-sm font-medium flex-1">{toast.message}</p>
+            <button
+              onClick={closeToast}
+              className="flex-shrink-0 p-1 rounded-full hover:bg-gray-200 transition-colors"
+              aria-label="Close notification"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       )}

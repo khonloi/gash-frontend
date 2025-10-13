@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
-import { useToast } from "../components/Toast";
+import { useToast } from "../hooks/useToast";
 import FeedbackForm from "./FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
 import ImageModal from "./ImageModal";
@@ -31,8 +31,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             const response = await Api.order.getOrder(orderId, token);
 
-            // The new API returns the complete order data in response.data.data
-            const orderData = response.data.data || response.data;
+            // The API returns the complete order data in response.data.data
+            const orderData = response.data.data;
 
             setOrder(orderData);
         } catch (err) {
@@ -49,11 +49,18 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         const feedbackMap = {};
 
         // Extract feedbacks from orderDetails
-        order.orderDetails.forEach(detail => {
-            if (detail.variant?._id && detail.feedback) {
+        order.orderDetails.forEach((detail, index) => {
+            // Use index as key when variant is null, or variant._id when available
+            const key = detail.variant?._id || `item_${index}`;
+
+            if (detail.feedback) {
                 // Only include feedback if it has content or rating and is not deleted
-                if ((detail.feedback.content || detail.feedback.rating) && !detail.feedback.is_deleted) {
-                    feedbackMap[detail.variant._id] = detail.feedback;
+                // Check the has_* flags to determine if feedback exists
+                const hasContent = detail.feedback.has_content && detail.feedback.content && detail.feedback.content.trim() !== '';
+                const hasRating = detail.feedback.has_rating && detail.feedback.rating && detail.feedback.rating > 0;
+
+                if ((hasContent || hasRating) && !detail.feedback.is_deleted) {
+                    feedbackMap[key] = detail.feedback;
                 }
             }
         });
@@ -145,7 +152,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </div>
 
                     {/* --- Rating --- */}
-                    {feedback.rating && (
+                    {feedback.has_rating && feedback.rating && feedback.rating > 0 && (
                         <div className="flex items-center">
                             {[...Array(5)].map((_, i) => (
                                 <svg
@@ -166,7 +173,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         </div>
                     )}
                 </div>
-                {feedback.content && (
+                {feedback.has_content && feedback.content && feedback.content.trim() !== '' && (
                     <p className="text-gray-700 text-sm">{feedback.content}</p>
                 )}
 
@@ -256,9 +263,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 content: comment ? comment.trim() : null
             };
 
+            // For items without variant, use the orderDetail index
+            const actualVariantId = variantId.startsWith('item_') ? null : variantId;
+
             await Api.feedback.addFeedback(
                 orderId,
-                variantId,
+                actualVariantId,
                 feedbackData,
                 token
             );
@@ -338,9 +348,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 content: comment ? comment.trim() : null
             };
 
+            // For items without variant, use the orderDetail index
+            const actualVariantId = variantId.startsWith('item_') ? null : variantId;
+
             await Api.feedback.editFeedback(
                 orderId,
-                variantId,
+                actualVariantId,
                 feedbackData,
                 token
             );
@@ -419,8 +432,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     throw new Error("Authentication token is missing");
                 }
 
+                // For items without variant, use the orderDetail index
+                const actualVariantId = variantId.startsWith('item_') ? null : variantId;
 
-                await Api.feedback.deleteFeedback(orderId, variantId, token);
+                await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
 
                 // Show success message after API call succeeds
                 showToast("Feedback deleted successfully!", "success");
@@ -589,7 +604,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 Order #{order._id}
                             </h2>
                             {/* View Bill button in header - only show if order is paid */}
-                            {(order.pay_status?.toLowerCase() === 'paid' || order.paymentStatus?.toLowerCase() === 'paid') && (
+                            {order.pay_status?.toLowerCase() === 'paid' && (
                                 <button
                                     onClick={() => {
                                         onClose(); // Close the modal first
@@ -654,6 +669,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
                             <h4 className="font-semibold text-yellow-800 mb-3">Order Summary</h4>
                             <div className="space-y-2">
+                                {order.summary && (
+                                    <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
+                                        <span className="font-medium">Items:</span>
+                                        <span>{order.summary.totalItems} item(s) • {order.summary.totalQuantity} quantity</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-700 font-medium">Subtotal (before discount):</span>
                                     <span className="font-semibold text-gray-900">{formatPrice(order.totalPrice)}</span>
@@ -676,48 +697,55 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         <div className="space-y-3">
                             <h4 className="font-semibold text-gray-800 mb-3">Order Items</h4>
                             {order.orderDetails && order.orderDetails.length > 0 ? (
-                                order.orderDetails.map((d) => (
-                                    <div key={d._id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                                        <img
-                                            src={d.variant?.product?.image || "/placeholder.png"}
-                                            alt={d.variant?.product?.name}
-                                            className="w-16 h-16 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                                            onClick={() => setSelectedImage({
-                                                src: d.variant?.product?.image || "/placeholder.png",
-                                                alt: d.variant?.product?.name
-                                            })}
-                                        />
-                                        <div className="flex-1">
-                                            <p className="font-medium text-gray-900">{d.variant?.product?.name}</p>
-                                            <p className="text-sm text-gray-500">
-                                                <span className="font-medium">Color:</span> {d.variant?.color?.name || 'N/A'} |
-                                                <span className="font-medium"> Size:</span> {d.variant?.size?.name || 'N/A'} |
-                                                <span className="font-medium"> Quantity:</span> {d.quantity}
-                                            </p>
-                                            {order.order_status?.toLowerCase() === "delivered" && (
-                                                <div className="mt-2">
-                                                    {existingFeedbacks[d.variant?._id] ? (
-                                                        renderExistingFeedback(existingFeedbacks[d.variant._id], d.variant._id)
-                                                    ) : (
-                                                        <FeedbackForm
-                                                            variantId={d.variant?._id}
-                                                            onSubmit={handleFeedback}
-                                                            isSubmitting={loadingStates.submitting[d.variant?._id]}
-                                                        />
-                                                    )}
-                                                </div>
-                                            )}
+                                order.orderDetails.map((d, index) => {
+                                    // Create a unique key for feedback handling
+                                    const feedbackKey = d.variant?._id || `item_${index}`;
+
+                                    return (
+                                        <div key={d._id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                                            <img
+                                                src={d.variant?.image || "/placeholder.png"}
+                                                alt={d.variant?.product?.name || "Product"}
+                                                className="w-16 h-16 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => setSelectedImage({
+                                                    src: d.variant?.image || "/placeholder.png",
+                                                    alt: d.variant?.product?.name || "Product"
+                                                })}
+                                            />
+                                            <div className="flex-1">
+                                                <p className="font-medium text-gray-900">
+                                                    {d.variant?.product?.name || "Product (Variant not available)"}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    <span className="font-medium">Color:</span> {d.variant?.color?.name || 'N/A'} |
+                                                    <span className="font-medium"> Size:</span> {d.variant?.size?.name || 'N/A'} |
+                                                    <span className="font-medium"> Quantity:</span> {d.quantity}
+                                                </p>
+                                                {order.order_status?.toLowerCase() === "delivered" && (
+                                                    <div className="mt-2">
+                                                        {existingFeedbacks[feedbackKey] ? (
+                                                            renderExistingFeedback(existingFeedbacks[feedbackKey], feedbackKey)
+                                                        ) : (
+                                                            <FeedbackForm
+                                                                variantId={feedbackKey}
+                                                                onSubmit={handleFeedback}
+                                                                isSubmitting={loadingStates.submitting[feedbackKey]}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-gray-500">
+                                                    <span className="font-medium">Unit Price:</span> {formatPrice(d.unitPrice)}
+                                                </p>
+                                                <p className="font-semibold text-yellow-600">
+                                                    <span className="font-medium">Total:</span> {formatPrice(d.totalPrice)}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-500">
-                                                <span className="font-medium">Unit Price:</span> {formatPrice(d.unitPrice)}
-                                            </p>
-                                            <p className="font-semibold text-yellow-600">
-                                                <span className="font-medium">Total:</span> {formatPrice(d.totalPrice)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <div className="text-center py-8 text-gray-500">
                                     <p>No product details available</p>
