@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosClient from '../common/axiosClient';
+import Api from '../common/SummaryAPI';
 import OrderSuccessModal from '../components/OrderSuccessModal';
 
 export default function VNPayReturn() {
@@ -12,7 +12,7 @@ export default function VNPayReturn() {
     const fetchPaymentResult = async () => {
       const params = window.location.search;
       try {
-        const response = await axiosClient.get(`/orders/vnpay-return${params}`);
+        const response = await Api.order.vnpayReturn(params);
         const data = response.data;
         if (data.success && data.data && data.data.code === '00') {
           setStatus('success');

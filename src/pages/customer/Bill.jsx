@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import Api from '../common/SummaryAPI';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { useToast } from '../components/Toast';
-import gashLogo from '../assets/image/gash-logo.svg';
+import Api from '../../common/SummaryAPI';
+import LoadingSpinner, { LoadingButton } from '../../components/LoadingSpinner';
+import { useToast } from '../../hooks/useToast';
+import gashLogo from '../../assets/image/gash-logo.svg';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -15,7 +15,7 @@ const Bill = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isExporting, setIsExporting] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
+    // const [selectedImage, setSelectedImage] = useState(null); // Unused for now
     const billRef = useRef(null);
 
     const fetchBillData = useCallback(async () => {
@@ -106,7 +106,6 @@ const Bill = () => {
                         <div style="background: #FFCF71; padding: 24px; border-radius: 8px; border-left: 4px solid #B6771D;">
                             <h3 style="font-size: 18px; font-weight: bold; color: #7B542F; margin: 0 0 16px 0;">BILL TO:</h3>
                             <div style="color: #374151;">
-                                <p style="font-weight: 600; color: #111827; margin: 0 0 4px 0;">Name: ${billData.customer?.name || 'N/A'}</p>
                                 <p style="color: #4b5563; margin: 0 0 4px 0;">Email: ${billData.customer?.email || 'N/A'}</p>
                                 <p style="color: #4b5563; margin: 0 0 4px 0;">Phone: ${billData.customer?.phone || 'N/A'}</p>
                                 <p style="color: #4b5563; margin: 0;">Address: ${billData.customer?.address || 'N/A'}</p>
@@ -194,10 +193,10 @@ const Bill = () => {
                                     <span>Subtotal:</span>
                                     <span>${formatPrice(billData.summary?.subtotal || 0)}</span>
                                 </div>
-                                ${billData.discount?.appliedDiscount > 0 ? `
+                                ${billData.summary?.discount > 0 ? `
                                     <div style="display: flex; justify-content: space-between; color: #B6771D; margin-bottom: 8px;">
                                         <span>Discount:</span>
-                                        <span>-${formatPrice(billData.discount.appliedDiscount)}</span>
+                                        <span>-${formatPrice(billData.summary.discount)}</span>
                                     </div>
                                 ` : ''}
                                 <hr style="border: none; border-top: 1px solid #d1d5db; margin: 8px 0;" />
@@ -264,7 +263,8 @@ const Bill = () => {
             pdf.save(fileName);
 
             showToast('PDF exported successfully!', 'success');
-        } catch (err) {
+        } catch (error) {
+            console.error('PDF export error:', error);
             showToast('Failed to export PDF', 'error');
         } finally {
             setIsExporting(false);
@@ -297,31 +297,19 @@ const Bill = () => {
                 {/* Header Actions */}
                 <div className="mb-6 flex justify-between items-center no-print">
                     <div className="flex gap-3">
-                        <button
+                        <LoadingButton
                             onClick={handleExportPDF}
-                            disabled={isExporting}
-                            className="text-white px-6 py-2 rounded-lg transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                            loading={isExporting}
+                            className="text-white px-6 py-2 rounded-lg transition-colors flex items-center"
                             style={{ backgroundColor: '#FF9D00' }}
                             onMouseEnter={(e) => e.target.style.backgroundColor = '#B6771D'}
                             onMouseLeave={(e) => e.target.style.backgroundColor = '#FF9D00'}
                         >
-                            {isExporting ? (
-                                <>
-                                    <svg className="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Exporting...
-                                </>
-                            ) : (
-                                <>
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Export PDF
-                                </>
-                            )}
-                        </button>
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {isExporting ? 'Exporting...' : 'Export PDF'}
+                        </LoadingButton>
                     </div>
                 </div>
 
@@ -360,7 +348,6 @@ const Bill = () => {
                             <div className="p-6 rounded-lg" style={{ backgroundColor: '#FFCF71', borderLeft: '4px solid #B6771D' }}>
                                 <h3 className="text-lg font-bold mb-4" style={{ color: '#7B542F' }}>BILL TO:</h3>
                                 <div className="text-gray-700 space-y-1">
-                                    <p className="font-semibold text-gray-900">Name: {billData.customer?.name || 'N/A'}</p>
                                     <p className="text-gray-600">Email: {billData.customer?.email || 'N/A'}</p>
                                     <p className="text-gray-600">Phone: {billData.customer?.phone || 'N/A'}</p>
                                     <p className="text-gray-600">Address: {billData.customer?.address || 'N/A'}</p>
@@ -455,10 +442,10 @@ const Bill = () => {
                                         <span>Subtotal:</span>
                                         <span>{formatPrice(billData.summary?.subtotal || 0)}</span>
                                     </div>
-                                    {billData.discount?.appliedDiscount > 0 && (
+                                    {billData.summary?.discount > 0 && (
                                         <div className="flex justify-between" style={{ color: '#B6771D' }}>
                                             <span>Discount:</span>
-                                            <span>-{formatPrice(billData.discount.appliedDiscount)}</span>
+                                            <span>-{formatPrice(billData.summary.discount)}</span>
                                         </div>
                                     )}
                                     <hr className="border-gray-300" />

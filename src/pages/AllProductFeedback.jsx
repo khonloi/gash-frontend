@@ -3,18 +3,17 @@ import { useParams, Link } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Api from '../common/SummaryAPI';
 // import { useAuth } from '../context/AuthContext'; // Not used
-import { useToast } from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-const ProductFeedback = () => {
-    const { id, variantId } = useParams();
+const AllProductFeedback = () => {
+    const { id } = useParams();
     // const navigate = useNavigate(); // Removed as not used
     // const { user } = useAuth(); // Not used in this component
     const { showToast } = useToast();
 
     // State management
     const [product, setProduct] = useState(null);
-    const [selectedVariant, setSelectedVariant] = useState(null);
     const [feedbacks, setFeedbacks] = useState([]);
     const [feedbackStats, setFeedbackStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -22,135 +21,169 @@ const ProductFeedback = () => {
     const [feedbackError, setFeedbackError] = useState(null);
     const [feedbacksToShow, setFeedbacksToShow] = useState(5);
 
-    // Fetch product and variant details
-    const fetchProductAndVariant = useCallback(async () => {
+    // Fetch product details
+    const fetchProduct = useCallback(async () => {
         setLoading(true);
         try {
-            const [productResponse, variantsResponse] = await Promise.all([
-                Api.products.getProduct(id),
-                Api.products.getVariants(id),
-            ]);
-
+            const productResponse = await Api.newProducts.getById(id);
             setProduct(productResponse.data);
-            const variants = variantsResponse.data || [];
-
-            // Find the specific variant if variantId is provided
-            if (variantId) {
-                const variant = variants.find(v => v._id === variantId);
-                if (variant) {
-                    setSelectedVariant(variant);
-                }
-            }
-
-            // If no specific variant, use the first available variant
-            if (!variantId && variants.length > 0) {
-                setSelectedVariant(variants[0]);
-            }
         } catch (err) {
-            showToast(err.message || "Failed to fetch product details", "error");
+            console.error('Product fetch error:', err);
+            const errorMessage = err?.response?.data?.message || err?.message || "Failed to fetch product details";
+
+            if (err?.response?.status === 404) {
+                // Product not found - don't show toast, just set product to null
+                setProduct(null);
+            } else {
+                showToast(errorMessage, "error");
+            }
         } finally {
             setLoading(false);
         }
-    }, [id, variantId, showToast]);
+    }, [id, showToast]);
 
-    // Fetch feedbacks for the selected variant
-    const fetchFeedbacks = useCallback(async (variantId = null, page = 1, limit = 50) => {
+    // Fetch feedbacks for the entire product (from all variants)
+    const fetchFeedbacks = useCallback(async (productId = null, page = 1, limit = 50) => {
+        if (!productId) {
+            setFeedbacks([]);
+            setFeedbackLoading(false);
+            return;
+        }
+
         setFeedbackLoading(true);
         setFeedbackError(null);
 
         try {
-            let feedbackResponse;
-            if (variantId) {
-                // Fetch feedbacks for specific variant with pagination
-                feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
+            // Fetch ALL feedbacks for the entire product (from all variants)
+            const feedbackResponse = await Api.feedback.getAllFeedback(productId, page, limit);
 
-                // Handle the exact API response structure
-                if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
-                    // The backend already sorts feedbacks with current user first, then by date
-                    // So we can use the feedbacks as they come from the API
-                    setFeedbacks(feedbackResponse.data.feedbacks);
-                    setFeedbackStats(feedbackResponse.data.statistics || null);
-
-                    // Update product info if available
-                    if (feedbackResponse.data.product) {
-                        setProduct(prev => ({
-                            ...prev,
-                            pro_name: feedbackResponse.data.product.product_name,
-                            total_variants: feedbackResponse.data.product.total_variants
-                        }));
-                    }
-                } else if (feedbackResponse.data && Array.isArray(feedbackResponse.data)) {
-                    setFeedbacks(feedbackResponse.data);
-                    setFeedbackStats(null);
-                } else {
-                    setFeedbacks([]);
-                    setFeedbackStats(null);
+            // Handle different response structures
+            let feedbacksData = [];
+            if (feedbackResponse.data) {
+                if (feedbackResponse.data.feedbacks && Array.isArray(feedbackResponse.data.feedbacks)) {
+                    feedbacksData = feedbackResponse.data.feedbacks;
+                } else if (Array.isArray(feedbackResponse.data)) {
+                    feedbacksData = feedbackResponse.data;
+                } else if (feedbackResponse.data.data && Array.isArray(feedbackResponse.data.data)) {
+                    feedbacksData = feedbackResponse.data.data;
                 }
-            } else {
-                // Fetch feedbacks for entire product
-                feedbackResponse = await Api.products.getFeedbacks(id);
-                setFeedbacks(Array.isArray(feedbackResponse.data) ? feedbackResponse.data : []);
-                setFeedbackStats(null);
+            }
+
+            // Filter out deleted feedbacks and sort: current user first, then by date (newest first)
+            const validFeedbacks = feedbacksData
+                .filter(feedback => !feedback.feedback?.is_deleted)
+                .sort((a, b) => {
+                    // If one is current user and other is not, current user comes first
+                    if (a.customer?.is_current_user && !b.customer?.is_current_user) {
+                        return -1;
+                    }
+                    if (!a.customer?.is_current_user && b.customer?.is_current_user) {
+                        return 1;
+                    }
+
+                    // If both are current user or both are not, sort by date (newest first)
+                    const dateA = new Date(a.feedback?.created_at || a.order_date || 0);
+                    const dateB = new Date(b.feedback?.created_at || b.order_date || 0);
+                    return dateB - dateA;
+                });
+
+            setFeedbacks(validFeedbacks);
+
+            // Set statistics if available
+            if (feedbackResponse.data?.statistics) {
+                setFeedbackStats(feedbackResponse.data.statistics);
+            }
+
+            // Update product info if available
+            if (feedbackResponse.data?.product) {
+                setProduct(prev => ({
+                    ...prev,
+                    name: feedbackResponse.data.product.product_name,
+                    pro_name: feedbackResponse.data.product.product_name,
+                    total_variants: feedbackResponse.data.product.total_variants
+                }));
             }
         } catch (err) {
             console.error('Feedback fetch error:', err);
-            if (err.status === 404) {
+            const errorMessage = err?.response?.data?.message || err?.message || "Failed to load reviews";
+            setFeedbackError(errorMessage);
+
+            if (err?.response?.status === 404) {
                 setFeedbacks([]);
-                setFeedbackStats(null);
-            } else {
-                setFeedbackError(err.message || "Failed to fetch feedback");
+                setFeedbackError(null); // Don't show error for no feedbacks
+            } else if (err?.response?.status !== 401) {
+                // Don't show toast for 401 (unauthorized) as it's handled globally
+                showToast(errorMessage, "error", 3000);
             }
         } finally {
             setFeedbackLoading(false);
         }
-    }, [id]);
+    }, [showToast]);
 
     // Load data on component mount
     useEffect(() => {
-        fetchProductAndVariant();
-    }, [fetchProductAndVariant]);
-
-    // Fetch feedbacks when variant changes
-    useEffect(() => {
-        if (selectedVariant?._id) {
-            fetchFeedbacks(selectedVariant._id);
+        if (id) {
+            fetchProduct();
         }
-    }, [selectedVariant, fetchFeedbacks]);
+    }, [fetchProduct, id]);
+
+    // Fetch feedbacks when product is loaded
+    useEffect(() => {
+        if (id) {
+            fetchFeedbacks(id);
+        }
+    }, [id, fetchFeedbacks]);
 
     // Format date helper
     const formatDate = (dateString) => {
         if (!dateString) return 'Unknown Date';
         try {
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+            if (isNaN(date.getTime())) return 'Unknown Date';
+
+            // Format as DD/MM/YYYY HH:MM (Vietnamese standard)
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
         } catch {
             return 'Unknown Date';
         }
     };
 
-    // Format price helper
-    const formatPrice = (price) => {
-        if (!price) return 'N/A';
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price);
-    };
-
-    // Handle variant selection
-    const handleVariantSelect = (variant) => {
-        setSelectedVariant(variant);
-        setFeedbacksToShow(5); // Reset to show first 5 feedbacks
-    };
+    // Format price helper (for future use if needed)
+    // const formatPrice = (price) => {
+    //     if (!price) return 'N/A';
+    //     return new Intl.NumberFormat('vi-VN', {
+    //         style: 'currency',
+    //         currency: 'VND'
+    //     }).format(price);
+    // };
 
     // Show more feedbacks
     const handleShowMore = () => {
         setFeedbacksToShow(prev => prev + 5);
     };
+
+    // Early return if no product ID
+    if (!id) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Product ID</h2>
+                    <Link
+                        to="/products"
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Back to Products
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
@@ -180,8 +213,8 @@ const ProductFeedback = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Variant Selection */}
-                {product.variants && product.variants.length > 1 && (
+                {/* Variant Selection - Hidden since we show all product feedbacks */}
+                {/* {product.variants && product.variants.length > 1 && (
                     <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Variant</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -204,14 +237,21 @@ const ProductFeedback = () => {
                             ))}
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* Feedback Section */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
-                    <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">
-                            {product?.pro_name || 'Product'} Feedback
+                    <div className="mb-6 flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-gray-900">
+                            {product?.name || product?.pro_name || 'Product'} Feedback
                         </h2>
+                        <Link
+                            to={`/product/${id}`}
+                            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                        >
+                            <i className="lni lni-arrow-left mr-2"></i>
+                            Back to Product
+                        </Link>
                     </div>
 
                     {/* Loading State */}
@@ -232,7 +272,7 @@ const ProductFeedback = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={() => fetchFeedbacks(selectedVariant?._id)}
+                                onClick={() => fetchFeedbacks(id)}
                                 className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                             >
                                 Retry
@@ -246,10 +286,7 @@ const ProductFeedback = () => {
                             <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">No Feedback Yet</h3>
                             <p className="text-gray-600">
-                                {selectedVariant
-                                    ? `No feedback available for ${selectedVariant.color_id?.color_name} - ${selectedVariant.size_id?.size_name}`
-                                    : "Please select a variant to view feedback"
-                                }
+                                No feedback available for this product yet
                             </p>
                         </div>
                     )}
@@ -310,7 +347,7 @@ const ProductFeedback = () => {
                     {/* Feedback List */}
                     {!feedbackLoading && !feedbackError && feedbacks.length > 0 && (
                         <>
-                            {/* Note: Feedbacks are sorted by backend with current user's feedback first, then by date */}
+                            {/* Note: Feedbacks are sorted with current user's feedback first, then by date (newest first) */}
                             <AnimatePresence>
                                 <div className="space-y-6">
                                     {feedbacks
@@ -360,18 +397,16 @@ const ProductFeedback = () => {
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            {feedback.customer?.name && (
-                                                                <div className="text-sm text-gray-600">
-                                                                    {feedback.customer.name}
-                                                                </div>
-                                                            )}
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-sm text-gray-500">
-                                                            {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
+                                                            {feedback.feedback?.created_at
+                                                                ? formatDate(feedback.feedback.created_at)
+                                                                : feedback.order_date
+                                                                    ? formatDate(feedback.order_date)
+                                                                    : 'Unknown Date'}
                                                         </div>
-
                                                     </div>
                                                 </div>
 
@@ -429,4 +464,4 @@ const ProductFeedback = () => {
     );
 };
 
-export default ProductFeedback;
+export default AllProductFeedback;

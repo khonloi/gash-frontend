@@ -5,14 +5,15 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { useToast } from "../components/Toast";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useToast } from "../hooks/useToast";
+import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import axiosClient from '../common/axiosClient';
 import Api from '../common/SummaryAPI';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import LoadingSpinner, { LoadingForm, LoadingSkeleton } from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ProductFeedback from "../components/ProductFeedback";
 import "../styles/ProductDetail.css";
 import {
   DETAIL_STORAGE_KEY,
@@ -89,9 +90,7 @@ const ProductDetail = () => {
   const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
-  const [feedbackError, setFeedbackError] = useState(null);
+  // Feedback states moved to ProductFeedback component
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
@@ -105,10 +104,10 @@ const ProductDetail = () => {
   // Pre-index variants (only active variants)
   const variantIndex = useMemo(() => {
     const index = { byColor: {}, bySize: {}, byColorSize: {} };
-    const activeVariants = variants.filter(v => 
+    const activeVariants = variants.filter(v =>
       !v.variantStatus || v.variantStatus === 'active'
     );
-    
+
     activeVariants.forEach((variant) => {
       const color = variant.productColorId?.color_name;
       const size = variant.productSizeId?.size_name;
@@ -130,7 +129,7 @@ const ProductDetail = () => {
   // Get all thumbnails: main product image + active variant images
   const allThumbnails = useMemo(() => {
     const thumbnails = [];
-    
+
     const mainImage = images.find(img => img.isMain);
     if (mainImage) {
       thumbnails.push({
@@ -147,7 +146,7 @@ const ProductDetail = () => {
         variant: null
       });
     }
-    
+
     const seenImages = new Set([thumbnails[0]?.imageUrl]);
     variants
       .filter(v => (!v.variantStatus || v.variantStatus === 'active') && v.variantImage)
@@ -162,7 +161,7 @@ const ProductDetail = () => {
           seenImages.add(variant.variantImage);
         }
       });
-    
+
     return thumbnails;
   }, [images, variants]);
 
@@ -170,7 +169,7 @@ const ProductDetail = () => {
   const lowestPriceVariant = useMemo(() => {
     const activeVariants = variants.filter(v => !v.variantStatus || v.variantStatus === 'active');
     if (activeVariants.length === 0) return null;
-    
+
     return activeVariants.reduce((lowest, variant) => {
       if (!lowest || variant.variantPrice < lowest.variantPrice) {
         return variant;
@@ -197,13 +196,13 @@ const ProductDetail = () => {
       }
 
       const productData = productResponse.data?.data || productResponse.data;
-      
+
       if (!productData) {
         throw new Error("Product data is empty");
       }
 
       setProduct(productData);
-      
+
       const productVariants = productData.productVariantIds || [];
       setVariants(productVariants);
 
@@ -216,10 +215,10 @@ const ProductDetail = () => {
         setSelectedVariant(null);
         console.warn("Product has no variants");
       } else {
-        const activeVariants = productVariants.filter(v => 
+        const activeVariants = productVariants.filter(v =>
           !v.variantStatus || v.variantStatus === 'active'
         );
-        
+
         const uniqueColors = [
           ...new Set(
             activeVariants.map((v) => v.productColorId?.color_name).filter(Boolean)
@@ -270,35 +269,7 @@ const ProductDetail = () => {
     }
   }, [id, user, showToast]);
 
-  const fetchFeedbacks = useCallback(async (variantId = null, page = 1, limit = 10) => {
-    setFeedbackLoading(true);
-    setFeedbackError(null);
-
-    try {
-      if (variantId) {
-        const feedbackResponse = await Api.feedback.getAllFeedback(variantId, page, limit);
-
-        if (feedbackResponse.data && feedbackResponse.data.feedbacks) {
-          setFeedbacks(feedbackResponse.data.feedbacks);
-        } else if (feedbackResponse.data && Array.isArray(feedbackResponse.data)) {
-          setFeedbacks(feedbackResponse.data);
-        } else {
-          setFeedbacks([]);
-        }
-      } else {
-        setFeedbacks([]);
-      }
-    } catch (err) {
-      console.error('Feedback fetch error:', err);
-      if (err.status === 404) {
-        setFeedbacks([]);
-      } else {
-        showToast(err.message || "Failed to fetch feedback", "error", TOAST_TIMEOUT);
-      }
-    } finally {
-      setFeedbackLoading(false);
-    }
-  }, [showToast]);
+  // Feedback fetching logic moved to ProductFeedback component
 
   // Initial fetch
   useEffect(() => {
@@ -306,12 +277,7 @@ const ProductDetail = () => {
     fetchFavorites();
   }, [id, fetchFavorites, fetchProductAndVariants]);
 
-  // Fetch feedbacks when variant is selected
-  useEffect(() => {
-    if (selectedVariant?._id) {
-      fetchFeedbacks(selectedVariant._id);
-    }
-  }, [selectedVariant, fetchFeedbacks]);
+  // Feedback fetching moved to ProductFeedback component
 
   // Stock status - based on selected variant (include inactive variants with stock)
   const isInStock = useMemo(
@@ -351,12 +317,12 @@ const ProductDetail = () => {
       setSelectedColor(color);
       setSelectedSize(null);
       setSelectedVariant(null);
-      
+
       const colorVariants = variantIndex.byColor[color];
       if (colorVariants && colorVariants.length > 0 && colorVariants[0].variantImage) {
         setSelectedImage(colorVariants[0].variantImage);
       }
-      
+
       setStoredState((prev) => ({
         ...prev,
         [id]: { ...prev[id], selectedColor: color, selectedSize: null },
@@ -390,16 +356,16 @@ const ProductDetail = () => {
   const handleImageClick = useCallback(
     (thumbnail) => {
       setSelectedImage(thumbnail.imageUrl);
-      
+
       if (thumbnail.variant) {
         const variant = thumbnail.variant;
         const color = variant.productColorId?.color_name;
         const size = variant.productSizeId?.size_name;
-        
+
         setSelectedColor(color);
         setSelectedSize(size);
         setSelectedVariant(variant);
-        
+
         setStoredState((prev) => ({
           ...prev,
           [id]: { ...prev[id], selectedColor: color, selectedSize: size },
@@ -408,7 +374,7 @@ const ProductDetail = () => {
         setSelectedColor(null);
         setSelectedSize(null);
         setSelectedVariant(null);
-        
+
         setStoredState((prev) => ({
           ...prev,
           [id]: { ...prev[id], selectedColor: null, selectedSize: null },
@@ -593,17 +559,7 @@ const ProductDetail = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   }, []);
 
-  const formatDate = useCallback((dateString) => {
-    try {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return "Unknown Date";
-    }
-  }, []);
+  // formatDate moved to ProductFeedback component
 
   // Check if a color-size combination is valid
   const isValidCombination = useCallback(
@@ -726,9 +682,9 @@ const ProductDetail = () => {
         <div className="product-detail-info">
           <h1>{product?.productName || "Unnamed Product"}</h1>
           <div className="product-detail-price">
-            {selectedVariant && selectedVariant.variantPrice 
-              ? formatPrice(selectedVariant.variantPrice) 
-              : lowestPriceVariant 
+            {selectedVariant && selectedVariant.variantPrice
+              ? formatPrice(selectedVariant.variantPrice)
+              : lowestPriceVariant
                 ? `From ${formatPrice(lowestPriceVariant.variantPrice)}`
                 : "No variants available"}
           </div>
@@ -736,7 +692,7 @@ const ProductDetail = () => {
             <span
               className={`product-detail-stock ${isInStock ? "in-stock" : "out-of-stock"}`}
             >
-              {selectedVariant 
+              {selectedVariant
                 ? (isInStock ? "In Stock" : "Out of Stock")
                 : "Select a variant to check stock"}
               {selectedVariant?.stockQuantity > 0 &&
@@ -925,116 +881,9 @@ const ProductDetail = () => {
       )}
 
       {/* Customer Feedback Section */}
-      <div className="product-detail-feedback">
-        {feedbackLoading && (
-          <LoadingForm
-            text="Loading reviews..."
-            height="h-32"
-            className="mb-6"
-            size="lg"
-          />
-        )}
-
-        {feedbackError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center">
-              <i className="lni lni-warning text-red-500 text-xl mr-3"></i>
-              <div>
-                <h3 className="text-red-800 font-medium">Error Loading Reviews</h3>
-                <p className="text-red-600 text-sm mt-1">{feedbackError}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => fetchFeedbacks(selectedVariant?._id)}
-              className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        {!feedbackLoading && !feedbackError && feedbacks.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
-            {feedbacks
-              .filter(feedback => !feedback.feedback?.is_deleted)
-              .slice(0, 2)
-              .map((feedback) => (
-                <div key={feedback._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                        {feedback.customer?.image ? (
-                          <img
-                            src={feedback.customer.image}
-                            alt={feedback.customer?.username || 'User'}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div
-                          className={`w-full h-full flex items-center justify-center text-white font-bold ${feedback.customer?.image ? 'hidden' : 'flex'}`}
-                        >
-                          {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900">
-                          {feedback.customer?.username || "Anonymous"}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {feedback.order_date ? formatDate(feedback.order_date) : 'Unknown Date'}
-                        </div>
-                      </div>
-                    </div>
-                    {feedback.feedback?.has_rating && (
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            className={`w-4 h-4 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  {feedback.feedback?.has_content && (
-                    <p className="text-gray-700 text-sm line-clamp-2">
-                      "{feedback.feedback.content}"
-                    </p>
-                  )}
-                </div>
-              ))}
-            {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length > 2 && (
-              <div className="text-center">
-                <Link
-                  to={selectedVariant ? `/product/${id}/feedback/${selectedVariant._id}` : `/product/${id}/feedback`}
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  View {feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length - 2} more reviews
-                  <i className="lni lni-arrow-right ml-1"></i>
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {!feedbackLoading && !feedbackError && feedbacks.filter(feedback => !feedback.feedback?.is_deleted).length === 0 && (
-          <div className="text-center py-12">
-            <div className="mb-6">
-              <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
-              <h3 className="text-xl font-medium text-gray-900 mb-2">No Reviews Yet</h3>
-            </div>
-          </div>
-        )}
-      </div>
+      <ProductFeedback
+        productId={id}
+      />
     </div>
   );
 };

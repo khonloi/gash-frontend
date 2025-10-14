@@ -1,11 +1,11 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect } from 'react';
-import OrderSuccessModal from '../components/OrderSuccessModal';
+import OrderSuccessModal from '../../components/OrderSuccessModal';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { useToast } from '../components/Toast';
-import axiosClient from '../common/axiosClient';
-import '../styles/Checkout.css';
-import Api from "../common/SummaryAPI";
+import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../hooks/useToast';
+import '../../styles/Checkout.css';
+import Api from "../../common/SummaryAPI";
+import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/LoadingSpinner';
 
 const Checkout = () => {
   // Shared success modal state
@@ -29,11 +29,11 @@ const Checkout = () => {
   const [formData, setFormData] = useState({
     addressReceive: '',
     phone: '',
-    name: user?.name || user?.username || '',
+    name: '',
   });
-  const [paymentMethod, setPaymentMethod] = useState('COD'); // Updated to match backend enum
+  const [paymentMethod, setPaymentMethod] = useState('COD');
   const [loading, setLoading] = useState(false);
-  // ✅ Voucher state
+  // Voucher state
   const [voucherCode, setVoucherCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [appliedVoucher, setAppliedVoucher] = useState(null);
@@ -50,10 +50,8 @@ const Checkout = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
 
-      const response = await Api.utils.fetchWithRetry(`/new-carts/account/${user._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCartItems(Array.isArray(response) ? response : []);
+      const response = await Api.newCart.getByAccount(user._id, token);
+      setCartItems(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       showToast(err.message || 'Failed to load cart items', 'error');
       console.error('Fetch cart items error:', err);
@@ -157,17 +155,17 @@ const Checkout = () => {
   // Validation functions
   const validateName = useCallback((name) => {
     const trimmed = name.trim();
-    if (!trimmed) return 'Name is required';
-    if (trimmed.length < 3) return 'Name must be at least 3 characters';
-    if (trimmed.length > 30) return 'Name cannot exceed 30 characters';
-    if (!/^[a-zA-Z\s]+$/.test(trimmed)) return 'Name can only contain letters and spaces';
+    if (!trimmed) return 'Recipient name is required';
+    if (trimmed.length < 3) return 'Recipient name must be at least 3 characters';
+    if (trimmed.length > 30) return 'Recipient name cannot exceed 30 characters';
+    if (!/^[a-zA-Z0-9\s]+$/.test(trimmed)) return 'Recipient name can only contain letters, numbers and spaces';
     return null;
   }, []);
 
   const validateAddress = useCallback((address) => {
     const trimmed = address.trim();
     if (!trimmed) return 'Address is required';
-    if (trimmed.length < 10) return 'Address must be at least 10 characters';
+    if (trimmed.length < 5) return 'Address must be at least 5 characters';
     return null;
   }, []);
 
@@ -280,6 +278,7 @@ const Checkout = () => {
           paymentMethod: 'COD',
         });
         showToast('Order placed successfully!', 'success');
+        setLoading(false);
       } else if (paymentMethod === "VNPAY") {
         const orderId =
           checkoutRes?.data?.data?.order?._id ||
@@ -294,10 +293,9 @@ const Checkout = () => {
         }
 
         try {
-          const paymentUrlRes = await axiosClient.post(
-            "/orders/payment-url",
+          const paymentUrlRes = await Api.order.getPaymentUrl(
             { orderId, bankCode: "", language: "vn" },
-            { headers: { Authorization: `Bearer ${token}` } }
+            token
           );
 
           const paymentUrl = paymentUrlRes?.data?.paymentUrl;
@@ -334,21 +332,19 @@ const Checkout = () => {
   const itemsToDisplay = buyNowState
     ? [buyNowState]
     : selectedItems.length > 0
-    ? selectedItems
-    : cartItems;
+      ? selectedItems
+      : cartItems;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       {successInfo && (
         <OrderSuccessModal
-          isOpen={!!successInfo}
+          open={!!successInfo}
+          info={successInfo}
           onClose={() => {
             setSuccessInfo(null);
             navigate('/');
           }}
-          orderId={successInfo.orderId}
-          totalPrice={successInfo.amount}
-          paymentMethod={successInfo.paymentMethod}
         />
       )}
 
@@ -361,7 +357,7 @@ const Checkout = () => {
           <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
             {loading ? (
               <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600"></div>
+                <LoadingSpinner size="lg" color="yellow" />
               </div>
             ) : itemsToDisplay.length === 0 ? (
               <p className="text-center text-gray-500 py-8">No items in checkout</p>
@@ -402,7 +398,8 @@ const Checkout = () => {
                 value={voucherCode}
                 onChange={(e) => setVoucherCode(e.target.value)}
                 placeholder="Enter voucher code"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading}
               />
               <button
                 onClick={handleApplyVoucher}
@@ -445,8 +442,17 @@ const Checkout = () => {
         </div>
 
         {/* Checkout Form */}
-        {!loading && itemsToDisplay.length > 0 && (
-          <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-200">
+        {itemsToDisplay.length > 0 && (
+          <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-200 relative">
+            {loading && (
+              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-xl">
+                <div className="text-center">
+                  <LoadingSpinner size="xl" color="yellow" className="mb-4" />
+                  <p className="text-yellow-600 font-medium">Processing your order...</p>
+                  <p className="text-gray-500 text-sm mt-2">Please wait while we process your order</p>
+                </div>
+              </div>
+            )}
             <form onSubmit={handlePlaceOrder} className="space-y-6">
               {/* Shipping Information */}
               <fieldset className="space-y-4">
@@ -454,7 +460,7 @@ const Checkout = () => {
 
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name
+                    Recipient Name
                   </label>
                   <input
                     type="text"
@@ -463,9 +469,10 @@ const Checkout = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
-                    placeholder="Your name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+                    placeholder="Your recipient name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-describedby="name-description"
+                    disabled={loading}
                   />
                 </div>
 
@@ -481,8 +488,9 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your delivery address"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-describedby="address-description"
+                    disabled={loading}
                   />
                 </div>
 
@@ -498,8 +506,9 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your phone number"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-describedby="phone-description"
+                    disabled={loading}
                   />
                 </div>
               </fieldset>
@@ -508,7 +517,7 @@ const Checkout = () => {
               <fieldset className="space-y-4">
                 <legend className="text-xl font-bold text-yellow-800 mb-4">Payment Method</legend>
                 <div className="space-y-3">
-                  <label className="flex items-center p-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <label className={`flex items-center p-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
@@ -516,6 +525,7 @@ const Checkout = () => {
                       checked={paymentMethod === 'COD'}
                       onChange={handlePaymentMethodChange}
                       className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      disabled={loading}
                     />
                     <div className="ml-3">
                       <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
@@ -523,7 +533,7 @@ const Checkout = () => {
                     </div>
                   </label>
 
-                  <label className="flex items-center p-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <label className={`flex items-center p-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
@@ -531,6 +541,7 @@ const Checkout = () => {
                       checked={paymentMethod === 'VNPAY'}
                       onChange={handlePaymentMethodChange}
                       className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      disabled={loading}
                     />
                     <div className="ml-3">
                       <span className="text-sm font-medium text-gray-900">VNPay</span>
@@ -550,20 +561,13 @@ const Checkout = () => {
                 >
                   Back
                 </button>
-                <button
+                <LoadingButton
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={loading}
+                  loading={loading}
+                  className="flex-1 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition font-medium"
                 >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing...
-                    </div>
-                  ) : (
-                    paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'
-                  )}
-                </button>
+                  {paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
+                </LoadingButton>
               </div>
             </form>
           </div>

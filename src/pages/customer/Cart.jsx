@@ -7,9 +7,9 @@ import React, {
   useRef,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import axiosClient from "../common/axiosClient";
-import "../styles/Cart.css";
+import { AuthContext } from "../../context/AuthContext";
+import axiosClient from "../../common/axiosClient";
+import "../../styles/Cart.css";
 
 const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
@@ -88,14 +88,14 @@ const Cart = () => {
         const data = response.data; // Access the data property
         const items = Array.isArray(data)
           ? data
-              .map((i) => {
-                if (!i.variantId) {
-                  console.warn("Cart item missing variantId:", i);
-                  return null;
-                }
-                return { ...i, checked: i.selected };
-              })
-              .filter((item) => item !== null)
+            .map((i) => {
+              if (!i.variantId) {
+                console.warn("Cart item missing variantId:", i);
+                return null;
+              }
+              return { ...i, checked: i.selected };
+            })
+            .filter((item) => item !== null)
           : [];
         console.log("Processed cart items:", items);
         setCartItems(items);
@@ -273,9 +273,8 @@ const Cart = () => {
       <h2 className="cart-title">Shopping Cart</h2>
       {toast && (
         <div
-          className={`cart-toast ${
-            toast.type === "success" ? "cart-toast-success" : "cart-toast-error"
-          }`}
+          className={`cart-toast ${toast.type === "success" ? "cart-toast-success" : "cart-toast-error"
+            }`}
           role="alert"
         >
           {toast.message}
@@ -322,9 +321,8 @@ const Cart = () => {
                   key={item._id}
                   className="cart-item"
                   tabIndex={0}
-                  aria-label={`Cart item: ${
-                    item.variantId?.productId?.productName || "Unnamed Product"
-                  }`}
+                  aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"
+                    }`}
                 >
                   <input
                     type="checkbox"
@@ -359,7 +357,7 @@ const Cart = () => {
                       Total:{" "}
                       {formatPrice(
                         (item.productPrice || 0) *
-                          (parseInt(item.productQuantity, 10) || 0)
+                        (parseInt(item.productQuantity, 10) || 0)
                       )}
                     </p>
                   </div>
@@ -381,18 +379,16 @@ const Cart = () => {
                             handleQuantityChange(item._id, e.target.value)
                           }
                           className="cart-quantity-input"
-                          aria-label={`Quantity for ${
-                            item.variantId?.productId?.productName || "product"
-                          }`}
+                          aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"
+                            }`}
                           disabled={actionInProgress}
                         />
                       </div>
                       <button
                         className="cart-remove-button"
                         onClick={() => handleRemoveItem(item._id)}
-                        aria-label={`Remove ${
-                          item.variantId?.productId?.productName || "product"
-                        } from cart`}
+                        aria-label={`Remove ${item.variantId?.productId?.productName || "product"
+                          } from cart`}
                         disabled={actionInProgress}
                       >
                         Remove
