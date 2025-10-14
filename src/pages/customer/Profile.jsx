@@ -285,117 +285,225 @@ const Profile = () => {
   }
 
   return (
-    <div className="flex justify-center items-center py-10 bg-gray-50 min-h-screen">
-      {loading ? (
-        <div className="text-gray-500 text-sm p-4">Loading...</div>
-      ) : profile ? (
-        <div className="w-full max-w-md bg-white rounded-lg shadow p-10 text-center">
-          {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Profile</h1>
-
-          {/* Avatar */}
-          <div className="flex justify-center mb-8">
-            <img
-              src={profile.image || "https://via.placeholder.com/128x128?text=No+Image"}
-              alt={profile.username || "Profile"}
-              className="w-32 h-32 rounded-full object-cover border-4 border-gray-300"
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/128x128?text=No+Image";
-              }}
-            />
-          </div>
-
-          {/* Info */}
-          <div className="space-y-3 text-gray-800 mb-8 text-lg">
-            <p>
-              <span className="font-semibold">Username:</span> {profile.username}
-            </p>
-            <p>
-              <span className="font-semibold">Name:</span>{" "}
-              {profile.name || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">Email:</span> {profile.email}
-            </p>
-            <p>
-              <span className="font-semibold">Phone:</span>{" "}
-              {profile.phone || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">Address:</span>{" "}
-              {profile.address || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">Created:</span>{" "}
-              {new Date(profile.createdAt).toLocaleDateString()}
-            </p>
-            {profile.gender && (
-              <p>
-                <span className="font-semibold">Gender:</span>{" "}
-                {profile.gender}
-              </p>
-            )}
-            {profile.dob && (
-              <p>
-                <span className="font-semibold">Date of Birth:</span>{" "}
-                {new Date(profile.dob).toLocaleDateString()}
-              </p>
-            )}
-            <p>
-              <span className="font-semibold">Last Updated:</span>{" "}
-              {new Date(profile.updatedAt).toLocaleDateString()}
-            </p>
-          </div>
-
-          {/* Buttons */}
-          {!isDeleted ? (
-            <div className="flex flex-col gap-3">
-              <button
-                className="px-6 py-3 rounded-full bg-yellow-400 hover:bg-yellow-500 text-base font-semibold"
-                onClick={() => setEditMode(true)}
-              >
-                Edit Profile
-              </button>
-              <button
-                className="px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold"
-                onClick={() => setShowChangePassword(true)}
-              >
-                Change Password
-              </button>
-              <button
-                className="px-6 py-3 rounded-full bg-red-600 hover:bg-red-700 text-white text-base font-semibold"
-                onClick={() => setShowDeleteConfirm(true)}
-              >
-                Close Account
-              </button>
+    <div className="bg-gray-50 pt-6 pb-4 px-4">
+      <div className="max-w-6xl mx-auto">
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading your profile...</p>
             </div>
-          ) : (
-            <div className="text-center">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center justify-center mb-2">
-                  <svg className="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <span className="text-red-800 font-semibold">Account Deleted</span>
+          </div>
+        ) : profile ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            {/* Profile Card */}
+            <div className="lg:col-span-1 flex">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col pt-2">
+                {/* Header */}
+                <div className="bg-gray-50 p-8 text-center border-b border-gray-200">
+                  <div className="relative inline-block">
+                    <img
+                      src={profile.image || "https://via.placeholder.com/120x120?text=No+Image"}
+                      alt={profile.username || "Profile"}
+                      className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/120x120?text=No+Image";
+                      }}
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
+                  </div>
+                  <h1 className="text-2xl font-semibold text-gray-900 mt-4">{profile.name || profile.username}</h1>
+                  <p className="text-gray-500 text-base">@{profile.username}</p>
                 </div>
-                <p className="text-red-600 text-sm">
-                  This account has been soft deleted and is no longer active.
-                </p>
+
+                {/* Action Buttons */}
+                {!isDeleted ? (
+                  <div className="p-6 space-y-3 flex-grow flex flex-col justify-end">
+                    <button
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
+                      onClick={() => setEditMode(true)}
+                    >
+                      Edit Profile
+                    </button>
+                    <button
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-md transition-colors duration-200"
+                      onClick={() => setShowChangePassword(true)}
+                    >
+                      Change Password
+                    </button>
+                    <button
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
+                      onClick={() => setShowDeleteConfirm(true)}
+                    >
+                      Close Account
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-6 flex-grow flex flex-col justify-end">
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                      <div className="flex items-center justify-center mb-2">
+                        <svg className="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <span className="text-red-800 font-semibold">Account Deleted</span>
+                      </div>
+                      <p className="text-red-600 text-sm text-center">
+                        This account has been soft deleted and is no longer active.
+                      </p>
+                    </div>
+                    <button
+                      className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200"
+                      onClick={logout}
+                    >
+                      Return to Login
+                    </button>
+                  </div>
+                )}
               </div>
-              <button
-                className="px-6 py-3 rounded-full bg-gray-500 hover:bg-gray-600 text-white text-base font-semibold"
-                onClick={logout}
-              >
-                Return to Login
-              </button>
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="bg-red-50 text-red-600 border border-red-300 p-3 rounded text-sm flex items-center gap-2">
-          ⚠ Profile not found
-        </div>
-      )}
+
+            {/* Profile Details */}
+            <div className="lg:col-span-2 flex">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col pt-2">
+                <div className="bg-gray-50 border-b border-gray-200 p-5">
+                  <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
+                </div>
+
+                <div className="p-5 flex-grow">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Personal Information */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Personal Information</h3>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Username</p>
+                            <p className="font-medium text-gray-900">@{profile.username}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Full Name</p>
+                            <p className="font-medium text-gray-900">{profile.name || "Not provided"}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Email</p>
+                            <p className="font-medium text-gray-900">{profile.email}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Phone</p>
+                            <p className="font-medium text-gray-900">{profile.phone || "Not provided"}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Information */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Additional Information</h3>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Address</p>
+                            <p className="font-medium text-gray-900">{profile.address || "Not provided"}</p>
+                          </div>
+                        </div>
+
+                        {profile.gender && (
+                          <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">Gender</p>
+                              <p className="font-medium text-gray-900 capitalize">{profile.gender}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {profile.dob && (
+                          <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">Date of Birth</p>
+                              <p className="font-medium text-gray-900">{new Date(profile.dob).toLocaleDateString('vi-VN')}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Member Since</p>
+                            <p className="font-medium text-gray-900">{new Date(profile.createdAt).toLocaleDateString('vi-VN')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center max-w-md">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Profile Not Found</h3>
+              <p className="text-gray-600 text-sm">We couldn't find your profile information. Please try refreshing the page.</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Modal Edit Profile */}
       {editMode && (
