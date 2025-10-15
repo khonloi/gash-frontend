@@ -45,7 +45,20 @@ const ResetPassword = () => {
   const validateForm = useCallback(() => {
     const newPassword = formData.newPassword.trim();
     const repeatPassword = formData.repeatPassword.trim();
+    
     if (newPassword.length < 8) return 'Password must be at least 8 characters long';
+    
+    // Password validation: at least 3 of 4 character types
+    const hasUpperCase = /[A-Z]/.test(newPassword);
+    const hasLowerCase = /[a-z]/.test(newPassword);
+    const hasNumber = /\d/.test(newPassword);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword);
+    const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
+    
+    if (characterTypesMet < 3) {
+      return 'Password must include at least three of: uppercase letter, lowercase letter, number, special character';
+    }
+    
     if (newPassword !== repeatPassword) return 'Passwords do not match';
     return '';
   }, [formData]);

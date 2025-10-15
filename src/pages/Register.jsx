@@ -95,7 +95,20 @@ const Register = () => {
     if (!/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email address';
     if (phone && !/^\d{10}$/.test(phone)) return 'Phone number must be exactly 10 digits';
     if (address && address.length > 100) return 'Address cannot exceed 100 characters';
+    
+    // Password validation: at least 8 characters, at least 3 of 4 character types
     if (password.length < 8) return 'Password must be at least 8 characters long';
+    
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
+    
+    if (characterTypesMet < 3) {
+      return 'Password must include at least three of: uppercase letter, lowercase letter, number, special character';
+    }
+    
     if (password !== repeatPassword) return 'Passwords do not match';
     if (invalidFile) return 'Please select a valid image file';
     return '';
