@@ -38,6 +38,21 @@ const ChangePasswordModal = ({ handleCancel }) => {
             showToast("New password must be at least 8 characters", "error", 3000);
             return;
         }
+        // Password validation: at least 3 of 4 character types
+        const hasUpperCase = /[A-Z]/.test(form.newPassword);
+        const hasLowerCase = /[a-z]/.test(form.newPassword);
+        const hasNumber = /\d/.test(form.newPassword);
+        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(form.newPassword);
+        const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
+        
+        if (characterTypesMet < 3) {
+            showToast(
+                "Password must include at least three of: uppercase letter, lowercase letter, number, special character",
+                "error",
+                3000
+            );
+            return;
+        }
         if (form.newPassword !== form.repeatPassword) {
             showToast("Passwords do not match", "error", 3000);
             return;
