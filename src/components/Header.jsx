@@ -160,9 +160,16 @@ export default function Header() {
         return formattedPrice;
     };
 
+    // Helper function to get the first word of the user's name
+    const getFirstName = (name) => {
+        if (!name) return "User";
+        const firstWord = name.trim().split(" ")[0];
+        return firstWord || "User";
+    };
+
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
-            <div className="max-w-8xl mx-auto h-20 sm:h-24 flex items-center px-4 sm:px-6 lg:px-12">
+            <div className="max-w-7xl mx-auto h-20 sm:h-24 flex items-center px-4 sm:px-6 lg:px-12">
                 {/* ==== MOBILE HEADER ==== */}
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
@@ -499,7 +506,7 @@ export default function Header() {
                             </button>
                             {user && (
                                 <span className="hidden sm:block text-sm text-gray-200">
-                                    Hello, <span className="font-semibold text-white">{user?.name || "User"}</span>
+                                    Hello, <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
                                 </span>
                             )}
                             {user && showUserMenu && (

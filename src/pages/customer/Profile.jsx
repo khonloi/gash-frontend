@@ -79,7 +79,6 @@ const Profile = () => {
         dob: response.data.dob || "",
         image: response.data.image || "",
       });
-      showToast("Profile loaded successfully!", "success", 2000);
     } catch (err) {
       console.error("Fetch profile error:", err.response || err.message);
       showToast("Failed to fetch profile", "error", 4000);

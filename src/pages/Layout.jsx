@@ -79,7 +79,7 @@ export default function Layout({ children }) {
       <Header />
 
       {/* Spacer để tránh nội dung bị che bởi fixed header */}
-      <div className="h-16" />
+      <div className="h-24" />
 
       {/* Main content */}
       <main className="flex-1">{children}</main>
