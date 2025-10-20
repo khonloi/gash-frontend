@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
@@ -82,7 +82,7 @@ export default function NotificationsDropdown({ user }) {
         onClick={() => (user ? setShowNotifications((prev) => !prev) : navigate("/login"))}
         title="Notifications"
       >
-        <NotificationsIcon />
+        <NotificationsNoneOutlinedIcon />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
             {unreadCount}
@@ -120,7 +120,7 @@ export default function NotificationsDropdown({ user }) {
                 >
                   {/* Icon */}
                   <div className="flex-shrink-0 w-10 h-10 bg-[#ffb300]/10 text-[#ffb300] rounded-full flex items-center justify-center text-lg">
-                    <NotificationsIcon fontSize="small" />
+                    <NotificationsNoneOutlinedIcon fontSize="small" />
                   </div>
 
                   {/* Nội dung */}

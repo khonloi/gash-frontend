@@ -6,13 +6,12 @@ import gashLogo from "../assets/image/gash-logo.svg";
 import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../constants/constants";
 
 // Material UI Icons
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import IconButton from "./IconButton";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import NotificationsDropdown from "./NotificationsDropdown";
 
 // API retry utility from Search.jsx
@@ -161,9 +160,16 @@ export default function Header() {
         return formattedPrice;
     };
 
+    // Helper function to get the first word of the user's name
+    const getFirstName = (name) => {
+        if (!name) return "User";
+        const firstWord = name.trim().split(" ")[0];
+        return firstWord || "User";
+    };
+
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
-            <div className="max-w-7xl mx-auto h-16 sm:h-20 flex items-center px-4 sm:px-6 lg:px-12">
+            <div className="max-w-7xl mx-auto h-20 sm:h-24 flex items-center px-4 sm:px-6 lg:px-12">
                 {/* ==== MOBILE HEADER ==== */}
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
@@ -182,7 +188,7 @@ export default function Header() {
                                     }}
                                     placeholder="Search..."
                                     autoFocus
-                                    className="flex-1 pl-4 pr-12 py-2 text-sm text-gray-900 focus:outline-none"
+                                    className="flex-1 pl-4 pr-12 py-2 text-base text-gray-900 focus:outline-none"
                                 />
                                 {search ? (
                                     <button
@@ -271,21 +277,25 @@ export default function Header() {
                     ) : (
                         <>
                             {/* Search icon trái */}
-                            <IconButton onClick={() => {
-                                console.log("Opening mobile search"); // Debug log
-                                setMobileSearchOpen(true);
-                            }} title="Search">
+                            <button 
+                                onClick={() => {
+                                    console.log("Opening mobile search"); // Debug log
+                                    setMobileSearchOpen(true);
+                                }} 
+                                title="Search"
+                                className="p-2 text-white hover:text-amber-500"
+                            >
                                 <SearchIcon />
-                            </IconButton>
+                            </button>
 
                             {/* Logo giữa */}
                             <Link to="/" className="flex items-center justify-center">
-                                <img src={gashLogo} alt="Gash Logo" className="h-8" />
+                                <img src={gashLogo} alt="Gash Logo" className="h-7" />
                             </Link>
 
                             {/* Menu phải */}
                             <div className="relative" ref={userMenuRef}>
-                                <IconButton
+                                <button
                                     onClick={() => {
                                         if (!user) {
                                             console.log("Navigating to login"); // Debug log
@@ -296,9 +306,10 @@ export default function Header() {
                                         }
                                     }}
                                     title="My Account"
+                                    className="p-2 text-white hover:text-amber-500"
                                 >
-                                    <AccountCircleIcon />
-                                </IconButton>
+                                    <PermIdentityOutlinedIcon />
+                                </button>
 
                                 {/* Dropdown menu */}
                                 {user && showUserMenu && (
@@ -315,7 +326,7 @@ export default function Header() {
                                             }}
                                             className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
-                                            <ShoppingCartIcon fontSize="small" /> Cart
+                                            <ShoppingBagOutlinedIcon fontSize="small" /> Cart
                                         </button>
                                         <button
                                             onClick={(e) => {
@@ -326,7 +337,7 @@ export default function Header() {
                                             }}
                                             className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
                                         >
-                                            <NotificationsIcon fontSize="small" /> Notifications
+                                            <NotificationsNoneOutlinedIcon fontSize="small" /> Notifications
                                         </button>
                                         <Link
                                             to="/profile"
@@ -341,7 +352,7 @@ export default function Header() {
                                                 }}
                                                 className="flex items-center gap-2 w-full text-left"
                                             >
-                                                <AccountCircleIcon fontSize="small" /> My Account
+                                                <PermIdentityOutlinedIcon fontSize="small" /> My Account
                                             </button>
                                         </Link>
                                         <button
@@ -366,7 +377,7 @@ export default function Header() {
                 <div className="hidden sm:flex w-full items-center justify-between">
                     {/* Logo trái */}
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={gashLogo} alt="Gash Logo" className="h-10" />
+                        <img src={gashLogo} alt="Gash Logo" className="h-7" />
                     </Link>
 
                     {/* Search giữa */}
@@ -383,7 +394,7 @@ export default function Header() {
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
-                                className="flex-1 pl-5 pr-12 py-2 text-sm text-gray-900 focus:outline-none"
+                                className="flex-1 pl-5 pr-12 py-2 text-base text-gray-900 focus:outline-none"
                             />
                             <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500">
                                 <SearchIcon fontSize="small" />
@@ -436,7 +447,7 @@ export default function Header() {
                                                 setShowDropdown(false);
                                             }}
                                             className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                            >
+                                        >
                                             View all results
                                         </button>
                                     </>
@@ -449,38 +460,53 @@ export default function Header() {
 
                     {/* Icon phải */}
                     <div className="flex items-center gap-4 sm:gap-6" ref={userMenuRef}>
-                        <IconButton onClick={() => {
-                            console.log("Favorites clicked, user:", !!user); // Debug log
-                            user ? navigate("/favorites") : navigate("/login");
-                        }} title="Favorites">
-                            <FavoriteIcon />
-                        </IconButton>
-                        <IconButton onClick={() => {
-                            console.log("Cart clicked, user:", !!user); // Debug log
-                            user ? navigate("/cart") : navigate("/login");
-                        }} title="Cart">
-                            <ShoppingCartIcon />
-                        </IconButton>
+                        <button 
+                            onClick={() => {
+                                console.log("Favorites clicked, user:", !!user); // Debug log
+                                user ? navigate("/favorites") : navigate("/login");
+                            }} 
+                            title="Favorites"
+                            className="p-2 text-white hover:text-amber-500"
+                        >
+                            <FavoriteBorderIcon />
+                        </button>
+                        <button 
+                            onClick={() => {
+                                console.log("Cart clicked, user:", !!user); // Debug log
+                                user ? navigate("/cart") : navigate("/login");
+                            }} 
+                            title="Cart"
+                            className="p-2 text-white hover:text-amber-500"
+                        >
+                            <ShoppingBagOutlinedIcon />
+                        </button>
                         {user ? (
                             <NotificationsDropdown user={user} />
                         ) : (
-                            <IconButton onClick={() => {
-                                console.log("Notifications clicked, navigating to login"); // Debug log
-                                navigate("/login");
-                            }} title="Notifications">
-                                <NotificationsIcon />
-                            </IconButton>
+                            <button 
+                                onClick={() => {
+                                    console.log("Notifications clicked, navigating to login"); // Debug log
+                                    navigate("/login");
+                                }} 
+                                title="Notifications"
+                                className="p-2 text-white hover:text-amber-500"
+                            >
+                                <NotificationsNoneOutlinedIcon />
+                            </button>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
                             console.log("Account menu clicked, user:", !!user); // Debug log
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
-                            <IconButton title="My Account">
-                                <AccountCircleIcon />
-                            </IconButton>
+                            <button 
+                                title="My Account"
+                                className="p-2 text-white hover:text-amber-500"
+                            >
+                                <PermIdentityOutlinedIcon />
+                            </button>
                             {user && (
                                 <span className="hidden sm:block text-sm text-gray-200">
-                                    Hello, <span className="font-semibold text-white">{user?.name || "User"}</span>
+                                    Hello, <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
                                 </span>
                             )}
                             {user && showUserMenu && (

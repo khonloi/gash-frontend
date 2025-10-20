@@ -74,12 +74,12 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Navbar */}
       <Header />
 
       {/* Spacer để tránh nội dung bị che bởi fixed header */}
-      <div className="h-16" />
+      <div className="h-24" />
 
       {/* Main content */}
       <main className="flex-1">{children}</main>

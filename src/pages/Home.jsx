@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
-import "../styles/Home.css";
-import "../styles/ProductDetail.css"; // For button styling
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY
 } from "../constants/constants";
-
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
@@ -185,36 +182,36 @@ const Home = () => {
   return (
     <>
       {/* Carousel Section - full viewport width */}
-      <div className="home-carousel-outer">
-        <div className="home-carousel">
+      <div className="w-full overflow-x-hidden">
+        <div className="relative w-full min-h-[340px] h-[36vw] max-h-[400px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 overflow-hidden box-border">
           <button
-            className="home-carousel-arrow home-carousel-arrow-left"
+            className="absolute left-8 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-2xl"
             onClick={handlePrevCarousel}
             aria-label="Previous announcement"
           >
-            <i className="lni lni-chevron-left home-carousel-arrow-icon"></i>
+            <i className="lni lni-chevron-left"></i>
           </button>
-          <div className="home-carousel-message">
+          <div className="w-full max-w-[900px] text-center text-4xl font-bold text-gray-900 letter-spacing tracking-wide leading-tight px-16 select-none box-border m-0 overflow-hidden md:text-2xl">
             {carouselMessages[carouselIndex]}
           </div>
           <button
-            className="home-carousel-arrow home-carousel-arrow-right"
+            className="absolute right-8 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-2xl"
             onClick={handleNextCarousel}
             aria-label="Next announcement"
           >
-            <i className="lni lni-chevron-right home-carousel-arrow-icon"></i>
+            <i className="lni lni-chevron-right"></i>
           </button>
         </div>
       </div>
       {/* Main Home Content */}
-      <div className="product-list-container home-main-content">
+      <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-5 p-4 bg-white text-gray-900">
         {error && (
-          <div className="product-list-error" role="alert" tabIndex={0} aria-live="polite">
-            <span className="product-list-error-icon" aria-hidden="true">⚠</span>
+          <div className="text-center text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-8 mb-4 w-full flex items-center justify-center gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
+            <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
             <button
               onClick={fetchProducts}
-              className="product-list-retry-button"
+              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               disabled={loading}
               aria-label="Retry loading products"
             >
@@ -224,25 +221,25 @@ const Home = () => {
         )}
 
         {loading && (
-          <div className="product-list-loading" role="status" aria-live="polite">
-            <div className="product-list-loading-spinner" aria-hidden="true"></div>
+          <div className="text-center text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-8 mb-4 w-full flex items-center justify-center gap-2 flex-wrap" role="status" aria-live="polite">
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
             Loading recommendations...
           </div>
         )}
 
         {/* Category Section */}
         {!loading && !error && randomCategories.length > 0 && (
-          <section className="home-section home-categories-section">
-            <h2 className="home-section-title">Categories</h2>
+          <section className="w-full mt-0">
+            <h2 className="text-left mb-6 text-xl font-semibold">Categories</h2>
             <div
-              className="product-list-product-grid home-categories-grid"
+              className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-5"
               role="list"
               aria-label={`${randomCategories.length} categories`}
             >
               {randomCategories.map((category) => (
                 <div
                   key={category}
-                  className="product-list-product-card home-category-card"
+                  className="border-2 border-gray-300 rounded-xl p-4 flex items-center justify-center min-h-[30px] font-semibold text-lg cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
                   tabIndex={0}
                   role="listitem"
                   aria-label={`View products in ${category}`}
@@ -260,10 +257,10 @@ const Home = () => {
 
         {/* For You Section */}
         {!loading && !error && forYouProducts.length > 0 && (
-          <section className="home-section home-for-you-section">
-            <h2 className="home-section-title">For You</h2>
+          <section className="w-full mt-10">
+            <h2 className="text-left mb-6 text-xl font-semibold">For You</h2>
             <div
-              className="product-list-product-grid home-for-you-grid"
+              className="grid grid-cols-2 gap-5 md:grid-cols-5"
               role="grid"
               aria-label={`${forYouProducts.length} personalized products`}
             >
@@ -273,28 +270,34 @@ const Home = () => {
                 return (
                   <article
                     key={product._id}
-                    className="product-list-product-card home-for-you-card"
+                    className="border-2 border-gray-300 rounded-xl p-4 hover:shadow-md focus:shadow-md focus:outline-none cursor-pointer"
                     onClick={() => handleProductClick(product._id)}
                     onKeyDown={(e) => handleKeyDown(e, product._id)}
                     role="gridcell"
                     tabIndex={0}
                     aria-label={`View ${product.productName || "product"} details`}
                   >
-                    <div className="product-list-image-container">
+                    <div className="mb-3">
                       <img
                         src={imageUrl}
                         alt={product.productName || "Product image"}
                         loading="lazy"
+                        className="w-full max-h-[180px] object-contain rounded"
                         onError={(e) => {
                           e.target.src = "/placeholder-image.png";
                           e.target.alt = `Image not available for ${product.productName || "product"}`;
                         }}
                       />
                     </div>
-                    <div className="product-list-content">
-                      <h2 title={product.productName}>{product.productName || "Unnamed Product"}</h2>
+                    <div>
+                      <h2
+                        title={product.productName}
+                        className="text-black line-clamp-2 min-h-[2.6em] leading-tight"
+                      >
+                        {product.productName || "Unnamed Product"}
+                      </h2>
                       <p
-                        className="product-list-price"
+                        className="text-red-600 text-lg font-semibold mt-2"
                         aria-label={`Price: ${formatPrice(minPrice)}`}
                       >
                         {formatPrice(minPrice)}
@@ -309,10 +312,10 @@ const Home = () => {
 
         {/* Recommendations Section */}
         {!loading && !error && recommendedProducts.length > 0 && (
-          <section className="home-section home-recommendations-section">
-            <h2 className="home-section-title">Recommendations</h2>
+          <section className="w-full mt-10">
+            <h2 className="text-left mb-6 text-xl font-semibold">Recommendations</h2>
             <div
-              className="product-list-product-grid home-recommendations-grid"
+              className="grid grid-cols-2 gap-5 md:grid-cols-5"
               role="grid"
               aria-label={`${recommendedProducts.length} recommended products`}
             >
@@ -322,28 +325,34 @@ const Home = () => {
                 return (
                   <article
                     key={product._id}
-                    className="product-list-product-card home-recommendation-card"
+                    className="border-2 border-gray-300 rounded-xl p-4 hover:shadow-md focus:shadow-md focus:outline-none cursor-pointer"
                     onClick={() => handleProductClick(product._id)}
                     onKeyDown={(e) => handleKeyDown(e, product._id)}
                     role="gridcell"
                     tabIndex={0}
                     aria-label={`View ${product.productName || "product"} details`}
                   >
-                    <div className="product-list-image-container">
+                    <div className="mb-3">
                       <img
                         src={imageUrl}
                         alt={product.productName || "Product image"}
                         loading="lazy"
+                        className="w-full max-h-[180px] object-contain rounded"
                         onError={(e) => {
                           e.target.src = "/placeholder-image.png";
                           e.target.alt = `Image not available for ${product.productName || "product"}`;
                         }}
                       />
                     </div>
-                    <div className="product-list-content">
-                      <h2 title={product.productName}>{product.productName || "Unnamed Product"}</h2>
+                    <div>
+                      <h2
+                        title={product.productName}
+                        className="text-black line-clamp-2 min-h-[2.6em] leading-tight"
+                      >
+                        {product.productName || "Unnamed Product"}
+                      </h2>
                       <p
-                        className="product-list-price"
+                        className="text-red-600 text-lg font-semibold mt-2"
                         aria-label={`Price: ${formatPrice(minPrice)}`}
                       >
                         {formatPrice(minPrice)}
@@ -353,9 +362,9 @@ const Home = () => {
                 );
               })}
             </div>
-            <div className="home-view-all-container">
+            <div className="flex justify-center mt-8">
               <button
-                className="product-detail-add-to-favorites home-view-all-btn"
+                className="min-w-[180px] text-base bg-amber-400 text-gray-900 py-2 px-4 rounded-lg hover:bg-amber-500 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
                 onClick={handleViewAll}
               >
                 View All

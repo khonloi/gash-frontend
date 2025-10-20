@@ -33,7 +33,21 @@ const Orders = () => {
         const token = localStorage.getItem("token");
         const response = await Api.order.getOrders(user._id, token);
         const data = Array.isArray(response.data) ? response.data : [];
-        const sorted = data.sort(
+        
+        // Fetch detailed order data for each order
+        const detailedOrders = await Promise.all(
+          data.map(async (order) => {
+            try {
+              const detailedResponse = await Api.order.getOrder(order._id, token);
+              return detailedResponse.data.data || order; // Use detailed data if available, fallback to original
+            } catch (err) {
+              console.error(`Failed to fetch details for order ${order._id}:`, err);
+              return order; // Fallback to original order if detail fetch fails
+            }
+          })
+        );
+
+        const sorted = detailedOrders.sort(
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
         setOrders(sorted);
@@ -112,7 +126,7 @@ const Orders = () => {
     const base =
       "px-3 py-1 rounded-full text-xs font-semibold border inline-block";
     if (type === "order") {
-      switch (status) {
+      switch (status?.toLowerCase()) {
         case "pending":
           return (
             <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-300`}>
@@ -152,7 +166,7 @@ const Orders = () => {
       }
     } else {
       // pay_status
-      switch (status) {
+      switch (status?.toLowerCase()) {
         case "unpaid":
           return (
             <span className={`${base} bg-orange-100 text-orange-700 border-orange-300`}>
@@ -369,7 +383,6 @@ const Orders = () => {
           </div>
         )}
 
-
         {error && (
           <p className="text-red-600 text-center mb-4 font-medium">{error}</p>
         )}
@@ -413,10 +426,29 @@ const Orders = () => {
                 className="border border-yellow-200 rounded-xl p-5 bg-white hover:shadow-lg transition transform hover:-translate-y-1"
               >
                 <div className="flex justify-between items-center border-b pb-2 mb-3">
-                  <p className="text-sm text-gray-500">
-                    <strong className="text-yellow-600">Order ID:</strong>{" "}
-                    {order._id}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    {order.orderDetails?.length > 0 ? (
+                      <>
+                        <img
+                          src={order.orderDetails[0]?.variant?.image || "/placeholder.png"}
+                          alt={order.orderDetails[0]?.variant?.product?.name || "Product"}
+                          className="w-12 h-12 object-cover rounded border"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">
+                            {order.orderDetails[0]?.variant?.product?.name || "Unknown Product"}
+                          </p>
+                          {order.orderDetails.length > 1 && (
+                            <p className="text-xs text-gray-500">
+                              + {order.orderDetails.length - 1} product{order.orderDetails.length > 2 ? "s" : ""}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-500">No items</p>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500">
                     {formatDate(order.orderDate)}
                   </p>
@@ -424,7 +456,7 @@ const Orders = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
                   <p>
-                    <strong>Address:</strong>
+                    <strong>Address: </strong>
                     {searchType === "address" && searchQuery ? (
                       <span
                         dangerouslySetInnerHTML={{
@@ -439,7 +471,7 @@ const Orders = () => {
                     )}
                   </p>
                   <p>
-                    <strong>Phone:</strong>
+                    <strong>Phone: </strong>
                     {searchType === "phone" && searchQuery ? (
                       <span
                         dangerouslySetInnerHTML={{
@@ -473,7 +505,6 @@ const Orders = () => {
                 </div>
 
                 <div className="flex justify-end gap-3 mt-4">
-                  {/* View Bill button - only show if order is paid */}
                   {order.pay_status?.toLowerCase() === 'paid' && (
                     <button
                       onClick={() => navigate(`/bills/${order._id}`)}
@@ -529,14 +560,12 @@ const Orders = () => {
               {/* Page numbers */}
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                  // Show first page, last page, current page, and pages around current page
                   const shouldShow =
                     page === 1 ||
                     page === totalPages ||
                     (page >= currentPage - 1 && page <= currentPage + 1);
 
                   if (!shouldShow) {
-                    // Show ellipsis for gaps
                     if (page === currentPage - 2 || page === currentPage + 2) {
                       return (
                         <span key={page} className="px-2 py-1 text-gray-400">
