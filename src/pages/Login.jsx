@@ -4,7 +4,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../constants/constants";
-import "../styles/Login.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -110,20 +109,32 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="login-container">
-      {/* ...global toast handled by ToastProvider... */}
-      <div className="login-box">
-        <h1 className="login-title">Sign In</h1>
+    <div className="min-h-[calc(100vh-4rem)] bg-white flex items-center justify-center px-3 sm:px-0">
+      <div className="w-full max-w-[360px] p-6 bg-white border-2 border-gray-300 rounded-xl shadow-md">
+        <h1 className="text-2xl font-normal text-gray-900 mb-5 text-center">Sign In</h1>
+        {error && (
+          <div
+            className="bg-red-50 text-red-600 border-2 border-red-200 rounded-lg p-3 mb-4 text-sm text-center flex items-center gap-2"
+            role="alert"
+            aria-live="assertive"
+            ref={errorRef}
+            tabIndex={-1}
+            id="error-message"
+          >
+            <span className="text-lg" aria-hidden="true">⚠</span>
+            {error}
+          </div>
+        )}
         <form
-          className="login-form"
+          className="flex flex-col"
           onSubmit={handleSubmit}
           role="form"
           aria-label="Sign in form"
           aria-describedby={error ? "error-message" : undefined}
         >
-          <div className="login-form-group">
-            <label htmlFor="username" className="login-form-label">
-              Username <span className="login-required-indicator">*</span>
+          <div className="mb-4">
+            <label htmlFor="username" className="text-sm text-gray-900 mb-1 block">
+              Username <span className="text-red-600">*</span>
             </label>
             <input
               id="username"
@@ -133,14 +144,14 @@ const Login = () => {
               onChange={handleInputChange}
               ref={usernameRef}
               required
-              className="login-form-input"
+              className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg text-sm bg-white hover:bg-gray-50 hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 aria-invalid:border-red-500"
               aria-required="true"
               aria-invalid={!!error}
             />
           </div>
-          <div className="login-form-group">
-            <label htmlFor="password" className="login-form-label">
-              Password <span className="login-required-indicator">*</span>
+          <div className="mb-4">
+            <label htmlFor="password" className="text-sm text-gray-900 mb-1 block">
+              Password <span className="text-red-600">*</span>
             </label>
             <input
               id="password"
@@ -149,33 +160,28 @@ const Login = () => {
               value={formData.password}
               onChange={handleInputChange}
               required
-              className="login-form-input"
+              className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg text-sm bg-white hover:bg-gray-50 hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 aria-invalid:border-red-500"
               aria-required="true"
               aria-invalid={!!error}
             />
           </div>
-          <div className="login-forgot-password">
-            <Link to="/forgot-password" className="login-forgot-password-link">
+          <div className="mb-4 text-right">
+            <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-orange-600 hover:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
               Forgot Password?
             </Link>
           </div>
           <button
             type="submit"
-            className="sign-in-button"
+            className="w-full px-3 py-2.5 bg-yellow-400 border-2 border-yellow-600 rounded-xl text-sm font-semibold text-gray-900 hover:bg-yellow-300 hover:border-yellow-500 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             disabled={isLoading}
             aria-busy={isLoading}
           >
             <span aria-live="polite">
-              {isLoading ? (
-                // Removed spinner, only show text
-                "Signing In..."
-              ) : (
-                "Sign In"
-              )}
+              {isLoading ? "Signing In..." : "Sign In"}
             </span>
           </button>
         </form>
-        <div className="google-login-container">
+        <div className="my-5 text-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
@@ -185,9 +191,9 @@ const Login = () => {
             aria-label="Sign in with Google"
           />
         </div>
-        <p className="login-signup-prompt">
+        <p className="text-center text-sm text-gray-600 mt-6">
           New to GASH?{" "}
-          <Link to="/signup" className="login-signup-link">
+          <Link to="/signup" className="text-blue-600 font-medium hover:text-orange-600 hover:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Create your GASH account
           </Link>
         </p>

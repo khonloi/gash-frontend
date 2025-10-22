@@ -3,7 +3,6 @@ import { useToast } from '../hooks/useToast';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
-import '../styles/Signup.css';
 
 // Initialize EmailJS with Public API Key
 const emailJsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -143,19 +142,29 @@ const Signup = () => {
   );
 
   return (
-    <div className="signup-container">
-      <div className="signup-box">
-        <h1 className="signup-title">Create Account</h1>
-        {/* ...global toast handled by ToastProvider... */}
+    <div className="min-h-[calc(100vh-4rem)] bg-white flex items-center justify-center px-4 sm:px-0">
+      <div className="w-full max-w-[360px] p-6 bg-white border-2 border-gray-300 rounded-lg shadow-md">
+        <h1 className="text-2xl font-normal text-gray-900 mb-5 text-center">Create Account</h1>
+        {error && (
+          <div
+            className="bg-red-50 text-red-600 border-2 border-red-200 rounded-lg p-3 mb-4 text-sm text-center flex items-center gap-2"
+            role="alert"
+            aria-live="assertive"
+            id="error-message"
+          >
+            <span className="text-lg" aria-hidden="true">⚠</span>
+            {error}
+          </div>
+        )}
         <form
-          className="signup-form"
+          className="flex flex-col"
           onSubmit={handleSubmit}
           aria-describedby={error ? 'error-message' : undefined}
           aria-label="Signup form"
         >
-          <div className="signup-form-group">
-            <label htmlFor="email" className="signup-form-label">
-              Email <span className="signup-required-indicator">*</span>
+          <div className="mb-4">
+            <label htmlFor="email" className="text-sm text-gray-900 mb-1 block">
+              Email <span className="text-red-600">*</span>
             </label>
             <input
               id="email"
@@ -165,7 +174,7 @@ const Signup = () => {
               onChange={handleChange}
               ref={emailRef}
               required
-              className="signup-form-input"
+              className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 placeholder-opacity-70 hover:bg-gray-50 hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 aria-invalid:border-red-500"
               aria-required="true"
               aria-invalid={!!error}
               placeholder="Enter your email"
@@ -173,23 +182,18 @@ const Signup = () => {
           </div>
           <button
             type="submit"
-            className="signup-continue-button"
+            className="w-full px-3 py-2.5 bg-yellow-400 border-2 border-yellow-600 rounded-xl text-sm font-semibold text-gray-900 hover:bg-yellow-300 hover:border-yellow-500 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             disabled={isLoading}
             aria-busy={isLoading}
           >
             <span aria-live="polite">
-              {isLoading ? (
-                // Removed spinner, only show text
-                'Sending OTP...'
-              ) : (
-                'Continue'
-              )}
+              {isLoading ? 'Sending OTP...' : 'Continue'}
             </span>
           </button>
         </form>
-        <p className="signup-login-prompt">
+        <p className="text-center text-sm text-gray-600 mt-6">
           Already have an account?{' '}
-          <Link to="/login" className="signup-login-link">
+          <Link to="/login" className="text-blue-600 font-medium hover:text-orange-600 hover:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Sign In
           </Link>
         </p>
