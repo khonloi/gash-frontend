@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import emailjs from '@emailjs/browser';
+import '../../styles/Signup.css';
 
 // Initialize EmailJS with Public API Key
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;

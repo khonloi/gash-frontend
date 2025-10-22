@@ -24,6 +24,7 @@ import OTPVerification from "./pages/OTPVerification";
 import ForgotPassword from "./pages/customer/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
+import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import VNPayReturn from "./pages/VNPayReturn";
 import Bill from "./pages/customer/Bill";
@@ -85,7 +86,8 @@ const App = () => {
                 <Route path="/favorites" element={<ProductFavorite />} />
                 <Route path="/search" element={<Search />} />
 
-                {/* Liên hệ, thanh toán */}
+                {/* Blog, liên hệ, thanh toán */}
+                <Route path="/news" element={<BlogPost />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/vnpay-return" element={<VNPayReturn />} />
 
