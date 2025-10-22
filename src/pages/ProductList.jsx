@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
+import "../styles/ProductList.css";
 import {
   FILTER_STORAGE_KEY,
   DEFAULT_FILTERS,
