@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
+import "../styles/ProductList.css";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -62,18 +63,18 @@ const Search = () => {
     try {
       const response = await fetchWithRetry(() => Api.newProducts.search({ name: searchQuery.trim(), status: "active" }));
       const productsData = response?.data || response || [];
-
+      
       if (!Array.isArray(productsData)) {
         setError("No products available for this search");
         setProducts([]);
         return;
       }
-
+      
       // Filter products with variants
       const filteredProducts = productsData.filter(
         (product) => product.productVariantIds?.length > 0
       );
-
+      
       console.log("Filtered search results:", filteredProducts); // Debug log
       setProducts(filteredProducts);
     } catch (err) {

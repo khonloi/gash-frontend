@@ -1,7 +1,15 @@
-import React, { useState, useEffect, useContext, useMemo, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import axiosClient from "../../common/axiosClient";
+import "../../styles/Cart.css";
 
 const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
@@ -10,7 +18,9 @@ const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
       return response.data;
     } catch (error) {
       if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
+      await new Promise((resolve) =>
+        setTimeout(resolve, delay * Math.pow(2, i))
+      );
     }
   }
 };
@@ -36,38 +46,56 @@ const Cart = () => {
   const [actionInProgress, setActionInProgress] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const cartCache = useRef({ items: [], timestamp: 0 });
 
+  // Fetch cart items
   const fetchCartItems = useCallback(
     async (showLoading = true) => {
       if (!user?._id) {
         console.log("No user ID, skipping fetch");
         return;
       }
+
       const now = Date.now();
+      console.log("Cache check:", {
+        items: cartCache.current.items.length,
+        timestamp: cartCache.current.timestamp,
+        age: now - cartCache.current.timestamp,
+      });
+      // Temporarily disable cache to ensure fresh data
+      // if (cartCache.current.items.length > 0 &&
+      //     now - cartCache.current.timestamp < 30000 &&
+      //     !showLoading) {
+      //   console.log('Using cached cart items:', cartCache.current.items);
+      //   setCartItems(cartCache.current.items);
+      //   return;
+      // }
+
       if (showLoading) setLoading(true);
       setError("");
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
         console.log("Fetching cart for user:", user._id);
-        const response = await fetchWithRetry(`/new-carts/account/${user._id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetchWithRetry(
+          `/new-carts/account/${user._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         console.log("Cart fetch response:", response);
-        const data = response.data;
+        const data = response.data; // Access the data property
         const items = Array.isArray(data)
           ? data
-              .map((i) => {
-                if (!i.variantId) {
-                  console.warn("Cart item missing variantId:", i);
-                  return null;
-                }
-                return { ...i, checked: i.selected };
-              })
-              .filter((item) => item !== null)
+            .map((i) => {
+              if (!i.variantId) {
+                console.warn("Cart item missing variantId:", i);
+                return null;
+              }
+              return { ...i, checked: i.selected };
+            })
+            .filter((item) => item !== null)
           : [];
         console.log("Processed cart items:", items);
         setCartItems(items);
@@ -103,12 +131,18 @@ const Cart = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
-        console.log("Updating quantity for cartId:", cartId, "to:", newQuantity);
+        console.log(
+          "Updating quantity for cartId:",
+          cartId,
+          "to:",
+          newQuantity
+        );
         await axiosClient.put(
           `/new-carts/${cartId}`,
           { productQuantity: newQuantity },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
         const updatedItems = cartItems.map((item) =>
           item._id === cartId ? { ...item, productQuantity: newQuantity } : item
         );
@@ -174,6 +208,7 @@ const Cart = () => {
     }).format(price);
   }, []);
 
+  // Calculate total for selected items
   const totalPrice = useMemo(() => {
     return cartItems
       .filter((item) => item.checked)
@@ -227,47 +262,19 @@ const Cart = () => {
     );
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const filteredCartItems = useMemo(() => {
-    if (!searchTerm) return cartItems;
-    return cartItems.filter((item) =>
-      item.variantId?.productId?.productName
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
-  }, [cartItems, searchTerm]);
-
   console.log("Render conditions:", {
     loading,
     cartItemsLength: cartItems.length,
-    filteredCartItemsLength: filteredCartItems.length,
     error,
-    searchTerm,
   });
 
   return (
-    <div className="max-w-6xl mx-auto p-4 bg-white text-gray-900 min-h-screen rounded-xl">
-      <h2 className="text-2xl font-normal text-gray-900 mb-4">Shopping Cart</h2>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search products in cart..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="w-full max-w-md p-2 border-2 border-gray-200 rounded-md text-sm bg-white hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Search products in cart"
-        />
-      </div>
+    <div className="cart-container">
+      <h2 className="cart-title">Shopping Cart</h2>
       {toast && (
         <div
-          className={`fixed top-4 right-4 p-3 rounded-xl text-sm z-[1000] shadow-md border-2 ${
-            toast.type === "success"
-              ? "bg-green-100 text-green-700 border-green-200"
-              : "bg-red-50 text-red-600 border-red-200"
-          }`}
+          className={`cart-toast ${toast.type === "success" ? "cart-toast-success" : "cart-toast-error"
+            }`}
           role="alert"
         >
           {toast.message}
@@ -275,17 +282,17 @@ const Cart = () => {
       )}
       {error && (
         <div
-          className="flex items-center gap-2 bg-red-50 text-red-600 border-2 border-red-200 p-3 rounded-xl mb-4 shadow-md"
+          className="product-list-error"
           role="alert"
           tabIndex={0}
           aria-live="polite"
         >
-          <span className="text-lg" aria-hidden="true">
+          <span className="product-list-error-icon" aria-hidden="true">
             ⚠
           </span>
           {error}
           <button
-            className="px-3 py-2 bg-yellow-400 border-2 border-yellow-500 rounded-full text-sm font-semibold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500"
+            className="product-list-retry-button"
             onClick={handleRetry}
             aria-label="Retry loading cart items"
           >
@@ -293,16 +300,11 @@ const Cart = () => {
           </button>
         </div>
       )}
-      {!loading && filteredCartItems.length === 0 && !error ? (
-        <div
-          className="text-center p-8 bg-white border-2 border-gray-200 rounded-xl mb-4 shadow-md"
-          role="status"
-        >
-          <h3 className="text-sm text-gray-600 mb-3">
-            {searchTerm ? "No products match your search." : "Your cart is empty."}
-          </h3>
+      {!loading && cartItems.length === 0 && !error ? (
+        <div className="cart-empty" role="status">
+          <h3>Your cart is empty.</h3>
           <button
-            className="px-3 py-2 bg-yellow-400 border-2 border-yellow-500 rounded-full text-sm font-semibold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500"
+            className="cart-continue-shopping-button"
             onClick={() => navigate("/products")}
             aria-label="Continue shopping"
           >
@@ -310,94 +312,98 @@ const Cart = () => {
           </button>
         </div>
       ) : (
-        <main className="flex flex-row gap-8 w-full max-md:flex-col max-md:gap-0">
-          <section className="flex-3 overflow-x-auto" aria-label="Cart items">
-            {filteredCartItems.map((item) => {
+        <main className="cart-main-section" role="main">
+          <section className="cart-items" aria-label="Cart items">
+            {cartItems.map((item) => {
               console.log("Rendering item:", item);
               return (
                 <article
                   key={item._id}
-                  className="bg-white border-2 border-gray-200 rounded-xl mb-5 shadow-sm p-5 flex justify-between items-start hover:shadow-md focus:shadow-md focus:outline-none transition-shadow"
+                  className="cart-item"
                   tabIndex={0}
-                  aria-label={`Cart item: ${
-                    item.variantId?.productId?.productName || "Unnamed Product"
-                  }`}
+                  aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"
+                    }`}
                 >
                   <input
                     type="checkbox"
                     checked={item.checked || false}
                     onChange={() => toggleChecked(item._id)}
-                    className="mt-2"
+                    className="cart-item-checkbox"
                   />
                   <img
                     src={item.variantId?.variantImage || "/default.png"}
                     alt={item.variantId?.productId?.productName || "Product"}
-                    className="w-[100px] h-[100px] object-cover rounded-lg ml-4"
+                    className="cart-item-image"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
                   />
-                  <div className="flex flex-col gap-1 ml-4">
-                    <p className="text-base font-semibold text-blue-600 hover:text-orange-600 hover:underline">
+                  <div className="cart-item-info">
+                    <p className="cart-item-name">
                       {item.variantId?.productId?.productName || "Unnamed Product"}
                     </p>
-                    <p className="text-sm text-gray-600">
-                      Color: {item.variantId?.productColorId?.color_name || "N/A"}, Size:{" "}
-                      {item.variantId?.productSizeId?.size_name || "N/A"}
+                    <p className="cart-item-variant">
+                      Color:{" "}
+                      {item.variantId?.productColorId?.color_name || "N/A"},
+                      Size: {item.variantId?.productSizeId?.size_name || "N/A"}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="cart-item-price">
                       Price: {formatPrice(item.productPrice)}
                     </p>
-                    <p className="text-base text-red-600 font-semibold">
+                    <p className="cart-item-total">
                       Total:{" "}
                       {formatPrice(
-                        (item.productPrice || 0) * (parseInt(item.productQuantity, 10) || 0)
+                        (item.productPrice || 0) *
+                        (parseInt(item.productQuantity, 10) || 0)
                       )}
                     </p>
                   </div>
-                  <div className="flex flex-col items-center gap-3 ml-4">
-                    <div className="flex items-center gap-2">
-                      <label
-                        htmlFor={`quantity-${item._id}`}
-                        className="text-sm text-gray-900"
-                      >
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        id={`quantity-${item._id}`}
-                        min="1"
-                        value={item.productQuantity || 1}
-                        onChange={(e) => handleQuantityChange(item._id, e.target.value)}
-                        className="w-14 p-1 border-2 border-gray-200 rounded-md text-sm text-center bg-white hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 appearance-textfield"
-                        aria-label={`Quantity for ${
-                          item.variantId?.productId?.productName || "product"
-                        }`}
+                  <div className="cart-item-action">
+                    <div className="cart-item-quantity">
+                      <div className="cart-quantity-group">
+                        <label
+                          htmlFor={`quantity-${item._id}`}
+                          className="cart-quantity-label"
+                        >
+                          Quantity
+                        </label>
+                        <input
+                          type="number"
+                          id={`quantity-${item._id}`}
+                          min="1"
+                          value={item.productQuantity || 1}
+                          onChange={(e) =>
+                            handleQuantityChange(item._id, e.target.value)
+                          }
+                          className="cart-quantity-input"
+                          aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"
+                            }`}
+                          disabled={actionInProgress}
+                        />
+                      </div>
+                      <button
+                        className="cart-remove-button"
+                        onClick={() => handleRemoveItem(item._id)}
+                        aria-label={`Remove ${item.variantId?.productId?.productName || "product"
+                          } from cart`}
                         disabled={actionInProgress}
-                      />
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <button
-                      className="px-3 py-1 bg-transparent border-2 border-gray-200 rounded-md text-sm font-semibold text-red-600 hover:bg-gray-50 hover:border-blue-500 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 w-full"
-                      onClick={() => handleRemoveItem(item._id)}
-                      aria-label={`Remove ${
-                        item.variantId?.productId?.productName || "product"
-                      } from cart`}
-                      disabled={actionInProgress}
-                    >
-                      Remove
-                    </button>
                   </div>
                 </article>
               );
             })}
           </section>
-          {filteredCartItems.length > 0 && (
-            <aside
-              className="flex-1 self-start bg-white border-2 border-gray-200 p-4 rounded-xl shadow-md max-md:mt-4 max-md:w-full"
-              aria-label="Cart summary"
-            >
-              <p className="text-lg font-bold text-red-600 mb-3">
-                Total: {formatPrice(totalPrice)}
-              </p>
+          {cartItems.length > 0 && (
+            <aside className="cart-summary" aria-label="Cart summary">
+              <p className="cart-total">Total: {formatPrice(totalPrice)}</p>
               <button
-                className="w-full px-3 py-2 bg-yellow-400 border-2 border-yellow-500 rounded-full text-sm font-semibold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500"
+                className="cart-checkout-button"
                 onClick={() => {
                   const selectedItems = cartItems.filter((i) => i.checked);
                   navigate("/checkout", { state: { selectedItems } });
