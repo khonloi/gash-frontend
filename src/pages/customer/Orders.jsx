@@ -25,46 +25,6 @@ const Orders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  // Mock data for testing rendering (commented out)
-  /*
-  const mockOrders = [
-    {
-      _id: "68f9051c946d7c3805019eb8",
-      acc_id: { _id: "68cd38cf459615ba0cf0e88b", username: "admin", name: "Владимир Владимирович Путин", email: "admin@email.com", phone: "0932145678", address: "Moscow, Russian Federation", image: "https://res.cloudinary.com/dsevkup6t/image/upload/v1760718958/gash_app/mt4yu1jup7nbbllgzn2d.jpg" },
-      addressReceive: "ABCAAAAA",
-      name: "asssssssssss",
-      phone: "0987654321",
-      totalPrice: 123,
-      discountAmount: 0,
-      finalPrice: 123,
-      order_status: "delivered",
-      pay_status: "paid",
-      payment_method: "VNPAY",
-      refund_status: "not_applicable",
-      refund_proof: "",
-      orderDetails: [
-        {
-          feedback: { rating: null, content: "", created_at: null, updated_at: null, is_deleted: false },
-          _id: "68f9051c946d7c3805019ebb",
-          variant_id: {
-            _id: "68f23443a93db4bdb4e456c3",
-            productId: { _id: "68f045b9c4673c3193d1fc45", productName: "tessssst" },
-            productColorId: { _id: "687ba933e54fd20023e1beee", color_name: "Black" },
-            productSizeId: { _id: "687ba9f8e54fd20023e1bf07", size_name: "L" },
-            variantImage: "https://res.cloudinary.com/dsevkup6t/image/upload/v1760703555/gash_app/cdibokrqsc9smgpcnc4r.webp"
-          },
-          UnitPrice: 123,
-          Quantity: 1
-        }
-      ],
-      orderDate: "2025-10-22T16:23:56.105Z",
-      createdAt: "2025-10-22T16:23:56.107Z",
-      updatedAt: "2025-10-22T16:30:53.623Z",
-      __v: 1
-    }
-  ];
-  */
-
   const fetchOrders = useCallback(
     async () => {
       if (!user?._id) {
