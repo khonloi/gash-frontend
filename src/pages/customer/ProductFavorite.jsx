@@ -5,11 +5,6 @@ import { AuthContext } from "../../context/AuthContext";
 import axiosClient from "../../common/axiosClient";
 import "../../styles/ProductList.css";
 
-// Constants
-// Use shared axiosClient
-
-// Interceptors are set in axiosClient.js
-
 // API functions
 const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
@@ -21,6 +16,26 @@ const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
       await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
     }
   }
+};
+
+// Helper function to get minimum price from product variants
+const getMinPrice = (product) => {
+  if (!product || !product.productVariantIds || product.productVariantIds.length === 0) {
+    return 0;
+  }
+  const prices = product.productVariantIds
+    .filter(v => v && v.variantStatus === 'active' && v.variantPrice > 0 && v.stockQuantity > 0)
+    .map(v => v.variantPrice);
+  return prices.length > 0 ? Math.min(...prices) : 0;
+};
+
+// Helper function to get main image URL
+const getMainImageUrl = (product) => {
+  if (!product || !product.productImageIds || product.productImageIds.length === 0) {
+    return "/placeholder-image.png";
+  }
+  const mainImage = product.productImageIds.find(img => img && img.isMain === true);
+  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
 };
 
 const ProductFavorite = () => {
@@ -175,50 +190,58 @@ const ProductFavorite = () => {
             role="grid"
             aria-label={`${favorites.length} favorite products`}
           >
-            {favorites.map((favorite) => (
-              <article
-                key={favorite._id}
-                className="product-list-product-card"
-                role="gridcell"
-                aria-label={`View ${favorite.pro_id?.pro_name || "product"} details`}
-                style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
-              >
-                <div
-                  className="product-list-image-container"
-                  onClick={() => handleProductClick(favorite.pro_id?._id)}
-                  onKeyDown={(e) => handleKeyDown(e, favorite.pro_id?._id)}
-                  tabIndex={0}
-                  style={{ cursor: "pointer" }}
+            {favorites.map((favorite) => {
+              if (!favorite.pro_id) {
+                return null; // Skip rendering if pro_id is missing
+              }
+              const product = favorite.pro_id;
+              const minPrice = getMinPrice(product);
+              const imageUrl = getMainImageUrl(product);
+              return (
+                <article
+                  key={favorite._id}
+                  className="product-list-product-card"
+                  role="gridcell"
+                  aria-label={`View ${product?.productName || "product"} details`}
+                  style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
                 >
-                  <img
-                    src={favorite.pro_id?.imageURL || "/placeholder-image.png"}
-                    alt={favorite.pro_id?.pro_name || "Product image"}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.target.src = "/placeholder-image.png";
-                      e.target.alt = `Image not available for ${favorite.pro_id?.pro_name || "product"}`;
-                    }}
-                  />
-                </div>
-                <div className="product-list-content">
-                  <h2 title={favorite.pro_id?.pro_name}>{favorite.pro_id?.pro_name || "Unnamed Product"}</h2>
-                  <p
-                    className="product-list-price"
-                    aria-label={`Price: ${formatPrice(favorite.pro_id?.pro_price)}`}
+                  <div
+                    className="product-list-image-container"
+                    onClick={() => handleProductClick(product?._id)}
+                    onKeyDown={(e) => handleKeyDown(e, product?._id)}
+                    tabIndex={0}
+                    style={{ cursor: "pointer" }}
                   >
-                    {formatPrice(favorite.pro_id?.pro_price)}
-                  </p>
-                </div>
-                <button
-                  className="product-list-clear-filters-button"
-                  style={{ background: "#fff", borderColor: "#b12704", color: "#b12704" }}
-                  onClick={() => handleDeleteFavorite(favorite._id)}
-                  aria-label={`Remove ${favorite.pro_id?.pro_name || "product"} from favorites`}
-                >
-                  Remove
-                </button>
-              </article>
-            ))}
+                    <img
+                      src={imageUrl}
+                      alt={product?.productName || "Product image"}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-image.png";
+                        e.target.alt = `Image not available for ${product?.productName || "product"}`;
+                      }}
+                    />
+                  </div>
+                  <div className="product-list-content">
+                    <h2 title={product?.productName}>{product?.productName || "Unnamed Product"}</h2>
+                    <p
+                      className="product-list-price"
+                      aria-label={`Price: ${formatPrice(minPrice)}`}
+                    >
+                      {formatPrice(minPrice)}
+                    </p>
+                  </div>
+                  <button
+                    className="product-list-clear-filters-button"
+                    style={{ background: "#fff", borderColor: "#b12704", color: "#b12704" }}
+                    onClick={() => handleDeleteFavorite(favorite._id)}
+                    aria-label={`Remove ${product?.productName || "product"} from favorites`}
+                  >
+                    Remove
+                  </button>
+                </article>
+              );
+            })}
           </div>
         )}
       </main>
