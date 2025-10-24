@@ -4,7 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import OrderDetailsModal from "../../components/OrderDetails";
-import LoadingSpinner, { LoadingCard, LoadingSkeleton, LoadingButton } from "../../components/LoadingSpinner";
+import LoadingSpinner, { LoadingSkeleton } from "../../components/LoadingSpinner";
 
 const Orders = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -18,7 +18,7 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [searchType, setSearchType] = useState("phone"); // phone or address
+  const [searchType, setSearchType] = useState("phone");
   const [showFilterPanel, setShowFilterPanel] = useState(false);
 
   // Pagination state
@@ -27,22 +27,40 @@ const Orders = () => {
 
   const fetchOrders = useCallback(
     async () => {
-      if (!user?._id) return;
+      if (!user?._id) {
+        showToast("No user ID available", "error");
+        return;
+      }
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
         const response = await Api.order.getOrders(user._id, token);
-        const data = Array.isArray(response.data) ? response.data : [];
-        
+        const data = response.data.data || [];
+
+        if (!Array.isArray(data)) {
+          showToast("Invalid API response format", "error");
+          setOrders([]);
+          setFilteredOrders([]);
+          setLoading(false);
+          return;
+        }
+
+        if (data.length === 0) {
+          showToast("No orders found for this user", "info");
+        }
+
         // Fetch detailed order data for each order
         const detailedOrders = await Promise.all(
           data.map(async (order) => {
             try {
               const detailedResponse = await Api.order.getOrder(order._id, token);
-              return detailedResponse.data.data || order; // Use detailed data if available, fallback to original
+              const orderDetailsResponse = await Api.order.getAllOrderDetails(order._id, token);
+              return {
+                ...detailedResponse.data.data,
+                orderDetails: Array.isArray(orderDetailsResponse.data) ? orderDetailsResponse.data : []
+              };
             } catch (err) {
-              console.error(`Failed to fetch details for order ${order._id}:`, err);
-              return order; // Fallback to original order if detail fetch fails
+              return order;
             }
           })
         );
@@ -55,6 +73,8 @@ const Orders = () => {
       } catch (err) {
         setError(err.message);
         showToast("Failed to load orders", "error");
+        setOrders([]);
+        setFilteredOrders([]);
       } finally {
         setLoading(false);
       }
@@ -63,14 +83,14 @@ const Orders = () => {
   );
 
   useEffect(() => {
-    if (!isAuthLoading && user) fetchOrders();
+    if (!isAuthLoading && user) {
+      fetchOrders();
+    }
   }, [isAuthLoading, user, fetchOrders]);
 
-  // Frontend search and filter function
   const handleSearchAndFilter = useCallback(() => {
     let filtered = [...orders];
 
-    // Search by phone or address
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(order => {
@@ -82,9 +102,8 @@ const Orders = () => {
       });
     }
 
-    // Filter by status
     if (statusFilter !== "all") {
-      filtered = filtered.filter(order =>
+      filtered = filtered.filter(order => 
         order.order_status?.toLowerCase() === statusFilter.toLowerCase()
       );
     }
@@ -92,19 +111,16 @@ const Orders = () => {
     setFilteredOrders(filtered);
   }, [orders, searchQuery, searchType, statusFilter]);
 
-  // Apply search and filter when dependencies change
   useEffect(() => {
     handleSearchAndFilter();
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, [handleSearchAndFilter]);
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentOrders = filteredOrders.slice(startIndex, endIndex);
 
-  // Pagination handlers
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -112,7 +128,7 @@ const Orders = () => {
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);
   };
 
   const formatDate = (date) =>
@@ -165,7 +181,6 @@ const Orders = () => {
           );
       }
     } else {
-      // pay_status
       switch (status?.toLowerCase()) {
         case "unpaid":
           return (
@@ -195,8 +210,9 @@ const Orders = () => {
     }
   };
 
-  if (isAuthLoading)
+  if (isAuthLoading) {
     return <LoadingSpinner fullScreen text="Loading user data..." />;
+  }
 
   if (!user) {
     navigate("/login");
@@ -210,7 +226,6 @@ const Orders = () => {
           My Orders
         </h1>
 
-        {/* 🔍 Search Bar */}
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 max-w-md">
             <div className="relative">
@@ -230,7 +245,6 @@ const Orders = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Search Type Toggle */}
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setSearchType("phone")}
@@ -252,7 +266,6 @@ const Orders = () => {
               </button>
             </div>
 
-            {/* Filter Button */}
             <button
               onClick={() => setShowFilterPanel(!showFilterPanel)}
               className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${showFilterPanel || statusFilter !== "all"
@@ -271,7 +284,6 @@ const Orders = () => {
               )}
             </button>
 
-            {/* Clear Button */}
             {(searchQuery || statusFilter !== "all") && (
               <button
                 onClick={() => {
@@ -287,105 +299,25 @@ const Orders = () => {
           </div>
         </div>
 
-        {/* 📊 Results Summary */}
-        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
-          <span>
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length} orders
-            {filteredOrders.length !== orders.length && ` (${orders.length} total)`}
-          </span>
-          <div className="flex items-center gap-4">
-            {(searchQuery || statusFilter !== "all") && (
-              <span className="text-yellow-600 font-medium">
-                Filters applied
-              </span>
-            )}
-            {/* Items per page selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500">Show:</span>
-              <select
-                value={itemsPerPage}
-                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-              <span className="text-gray-500">per page</span>
-            </div>
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-sm text-gray-600">
+            Showing {Math.min(startIndex + 1, filteredOrders.length)}–
+            {Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length}{" "}
+            orders
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Items per page:</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+              className="border border-yellow-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
           </div>
         </div>
-
-        {/* 🔧 Collapsible Filter Panel */}
-        {showFilterPanel && (
-          <div className="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200 animate-fadeIn">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Status Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Order Status
-                </label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
-                >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="shipping">Shipping</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              {/* Quick Status Buttons */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quick Filter
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {["pending", "confirmed", "shipping", "delivered", "cancelled"].map(status => {
-                    const count = orders.filter(order => order.order_status?.toLowerCase() === status).length;
-                    return count > 0 ? (
-                      <button
-                        key={status}
-                        onClick={() => setStatusFilter(statusFilter === status ? "all" : status)}
-                        className={`px-3 py-1 text-xs font-medium rounded-full transition ${statusFilter === status
-                          ? 'bg-yellow-200 text-yellow-800'
-                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                          }`}
-                      >
-                        {status.charAt(0).toUpperCase() + status.slice(1)} ({count})
-                      </button>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-
-              {/* Stats Display */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Order Statistics
-                </label>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <div>Total Orders: {orders.length}</div>
-                  <div>Filtered Results: {filteredOrders.length}</div>
-                  {searchQuery && (
-                    <div className="text-yellow-600">
-                      Searching: "{searchQuery}" in {searchType}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <p className="text-red-600 text-center mb-4 font-medium">{error}</p>
-        )}
 
         {loading ? (
           <LoadingSkeleton count={3} />
@@ -430,13 +362,13 @@ const Orders = () => {
                     {order.orderDetails?.length > 0 ? (
                       <>
                         <img
-                          src={order.orderDetails[0]?.variant?.image || "/placeholder.png"}
-                          alt={order.orderDetails[0]?.variant?.product?.name || "Product"}
+                          src={order.orderDetails[0]?.variant_id?.variantImage || "/placeholder.png"}
+                          alt={order.orderDetails[0]?.variant_id?.productId?.productName || "Product"}
                           className="w-12 h-12 object-cover rounded border"
                         />
                         <div>
                           <p className="text-sm font-medium text-gray-800">
-                            {order.orderDetails[0]?.variant?.product?.name || "Unknown Product"}
+                            {order.orderDetails[0]?.variant_id?.productId?.productName || "Unknown Product"}
                           </p>
                           {order.orderDetails.length > 1 && (
                             <p className="text-xs text-gray-500">
@@ -534,7 +466,6 @@ const Orders = () => {
           </div>
         )}
 
-        {/* 📄 Pagination */}
         {filteredOrders.length > itemsPerPage && (
           <div className="mt-8 flex items-center justify-between">
             <div className="text-sm text-gray-600">
@@ -542,7 +473,6 @@ const Orders = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Previous button */}
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -557,7 +487,6 @@ const Orders = () => {
                 Previous
               </button>
 
-              {/* Page numbers */}
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                   const shouldShow =
@@ -591,7 +520,6 @@ const Orders = () => {
                 })}
               </div>
 
-              {/* Next button */}
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
@@ -610,7 +538,6 @@ const Orders = () => {
         )}
       </div>
 
-      {/* Order Details Modal */}
       {selectedOrderId && (
         <OrderDetailsModal
           orderId={selectedOrderId}

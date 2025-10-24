@@ -180,7 +180,7 @@ const ProductDetail = () => {
 
   // Data fetching
   const fetchProductAndVariants = useCallback(async () => {
-    if (!id) {
+  if (!id) {
       showToast("Product ID is required", "error", TOAST_TIMEOUT);
       return;
     }
@@ -190,23 +190,19 @@ const ProductDetail = () => {
 
     try {
       const productResponse = await Api.newProducts.getById(id);
-
-      if (!productResponse) {
-        throw new Error("Product not found");
+      if (!productResponse?.data) {
+        throw new Error("Invalid product response");
       }
 
       const productData = productResponse.data?.data || productResponse.data;
-
-      if (!productData) {
-        throw new Error("Product data is empty");
+      if (!productData?._id) {
+        throw new Error("Product data is incomplete");
       }
 
       setProduct(productData);
-
-      const productVariants = productData.productVariantIds || [];
+      const productVariants = Array.isArray(productData.productVariantIds) ? productData.productVariantIds : [];
       setVariants(productVariants);
-
-      const productImages = productData.productImageIds || [];
+      const productImages = Array.isArray(productData.productImageIds) ? productData.productImageIds : [];
       setImages(productImages);
 
       if (!Array.isArray(productVariants) || productVariants.length === 0) {
@@ -241,41 +237,21 @@ const ProductDetail = () => {
       const mainImage = productImages.find(img => img.isMain);
       const defaultImageUrl = mainImage?.imageUrl || productImages[0]?.imageUrl || "/placeholder-image.png";
       setSelectedImage(defaultImageUrl);
-    } catch (err) {
+  } catch (err) {
       console.error("Error fetching product:", err);
-      showToast(err.response?.data?.message || err.message || "Failed to fetch product details", "error", TOAST_TIMEOUT);
+      setError(err.message || "Failed to fetch product details");
+      showToast(err.message || "Failed to fetch product details", "error", TOAST_TIMEOUT);
     } finally {
       setLoading(false);
     }
   }, [id, showToast]);
-
-  const fetchFavorites = useCallback(async () => {
-    if (!user || !localStorage.getItem("token")) {
-      setIsFavorited(false);
-      setFavoriteId(null);
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const favorites = await Api.favorites.fetch(token);
-      const favorite = favorites.data.find((f) => f.pro_id?._id === id);
-      setIsFavorited(!!favorite);
-      setFavoriteId(favorite?._id || null);
-    } catch (err) {
-      showToast(err.message || "Failed to fetch favorites", "error", TOAST_TIMEOUT);
-      setIsFavorited(false);
-      setFavoriteId(null);
-    }
-  }, [id, user, showToast]);
 
   // Feedback fetching logic moved to ProductFeedback component
 
   // Initial fetch
   useEffect(() => {
     fetchProductAndVariants();
-    fetchFavorites();
-  }, [id, fetchFavorites, fetchProductAndVariants]);
+  }, [id, fetchProductAndVariants]);
 
   // Feedback fetching moved to ProductFeedback component
 
@@ -434,8 +410,7 @@ const ProductDetail = () => {
 
   const handleRetry = useCallback(() => {
     fetchProductAndVariants();
-    fetchFavorites();
-  }, [fetchProductAndVariants, fetchFavorites]);
+  }, [fetchProductAndVariants]);
 
   const handleAddToFavorites = useCallback(async () => {
     if (!user) {
