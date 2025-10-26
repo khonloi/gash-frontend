@@ -30,6 +30,7 @@ import VNPayReturn from "./pages/VNPayReturn";
 import Bill from "./pages/customer/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
 import Notifications from "./pages/Notifications";
+import LiveStream from "./pages/ViewLiveStream";
 
 // ==== Components ====
 import UserChat from "./components/UserChat";
@@ -96,6 +97,9 @@ const App = () => {
 
                 {/* Trang thông báo */}
                 <Route path="/notifications" element={<Notifications />} />
+
+                {/* Livestream */}
+                <Route path="/live" element={<LiveStream />} />
 
               </Routes>
 

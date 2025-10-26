@@ -12,21 +12,22 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import LiveTvIcon from '@mui/icons-material/LiveTv';
 import NotificationsDropdown from "./NotificationsDropdown";
 
 // API retry utility from Search.jsx
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await apiCall();
-      console.log("Search API response:", response.data); // Debug log
-      return response.data;
-    } catch (error) {
-      console.error(`Fetch retry attempt ${i + 1} failed:`, error.message); // Debug log
-      if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await apiCall();
+            console.log("Search API response:", response.data); // Debug log
+            return response.data;
+        } catch (error) {
+            console.error(`Fetch retry attempt ${i + 1} failed:`, error.message); // Debug log
+            if (i === retries - 1) throw error;
+            await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
+        }
     }
-  }
 };
 
 export default function Header() {
@@ -62,27 +63,27 @@ export default function Header() {
 
     // Helper function to get minimum price from product variants
     const getMinPrice = (product) => {
-      if (!product.productVariantIds || product.productVariantIds.length === 0) {
-        console.log(`No variants for product ${product._id}`); // Debug log
-        return 0;
-      }
-      const prices = product.productVariantIds
-        .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
-        .map(v => v.variantPrice);
-      console.log(`Prices for product ${product._id}:`, prices); // Debug log
-      return prices.length > 0 ? Math.min(...prices) : 0;
+        if (!product.productVariantIds || product.productVariantIds.length === 0) {
+            console.log(`No variants for product ${product._id}`); // Debug log
+            return 0;
+        }
+        const prices = product.productVariantIds
+            .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
+            .map(v => v.variantPrice);
+        console.log(`Prices for product ${product._id}:`, prices); // Debug log
+        return prices.length > 0 ? Math.min(...prices) : 0;
     };
 
     // Helper function to get main image URL
     const getMainImageUrl = (product) => {
-      if (!product.productImageIds || product.productImageIds.length === 0) {
-        console.log(`No images for product ${product._id}`); // Debug log
-        return "/placeholder-image.png";
-      }
-      const mainImage = product.productImageIds.find(img => img.isMain);
-      const imageUrl = mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-      console.log(`Image URL for product ${product._id}:`, imageUrl); // Debug log
-      return imageUrl;
+        if (!product.productImageIds || product.productImageIds.length === 0) {
+            console.log(`No images for product ${product._id}`); // Debug log
+            return "/placeholder-image.png";
+        }
+        const mainImage = product.productImageIds.find(img => img.isMain);
+        const imageUrl = mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
+        console.log(`Image URL for product ${product._id}:`, imageUrl); // Debug log
+        return imageUrl;
     };
 
     const fetchSearchResults = useCallback(async (query) => {
@@ -277,11 +278,11 @@ export default function Header() {
                     ) : (
                         <>
                             {/* Search icon trái */}
-                            <button 
+                            <button
                                 onClick={() => {
                                     console.log("Opening mobile search"); // Debug log
                                     setMobileSearchOpen(true);
-                                }} 
+                                }}
                                 title="Search"
                                 className="p-2 text-white hover:text-amber-500"
                             >
@@ -460,21 +461,31 @@ export default function Header() {
 
                     {/* Icon phải */}
                     <div className="flex items-center gap-4 sm:gap-6" ref={userMenuRef}>
-                        <button 
+                        <button
+                            onClick={() => {
+                                console.log("Live Stream clicked"); // Debug log
+                                navigate("/live");
+                            }}
+                            title="Live Stream"
+                            className="p-2 text-white hover:text-amber-500"
+                        >
+                            <LiveTvIcon />
+                        </button>
+                        <button
                             onClick={() => {
                                 console.log("Favorites clicked, user:", !!user); // Debug log
                                 user ? navigate("/favorites") : navigate("/login");
-                            }} 
+                            }}
                             title="Favorites"
                             className="p-2 text-white hover:text-amber-500"
                         >
                             <FavoriteBorderIcon />
                         </button>
-                        <button 
+                        <button
                             onClick={() => {
                                 console.log("Cart clicked, user:", !!user); // Debug log
                                 user ? navigate("/cart") : navigate("/login");
-                            }} 
+                            }}
                             title="Cart"
                             className="p-2 text-white hover:text-amber-500"
                         >
@@ -483,11 +494,11 @@ export default function Header() {
                         {user ? (
                             <NotificationsDropdown user={user} />
                         ) : (
-                            <button 
+                            <button
                                 onClick={() => {
                                     console.log("Notifications clicked, navigating to login"); // Debug log
                                     navigate("/login");
-                                }} 
+                                }}
                                 title="Notifications"
                                 className="p-2 text-white hover:text-amber-500"
                             >
@@ -498,7 +509,7 @@ export default function Header() {
                             console.log("Account menu clicked, user:", !!user); // Debug log
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
-                            <button 
+                            <button
                                 title="My Account"
                                 className="p-2 text-white hover:text-amber-500"
                             >
