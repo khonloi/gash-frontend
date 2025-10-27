@@ -49,23 +49,7 @@ const Orders = () => {
           showToast("No orders found for this user", "info");
         }
 
-        // Fetch detailed order data for each order
-        const detailedOrders = await Promise.all(
-          data.map(async (order) => {
-            try {
-              const detailedResponse = await Api.order.getOrder(order._id, token);
-              const orderDetailsResponse = await Api.order.getAllOrderDetails(order._id, token);
-              return {
-                ...detailedResponse.data.data,
-                orderDetails: Array.isArray(orderDetailsResponse.data) ? orderDetailsResponse.data : []
-              };
-            } catch (err) {
-              return order;
-            }
-          })
-        );
-
-        const sorted = detailedOrders.sort(
+        const sorted = data.sort(
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
         setOrders(sorted);
@@ -93,7 +77,7 @@ const Orders = () => {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(order => {
+      filtered = filtered.filter((order) => {
         if (searchType === "phone") {
           return order.phone?.toLowerCase().includes(query);
         } else {
@@ -103,8 +87,8 @@ const Orders = () => {
     }
 
     if (statusFilter !== "all") {
-      filtered = filtered.filter(order => 
-        order.order_status?.toLowerCase() === statusFilter.toLowerCase()
+      filtered = filtered.filter(
+        (order) => order.order_status?.toLowerCase() === statusFilter.toLowerCase()
       );
     }
 
@@ -123,7 +107,7 @@ const Orders = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
@@ -237,8 +221,18 @@ const Orders = () => {
                 className="w-full px-4 py-2 pl-10 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
             </div>
@@ -248,19 +242,21 @@ const Orders = () => {
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setSearchType("phone")}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition ${searchType === "phone"
-                  ? "bg-white text-yellow-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
-                  }`}
+                className={`px-3 py-1 text-sm font-medium rounded-md transition ${
+                  searchType === "phone"
+                    ? "bg-white text-yellow-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
               >
                 Phone
               </button>
               <button
                 onClick={() => setSearchType("address")}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition ${searchType === "address"
-                  ? "bg-white text-yellow-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
-                  }`}
+                className={`px-3 py-1 text-sm font-medium rounded-md transition ${
+                  searchType === "address"
+                    ? "bg-white text-yellow-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
               >
                 Address
               </button>
@@ -268,13 +264,19 @@ const Orders = () => {
 
             <button
               onClick={() => setShowFilterPanel(!showFilterPanel)}
-              className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${showFilterPanel || statusFilter !== "all"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+              className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                showFilterPanel || statusFilter !== "all"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
+                />
               </svg>
               Filter
               {statusFilter !== "all" && (
@@ -324,19 +326,35 @@ const Orders = () => {
         ) : filteredOrders.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="w-16 h-16 mx-auto"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
             {orders.length === 0 ? (
               <>
                 <p className="text-gray-500 italic text-lg">No orders found</p>
-                <p className="text-gray-400 text-sm mt-2">Your orders will appear here once you make a purchase</p>
+                <p className="text-gray-400 text-sm mt-2">
+                  Your orders will appear here once you make a purchase
+                </p>
               </>
             ) : (
               <>
-                <p className="text-gray-500 italic text-lg">No orders match your search</p>
-                <p className="text-gray-400 text-sm mt-2">Try adjusting your search criteria or filters</p>
+                <p className="text-gray-500 italic text-lg">
+                  No orders match your search
+                </p>
+                <p className="text-gray-400 text-sm mt-2">
+                  Try adjusting your search criteria or filters
+                </p>
                 <button
                   onClick={() => {
                     setSearchQuery("");
@@ -359,31 +377,9 @@ const Orders = () => {
               >
                 <div className="flex justify-between items-center border-b pb-2 mb-3">
                   <div className="flex items-center gap-3">
-                    {order.orderDetails?.length > 0 ? (
-                      <>
-                        <img
-                          src={order.orderDetails[0]?.variant_id?.variantImage || "/placeholder.png"}
-                          alt={order.orderDetails[0]?.variant_id?.productId?.productName || "Product"}
-                          className="w-12 h-12 object-cover rounded border"
-                        />
-                        <div>
-                          <p className="text-sm font-medium text-gray-800">
-                            {order.orderDetails[0]?.variant_id?.productId?.productName || "Unknown Product"}
-                          </p>
-                          {order.orderDetails.length > 1 && (
-                            <p className="text-xs text-gray-500">
-                              + {order.orderDetails.length - 1} product{order.orderDetails.length > 2 ? "s" : ""}
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <p className="text-sm text-gray-500">No items</p>
-                    )}
+                    <p className="text-sm text-gray-500">Order #{order._id}</p>
                   </div>
-                  <p className="text-sm text-gray-500">
-                    {formatDate(order.orderDate)}
-                  </p>
+                  <p className="text-sm text-gray-500">{formatDate(order.orderDate)}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
@@ -393,9 +389,9 @@ const Orders = () => {
                       <span
                         dangerouslySetInnerHTML={{
                           __html: order.addressReceive?.replace(
-                            new RegExp(`(${searchQuery})`, 'gi'),
+                            new RegExp(`(${searchQuery})`, "gi"),
                             '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-                          )
+                          ),
                         }}
                       />
                     ) : (
@@ -408,9 +404,9 @@ const Orders = () => {
                       <span
                         dangerouslySetInnerHTML={{
                           __html: order.phone?.replace(
-                            new RegExp(`(${searchQuery})`, 'gi'),
+                            new RegExp(`(${searchQuery})`, "gi"),
                             '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-                          )
+                          ),
                         }}
                       />
                     ) : (
@@ -437,14 +433,24 @@ const Orders = () => {
                 </div>
 
                 <div className="flex justify-end gap-3 mt-4">
-                  {order.pay_status?.toLowerCase() === 'paid' && (
+                  {order.pay_status?.toLowerCase() === "paid" && (
                     <button
                       onClick={() => navigate(`/bills/${order._id}`)}
                       className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
                       title="View Bill"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
                       </svg>
                       View Bill
                     </button>
@@ -454,9 +460,24 @@ const Orders = () => {
                     className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition flex items-center gap-2"
                     title="View Details"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
                     </svg>
                     View Details
                   </button>
@@ -476,13 +497,19 @@ const Orders = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${currentPage === 1
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-yellow-500 text-white hover:bg-yellow-600"
-                  }`}
+                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${
+                  currentPage === 1
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
+                }`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
                 Previous
               </button>
@@ -509,10 +536,11 @@ const Orders = () => {
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`px-3 py-2 rounded-lg font-medium transition ${page === currentPage
-                        ? "bg-yellow-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        }`}
+                      className={`px-3 py-2 rounded-lg font-medium transition ${
+                        page === currentPage
+                          ? "bg-yellow-600 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
                     >
                       {page}
                     </button>
@@ -523,14 +551,20 @@ const Orders = () => {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${currentPage === totalPages
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-yellow-500 text-white hover:bg-yellow-600"
-                  }`}
+                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${
+                  currentPage === totalPages
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
+                }`}
               >
                 Next
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
