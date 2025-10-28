@@ -56,20 +56,15 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}>
       <Router>
-        <AuthProvider>
-          <ToastProvider>
+        <ToastProvider>
+          <AuthProvider>
             <ScrollToTop />
             <Layout>
               <Routes>
-                {/* Trang chính */}
                 <Route path="/" element={<Home />} />
-
-                {/* Sản phẩm */}
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/product/:id/all-feedback" element={<AllProductFeedback />} />
-
-                {/* Tài khoản */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/otp-verification" element={<OTPVerification />} />
@@ -77,8 +72,6 @@ const App = () => {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
-
-                {/* Giỏ hàng & thanh toán */}
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<Orders />} />
@@ -86,28 +79,17 @@ const App = () => {
                 <Route path="/bills/:orderId" element={<Bill />} />
                 <Route path="/favorites" element={<ProductFavorite />} />
                 <Route path="/search" element={<Search />} />
-
-                {/* Blog, liên hệ, thanh toán */}
                 <Route path="/news" element={<BlogPost />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/vnpay-return" element={<VNPayReturn />} />
-
-                {/* Ví Voucher */}
                 <Route path="/vouchers" element={<UserVoucherPage />} />
-
-                {/* Trang thông báo */}
                 <Route path="/notifications" element={<Notifications />} />
-
-                {/* Livestream */}
                 <Route path="/live" element={<LiveStream />} />
-
               </Routes>
-
-              {/* Chỉ hiển thị chat khi user đã đăng nhập */}
               <ChatIfLoggedIn />
             </Layout>
-          </ToastProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </ToastProvider>
       </Router>
     </GoogleOAuthProvider>
   );

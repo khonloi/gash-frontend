@@ -246,14 +246,10 @@ const ProductDetail = () => {
     }
   }, [id, showToast]);
 
-  // Feedback fetching logic moved to ProductFeedback component
-
   // Initial fetch
   useEffect(() => {
     fetchProductAndVariants();
   }, [id, fetchProductAndVariants]);
-
-  // Feedback fetching moved to ProductFeedback component
 
   // Stock status - based on selected variant (include inactive variants with stock)
   const isInStock = useMemo(
@@ -569,6 +565,31 @@ const ProductDetail = () => {
     [selectedColor, variantIndex]
   );
 
+  const colorStockInfo = useMemo(() => {
+  if (!selectedColor) {
+    return { inStock: false, message: "Select a color to check stock" };
+  }
+  const anyInStock = isColorInStock(selectedColor);
+  if (!anyInStock) {
+    return { inStock: false, message: "Out of Stock" };
+  }
+
+  // If a size is also selected we can show the exact quantity,
+  // otherwise show a generic “In Stock” for the whole color.
+  if (selectedSize && selectedVariant) {
+    return {
+      inStock: true,
+      message: `In Stock (${selectedVariant.stockQuantity} available)`,
+    };
+  }
+  return { inStock: true, message: "In Stock" };
+}, [
+  selectedColor,
+  selectedSize,
+  selectedVariant,
+  isColorInStock,
+]);
+
   // Render
   if (loading) {
     return (
@@ -688,17 +709,15 @@ const ProductDetail = () => {
                 ? `From ${formatPrice(lowestPriceVariant.variantPrice)}`
                 : "No variants available"}
           </div>
-          <div className="product-detail-stock-status">
-            <span
-              className={`product-detail-stock ${isInStock ? "in-stock" : "out-of-stock"}`}
-            >
-              {selectedVariant
-                ? (isInStock ? "In Stock" : "Out of Stock")
-                : "Select a variant to check stock"}
-              {selectedVariant?.stockQuantity > 0 &&
-                ` (${selectedVariant.stockQuantity} available)`}
-            </span>
-          </div>
+            <div className="product-detail-stock-status">
+              <span
+                className={`product-detail-stock ${
+                  colorStockInfo.inStock ? "in-stock" : "out-of-stock"
+                }`}
+              >
+                {colorStockInfo.message}
+              </span>
+            </div>
           <div className="product-detail-variants">
                 {availableColors.length > 0 && (
                   <fieldset className="product-detail-color-section">
