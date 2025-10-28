@@ -539,9 +539,34 @@ const ProductDetail = () => {
   // Check if a color-size combination is valid
   const isValidCombination = useCallback(
     (color, size) => {
-      return !!variantIndex.byColorSize[`${color}-${size}`];
+      const variant = variantIndex.byColorSize[`${color}-${size}`];
+      return variant && variant.variantStatus !== "discontinued" && variant.stockQuantity > 0;
     },
     [variantIndex]
+  );
+
+  // Check if a color has any in-stock variants (for styling only)
+  const isColorInStock = useCallback(
+    (color) => {
+      const colorVariants = variantIndex.byColor[color] || [];
+      return colorVariants.some(
+        (v) => v.variantStatus !== "discontinued" && v.stockQuantity > 0
+      );
+    },
+    [variantIndex]
+  );
+
+  // Check if a size is in stock (considering selected color if any)
+  const isSizeInStock = useCallback(
+    (size) => {
+      if (selectedColor) {
+        const variant = variantIndex.byColorSize[`${selectedColor}-${size}`];
+        return variant && variant.variantStatus !== "discontinued" && variant.stockQuantity > 0;
+      }
+      const sizeVariants = variantIndex.bySize[size] || [];
+      return sizeVariants.some(v => v.variantStatus !== "discontinued" && v.stockQuantity > 0);
+    },
+    [selectedColor, variantIndex]
   );
 
   // Render
@@ -675,62 +700,61 @@ const ProductDetail = () => {
             </span>
           </div>
           <div className="product-detail-variants">
-            {availableColors.length > 0 && (
-              <fieldset className="product-detail-color-section">
-                <legend>Color:</legend>
-                <div className="product-detail-color-buttons">
-                  {availableColors.map((color) => (
-                    <button
-                      key={color}
-                      className={`product-detail-color-button ${selectedColor === color ? "selected" : ""
-                        }`}
-                      onClick={() => handleColorClick(color)}
-                      type="button"
-                      aria-label={`Select ${color} color`}
-                      aria-pressed={selectedColor === color}
-                    >
-                      {color}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-            )}
-            {availableSizes.length > 0 && (
-              <fieldset className="product-detail-size-section">
-                <legend>Size:</legend>
-                <div className="product-detail-size-buttons">
-                  {availableSizes.map((size) => (
-                    <button
-                      key={size}
-                      className={`product-detail-size-button ${selectedSize === size ? "selected" : ""
-                        }`}
-                      onClick={() => handleSizeClick(size)}
-                      disabled={
-                        selectedColor &&
-                        !isValidCombination(selectedColor, size)
-                      }
-                      type="button"
-                      aria-label={`Select ${size} size`}
-                      aria-pressed={selectedSize === size}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-            )}
-            <fieldset className="product-detail-quantity-section">
-              <legend>Quantity:</legend>
-              <input
-                type="number"
-                className="product-detail-quantity-input"
-                value={quantity}
-                onChange={handleQuantityChange}
-                min="1"
-                disabled={!selectedVariant || !isInStock}
-                aria-label="Select quantity"
-              />
-            </fieldset>
+                {availableColors.length > 0 && (
+                  <fieldset className="product-detail-color-section">
+                    <legend>Color:</legend>
+                    <div className="product-detail-color-buttons">
+                      {availableColors.map((color) => (
+                        <button
+                          key={color}
+                          className={`product-detail-color-button ${selectedColor === color ? "selected" : ""} ${
+                            !isColorInStock(color) ? "opacity-50" : ""
+                          }`}
+                          onClick={() => handleColorClick(color)}
+                          type="button"
+                          aria-label={`Select ${color} color`}
+                          aria-pressed={selectedColor === color}
+                        >
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
+                {availableSizes.length > 0 && (
+                  <fieldset className="product-detail-size-section">
+                    <legend>Size:</legend>
+                    <div className="product-detail-size-buttons">
+                      {availableSizes.map((size) => (
+                        <button
+                          key={size}
+                          className={`product-detail-size-button ${selectedSize === size ? "selected" : ""} ${
+                            !isSizeInStock(size) ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                          onClick={() => isSizeInStock(size) && handleSizeClick(size)}
+                          disabled={!isSizeInStock(size) || (selectedColor && !isValidCombination(selectedColor, size))}
+                          type="button"
+                          aria-label={`Select ${size} size`}
+                          aria-pressed={selectedSize === size}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
+                <fieldset className="product-detail-quantity-section">
+                  <legend>Quantity:</legend>
+                  <input
+                    type="number"
+                    className="product-detail-quantity-input"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                    min="1"
+                    disabled={!selectedVariant || !isInStock}
+                    aria-label="Select quantity"
+                  />
+                </fieldset>
           </div>
         </div>
 
