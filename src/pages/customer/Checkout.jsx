@@ -7,6 +7,32 @@ import '../../styles/Checkout.css';
 import Api from "../../common/SummaryAPI";
 import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/LoadingSpinner';
 
+// === LocalStorage Helpers ===
+const CHECKOUT_STORAGE_KEY = 'checkout_persistent_data';
+
+const saveCheckoutData = (data) => {
+  try {
+    localStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.warn('Failed to save checkout data', err);
+  }
+};
+
+const loadCheckoutData = () => {
+  try {
+    const data = localStorage.getItem(CHECKOUT_STORAGE_KEY);
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    console.warn('Failed to load checkout data', err);
+    return null;
+  }
+};
+
+const clearCheckoutData = () => {
+  localStorage.removeItem(CHECKOUT_STORAGE_KEY);
+};
+// === End Helpers ===
+
 const Checkout = () => {
   // Shared success modal state
   const [successInfo, setSuccessInfo] = useState(null);
@@ -14,38 +40,64 @@ const Checkout = () => {
   const { showToast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  const selectedItems = useMemo(() => location.state?.selectedItems || [], [location.state?.selectedItems]);
-  const buyNowState = useMemo(() =>
-    location.state && location.state.product && location.state.variant && location.state.quantity
+
+  // === Restore persistent data from localStorage ===
+  const persistentData = loadCheckoutData();
+
+  // === selectedItems & buyNowState with persistence ===
+  const selectedItems = useMemo(() => {
+    const fromLocation = location.state?.selectedItems;
+    if (fromLocation && Array.isArray(fromLocation)) {
+      saveCheckoutData({ ...persistentData, selectedItems: fromLocation, buyNowState: null });
+      return fromLocation;
+    }
+    return persistentData?.selectedItems || [];
+  }, [location.state?.selectedItems, persistentData?.selectedItems]);
+
+  const buyNowState = useMemo(() => {
+    const fromLocation = location.state && location.state.product && location.state.variant && location.state.quantity
       ? {
-        product: location.state.product,
-        variant: location.state.variant,
-        quantity: location.state.quantity,
-      }
-      : null,
-    [location.state]
-  );
-  const [cartItems, setCartItems] = useState([]);
+          product: location.state.product,
+          variant: location.state.variant,
+          quantity: location.state.quantity,
+        }
+      : null;
+
+    if (fromLocation) {
+      saveCheckoutData({ ...persistentData, selectedItems: null, buyNowState: fromLocation });
+      return fromLocation;
+    }
+
+    return persistentData?.buyNowState || null;
+  }, [location.state, persistentData?.buyNowState]);
+
+  // === Form State with persistence ===
   const [formData, setFormData] = useState({
     addressReceive: '',
     phone: '',
     name: '',
   });
+
+  // Restore form data on mount
+  useEffect(() => {
+    const saved = loadCheckoutData();
+    if (saved?.formData) {
+      setFormData(saved.formData);
+    }
+  }, []);
+
+  const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [loading, setLoading] = useState(false);
-  // Voucher state
   const [voucherCode, setVoucherCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [appliedVoucher, setAppliedVoucher] = useState(null);
 
-  // Fetch cart items (only if not Buy Now)
+  // === Fetch cart items (only if not Buy Now and no selectedItems) ===
   const fetchCartItems = useCallback(async () => {
-    if (!user?._id) {
-      showToast('User not authenticated', 'error');
-      return;
-    }
-    setLoading(true);
+    if (!user?._id) return;
 
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
@@ -60,16 +112,27 @@ const Checkout = () => {
     }
   }, [user, showToast]);
 
-  // Redirect to login if not authenticated
+  // === Auth & Data Restore Logic ===
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    } else if (!buyNowState) {
+    const token = localStorage.getItem('token');
+
+    // If no token AND no user → redirect
+    if (!token && !user) {
+      showToast('Please login to continue', 'warning');
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+
+    // If token exists but user not loaded → wait (AuthContext may still be loading)
+    // Do NOT redirect
+
+    // Fetch cart only if needed
+    if (!buyNowState && selectedItems.length === 0 && user?._id && token) {
       fetchCartItems();
     }
-  }, [user, navigate, fetchCartItems, buyNowState]);
+  }, [user, navigate, buyNowState, selectedItems.length, fetchCartItems, showToast, location.pathname]);
 
-  // Calculate total price
+  // === Calculate total price ===
   const totalPrice = useMemo(() => {
     if (buyNowState) {
       return (buyNowState.variant?.variantPrice || 0) * (buyNowState.quantity || 1);
@@ -81,84 +144,62 @@ const Checkout = () => {
     }, 0);
   }, [selectedItems, buyNowState]);
 
-  // ==== Handle voucher apply ====
+  // === Handle voucher apply ===
   const handleApplyVoucher = async () => {
     try {
-      // Get token from localStorage
       const token = localStorage.getItem('token');
-
       if (!user || !token) {
         showToast('Please login to apply voucher.', 'error');
         return;
       }
 
-      // Prepare data for apply API call
       const applyData = {
         voucherCode: voucherCode.trim().toUpperCase(),
         totalPrice: totalPrice
       };
 
-      // Apply voucher directly using backend API
       const applyResponse = await Api.voucher.applyVoucher(applyData, token);
 
       if (applyResponse.data && applyResponse.data.success) {
         const { data } = applyResponse.data;
 
-        console.log("Voucher apply successful:", data);
-
         if (data.voucherId && data.discountAmount > 0) {
-          // Voucher applied successfully
           setAppliedVoucher({
             _id: data.voucherId,
             code: data.code,
-            discountType: 'percentage', // Default, will be updated when backend provides full voucher data
+            discountType: 'percentage',
             discountValue: data.discountAmount
           });
           setDiscount(data.discountAmount);
           showToast(`Voucher applied: -${data.discountAmount.toLocaleString()}₫`, 'success');
         } else if (data.voucherId && data.discountAmount === 0) {
-          // Voucher is valid but no discount applied (e.g., min order not met)
           showToast(`Voucher "${data.code}" is valid but no discount applied.`, 'info');
         } else {
-          // No voucher applied (empty voucherCode)
           showToast('No voucher applied.', 'info');
         }
       } else {
-        // Backend returned error - hiển thị lỗi do backend trả về
         const errorMessage = applyResponse.data?.message || 'Failed to apply voucher';
         showToast(errorMessage, 'error');
-        return;
       }
     } catch (err) {
-      // Hiển thị lỗi do backend trả về
-      let errorMessage = 'Invalid or expired voucher code.';
-
-      if (err.response?.data?.message) {
-        // Backend error message
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        // JavaScript error message
-        errorMessage = err.message;
-      }
-
+      const errorMessage = err.response?.data?.message || err.message || 'Invalid or expired voucher code.';
       showToast(errorMessage, 'error');
     }
   };
 
-  // Xóa voucher đã áp dụng
   const handleRemoveVoucher = () => {
     setAppliedVoucher(null);
     setDiscount(0);
     setVoucherCode('');
   };
 
-  // Validation functions
+  // === Validation ===
   const validateName = useCallback((name) => {
     const trimmed = name.trim();
     if (!trimmed) return 'Recipient name is required';
     if (trimmed.length < 3) return 'Recipient name must be at least 3 characters';
     if (trimmed.length > 30) return 'Recipient name cannot exceed 30 characters';
-    if (!/^[a-zA-Z0-9\s]+$/.test(trimmed)) return 'Recipient name can only contain letters, numbers and spaces';
+    if (!/^[\p{L}\s]+$/u.test(trimmed)) return 'Recipient name can only contain letters and spaces';
     return null;
   }, []);
 
@@ -176,18 +217,22 @@ const Checkout = () => {
     return null;
   }, []);
 
-  // Handle input change
+  // === Handle input change with persistence ===
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const newData = { ...prev, [name]: value };
+      const saved = loadCheckoutData();
+      saveCheckoutData({ ...saved, formData: newData });
+      return newData;
+    });
   };
 
-  // Handle payment method change
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
   };
 
-  // Handle place order
+  // === Handle place order ===
   const handlePlaceOrder = useCallback(async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -195,11 +240,11 @@ const Checkout = () => {
     const isBuyNow = !!buyNowState;
     const itemsToOrder = isBuyNow
       ? [{
-        variant_id: buyNowState.variant._id,
-        pro_price: buyNowState.variant.variantPrice || 0,
-        pro_quantity: buyNowState.quantity,
-        pro_name: buyNowState.product.productName,
-      }]
+          variant_id: buyNowState.variant._id,
+          pro_price: buyNowState.variant.variantPrice || 0,
+          pro_quantity: buyNowState.quantity,
+          pro_name: buyNowState.product.productName,
+        }]
       : selectedItems;
 
     if (itemsToOrder.length === 0) {
@@ -208,20 +253,16 @@ const Checkout = () => {
       return;
     }
 
-    // Validate all fields
     const nameError = validateName(formData.name);
     const addressError = validateAddress(formData.addressReceive);
     const phoneError = validatePhone(formData.phone);
 
     if (nameError || addressError || phoneError) {
-      // Show first error in toast
-      const firstError = nameError || addressError || phoneError;
-      showToast(firstError, 'error');
+      showToast(nameError || addressError || phoneError, 'error');
       setLoading(false);
       return;
     }
 
-    // Trim fields for submission
     const trimmedName = formData.name.trim();
     const trimmedAddress = formData.addressReceive.trim();
     const trimmedPhone = formData.phone.trim();
@@ -230,7 +271,6 @@ const Checkout = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No authentication token found');
 
-      // Prepare order data for API call
       const orderData = {
         acc_id: user._id,
         addressReceive: trimmedAddress,
@@ -246,11 +286,10 @@ const Checkout = () => {
         totalPrice: totalPrice,
       };
 
-      // Gọi API checkout qua SummaryAPI
       const checkoutRes = await Api.order.checkout(orderData, token);
 
       if (paymentMethod === 'COD') {
-        // Remove purchased items from cart if not Buy Now
+        // Clear purchased items from cart
         if (!isBuyNow && itemsToOrder.length > 0) {
           try {
             const boughtCartIds = itemsToOrder
@@ -267,9 +306,15 @@ const Checkout = () => {
             console.error('Clear cart error:', e);
           }
         }
+
+        // Refresh cart
         if (typeof fetchCartItems === 'function') {
           await fetchCartItems();
         }
+
+        // Clear persistent data
+        clearCheckoutData();
+
         setSuccessInfo({
           status: 'success',
           message: 'Your order will be promptly prepared and sent to you.',
@@ -280,13 +325,9 @@ const Checkout = () => {
         showToast('Order placed successfully!', 'success');
         setLoading(false);
       } else if (paymentMethod === "VNPAY") {
-        const orderId =
-          checkoutRes?.data?.data?.order?._id ||
-          checkoutRes?.data?.data?.order?.id ||
-          checkoutRes?.data?.data?.orderId;
+        const orderId = checkoutRes?.data?.data?.order?._id || checkoutRes?.data?.data?.order?.id || checkoutRes?.data?.data?.orderId;
 
         if (!orderId) {
-          console.error("checkoutRes.data:", checkoutRes.data);
           showToast("No orderId returned from checkout!", "error");
           setLoading(false);
           return;
@@ -300,13 +341,13 @@ const Checkout = () => {
 
           const paymentUrl = paymentUrlRes?.data?.paymentUrl;
           if (paymentUrl && paymentUrl.startsWith("http")) {
+            clearCheckoutData(); // Clear before redirect
             window.location.href = paymentUrl;
           } else {
             showToast("Could not get VNPay payment link!", "error");
             setLoading(false);
           }
         } catch (error) {
-          console.error("payment-url error:", error);
           showToast("Error getting VNPay payment link!", "error");
           setLoading(false);
         }
@@ -317,9 +358,13 @@ const Checkout = () => {
       console.error('Place order error:', err);
       setLoading(false);
     }
-  }, [cartItems, user, formData, totalPrice, paymentMethod, buyNowState, showToast, appliedVoucher, discount, selectedItems, fetchCartItems, validateName, validateAddress, validatePhone]);
+  }, [
+    cartItems, user, formData, totalPrice, paymentMethod, buyNowState, showToast,
+    appliedVoucher, discount, selectedItems, fetchCartItems, validateName,
+    validateAddress, validatePhone
+  ]);
 
-  // Handle field blur (for validation)
+  // === Blur validation ===
   const handleFieldBlur = (e) => {
     const { name, value } = e.target;
     let error;
@@ -329,6 +374,7 @@ const Checkout = () => {
     if (error) showToast(error, 'error');
   };
 
+  // === Items to display ===
   const itemsToDisplay = buyNowState
     ? [buyNowState]
     : selectedItems.length > 0
@@ -343,6 +389,7 @@ const Checkout = () => {
           info={successInfo}
           onClose={() => {
             setSuccessInfo(null);
+            clearCheckoutData();
             navigate('/');
           }}
         />
@@ -353,7 +400,6 @@ const Checkout = () => {
         <div className="bg-white rounded-xl p-6 shadow-md">
           <h2 className="text-2xl font-bold mb-6 text-yellow-800">Order Summary</h2>
 
-          {/* Items List */}
           <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
             {loading ? (
               <div className="flex justify-center items-center py-8">
@@ -471,7 +517,6 @@ const Checkout = () => {
                     onBlur={handleFieldBlur}
                     placeholder="Your recipient name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-describedby="name-description"
                     disabled={loading}
                   />
                 </div>
@@ -489,7 +534,6 @@ const Checkout = () => {
                     onBlur={handleFieldBlur}
                     placeholder="Your delivery address"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-describedby="address-description"
                     disabled={loading}
                   />
                 </div>
@@ -507,7 +551,6 @@ const Checkout = () => {
                     onBlur={handleFieldBlur}
                     placeholder="Your phone number"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-describedby="phone-description"
                     disabled={loading}
                   />
                 </div>
@@ -527,7 +570,7 @@ const Checkout = () => {
                       className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
                       disabled={loading}
                     />
-                    <div className="ml-3">
+                    <div classaaName="ml-3">
                       <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
                       <p className="text-xs text-gray-500">Pay when you receive the order</p>
                     </div>

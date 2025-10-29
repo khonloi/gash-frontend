@@ -6,22 +6,20 @@ export default function IconButton({
   title,
   className = "",
   badge,
-  badgeColor = "bg-red-500",
+  badgeColor = "bg-amber-500",
 }) {
   return (
     <button
       onClick={onClick}
       title={title}
-      className={`p-2 text-white hover:text-amber-500${className}`}
+      className={`p-2 text-white hover:text-amber-500 ${className}`}
     >
       {children}
 
-      {/* Badge hiển thị số */}
+      {/* Badge displaying number */}
       {badge && (
         <span
-          className={`absolute top-1 right-1 ${badgeColor} 
-            text-xs text-white px-1.5 rounded-full 
-            animate-pulse`}
+          className={`absolute -top-1 -right-1 ${badgeColor} text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center`}
         >
           {badge}
         </span>

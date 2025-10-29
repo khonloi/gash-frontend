@@ -109,7 +109,7 @@ const Api = {
 
   // ==== Order/Checkout ====
   order: {
-  // Get all orders for a user
+    // Get all orders for a user
     getOrders: (userId, token) =>
       axiosClient.get(`/orders/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -157,10 +157,12 @@ const Api = {
       axiosClient.get(`/orders/vnpay-return${params}`),
 
     // Cancel order
-    cancel: (orderId, token) =>
-      axiosClient.patch(`/orders/${orderId}/cancel`, {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
+    cancel: (orderId, cancelReason, token) =>
+      axiosClient.patch(`/orders/${orderId}/cancel`, { cancelReason }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       }),
 
     // Checkout
@@ -315,6 +317,18 @@ const Api = {
       axiosClient.get(`/bills/export-bill/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
+  },
+
+  // ==== Livestream ====
+  livestream: {
+    // Get live streams (authenticated users)
+    getLive: (token) => axiosClient.get("/livestream/live", {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // View/Join livestream (authenticated users)
+    view: (data, token) => axiosClient.post("/livestream/view", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
   },
 };
 
