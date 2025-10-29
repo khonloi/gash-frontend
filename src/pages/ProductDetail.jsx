@@ -67,8 +67,6 @@ axiosClient.interceptors.response.use(
   }
 );
 
-// Use centralized fetchWithRetry from Api.utils
-
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -90,7 +88,6 @@ const ProductDetail = () => {
   const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
-  // Feedback states moved to ProductFeedback component
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
@@ -100,6 +97,12 @@ const ProductDetail = () => {
 
   // Local storage
   const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
+
+  // Reset favorite state when product ID changes
+  useEffect(() => {
+    setIsFavorited(false);
+    setFavoriteId(null);
+  }, [id]);
 
   // Pre-index variants (only active variants)
   const variantIndex = useMemo(() => {
@@ -180,7 +183,7 @@ const ProductDetail = () => {
 
   // Data fetching
   const fetchProductAndVariants = useCallback(async () => {
-  if (!id) {
+    if (!id) {
       showToast("Product ID is required", "error", TOAST_TIMEOUT);
       return;
     }
@@ -237,7 +240,7 @@ const ProductDetail = () => {
       const mainImage = productImages.find(img => img.isMain);
       const defaultImageUrl = mainImage?.imageUrl || productImages[0]?.imageUrl || "/placeholder-image.png";
       setSelectedImage(defaultImageUrl);
-  } catch (err) {
+    } catch (err) {
       console.error("Error fetching product:", err);
       setError(err.message || "Failed to fetch product details");
       showToast(err.message || "Failed to fetch product details", "error", TOAST_TIMEOUT);
@@ -250,6 +253,38 @@ const ProductDetail = () => {
   useEffect(() => {
     fetchProductAndVariants();
   }, [id, fetchProductAndVariants]);
+
+  // Check if product is already in favorites on mount
+  useEffect(() => {
+    const checkIfFavorited = async () => {
+      if (!user || !id) return;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await Api.favorites.fetch(token);
+        const favorites = response.data?.favorites || response.data || [];
+
+        const favoriteEntry = favorites.find(fav =>
+          fav.pro_id?._id === id || fav.pro_id === id
+        );
+
+        if (favoriteEntry) {
+          setIsFavorited(true);
+          setFavoriteId(favoriteEntry._id);
+        } else {
+          setIsFavorited(false);
+          setFavoriteId(null);
+        }
+      } catch (err) {
+        console.warn("Failed to check favorites status:", err);
+        // Silent fail — don't break UI
+      }
+    };
+
+    checkIfFavorited();
+  }, [user, id]);
 
   // Stock status - based on selected variant (include inactive variants with stock)
   const isInStock = useMemo(
@@ -408,6 +443,7 @@ const ProductDetail = () => {
     fetchProductAndVariants();
   }, [fetchProductAndVariants]);
 
+  // Updated: Robust favorite handling
   const handleAddToFavorites = useCallback(async () => {
     if (!user) {
       navigate("/login");
@@ -418,25 +454,30 @@ const ProductDetail = () => {
 
     try {
       const token = localStorage.getItem("token");
-      if (isFavorited) {
+      if (!token) {
+        showToast("Authentication token missing", "error", TOAST_TIMEOUT);
+        navigate("/login");
+        return;
+      }
+
+      if (isFavorited && favoriteId) {
         await Api.favorites.remove(favoriteId, token);
         setIsFavorited(false);
         setFavoriteId(null);
-        showToast("Product removed from favorites successfully!", "success", TOAST_TIMEOUT);
+        showToast("Product removed from favorites!", "success", TOAST_TIMEOUT);
       } else {
         const favoriteItem = {
           acc_id: user._id,
           pro_id: id,
         };
         const response = await Api.favorites.add(favoriteItem, token);
+        const newFavorite = response.data?.favorite || response.data;
         setIsFavorited(true);
-        setFavoriteId(response.data.favorite._id);
-        showToast("Product added to favorites successfully!", "success", TOAST_TIMEOUT);
+        setFavoriteId(newFavorite._id);
+        showToast("Product added to favorites!", "success", TOAST_TIMEOUT);
       }
     } catch (err) {
-      const message = err.message || isFavorited
-        ? "Failed to remove from favorites"
-        : "Failed to add to favorites";
+      const message = err.response?.data?.message || err.message || "Failed to update favorites";
       showToast(message, "error", TOAST_TIMEOUT);
     } finally {
       setIsAddingToFavorites(false);
@@ -530,8 +571,6 @@ const ProductDetail = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   }, []);
 
-  // formatDate moved to ProductFeedback component
-
   // Check if a color-size combination is valid
   const isValidCombination = useCallback(
     (color, size) => {
@@ -541,7 +580,7 @@ const ProductDetail = () => {
     [variantIndex]
   );
 
-  // Check if a color has any in-stock variants (for styling only)
+  // Check if a color has any in-stock variants
   const isColorInStock = useCallback(
     (color) => {
       const colorVariants = variantIndex.byColor[color] || [];
@@ -552,7 +591,7 @@ const ProductDetail = () => {
     [variantIndex]
   );
 
-  // Check if a size is in stock (considering selected color if any)
+  // Check if a size is in stock
   const isSizeInStock = useCallback(
     (size) => {
       if (selectedColor) {
@@ -566,29 +605,22 @@ const ProductDetail = () => {
   );
 
   const colorStockInfo = useMemo(() => {
-  if (!selectedColor) {
-    return { inStock: false, message: "Select a color to check stock" };
-  }
-  const anyInStock = isColorInStock(selectedColor);
-  if (!anyInStock) {
-    return { inStock: false, message: "Out of Stock" };
-  }
+    if (!selectedColor) {
+      return { inStock: false, message: "Select a color to check stock" };
+    }
+    const anyInStock = isColorInStock(selectedColor);
+    if (!anyInStock) {
+      return { inStock: false, message: "Out of Stock" };
+    }
 
-  // If a size is also selected we can show the exact quantity,
-  // otherwise show a generic “In Stock” for the whole color.
-  if (selectedSize && selectedVariant) {
-    return {
-      inStock: true,
-      message: `In Stock (${selectedVariant.stockQuantity} available)`,
-    };
-  }
-  return { inStock: true, message: "In Stock" };
-}, [
-  selectedColor,
-  selectedSize,
-  selectedVariant,
-  isColorInStock,
-]);
+    if (selectedSize && selectedVariant) {
+      return {
+        inStock: true,
+        message: `In Stock (${selectedVariant.stockQuantity} available)`,
+      };
+    }
+    return { inStock: true, message: "In Stock" };
+  }, [selectedColor, selectedSize, selectedVariant, isColorInStock]);
 
   // Render
   if (loading) {
@@ -608,7 +640,7 @@ const ProductDetail = () => {
     return (
       <div className="product-detail-container">
         <div className="product-list-error" role="alert" tabIndex={0} aria-live="polite">
-          <span className="product-list-error-icon" aria-hidden="true">⚠</span>
+          <span className="product-list-error-icon" aria-hidden="true">Warning</span>
           {error}
           <button
             className="product-list-retry-button"
@@ -709,71 +741,71 @@ const ProductDetail = () => {
                 ? `From ${formatPrice(lowestPriceVariant.variantPrice)}`
                 : "No variants available"}
           </div>
-            <div className="product-detail-stock-status">
-              <span
-                className={`product-detail-stock ${
-                  colorStockInfo.inStock ? "in-stock" : "out-of-stock"
-                }`}
-              >
-                {colorStockInfo.message}
-              </span>
-            </div>
+          <div className="product-detail-stock-status">
+            <span
+              className={`product-detail-stock ${
+                colorStockInfo.inStock ? "in-stock" : "out-of-stock"
+              }`}
+            >
+              {colorStockInfo.message}
+            </span>
+          </div>
           <div className="product-detail-variants">
-                {availableColors.length > 0 && (
-                  <fieldset className="product-detail-color-section">
-                    <legend>Color:</legend>
-                    <div className="product-detail-color-buttons">
-                      {availableColors.map((color) => (
-                        <button
-                          key={color}
-                          className={`product-detail-color-button ${selectedColor === color ? "selected" : ""} ${
-                            !isColorInStock(color) ? "opacity-50" : ""
-                          }`}
-                          onClick={() => handleColorClick(color)}
-                          type="button"
-                          aria-label={`Select ${color} color`}
-                          aria-pressed={selectedColor === color}
-                        >
-                          {color}
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-                )}
-                {availableSizes.length > 0 && (
-                  <fieldset className="product-detail-size-section">
-                    <legend>Size:</legend>
-                    <div className="product-detail-size-buttons">
-                      {availableSizes.map((size) => (
-                        <button
-                          key={size}
-                          className={`product-detail-size-button ${selectedSize === size ? "selected" : ""} ${
-                            !isSizeInStock(size) ? "opacity-50 cursor-not-allowed" : ""
-                          }`}
-                          onClick={() => isSizeInStock(size) && handleSizeClick(size)}
-                          disabled={!isSizeInStock(size) || (selectedColor && !isValidCombination(selectedColor, size))}
-                          type="button"
-                          aria-label={`Select ${size} size`}
-                          aria-pressed={selectedSize === size}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-                )}
-                <fieldset className="product-detail-quantity-section">
-                  <legend>Quantity:</legend>
-                  <input
-                    type="number"
-                    className="product-detail-quantity-input"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                    min="1"
-                    disabled={!selectedVariant || !isInStock}
-                    aria-label="Select quantity"
-                  />
-                </fieldset>
+            {availableColors.length > 0 && (
+              <fieldset className="product-detail-color-section">
+                <legend>Color:</legend>
+                <div className="product-detail-color-buttons">
+                  {availableColors.map((color) => (
+                    <button
+                      key={color}
+                      className={`product-detail-color-button ${selectedColor === color ? "selected" : ""} ${
+                        !isColorInStock(color) ? "opacity-50" : ""
+                      }`}
+                      onClick={() => handleColorClick(color)}
+                      type="button"
+                      aria-label={`Select ${color} color`}
+                      aria-pressed={selectedColor === color}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+            {availableSizes.length > 0 && (
+              <fieldset className="product-detail-size-section">
+                <legend>Size:</legend>
+                <div className="product-detail-size-buttons">
+                  {availableSizes.map((size) => (
+                    <button
+                      key={size}
+                      className={`product-detail-size-button ${selectedSize === size ? "selected" : ""} ${
+                        !isSizeInStock(size) ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      onClick={() => isSizeInStock(size) && handleSizeClick(size)}
+                      disabled={!isSizeInStock(size) || (selectedColor && !isValidCombination(selectedColor, size))}
+                      type="button"
+                      aria-label={`Select ${size} size`}
+                      aria-pressed={selectedSize === size}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+            <fieldset className="product-detail-quantity-section">
+              <legend>Quantity:</legend>
+              <input
+                type="number"
+                className="product-detail-quantity-input"
+                value={quantity}
+                onChange={handleQuantityChange}
+                min="1"
+                disabled={!selectedVariant || !isInStock}
+                aria-label="Select quantity"
+              />
+            </fieldset>
           </div>
         </div>
 
@@ -898,10 +930,7 @@ const ProductDetail = () => {
         </div>
       )}
 
-      {/* Customer Feedback Section */}
-      <ProductFeedback
-        productId={id}
-      />
+      <ProductFeedback productId={id} />
     </div>
   );
 };
