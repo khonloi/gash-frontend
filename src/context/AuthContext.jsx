@@ -1,15 +1,17 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
+import { ToastContext } from './ToastContext'; // Import ToastContext
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const { showToast } = useContext(ToastContext); // Get showToast
 
   const handleSessionExpired = () => {
-    alert('Your session has expired. You will be logged out.');
+    showToast('Your session has expired. You will be logged out.', 'error');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
@@ -37,13 +39,12 @@ export const AuthProvider = ({ children }) => {
         }, remainingTime);
       }
     }
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
       (response) => response,
       (error) => {
-        // Only trigger session expired if user is logged in (token exists)
         if (error.response?.status === 401 && localStorage.getItem('token')) {
           handleSessionExpired();
         }
@@ -52,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     return () => axiosClient.interceptors.response.eject(interceptor);
-  }, []);
+  }, [showToast]);
 
   const login = async (username, password) => {
     try {
@@ -69,12 +70,16 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
+      showToast('Login successful!', 'success');
+
       setTimeout(() => {
         handleSessionExpired();
-      }, 24 * 60 * 60 * 1000); // 1 day
+      }, 24 * 60 * 60 * 1000);
 
       navigate('/');
     } catch (error) {
+      const msg = error.response?.data?.message || 'Login failed. Please try again.';
+      showToast(msg, 'error');
       throw error;
     }
   };
@@ -93,12 +98,16 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
+      showToast('Google login successful!', 'success');
+
       setTimeout(() => {
         handleSessionExpired();
-      }, 24 * 60 * 60 * 1000); // 1 day
+      }, 24 * 60 * 60 * 1000);
 
       navigate('/');
     } catch (error) {
+      const msg = error.response?.data?.message || 'Google login failed.';
+      showToast(msg, 'error');
       throw error;
     }
   };
@@ -110,8 +119,11 @@ export const AuthProvider = ({ children }) => {
           ? '/auth/register/request-otp'
           : '/auth/forgot-password/request-otp';
       const response = await axiosClient.post(endpoint, { email });
+      showToast('OTP sent to your email.', 'info');
       return response;
     } catch (error) {
+      const msg = error.response?.data?.message || 'Failed to send OTP.';
+      showToast(msg, 'error');
       throw error;
     }
   };
@@ -124,34 +136,32 @@ export const AuthProvider = ({ children }) => {
             ? '/auth/register/request-otp'
             : '/auth/forgot-password/request-otp';
         const response = await axiosClient.post(endpoint, { email });
+        showToast('OTP resent successfully.', 'info');
         return response;
       }
 
+      let response;
       if (type === 'register') {
-        const response = await axiosClient.post('/auth/register/verify-otp', {
-          email,
-          otp,
-        });
-        return response;
+        response = await axiosClient.post('/auth/register/verify-otp', { email, otp });
       } else if (type === 'forgot-password') {
-        const response = await axiosClient.post('/auth/forgot-password/verify-otp', {
-          email,
-          otp,
-        });
-        return response;
+        response = await axiosClient.post('/auth/forgot-password/verify-otp', { email, otp });
       }
+
+      showToast('OTP verified successfully.', 'success');
+      return response;
     } catch (error) {
+      const msg = error.response?.data?.message || 'Invalid or expired OTP.';
+      showToast(msg, 'error');
       throw error;
     }
   };
 
   const signup = async (formData) => {
     try {
-      console.log('🚀 Sending signup request to backend:', formData);
-      const response = await axiosClient.post('/auth/register', {
-        ...formData,
-      });
-      console.log('✅ Backend response:', response.data);
+      console.log('Sending signup request to backend:', formData);
+      const response = await axiosClient.post('/auth/register', { ...formData });
+      console.log('Backend response:', response.data);
+
       const { token, account } = response.data;
       const loginTime = Date.now().toString();
 
@@ -160,13 +170,17 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
+      showToast('Account created successfully!', 'success');
+
       setTimeout(() => {
         handleSessionExpired();
-      }, 24 * 60 * 60 * 1000); // 1 day
+      }, 24 * 60 * 60 * 1000);
 
       navigate('/');
     } catch (error) {
-      console.error('❌ Signup error:', error.response?.data || error.message);
+      console.error('Signup error:', error.response?.data || error.message);
+      const msg = error.response?.data?.message || 'Signup failed. Please try again.';
+      showToast(msg, 'error');
       throw error;
     }
   };
@@ -177,7 +191,10 @@ export const AuthProvider = ({ children }) => {
         email,
         newPassword,
       });
+      showToast('Password reset successfully!', 'success');
     } catch (error) {
+      const msg = error.response?.data?.message || 'Failed to reset password.';
+      showToast(msg, 'error');
       throw error;
     }
   };
@@ -187,6 +204,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
     setUser(null);
+    showToast('Logged out successfully.', 'info');
     navigate('/login');
   };
 

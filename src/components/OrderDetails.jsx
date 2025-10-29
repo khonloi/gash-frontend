@@ -569,6 +569,41 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         }
     };
 
+    const [cancelFormData, setCancelFormData] = useState({
+    cancelReason: "",
+    customReason: ""
+});
+const [error, setError] = useState("");
+
+const handleSubmitCancel = async () => {
+    if (!cancelFormData.cancelReason) {
+        setError("Please select a cancellation reason");
+        return;
+    }
+    if (cancelFormData.cancelReason === "other" && !cancelFormData.customReason.trim()) {
+        setError("Please provide a custom reason");
+        return;
+    }
+    if (cancelFormData.cancelReason === "other" && cancelFormData.customReason.length > 500) {
+        setError("Custom reason cannot exceed 500 characters");
+        return;
+    }
+    try {
+        const token = localStorage.getItem("token");
+        const reason = cancelFormData.cancelReason === "other" 
+            ? cancelFormData.customReason 
+            : cancelFormData.cancelReason;
+        console.log("Sending cancel request with reason:", reason); // Debug log
+        await Api.order.cancel(orderId, reason, token);
+        showToast("Order canceled successfully", "success");
+        fetchOrderDetails();
+        setShowConfirmModal(false);
+    } catch (err) {
+        console.error("Cancel error:", err.response?.data); // Log error details
+        setError(err.message || "Failed to cancel order");
+    }
+};
+
     return (
         <div
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -622,17 +657,27 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         </div>
 
                         {/* Order Status */}
-                        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
-                            <div className="flex items-center space-x-4">
-                                <span className="text-gray-600 font-medium">Order Status:</span>
-                                {getStatusBadge(order.order_status, "order")}
-                                <span className="text-gray-600 font-medium ml-2">Payment:</span>
-                                {getStatusBadge(order.pay_status, "pay")}
-                            </div>
-                            <span className="text-sm text-gray-500">
-                                Order Date: {new Date(order.orderDate || order.createdAt).toLocaleDateString('vi-VN')}
-                            </span>
-                        </div>
+                        <div>
+                                    <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex items-center space-x-4">
+                                            <span className="text-gray-600 font-medium">Order Status:</span>
+                                            {getStatusBadge(order.order_status, "order")}
+                                            <span className="text-gray-600 font-medium ml-2">Payment:</span>
+                                            {getStatusBadge(order.pay_status, "pay")}
+                                        </div>
+                                        <span className="text-sm text-gray-500">
+                                            Order Date: {new Date(order.orderDate || order.createdAt).toLocaleDateString('vi-VN')}
+                                        </span>
+                                    </div>
+                                    {order.order_status?.toLowerCase() === "cancelled" && order.cancelReason && (
+                                        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex items-center space-x-4">
+                                                <span className="text-gray-600 font-medium">Cancel Reason:</span>
+                                                <span className="text-gray-600">{order.cancelReason}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
 
                         {/* Customer & Payment Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -807,35 +852,97 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             />
 
             {/* Confirmation Modal */}
-            {showConfirmModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn">
-                        <div className="text-center">
-                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
-                                <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+{showConfirmModal && (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60 p-4">
+        <div 
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn"
+            onClick={(e) => e.stopPropagation()} // Prevent clicks from closing the modal
+        >
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">Cancel Order #{orderId}</h3>
+                    <button
+                        onClick={() => setShowConfirmModal(false)}
+                        className="text-gray-500 hover:text-gray-600 transition p-2 rounded-lg"
+                        aria-label="Close cancel modal"
+                    >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div className="space-y-4">
+                    <p className="text-sm font-medium text-gray-600">Select a reason for cancelling order:</p>
+                    {['address', 'voucher', 'product', 'demand'].map((reason) => (
+                        <div key={reason} className="flex items-center">
+                            <input
+                                type="radio"
+                                id={reason}
+                                name="cancelReason"
+                                value={reason}
+                                checked={cancelFormData.cancelReason === reason}
+                                onChange={(e) => setCancelFormData({ ...cancelFormData, cancelReason: e.target.value })}
+                                className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300"
+                            />
+                            <label htmlFor={reason} className="ml-2 text-sm text-gray-900">
+                                {reason.charAt(0).toUpperCase() + reason.slice(1)}
+                            </label>
+                        </div>
+                    ))}
+                    <div className="flex items-center">
+                        <input
+                            type="radio"
+                            id="other"
+                            name="cancelReason"
+                            value="other"
+                            checked={cancelFormData.cancelReason === "other"}
+                            onChange={(e) => setCancelFormData({ ...cancelFormData, cancelReason: e.target.value, customReason: "" })}
+                            className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300"
+                        />
+                        <label htmlFor="other" className="ml-2 text-sm text-gray-900">Other</label>
+                    </div>
+                    {cancelFormData.cancelReason === "other" && (
+                        <textarea
+                            value={cancelFormData.customReason}
+                            onChange={(e) => setCancelFormData({ ...cancelFormData, customReason: e.target.value })}
+                            placeholder="Enter custom reason"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 text-sm"
+                            rows={3}
+                        />
+                    )}
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-center">
+                                <svg className="h-5 w-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmation Required</h3>
-                            <p className="text-sm text-gray-500 mb-6">{confirmMessage}</p>
-                            <div className="flex gap-3 justify-center">
-                                <button
-                                    onClick={() => setShowConfirmModal(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={executeConfirmAction}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition"
-                                >
-                                    Confirm
-                                </button>
+                                <p className="text-sm text-red-800">{error}</p>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+                <div className="flex gap-3 justify-end mt-6">
+                    <button
+                        onClick={() => setShowConfirmModal(false)}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleSubmitCancel}
+                        disabled={!cancelFormData.cancelReason || (cancelFormData.cancelReason === "other" && !cancelFormData.customReason.trim())}
+                        className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Confirm Cancel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
 };

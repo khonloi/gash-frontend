@@ -15,20 +15,22 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
 import NotificationsDropdown from "./NotificationsDropdown";
 
-// API retry utility from Search.jsx
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
     for (let i = 0; i < retries; i++) {
         try {
             const response = await apiCall();
-            console.log("Search API response:", response.data); // Debug log
             return response.data;
         } catch (error) {
-            console.error(`Fetch retry attempt ${i + 1} failed:`, error.message); // Debug log
             if (i === retries - 1) throw error;
             await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
         }
     }
 };
+
+// Custom events for updates
+const CART_UPDATE_EVENT = 'cartUpdated';
+const NOTIFICATION_UPDATE_EVENT = 'notificationUpdated';
+const LIVESTREAM_UPDATE_EVENT = 'livestreamUpdated';
 
 export default function Header() {
     const { user, logout } = useContext(AuthContext);
@@ -38,12 +40,125 @@ export default function Header() {
     const [loading, setLoading] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [cartItemCount, setCartItemCount] = useState(0);
+    const [notificationCount, setNotificationCount] = useState(0);
+    const [livestreamCount, setLivestreamCount] = useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
     const userMenuRef = useRef(null);
+    const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null });
 
+    // Fetch cart item count
+    const fetchCartItemCount = useCallback(async () => {
+        if (!user) {
+            setCartItemCount(0);
+            return;
+        }
+        try {
+            const cartData = await fetchWithRetry(() =>
+                Api.newCart.getByAccount(user._id, user.token)
+            );
+            const itemCount = Array.isArray(cartData.data)
+                ? cartData.data.reduce((sum, item) => sum + parseInt(item.productQuantity || 0, 10), 0)
+                : 0;
+            setCartItemCount(itemCount);
+        } catch (error) {
+            setCartItemCount(0);
+        }
+    }, [user]);
+
+    // Fetch notification count
+    const fetchNotificationCount = useCallback(async () => {
+        if (!user) {
+            setNotificationCount(0);
+            return;
+        }
+        try {
+            const notificationData = await fetchWithRetry(() =>
+                Api.newNotifications.getByAccount(user._id, user.token)
+            );
+            const unreadCount = Array.isArray(notificationData.data)
+                ? notificationData.data.filter(item => !item.isRead).length
+                : 0;
+            setNotificationCount(unreadCount);
+        } catch (error) {
+            setNotificationCount(0);
+        }
+    }, [user]);
+
+    // Fetch livestream count
+    const fetchLivestreamCount = useCallback(async () => {
+        if (!user) {
+            setLivestreamCount(0);
+            return;
+        }
+        try {
+            const livestreamData = await fetchWithRetry(() =>
+                Api.livestream.getLive(user.token)
+            );
+            const activeCount = livestreamData.data?.count || 0;
+            setLivestreamCount(activeCount);
+        } catch (error) {
+            setLivestreamCount(0);
+        }
+    }, [user]);
+
+    // Debounced fetch functions
+    const debouncedFetchCartItemCount = useCallback(() => {
+        if (fetchTimeoutRef.current.cart) clearTimeout(fetchTimeoutRef.current.cart);
+        fetchTimeoutRef.current.cart = setTimeout(fetchCartItemCount, 300);
+    }, [fetchCartItemCount]);
+
+    const debouncedFetchNotificationCount = useCallback(() => {
+        if (fetchTimeoutRef.current.notification) clearTimeout(fetchTimeoutRef.current.notification);
+        fetchTimeoutRef.current.notification = setTimeout(fetchNotificationCount, 300);
+    }, [fetchNotificationCount]);
+
+    const debouncedFetchLivestreamCount = useCallback(() => {
+        if (fetchTimeoutRef.current.livestream) clearTimeout(fetchTimeoutRef.current.livestream);
+        fetchTimeoutRef.current.livestream = setTimeout(fetchLivestreamCount, 300);
+    }, [fetchLivestreamCount]);
+
+    // Fetch counts on mount, location change, or update events
+    useEffect(() => {
+        fetchCartItemCount();
+        fetchNotificationCount();
+        fetchLivestreamCount();
+
+        const handleCartUpdate = () => {
+            debouncedFetchCartItemCount();
+        };
+        const handleNotificationUpdate = () => {
+            debouncedFetchNotificationCount();
+        };
+        const handleLivestreamUpdate = () => {
+            debouncedFetchLivestreamCount();
+        };
+
+        window.addEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+        window.addEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
+        window.addEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
+
+        let pollInterval;
+        if (user) {
+            pollInterval = setInterval(() => {
+                debouncedFetchCartItemCount();
+                debouncedFetchNotificationCount();
+                debouncedFetchLivestreamCount();
+            }, 3000);
+        }
+
+        return () => {
+            window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+            window.removeEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
+            window.removeEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
+            clearInterval(pollInterval);
+            Object.values(fetchTimeoutRef.current).forEach(timeout => timeout && clearTimeout(timeout));
+        };
+    }, [debouncedFetchCartItemCount, debouncedFetchNotificationCount, debouncedFetchLivestreamCount, location, user]);       
+    
     useEffect(() => {
         setSearch("");
         setSearchResults([]);
@@ -57,76 +172,62 @@ export default function Header() {
             await logout();
             navigate("/");
         } catch (err) {
-            console.error("Logout error:", err); // Debug log
         }
     };
 
-    // Helper function to get minimum price from product variants
     const getMinPrice = (product) => {
         if (!product.productVariantIds || product.productVariantIds.length === 0) {
-            console.log(`No variants for product ${product._id}`); // Debug log
             return 0;
         }
         const prices = product.productVariantIds
             .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
             .map(v => v.variantPrice);
-        console.log(`Prices for product ${product._id}:`, prices); // Debug log
         return prices.length > 0 ? Math.min(...prices) : 0;
     };
 
-    // Helper function to get main image URL
     const getMainImageUrl = (product) => {
         if (!product.productImageIds || product.productImageIds.length === 0) {
-            console.log(`No images for product ${product._id}`); // Debug log
             return "/placeholder-image.png";
         }
         const mainImage = product.productImageIds.find(img => img.isMain);
         const imageUrl = mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-        console.log(`Image URL for product ${product._id}:`, imageUrl); // Debug log
         return imageUrl;
     };
 
     const fetchSearchResults = useCallback(async (query) => {
         if (!query.trim()) {
-            console.log("Empty query, clearing results"); // Debug log
             setSearchResults([]);
             setShowDropdown(false);
             return;
         }
         const sanitizedQuery = query.trim().replace(/[<>]/g, "");
-        console.log("Fetching search results for query:", sanitizedQuery); // Debug log
         try {
             setLoading(true);
             const productsData = await fetchWithRetry(() =>
                 Api.newProducts.search({ name: sanitizedQuery, status: "active" })
             );
-            console.log("Raw products data:", productsData); // Debug log
             const productsArray = Array.isArray(productsData.data) ? productsData.data : [];
-            console.log("Products array:", productsArray); // Debug log
             const filteredProducts = productsArray.filter(
                 (product) => product.productVariantIds?.length > 0
             );
-            console.log("Filtered products:", filteredProducts); // Debug log
             setSearchResults(filteredProducts);
             setShowDropdown(true);
         } catch (err) {
-            console.error("Search fetch error:", err.response?.data || err.message); // Debug log
             setSearchResults([]);
             setShowDropdown(true);
         } finally {
             setLoading(false);
-            console.log("Search results state:", searchResults); // Debug log
         }
     }, []);
 
     useEffect(() => {
         if (!search.trim()) {
-            console.log("Search input empty, clearing results"); // Debug log
+            console.log("Search input empty, clearing results");
             setSearchResults([]);
             setShowDropdown(false);
             return;
         }
-        console.log("Debouncing search for:", search); // Debug log
+        console.log("Debouncing search for:", search);
         const debounce = setTimeout(() => fetchSearchResults(search), SEARCH_DEBOUNCE_DELAY);
         return () => clearTimeout(debounce);
     }, [search, fetchSearchResults]);
@@ -134,7 +235,6 @@ export default function Header() {
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         if (search.trim()) {
-            console.log("Submitting search:", search); // Debug log
             navigate(`/search?q=${encodeURIComponent(search)}`);
             setShowDropdown(false);
             setMobileSearchOpen(false);
@@ -153,20 +253,19 @@ export default function Header() {
 
     const formatPrice = (price) => {
         if (!price) {
-            console.log("No price provided, returning empty string"); // Debug log
             return "";
         }
-        const formattedPrice = `${price.toLocaleString()} ₫`;
-        console.log(`Formatted price for ${price}:`, formattedPrice); // Debug log
-        return formattedPrice;
+        return `${price.toLocaleString()} ₫`;
     };
 
-    // Helper function to get the first word of the user's name
     const getFirstName = (name) => {
         if (!name) return "User";
         const firstWord = name.trim().split(" ")[0];
         return firstWord || "User";
     };
+
+    // Reusable badge class
+    const badgeClass = "absolute bg-amber-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center";
 
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
@@ -175,7 +274,6 @@ export default function Header() {
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
                         <div className="relative w-full">
-                            {/* Search form */}
                             <form
                                 onSubmit={handleSearchSubmit}
                                 className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden relative"
@@ -184,7 +282,7 @@ export default function Header() {
                                     type="text"
                                     value={search}
                                     onChange={(e) => {
-                                        console.log("Search input changed:", e.target.value); // Debug log
+                                        console.log("Search input changed:", e.target.value);
                                         setSearch(e.target.value);
                                     }}
                                     placeholder="Search..."
@@ -195,7 +293,7 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log("Clearing search input"); // Debug log
+                                            console.log("Clearing search input");
                                             setSearch("");
                                         }}
                                         className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
@@ -206,7 +304,7 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log("Closing mobile search"); // Debug log
+                                            console.log("Closing mobile search");
                                             setMobileSearchOpen(false);
                                         }}
                                         className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
@@ -215,8 +313,6 @@ export default function Header() {
                                     </button>
                                 )}
                             </form>
-
-                            {/* Dropdown search */}
                             {showDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
                                 border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
@@ -231,14 +327,14 @@ export default function Header() {
                                             {searchResults.map((item) => {
                                                 const minPrice = getMinPrice(item);
                                                 const imageUrl = getMainImageUrl(item);
-                                                console.log(`Rendering product ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl }); // Debug log
+                                                console.log(`Rendering product ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                                 return (
                                                     <Link
                                                         key={item._id}
                                                         to={`/product/${item._id}`}
                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                         onClick={() => {
-                                                            console.log(`Navigating to product ${item._id}`); // Debug log
+                                                            console.log(`Navigating to product ${item._id}`);
                                                             setShowDropdown(false);
                                                         }}
                                                     >
@@ -260,7 +356,7 @@ export default function Header() {
                                             })}
                                             <button
                                                 onClick={() => {
-                                                    console.log("Navigating to full search results:", search); // Debug log
+                                                    console.log("Navigating to full search results:", search);
                                                     navigate(`/search?q=${encodeURIComponent(search)}`);
                                                     setShowDropdown(false);
                                                 }}
@@ -277,10 +373,9 @@ export default function Header() {
                         </div>
                     ) : (
                         <>
-                            {/* Search icon trái */}
                             <button
                                 onClick={() => {
-                                    console.log("Opening mobile search"); // Debug log
+                                    console.log("Opening mobile search");
                                     setMobileSearchOpen(true);
                                 }}
                                 title="Search"
@@ -288,21 +383,17 @@ export default function Header() {
                             >
                                 <SearchIcon />
                             </button>
-
-                            {/* Logo giữa */}
                             <Link to="/" className="flex items-center justify-center">
                                 <img src={gashLogo} alt="Gash Logo" className="h-7" />
                             </Link>
-
-                            {/* Menu phải */}
                             <div className="relative" ref={userMenuRef}>
                                 <button
                                     onClick={() => {
                                         if (!user) {
-                                            console.log("Navigating to login"); // Debug log
+                                            console.log("Navigating to login");
                                             navigate("/login");
                                         } else {
-                                            console.log("Toggling user menu"); // Debug log
+                                            console.log("Toggling user menu");
                                             setShowUserMenu((prev) => !prev);
                                         }
                                     }}
@@ -311,8 +402,6 @@ export default function Header() {
                                 >
                                     <PermIdentityOutlinedIcon />
                                 </button>
-
-                                {/* Dropdown menu */}
                                 {user && showUserMenu && (
                                     <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
                                         <div className="px-4 py-2 hover:bg-[#ffb300]/20">
@@ -321,24 +410,36 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Navigating to cart"); // Debug log
+                                                console.log("Navigating to cart");
                                                 navigate('/cart');
                                                 setShowUserMenu(false);
                                             }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
                                         >
-                                            <ShoppingBagOutlinedIcon fontSize="small" /> Cart
+                                            <ShoppingBagOutlinedIcon fontSize="small" />
+                                            Cart
+                                            {cartItemCount > 0 && (
+                                                <span className={`${badgeClass} top-1 right-4`}>
+                                                    {cartItemCount}
+                                                </span>
+                                            )}
                                         </button>
                                         <button
-                                            onClick={(e) => {
+                                            onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Notifications clicked"); // Debug log
-                                                alert("Coming soon!");
+                                                console.log("Navigating to notifications");
+                                                navigate('/notifications');
                                                 setShowUserMenu(false);
                                             }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
                                         >
-                                            <NotificationsNoneOutlinedIcon fontSize="small" /> Notifications
+                                            <NotificationsNoneOutlinedIcon fontSize="small" />
+                                            Notifications
+                                            {notificationCount > 0 && (
+                                                <span className={`${badgeClass} top-1 right-4`}>
+                                                    {notificationCount}
+                                                </span>
+                                            )}
                                         </button>
                                         <Link
                                             to="/profile"
@@ -347,7 +448,7 @@ export default function Header() {
                                             <button
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation();
-                                                    console.log("Navigating to profile"); // Debug log
+                                                    console.log("Navigating to profile");
                                                     navigate('/profile');
                                                     setShowUserMenu(false);
                                                 }}
@@ -359,7 +460,7 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Logging out"); // Debug log
+                                                console.log("Logging out");
                                                 handleLogout();
                                                 setShowUserMenu(false);
                                             }}
@@ -376,12 +477,9 @@ export default function Header() {
 
                 {/* ==== DESKTOP HEADER ==== */}
                 <div className="hidden sm:flex w-full items-center justify-between">
-                    {/* Logo trái */}
                     <Link to="/" className="flex items-center gap-2">
                         <img src={gashLogo} alt="Gash Logo" className="h-7" />
                     </Link>
-
-                    {/* Search giữa */}
                     <div className="relative flex-1 mx-12 max-w-2xl" ref={dropdownRef}>
                         <form
                             onSubmit={handleSearchSubmit}
@@ -391,7 +489,7 @@ export default function Header() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => {
-                                    console.log("Search input changed (desktop):", e.target.value); // Debug log
+                                    console.log("Search input changed (desktop):", e.target.value);
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
@@ -401,7 +499,6 @@ export default function Header() {
                                 <SearchIcon fontSize="small" />
                             </button>
                         </form>
-                        {/* Dropdown search */}
                         {showDropdown && (
                             <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out] max-h-96 overflow-y-auto">
                                 {loading ? (
@@ -414,14 +511,14 @@ export default function Header() {
                                         {searchResults.map((item) => {
                                             const minPrice = getMinPrice(item);
                                             const imageUrl = getMainImageUrl(item);
-                                            console.log(`Rendering product (desktop) ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl }); // Debug log
+                                            console.log(`Rendering product (desktop) ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                             return (
                                                 <Link
                                                     key={item._id}
                                                     to={`/product/${item._id}`}
                                                     className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                     onClick={() => {
-                                                        console.log(`Navigating to product (desktop) ${item._id}`); // Debug log
+                                                        console.log(`Navigating to product (desktop) ${item._id}`);
                                                         setShowDropdown(false);
                                                     }}
                                                 >
@@ -443,7 +540,7 @@ export default function Header() {
                                         })}
                                         <button
                                             onClick={() => {
-                                                console.log("Navigating to full search results (desktop):", search); // Debug log
+                                                console.log("Navigating to full search results (desktop):", search);
                                                 navigate(`/search?q=${encodeURIComponent(search)}`);
                                                 setShowDropdown(false);
                                             }}
@@ -458,22 +555,27 @@ export default function Header() {
                             </div>
                         )}
                     </div>
-
-                    {/* Icon phải */}
                     <div className="flex items-center gap-4 sm:gap-6" ref={userMenuRef}>
+                        <div className="relative">
+                            <button
+                                onClick={() => {
+                                    console.log("Live Stream clicked");
+                                    navigate("/live");
+                                }}
+                                title="Live Stream"
+                                className="p-2 text-white hover:text-amber-500"
+                            >
+                                <LiveTvIcon />
+                                {livestreamCount > 0 && (
+                                    <span className={`${badgeClass} -top-1 -right-1`}>
+                                        {livestreamCount}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
                         <button
                             onClick={() => {
-                                console.log("Live Stream clicked"); // Debug log
-                                navigate("/live");
-                            }}
-                            title="Live Stream"
-                            className="p-2 text-white hover:text-amber-500"
-                        >
-                            <LiveTvIcon />
-                        </button>
-                        <button
-                            onClick={() => {
-                                console.log("Favorites clicked, user:", !!user); // Debug log
+                                console.log("Favorites clicked, user:", !!user);
                                 user ? navigate("/favorites") : navigate("/login");
                             }}
                             title="Favorites"
@@ -481,32 +583,48 @@ export default function Header() {
                         >
                             <FavoriteBorderIcon />
                         </button>
-                        <button
-                            onClick={() => {
-                                console.log("Cart clicked, user:", !!user); // Debug log
-                                user ? navigate("/cart") : navigate("/login");
-                            }}
-                            title="Cart"
-                            className="p-2 text-white hover:text-amber-500"
-                        >
-                            <ShoppingBagOutlinedIcon />
-                        </button>
-                        {user ? (
-                            <NotificationsDropdown user={user} />
-                        ) : (
+                        <div className="relative">
                             <button
                                 onClick={() => {
-                                    console.log("Notifications clicked, navigating to login"); // Debug log
-                                    navigate("/login");
+                                    console.log("Cart clicked, user:", !!user);
+                                    user ? navigate("/cart") : navigate("/login");
                                 }}
-                                title="Notifications"
+                                title="Cart"
                                 className="p-2 text-white hover:text-amber-500"
                             >
-                                <NotificationsNoneOutlinedIcon />
+                                <ShoppingBagOutlinedIcon />
+                                {cartItemCount > 0 && (
+                                    <span className={`${badgeClass} -top-1 -right-1`}>
+                                        {cartItemCount}
+                                    </span>
+                                )}
                             </button>
+                        </div>
+                        {user ? (
+                            <div className="relative">
+                                <NotificationsDropdown user={user} />
+                                {notificationCount > 0 && (
+                                    <span className={`${badgeClass} -top-1 -right-1`}>
+                                        {notificationCount}
+                                    </span>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="relative">
+                                <button
+                                    onClick={() => {
+                                        console.log("Notifications clicked, navigating to login");
+                                        navigate("/login");
+                                    }}
+                                    title="Notifications"
+                                    className="p-2 text-white hover:text-amber-500"
+                                >
+                                    <NotificationsNoneOutlinedIcon />
+                                </button>
+                            </div>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
-                            console.log("Account menu clicked, user:", !!user); // Debug log
+                            console.log("Account menu clicked, user:", !!user);
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
                             <button
@@ -525,7 +643,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to profile (desktop)"); // Debug log
+                                            console.log("Navigating to profile (desktop)");
                                             navigate("/profile");
                                             setShowUserMenu(false);
                                         }}
@@ -536,7 +654,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to orders"); // Debug log
+                                            console.log("Navigating to orders");
                                             navigate("/orders");
                                             setShowUserMenu(false);
                                         }}
@@ -547,7 +665,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("My Vouchers clicked"); // Debug log
+                                            console.log("My Vouchers clicked");
                                             alert("My Vouchers");
                                             setShowUserMenu(false);
                                         }}
@@ -558,7 +676,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Logging out (desktop)"); // Debug log
+                                            console.log("Logging out (desktop)");
                                             handleLogout();
                                             setShowUserMenu(false);
                                         }}

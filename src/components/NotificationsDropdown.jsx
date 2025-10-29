@@ -10,7 +10,7 @@ export default function NotificationsDropdown({ user }) {
   const notificationRef = useRef(null);
   const navigate = useNavigate();
 
-  // 🧠 Lấy danh sách thông báo từ backend
+  // Fetch notifications from backend
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!user?._id) return;
@@ -20,16 +20,16 @@ export default function NotificationsDropdown({ user }) {
         const data = await res.json();
         setNotifications(data);
       } catch (err) {
-        console.error("❌ Lỗi khi lấy thông báo:", err);
+        // Error handling without console log
       }
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // refresh mỗi 30s
+    const interval = setInterval(fetchNotifications, 30000); // refresh every 30s
     return () => clearInterval(interval);
   }, [user]);
 
-  // 🧱 Click ngoài để đóng dropdown
+  // Click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (notificationRef.current && !notificationRef.current.contains(e.target)) {
@@ -40,57 +40,57 @@ export default function NotificationsDropdown({ user }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🔢 Số lượng chưa đọc
+  // Number of unread notifications
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // ✅ Đánh dấu đã đọc
+  // Mark as read
   const markAsRead = async (id) => {
     try {
       await fetch(`http://localhost:5000/notifications/mark-read/${id}`, { method: "PUT" });
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
+      window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
     } catch (err) {
-      console.error("❌ Lỗi khi đánh dấu đã đọc:", err);
+      // Error handling without console log
     }
   };
 
-  // ❌ Xóa 1 thông báo (cho user)
+  // Delete one notification
   const deleteNotification = async (id) => {
     try {
       await fetch(`http://localhost:5000/notifications/admin/${id}`, { method: "DELETE" });
       setNotifications((prev) => prev.filter((n) => n._id !== id));
+      window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
     } catch (err) {
-      console.error("❌ Lỗi khi xóa thông báo:", err);
+      // Error handling without console log
     }
   };
 
-  // 🧹 Xóa toàn bộ thông báo
+  // Clear all notifications
   const clearAll = async () => {
     try {
       await fetch(`http://localhost:5000/notifications/clear/${user._id}`, { method: "DELETE" });
       setNotifications([]);
+      window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
     } catch (err) {
-      console.error("❌ Lỗi khi clear all:", err);
+      // Error handling without console log
     }
   };
 
   return (
     <div className="relative" ref={notificationRef}>
-      {/* 🔔 Icon chuông */}
+      {/* Notification Icon with Badge */}
       <IconButton
         onClick={() => (user ? setShowNotifications((prev) => !prev) : navigate("/login"))}
         title="Notifications"
+        badge={unreadCount > 0 ? unreadCount : null}
+        badgeColor="bg-amber-500"
       >
         <NotificationsNoneOutlinedIcon />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-            {unreadCount}
-          </span>
-        )}
       </IconButton>
 
-      {/* 📜 Dropdown danh sách */}
+      {/* Dropdown list */}
       {user && showNotifications && (
         <div className="absolute right-0 mt-3 w-96 bg-white text-gray-900 rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100 animate-[fadeDown_0.25s_ease-out]">
           {/* Header */}
@@ -107,7 +107,7 @@ export default function NotificationsDropdown({ user }) {
             )}
           </div>
 
-          {/* Danh sách */}
+          {/* List */}
           {notifications.length > 0 ? (
             <ul className="max-h-96 overflow-y-auto divide-y divide-gray-100 scrollbar-thin scrollbar-thumb-gray-300">
               {notifications.map((n) => (
@@ -123,7 +123,7 @@ export default function NotificationsDropdown({ user }) {
                     <NotificationsNoneOutlinedIcon fontSize="small" />
                   </div>
 
-                  {/* Nội dung */}
+                  {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p className="text-gray-800 text-sm leading-snug">
                       <strong>{n.title}</strong>
@@ -149,7 +149,7 @@ export default function NotificationsDropdown({ user }) {
                     </div>
                   </div>
 
-                  {/* Nút xóa */}
+                  {/* Delete button */}
                   <button
                     className="ml-auto text-gray-400 hover:text-red-500 transition"
                     onClick={(e) => {
