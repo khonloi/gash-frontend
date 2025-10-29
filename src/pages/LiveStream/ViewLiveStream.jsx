@@ -1,0 +1,531 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import Api from '../../common/SummaryAPI';
+import { useToast } from '../../hooks/useToast';
+import {
+    LiveTv,
+    Fullscreen,
+    FullscreenExit,
+    VolumeUp,
+    VolumeOff,
+    Videocam,
+    Chat,
+    ArrowBack
+} from '@mui/icons-material';
+import { LIVEKIT_CONFIG } from '../../config/livekit';
+import LiveStreamComments from './LiveStreamComments';
+import LiveStreamReactions from './LiveStreamReactions';
+
+const LiveStreamDetail = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { showToast } = useToast();
+
+    const [selectedStream, setSelectedStream] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
+    const [showComments, setShowComments] = useState(true);
+    const [connectionState, setConnectionState] = useState('disconnected');
+    const [streamEnded, setStreamEnded] = useState(false);
+    const [_room, setRoom] = useState(null);
+
+    const videoRef = useRef(null);
+    const containerRef = useRef(null);
+    const roomRef = useRef(null);
+    const isReconnectingRef = useRef(false);
+    const streamEndedRef = useRef(false);
+    const socketRef = useRef(null);
+
+    // Connect to LiveKit - moved before useEffect
+    const connectToLiveKit = useCallback(async (roomName, viewerToken) => {
+        if (isReconnectingRef.current) return;
+        if (streamEndedRef.current) return;
+
+        if (!roomName || !viewerToken) {
+            showToast('Missing connection information', 'error');
+                return;
+            }
+
+        if (typeof viewerToken !== 'string' || viewerToken.length < 10) {
+            showToast('Invalid token', 'error');
+                return;
+            }
+
+        if (!LIVEKIT_CONFIG.serverUrl || LIVEKIT_CONFIG.serverUrl.includes('your-livekit-server.com')) {
+            showToast('LiveKit server not configured', 'error');
+                return;
+            }
+
+        if (!LIVEKIT_CONFIG.serverUrl.startsWith('wss://') && !LIVEKIT_CONFIG.serverUrl.startsWith('ws://')) {
+            showToast('Invalid LiveKit server URL', 'error');
+                return;
+            }
+
+        const originalConsoleError = console.error;
+
+        try {
+            isReconnectingRef.current = true;
+            console.log('🔗 Connecting to LiveKit room:', roomName);
+            setConnectionState('connecting');
+
+            const existingRoom = roomRef.current;
+            if (existingRoom) {
+                existingRoom.removeAllListeners();
+                if (existingRoom.state !== 'disconnected') {
+                    await existingRoom.disconnect();
+                }
+                await new Promise(resolve => setTimeout(resolve, 800));
+                roomRef.current = null;
+                setRoom(null);
+            }
+
+            const { Room, RoomEvent } = await import('livekit-client');
+
+            const roomOptions = {
+                adaptiveStream: true,
+                dynacast: true,
+                publishDefaults: {
+                    videoEncoding: {
+                        maxBitrate: 1_000_000,
+                        maxFramerate: 30
+                    },
+                    red: false
+                }
+            };
+
+            const newRoom = new Room(roomOptions);
+
+            newRoom.on(RoomEvent.Connected, () => {
+                console.log('✅ Connected to LiveKit room');
+                setConnectionState('connected');
+            });
+
+            newRoom.on(RoomEvent.Disconnected, async (reason) => {
+                console.log('❌ Disconnected from LiveKit:', reason);
+                setConnectionState('disconnected');
+                setRoom(null);
+
+                if (reason === 'SERVER_SHUTDOWN' || reason === 'ROOM_DELETED') {
+                    showToast('Livestream has ended', 'info');
+                    streamEndedRef.current = true;
+                    setStreamEnded(true);
+                    setSelectedStream(prev => prev ? { ...prev, status: 'ended' } : null);
+                }
+            });
+
+            newRoom.on(RoomEvent.TrackSubscribed, (track) => {
+                if (track.kind === 'video' && videoRef.current) {
+                    track.attach(videoRef.current);
+                    setTimeout(() => {
+                        if (videoRef.current) {
+                            videoRef.current.play().catch(err => {
+                                if (err.name !== 'AbortError') {
+                                    console.error('Video play failed:', err);
+                                }
+                            });
+                        }
+                    }, 100);
+                }
+            });
+
+            newRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
+                if (track.kind === 'video' && videoRef.current) {
+                    track.detach(videoRef.current);
+                }
+            });
+
+            console.error = (...args) => {
+                const message = args[0]?.toString() || '';
+                if (message.includes('DataChannel error')) {
+                    return;
+                }
+                originalConsoleError.apply(console, args);
+            };
+
+            const connectPromise = newRoom.connect(LIVEKIT_CONFIG.serverUrl, viewerToken);
+            const timeoutPromise = new Promise((_, reject) => {
+                const timeoutId = setTimeout(() => {
+                    reject(new Error(`Connection timeout after 45 seconds`));
+                }, 45000);
+                connectPromise.then(() => clearTimeout(timeoutId)).catch(() => clearTimeout(timeoutId));
+            });
+
+            try {
+                await Promise.race([connectPromise, timeoutPromise]);
+                console.log('✅ Connection resolved');
+            } catch (error) {
+                console.error('❌ Connection failed:', error.message);
+                try {
+                    newRoom.removeAllListeners();
+                    if (newRoom.state !== 'disconnected' && newRoom.state !== 'disconnecting') {
+                        await Promise.race([
+                            newRoom.disconnect(),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Disconnect timeout')), 5000))
+                        ]).catch(() => { });
+                    }
+                } catch (disconnectError) {
+                    console.warn('Error during cleanup:', disconnectError.message);
+                } finally {
+                    if (roomRef.current === newRoom) {
+                        roomRef.current = null;
+                    }
+                    setRoom(null);
+                }
+                throw error;
+            }
+
+            setRoom(newRoom);
+            roomRef.current = newRoom;
+            isReconnectingRef.current = false;
+            console.error = originalConsoleError;
+            console.log('🎉 Successfully connected');
+            return newRoom;
+        } catch (error) {
+            if (typeof originalConsoleError !== 'undefined') {
+                console.error = originalConsoleError;
+            }
+            console.error('❌ Error connecting:', error);
+            setConnectionState('error');
+            isReconnectingRef.current = false;
+
+            if (error.message.includes('timeout')) {
+                showToast('Connection timeout. Please check network', 'error');
+            } else if (error.message.includes('token')) {
+                showToast('Invalid or expired token', 'error');
+            } else if (error.message.includes('server')) {
+                showToast('Unable to connect to server', 'error');
+            } else {
+                showToast(`Connection error: ${error.message}`, 'error');
+            }
+            throw error;
+        }
+    }, [showToast]);
+
+    // Load stream details
+    useEffect(() => {
+        const loadStream = async () => {
+            try {
+                setIsLoading(true);
+            const token = localStorage.getItem('token');
+                if (!token) {
+                    showToast('Please login to view livestream', 'error');
+                    navigate('/live');
+                    return;
+                }
+
+                const response = await Api.livestream.view({ livestreamId: id }, token);
+
+                if (response.data?.success) {
+                    const streamData = response.data.data;
+
+                    if (streamData.status !== 'live') {
+                    showToast('Livestream has ended', 'info');
+                        setStreamEnded(true);
+                        setSelectedStream(streamData);
+                        return;
+                    }
+
+                    setSelectedStream(streamData);
+
+                    // Auto-join livestream
+                        await connectToLiveKit(streamData.roomName, streamData.viewerToken);
+                    showToast('Joined livestream!', 'success');
+                } else {
+                    showToast('Livestream not found', 'error');
+                    navigate('/live');
+            }
+        } catch (error) {
+                console.error('Error loading stream:', error);
+                showToast('Error loading livestream', 'error');
+                navigate('/live');
+        } finally {
+            setIsLoading(false);
+        }
+        };
+
+        loadStream();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, connectToLiveKit]);
+
+    // Note: Reactions and Floating Reactions are now handled inside LiveStreamReactions component
+
+    const disconnectFromLiveKit = useCallback(async () => {
+        const roomToDisconnect = roomRef.current;
+        if (!roomToDisconnect) return;
+
+        try {
+            roomToDisconnect.removeAllListeners();
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            if (roomToDisconnect.state !== 'disconnected') {
+                await Promise.race([
+                    roomToDisconnect.disconnect(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Disconnect timeout')), 5000))
+                ]).catch(() => { });
+            }
+        } catch (error) {
+            console.error('Error disconnecting:', error.message);
+        } finally {
+            if (roomRef.current === roomToDisconnect) {
+                roomRef.current = null;
+            }
+            setRoom(null);
+        setConnectionState('disconnected');
+            isReconnectingRef.current = false;
+        }
+    }, []);
+
+    const leaveLivestream = async () => {
+        try {
+            if (selectedStream?._id) {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    try {
+                        await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
+                    } catch (apiError) {
+                        console.error('Error calling leave API:', apiError);
+                    }
+                }
+            }
+            await disconnectFromLiveKit();
+            showToast('Left livestream', 'info');
+        } catch (error) {
+            console.error('Error leaving livestream:', error);
+        }
+    };
+
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            containerRef.current?.requestFullscreen();
+            setIsFullscreen(true);
+        } else {
+            document.exitFullscreen();
+            setIsFullscreen(false);
+        }
+    };
+
+    const toggleMute = () => {
+        if (videoRef.current) {
+            videoRef.current.muted = !videoRef.current.muted;
+            setIsMuted(videoRef.current.muted);
+        }
+    };
+
+    const goBack = () => {
+        leaveLivestream();
+        navigate('/live');
+    };
+
+    useEffect(() => {
+        const room = roomRef.current;
+        const socket = socketRef.current;
+
+        return () => {
+            if (room) {
+                room.disconnect().catch(console.error);
+            }
+            if (socket) {
+                socket.disconnect();
+            }
+        };
+    }, []);
+
+    if (isLoading) {
+    return (
+            <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
+                <div className="text-center">
+                    <div className="relative">
+                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-800 mx-auto mb-6"></div>
+                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-500 mx-auto absolute top-0 left-1/2 transform -translate-x-1/2"></div>
+                            </div>
+                    <p className="text-gray-300 text-lg font-medium">Loading livestream...</p>
+                    <p className="text-gray-500 text-sm mt-2">Please wait a moment</p>
+                        </div>
+                    </div>
+        );
+    }
+
+    if (streamEnded) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center p-4">
+                <div className="text-center text-white max-w-md">
+                    <div className="relative mb-8">
+                        <div className="w-24 h-24 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center mb-6 mx-auto backdrop-blur-sm border border-red-500/30">
+                            <LiveTv className="w-12 h-12 text-red-400" />
+                    </div>
+                        <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping opacity-20"></div>
+                    </div>
+                    <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                        Livestream has ended
+                    </h3>
+                    <p className="text-gray-400 mb-8 text-lg">Thank you for watching!</p>
+                    <button
+                        onClick={goBack}
+                        className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
+                    >
+                        Back to Live Streams
+                    </button>
+                                        </div>
+                                    </div>
+        );
+    }
+
+    if (!selectedStream) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center p-4">
+                <div className="text-center text-white max-w-md">
+                    <div className="w-20 h-20 bg-gray-700/50 rounded-full flex items-center justify-center mb-6 mx-auto backdrop-blur-sm border border-gray-600/50">
+                        <LiveTv className="w-10 h-10 text-gray-400" />
+                                        </div>
+                    <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                        Livestream not found
+                                        </h3>
+                    <p className="text-gray-400 mb-8">The livestream you're looking for doesn't exist or has been removed.</p>
+                    <button
+                        onClick={goBack}
+                        className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
+                    >
+                        Back to Live Streams
+                    </button>
+                                            </div>
+                                        </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+            {/* Video Modal - Full Screen */}
+            <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black z-50 flex items-center justify-center p-4">
+                <div
+                    className={`relative bg-black/90 backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50 ${showComments ? 'mr-96' : ''}`}
+                    style={{
+                        width: showComments
+                            ? 'min(calc(100vw - 400px), calc((100vh - 2rem) * 9 / 16))'
+                            : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
+                        aspectRatio: '9/16',
+                        maxWidth: '90vw',
+                        maxHeight: 'calc(100vh - 2rem)'
+                    }}
+                    ref={containerRef}
+                >
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            playsInline
+                            controls={false}
+                            className="w-full h-full object-cover cursor-pointer"
+                        style={{ backgroundColor: '#000' }}
+                            onError={(e) => console.error('Video error:', e)}
+                        />
+
+                    {/* Back Button */}
+                        <button
+                        onClick={goBack}
+                        className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 z-50 border border-white/10 shadow-lg hover:scale-110 transform"
+                        >
+                            <ArrowBack className="w-5 h-5" />
+                        </button>
+
+                    {/* Status & Viewers */}
+                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
+                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border transition-all duration-300 shadow-lg ${connectionState === 'connected'
+                            ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white border-red-500/50 animate-pulse'
+                            : connectionState === 'connecting'
+                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-yellow-500/50'
+                                : connectionState === 'error'
+                                    ? 'bg-gradient-to-r from-red-700 to-red-800 text-white border-red-600/50'
+                                    : 'bg-gray-700/80 text-white border-gray-600/50'
+                            }`}>
+                            <div className={`w-2 h-2 rounded-full ${connectionState === 'connected'
+                                ? 'bg-white animate-ping'
+                                : connectionState === 'connecting'
+                                    ? 'bg-white animate-pulse'
+                                    : 'bg-white'
+                                    }`}></div>
+                                <span>
+                                    {connectionState === 'connected' ? 'LIVE' :
+                                        connectionState === 'connecting' ? 'CONNECTING' :
+                                            connectionState === 'error' ? 'ERROR' : 'ENDED'}
+                                </span>
+                            </div>
+
+                            {selectedStream && (
+                            <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
+                                <Videocam className="w-4 h-4 text-blue-400" />
+                                <span className="text-white font-semibold">{selectedStream.currentViewers !== undefined ? selectedStream.currentViewers : 0}</span>
+                                    <span className="text-xs text-gray-300">viewers</span>
+                                </div>
+                            )}
+                        </div>
+
+                    {/* Ended Overlay */}
+                    {connectionState !== 'connected' && !streamEnded && (
+                        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center">
+                                <div className="text-center text-white">
+                                <div className="relative mb-6">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mx-auto backdrop-blur-md border border-gray-600/30">
+                                        <LiveTv className="w-10 h-10 text-gray-400" />
+                                    </div>
+                                    <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                                    Livestream has ended
+                                </h3>
+                                <p className="text-gray-300 mb-6">Thank you for watching!</p>
+                                    <button
+                                    onClick={goBack}
+                                    className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                    {/* Controls */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={toggleMute}
+                                className="bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform"
+                                >
+                                {isMuted ? <VolumeOff className="w-5 h-5" /> : <VolumeUp className="w-5 h-5" />}
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setShowComments(!showComments)}
+                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
+                                        }`}
+                                >
+                                <Chat className="w-5 h-5" />
+                                </button>
+
+                                <button
+                                    onClick={toggleFullscreen}
+                                className="bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform"
+                                >
+                                {isFullscreen ? <FullscreenExit className="w-5 h-5" /> : <Fullscreen className="w-5 h-5" />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Comments Panel */}
+                {(selectedStream?._id || id) && (
+                    <LiveStreamComments
+                        liveId={selectedStream?._id || id}
+                        hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
+                        isVisible={showComments}
+                        onToggle={() => setShowComments(!showComments)}
+                    />
+            )}
+            </div>
+        </div>
+    );
+};
+
+export default LiveStreamDetail;
+

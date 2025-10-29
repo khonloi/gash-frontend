@@ -319,12 +319,40 @@ const Api = {
 
   // ==== Livestream ====
   livestream: {
-    // Get live streams (authenticated users)
-    getLive: (token) => axiosClient.get("/livestream/live", {
+    // Get currently live streams (User can only see live streams)
+    getLiveNow: (token) => axiosClient.get("/livestream/live-now", {
       headers: { Authorization: `Bearer ${token}` },
     }),
-    // View/Join livestream (authenticated users)
-    view: (data, token) => axiosClient.post("/livestream/view", data, {
+    // Join livestream (view)
+    view: (data, token) => axiosClient.post("/livestream/join", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Leave livestream
+    leave: (data, token) => axiosClient.post("/livestream/leave", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Add reaction to livestream
+    addReaction: (data, token) => axiosClient.post("/livestream-reactions/add-reaction", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Get reaction counts for a livestream (User và Admin dùng chung - reaction ko có xóa)
+    getReactions: (liveId, token) => axiosClient.get(`/livestream-reactions/reactions/${liveId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Get all active products in a livestream (User và Admin dùng chung - chỉ active products)
+    getLiveProducts: (liveId, token) => axiosClient.get(`/livestream-products/${liveId}/live-products`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Add comment to livestream
+    addComment: (data, token) => axiosClient.post("/livestream-comments/add-comment", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Get comments for a livestream (User - only non-deleted comments)
+    getComments: (liveId, token) => axiosClient.get(`/livestream-comments/comments/${liveId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    // Hide comment
+    hideComment: (commentId, token) => axiosClient.delete(`/livestream-comments/${commentId}/hide-comment`, {
       headers: { Authorization: `Bearer ${token}` },
     }),
   },
