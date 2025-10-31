@@ -98,19 +98,18 @@ export const ToastProvider = ({ children }) => {
       {toast.visible && (
         <div
           className={`
-            fixed inset-x-0 bottom-6 z-[9999]
-            w-full max-w-sm mx-auto
+            fixed top-6 right-6 z-[9999]
+            max-w-sm
             rounded-xl p-4 border-l-4
             shadow-xl bg-white backdrop-blur-sm
             transition-opacity duration-300
             ${toastStyles[toast.type] || toastStyles.info}
             ${toast.isClosing ? "opacity-0" : "opacity-100"}
-            [transform:translateX(-50%)]
-            ${toast.isClosing ? "translate-y-4 scale-95" : "translate-y-0 scale-100"}
+            ${toast.isClosing ? "-translate-y-4 scale-95" : "translate-y-0 scale-100"}
           `}
           style={{
             transform: toast.isClosing
-              ? "translateY(16px) scale(0.95)"
+              ? "translateY(-16px) scale(0.95)"
               : "translateY(0) scale(1)",
             transition:
               "opacity 300ms ease-out, transform 300ms cubic-bezier(0.2, 0.8, 0.4, 1)",

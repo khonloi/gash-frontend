@@ -6,8 +6,6 @@ import {
     LiveTv,
     Fullscreen,
     FullscreenExit,
-    VolumeUp,
-    VolumeOff,
     Videocam,
     Chat,
     ArrowBack
@@ -24,7 +22,6 @@ const LiveStreamDetail = () => {
     const [selectedStream, setSelectedStream] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
     const [showComments, setShowComments] = useState(true);
     const [connectionState, setConnectionState] = useState('disconnected');
     const [streamEnded, setStreamEnded] = useState(false);
@@ -44,23 +41,23 @@ const LiveStreamDetail = () => {
 
         if (!roomName || !viewerToken) {
             showToast('Missing connection information', 'error');
-                return;
-            }
+            return;
+        }
 
         if (typeof viewerToken !== 'string' || viewerToken.length < 10) {
             showToast('Invalid token', 'error');
-                return;
-            }
+            return;
+        }
 
         if (!LIVEKIT_CONFIG.serverUrl || LIVEKIT_CONFIG.serverUrl.includes('your-livekit-server.com')) {
             showToast('LiveKit server not configured', 'error');
-                return;
-            }
+            return;
+        }
 
         if (!LIVEKIT_CONFIG.serverUrl.startsWith('wss://') && !LIVEKIT_CONFIG.serverUrl.startsWith('ws://')) {
             showToast('Invalid LiveKit server URL', 'error');
-                return;
-            }
+            return;
+        }
 
         const originalConsoleError = console.error;
 
@@ -99,6 +96,55 @@ const LiveStreamDetail = () => {
             newRoom.on(RoomEvent.Connected, () => {
                 console.log('✅ Connected to LiveKit room');
                 setConnectionState('connected');
+
+                // CRITICAL: Ensure video element is not muted (audio always enabled)
+                if (videoRef.current) {
+                    videoRef.current.muted = false;
+                }
+
+                // Subscribe to all remote tracks (video and audio)
+                newRoom.remoteParticipants.forEach((participant) => {
+                    participant.trackPublications.forEach((publication) => {
+                        // Subscribe to the track if not already subscribed
+                        if (!publication.isSubscribed) {
+                            publication.setSubscribed(true);
+                        }
+
+                        // If track is available, attach it immediately
+                        if (publication.track) {
+                            if (publication.track.kind === 'video' && videoRef.current) {
+                                publication.track.attach(videoRef.current);
+                                videoRef.current.muted = false; // Ensure not muted
+                                videoRef.current.play().catch(() => { });
+                            } else if (publication.track.kind === 'audio' && videoRef.current) {
+                                publication.track.attach(videoRef.current);
+
+                                // CRITICAL: Enable audio track
+                                if (publication.track instanceof MediaStreamTrack) {
+                                    publication.track.enabled = true;
+                                }
+
+                                // CRITICAL: Ensure video is not muted
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
+
+                                console.log('✅ Audio track attached on connect', {
+                                    trackId: publication.track.id,
+                                    enabled: publication.track.enabled,
+                                    muted: videoRef.current?.muted
+                                });
+                            }
+                        }
+                    });
+                });
+
+                // Double-check video is not muted after a short delay
+                setTimeout(() => {
+                    if (videoRef.current) {
+                        videoRef.current.muted = false;
+                    }
+                }, 1000);
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
@@ -114,24 +160,76 @@ const LiveStreamDetail = () => {
                 }
             });
 
-            newRoom.on(RoomEvent.TrackSubscribed, (track) => {
-                if (track.kind === 'video' && videoRef.current) {
-                    track.attach(videoRef.current);
-                    setTimeout(() => {
-                        if (videoRef.current) {
-                            videoRef.current.play().catch(err => {
-                                if (err.name !== 'AbortError') {
-                                    console.error('Video play failed:', err);
-                                }
-                            });
+            newRoom.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+                if (videoRef.current) {
+                    if (track.kind === 'video') {
+                        track.attach(videoRef.current);
+                        setTimeout(() => {
+                            if (videoRef.current) {
+                                // Ensure video is not muted when playing
+                                videoRef.current.muted = false;
+                                videoRef.current.play().catch(err => {
+                                    if (err.name !== 'AbortError') {
+                                        console.error('Video play failed:', err);
+                                    }
+                                });
+                            }
+                        }, 100);
+                    } else if (track.kind === 'audio') {
+                        // Attach audio track to video element
+                        track.attach(videoRef.current);
+
+                        // CRITICAL: Ensure audio track is enabled
+                        if (track instanceof MediaStreamTrack) {
+                            track.enabled = true;
                         }
-                    }, 100);
+
+                        // CRITICAL: Ensure video element is not muted
+                        if (videoRef.current) {
+                            videoRef.current.muted = false;
+                            // Force unmute multiple times to ensure it sticks
+                            setTimeout(() => {
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
+                            }, 100);
+                            setTimeout(() => {
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
+                            }, 500);
+                        }
+                    }
                 }
             });
 
+            // Handle participant connected - subscribe to their tracks
+            newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
+                console.log('👤 Participant connected:', participant.identity);
+                // Subscribe to all their tracks
+                participant.trackPublications.forEach((publication) => {
+                    if (!publication.isSubscribed) {
+                        publication.setSubscribed(true);
+                    }
+
+                    // If audio track is already available, attach and enable it
+                    if (publication.track && publication.track.kind === 'audio' && videoRef.current) {
+                        publication.track.attach(videoRef.current);
+                        if (publication.track instanceof MediaStreamTrack) {
+                            publication.track.enabled = true;
+                        }
+                        videoRef.current.muted = false;
+                    }
+                });
+            });
+
             newRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
-                if (track.kind === 'video' && videoRef.current) {
-                    track.detach(videoRef.current);
+                if (videoRef.current) {
+                    if (track.kind === 'video') {
+                        track.detach(videoRef.current);
+                    } else if (track.kind === 'audio') {
+                        track.detach(videoRef.current);
+                    }
                 }
             });
 
@@ -153,9 +251,7 @@ const LiveStreamDetail = () => {
 
             try {
                 await Promise.race([connectPromise, timeoutPromise]);
-                console.log('✅ Connection resolved');
             } catch (error) {
-                console.error('❌ Connection failed:', error.message);
                 try {
                     newRoom.removeAllListeners();
                     if (newRoom.state !== 'disconnected' && newRoom.state !== 'disconnecting') {
@@ -179,13 +275,11 @@ const LiveStreamDetail = () => {
             roomRef.current = newRoom;
             isReconnectingRef.current = false;
             console.error = originalConsoleError;
-            console.log('🎉 Successfully connected');
             return newRoom;
         } catch (error) {
             if (typeof originalConsoleError !== 'undefined') {
                 console.error = originalConsoleError;
             }
-            console.error('❌ Error connecting:', error);
             setConnectionState('error');
             isReconnectingRef.current = false;
 
@@ -207,7 +301,7 @@ const LiveStreamDetail = () => {
         const loadStream = async () => {
             try {
                 setIsLoading(true);
-            const token = localStorage.getItem('token');
+                const token = localStorage.getItem('token');
                 if (!token) {
                     showToast('Please login to view livestream', 'error');
                     navigate('/live');
@@ -220,7 +314,7 @@ const LiveStreamDetail = () => {
                     const streamData = response.data.data;
 
                     if (streamData.status !== 'live') {
-                    showToast('Livestream has ended', 'info');
+                        showToast('Livestream has ended', 'info');
                         setStreamEnded(true);
                         setSelectedStream(streamData);
                         return;
@@ -229,19 +323,19 @@ const LiveStreamDetail = () => {
                     setSelectedStream(streamData);
 
                     // Auto-join livestream
-                        await connectToLiveKit(streamData.roomName, streamData.viewerToken);
+                    await connectToLiveKit(streamData.roomName, streamData.viewerToken);
                     showToast('Joined livestream!', 'success');
                 } else {
                     showToast('Livestream not found', 'error');
                     navigate('/live');
-            }
-        } catch (error) {
+                }
+            } catch (error) {
                 console.error('Error loading stream:', error);
                 showToast('Error loading livestream', 'error');
                 navigate('/live');
-        } finally {
-            setIsLoading(false);
-        }
+            } finally {
+                setIsLoading(false);
+            }
         };
 
         loadStream();
@@ -271,7 +365,7 @@ const LiveStreamDetail = () => {
                 roomRef.current = null;
             }
             setRoom(null);
-        setConnectionState('disconnected');
+            setConnectionState('disconnected');
             isReconnectingRef.current = false;
         }
     }, []);
@@ -305,12 +399,7 @@ const LiveStreamDetail = () => {
         }
     };
 
-    const toggleMute = () => {
-        if (videoRef.current) {
-            videoRef.current.muted = !videoRef.current.muted;
-            setIsMuted(videoRef.current.muted);
-        }
-    };
+    // Mute functionality removed
 
     const goBack = () => {
         leaveLivestream();
@@ -332,17 +421,17 @@ const LiveStreamDetail = () => {
     }, []);
 
     if (isLoading) {
-    return (
+        return (
             <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
                 <div className="text-center">
                     <div className="relative">
                         <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-800 mx-auto mb-6"></div>
                         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-500 mx-auto absolute top-0 left-1/2 transform -translate-x-1/2"></div>
-                            </div>
+                    </div>
                     <p className="text-gray-300 text-lg font-medium">Loading livestream...</p>
                     <p className="text-gray-500 text-sm mt-2">Please wait a moment</p>
-                        </div>
-                    </div>
+                </div>
+            </div>
         );
     }
 
@@ -353,7 +442,7 @@ const LiveStreamDetail = () => {
                     <div className="relative mb-8">
                         <div className="w-24 h-24 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center mb-6 mx-auto backdrop-blur-sm border border-red-500/30">
                             <LiveTv className="w-12 h-12 text-red-400" />
-                    </div>
+                        </div>
                         <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping opacity-20"></div>
                     </div>
                     <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -361,13 +450,14 @@ const LiveStreamDetail = () => {
                     </h3>
                     <p className="text-gray-400 mb-8 text-lg">Thank you for watching!</p>
                     <button
+                        type="button"
                         onClick={goBack}
                         className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
                     >
                         Back to Live Streams
                     </button>
-                                        </div>
-                                    </div>
+                </div>
+            </div>
         );
     }
 
@@ -377,26 +467,39 @@ const LiveStreamDetail = () => {
                 <div className="text-center text-white max-w-md">
                     <div className="w-20 h-20 bg-gray-700/50 rounded-full flex items-center justify-center mb-6 mx-auto backdrop-blur-sm border border-gray-600/50">
                         <LiveTv className="w-10 h-10 text-gray-400" />
-                                        </div>
+                    </div>
                     <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                         Livestream not found
-                                        </h3>
+                    </h3>
                     <p className="text-gray-400 mb-8">The livestream you're looking for doesn't exist or has been removed.</p>
                     <button
+                        type="button"
                         onClick={goBack}
                         className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
                     >
                         Back to Live Streams
                     </button>
-                                            </div>
-                                        </div>
+                </div>
+            </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+        <div
+            className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black"
+            onContextMenu={(e) => e.preventDefault()}
+        >
             {/* Video Modal - Full Screen */}
-            <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black z-50 flex items-center justify-center p-4">
+            <div
+                className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black z-50 flex items-center justify-center p-4"
+                onClick={(e) => {
+                    // Prevent default behavior for any clicks on background
+                    if (e.target === e.currentTarget) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }}
+            >
                 <div
                     className={`relative bg-black/90 backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50 ${showComments ? 'mr-96' : ''}`}
                     style={{
@@ -408,24 +511,46 @@ const LiveStreamDetail = () => {
                         maxHeight: 'calc(100vh - 2rem)'
                     }}
                     ref={containerRef}
+                    onClick={(e) => {
+                        // Prevent any navigation or reload from container clicks
+                        const target = e.target;
+                        if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'SVG' || target.closest('svg')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+                        }
+                    }}
+                    onMouseDown={(e) => {
+                        // Prevent any mouse down events on buttons from propagating
+                        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    }}
                 >
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            controls={false}
-                            className="w-full h-full object-cover cursor-pointer"
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        controls={false}
+                        muted={false}
+                        className="w-full h-full object-cover cursor-pointer"
                         style={{ backgroundColor: '#000' }}
-                            onError={(e) => console.error('Video error:', e)}
-                        />
+                        onError={(e) => console.error('Video error:', e)}
+                        onClick={(e) => {
+                            // Prevent video clicks from bubbling up
+                            e.stopPropagation();
+                        }}
+                    />
 
                     {/* Back Button */}
-                        <button
+                    <button
+                        type="button"
                         onClick={goBack}
                         className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 z-50 border border-white/10 shadow-lg hover:scale-110 transform"
-                        >
-                            <ArrowBack className="w-5 h-5" />
-                        </button>
+                    >
+                        <ArrowBack className="w-5 h-5" />
+                    </button>
 
                     {/* Status & Viewers */}
                     <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
@@ -442,27 +567,27 @@ const LiveStreamDetail = () => {
                                 : connectionState === 'connecting'
                                     ? 'bg-white animate-pulse'
                                     : 'bg-white'
-                                    }`}></div>
-                                <span>
-                                    {connectionState === 'connected' ? 'LIVE' :
-                                        connectionState === 'connecting' ? 'CONNECTING' :
-                                            connectionState === 'error' ? 'ERROR' : 'ENDED'}
-                                </span>
-                            </div>
+                                }`}></div>
+                            <span>
+                                {connectionState === 'connected' ? 'LIVE' :
+                                    connectionState === 'connecting' ? 'CONNECTING' :
+                                        connectionState === 'error' ? 'ERROR' : 'ENDED'}
+                            </span>
+                        </div>
 
-                            {selectedStream && (
+                        {selectedStream && (
                             <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
                                 <Videocam className="w-4 h-4 text-blue-400" />
                                 <span className="text-white font-semibold">{selectedStream.currentViewers !== undefined ? selectedStream.currentViewers : 0}</span>
-                                    <span className="text-xs text-gray-300">viewers</span>
-                                </div>
-                            )}
-                        </div>
+                                <span className="text-xs text-gray-300">viewers</span>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Ended Overlay */}
                     {connectionState !== 'connected' && !streamEnded && (
                         <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center">
-                                <div className="text-center text-white">
+                            <div className="text-center text-white">
                                 <div className="relative mb-6">
                                     <div className="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mx-auto backdrop-blur-md border border-gray-600/30">
                                         <LiveTv className="w-10 h-10 text-gray-400" />
@@ -473,47 +598,49 @@ const LiveStreamDetail = () => {
                                     Livestream has ended
                                 </h3>
                                 <p className="text-gray-300 mb-6">Thank you for watching!</p>
-                                    <button
+                                <button
+                                    type="button"
                                     onClick={goBack}
                                     className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                    {/* Controls */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={toggleMute}
-                                className="bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform"
                                 >
-                                {isMuted ? <VolumeOff className="w-5 h-5" /> : <VolumeUp className="w-5 h-5" />}
-                                </button>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setShowComments(!showComments)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
-                                        }`}
-                                >
-                                <Chat className="w-5 h-5" />
-                                </button>
-
-                                <button
-                                    onClick={toggleFullscreen}
-                                className="bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform"
-                                >
-                                {isFullscreen ? <FullscreenExit className="w-5 h-5" /> : <Fullscreen className="w-5 h-5" />}
+                                    Close
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Comments Panel */}
+                    {/* Controls */}
+                    <div
+                        className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-auto z-10"
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center gap-2">
+                            {/* Mute button removed */}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowComments(!showComments)}
+                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
+                                    }`}
+                            >
+                                <Chat className="w-5 h-5" />
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={toggleFullscreen}
+                                className="bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform"
+                            >
+                                {isFullscreen ? <FullscreenExit className="w-5 h-5" /> : <Fullscreen className="w-5 h-5" />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Comments Panel */}
                 {(selectedStream?._id || id) && (
                     <LiveStreamComments
                         liveId={selectedStream?._id || id}
@@ -521,7 +648,7 @@ const LiveStreamDetail = () => {
                         isVisible={showComments}
                         onToggle={() => setShowComments(!showComments)}
                     />
-            )}
+                )}
             </div>
         </div>
     );

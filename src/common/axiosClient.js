@@ -2,6 +2,9 @@ import axios from "axios";
 import { io } from "socket.io-client";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// Export SOCKET_URL for use in other files
+export const SOCKET_URL = API_BASE_URL;
+
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -30,10 +33,7 @@ axiosClient.interceptors.response.use(
 
 // Socket client logic merged here
 export const createSocket = (auth = {}) => {
-  return io(
-    axiosClient.defaults.baseURL || "http://localhost:5000",
-    { auth }
-  );
+  return io(SOCKET_URL, { auth });
 };
 
 export default axiosClient;

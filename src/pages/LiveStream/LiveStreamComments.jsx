@@ -2,11 +2,9 @@ import React, { useState, useEffect, useRef, useCallback, useContext } from 'rea
 import { Chat, Close, PushPin, Send, MoreVert } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
 import io from 'socket.io-client';
-import axiosClient from '../../common/axiosClient';
+import { SOCKET_URL } from '../../common/axiosClient';
 import Api from '../../common/SummaryAPI';
 import LiveStreamReactions from './LiveStreamReactions';
-
-const SOCKET_URL = axiosClient.defaults.baseURL || "http://localhost:5000";
 
 // ============= CommentInput Component (Inline) =============
 const CommentInput = ({ onSendComment, isSending }) => {
@@ -213,7 +211,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                     return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                 });
                 setComments(sortedComments);
-                } else {
+            } else {
                 setError('Failed to load comments');
             }
         } catch (error) {
@@ -402,10 +400,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             <div className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 p-5 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                    <Chat className="w-5 h-5 text-white" />
+                        <Chat className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                    <h3 className="text-white font-bold text-lg">Comments</h3>
+                        <h3 className="text-white font-bold text-lg">Comments</h3>
                         <p className="text-white/70 text-xs">Live chat</p>
                     </div>
                 </div>
@@ -423,34 +421,34 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                     <div className="flex justify-center">
                         <LiveStreamReactions liveId={liveId} horizontal={true} showComments={isVisible} />
                     </div>
-                    </div>
-                )}
+                </div>
+            )}
 
             {/* Pinned Comments Section - Sticky below reactions */}
-                        {comments.some(c => c.isPinned) && (
+            {comments.some(c => c.isPinned) && (
                 <div className="bg-gradient-to-br from-yellow-900/40 via-yellow-800/30 to-yellow-900/40 border-b border-yellow-500/30 p-4 backdrop-blur-sm max-h-48 overflow-y-auto scrollbar-livestream">
                     <div className="flex items-center gap-2 mb-3 px-2">
                         <PushPin className="w-4 h-4 text-yellow-400" />
                         <span className="text-yellow-400 text-xs font-bold uppercase tracking-wide">📌 Pinned Message</span>
-                                </div>
-                                <div className="space-y-2">
-                                    {comments
-                                        .filter(c => c.isPinned)
+                    </div>
+                    <div className="space-y-2">
+                        {comments
+                            .filter(c => c.isPinned)
                             .slice(0, 1) // Show only the first (and should be only) pinned comment
-                                        .map((comment) => (
-                                            <CommentItem
-                                                key={comment._id}
-                                                comment={comment}
-                                                currentUserId={user?._id}
-                                                hostId={hostId}
-                                                onHideComment={handleHideComment}
+                            .map((comment) => (
+                                <CommentItem
+                                    key={comment._id}
+                                    comment={comment}
+                                    currentUserId={user?._id}
+                                    hostId={hostId}
+                                    onHideComment={handleHideComment}
                                     onPinComment={undefined}
                                     onUnpinComment={undefined}
-                                            />
-                                        ))}
-                                </div>
-                            </div>
-                        )}
+                                />
+                            ))}
+                    </div>
+                </div>
+            )}
 
             {/* Regular Comments Section - Scrollable */}
             <div className="flex-1 overflow-y-auto p-5 space-y-3 scrollbar-livestream">

@@ -3,10 +3,8 @@ import { createPortal } from 'react-dom';
 import { Favorite } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
 import io from 'socket.io-client';
-import axiosClient from '../../common/axiosClient';
+import { SOCKET_URL } from '../../common/axiosClient';
 import Api from '../../common/SummaryAPI';
-
-const SOCKET_URL = axiosClient.defaults.baseURL || "http://localhost:5000";
 
 const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }) => {
     const { user } = useContext(AuthContext);
@@ -33,15 +31,15 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
     // Key format: `${userId}_${reactionType}_${timeWindow}` where timeWindow = Math.floor(timestamp/1000)
     const displayedReactionsRef = useRef(new Map()); // Map<key, true>
 
-const REACTION_TYPES = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
-const REACTION_EMOJIS = {
-    like: '👍',
-    love: '❤️',
-    haha: '😂',
-    wow: '😮',
-    sad: '😢',
-    angry: '😡'
-};
+    const REACTION_TYPES = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
+    const REACTION_EMOJIS = {
+        like: '👍',
+        love: '❤️',
+        haha: '😂',
+        wow: '😮',
+        sad: '😢',
+        angry: '😡'
+    };
 
     const fetchReactions = useCallback(async () => {
         if (!liveId || !user) return;
@@ -77,8 +75,7 @@ const REACTION_EMOJIS = {
         if (reactionData?._id && !reactionData?.isLocal) {
             // Only skip if already processed (avoid duplicate display)
             if (processedReactionsRef.current.has(reactionData._id)) {
-                console.log('⏭️ Skipping duplicate reaction:', reactionData._id);
-            return;
+                return;
             }
             processedReactionsRef.current.add(reactionData._id);
             // Clear after animation completes
@@ -123,23 +120,19 @@ const REACTION_EMOJIS = {
                 const timeDiff = now - pendingTimestamp;
                 // If we just sent a local reaction of this type within 2 seconds, skip this one (it's likely our own broadcast)
                 if (timeDiff >= 0 && timeDiff <= 2000 && reactionData?.userId === user?._id) {
-                    console.log('⏭️ Skipping reaction in handleReactionClick (recent local reaction)');
-            return;
-        }
+                    return;
+                }
             }
         }
 
         setShowFloatingReactions(true);
-        console.log('🎈 Showing floating reaction at position:', randomX + '%');
 
         setFloatingReactions(prev => {
             const exists = prev.some(r => r.id === reactionId);
             if (exists) {
-                console.log('⚠️ Reaction already exists:', reactionId);
                 return prev;
             }
             const updated = [...prev, newReaction];
-            console.log('✅ Added floating reaction, total:', updated.length);
             return updated;
         });
 
@@ -225,7 +218,6 @@ const REACTION_EMOJIS = {
                     setTimeout(() => {
                         pendingServerReactionsRef.current.delete(serverReactionId);
                     }, 5000);
-                    console.log('✅ Reaction sent to server, tracking ID:', serverReactionId, 'to avoid duplicate');
                 } else {
                     console.log('✅ Reaction sent to server, but no ID returned');
                 }
@@ -312,7 +304,6 @@ const REACTION_EMOJIS = {
                             [reactionType]: (prev[reactionType] || 0) + 1,
                             total: (prev.total || 0) + 1
                         };
-                        console.log('🎉 Real-time reaction added via WebSocket:', reactionType);
                         return updated;
                     });
 
@@ -333,16 +324,6 @@ const REACTION_EMOJIS = {
 
                     const currentUserId = user?._id;
 
-                    // Debug logging
-                    console.log('🔍 WebSocket reaction received:', {
-                        reactionType,
-                        reactionUserId,
-                        currentUserId,
-                        reactionUserIdType: typeof reactionUserId,
-                        currentUserIdType: typeof currentUserId,
-                        rawUserId: data.reaction.userId
-                    });
-
                     // CRITICAL FIX: Backend doesn't send userId in WebSocket reaction
                     // So we use tracking-based approach instead
                     const now = Date.now();
@@ -355,11 +336,6 @@ const REACTION_EMOJIS = {
                         const timeDiff = now - pendingTimestamp;
                         if (timeDiff >= 0 && timeDiff <= 4000) {
                             shouldSkip = true;
-                            console.log('⏭️ SKIPPING WebSocket reaction (pending local reaction within 4s)', {
-                                reactionType,
-                                timeDiff,
-                                pendingTimestamp
-                            });
                         }
                     }
 
@@ -375,10 +351,6 @@ const REACTION_EMOJIS = {
 
                             if (hasRecentReaction) {
                                 shouldSkip = true;
-                                console.log('⏭️ SKIPPING WebSocket reaction (recent local reaction within 4s)', {
-                                    reactionType,
-                                    timestampsCount: timestamps.size
-                                });
                             }
                         }
                     }
@@ -410,16 +382,10 @@ const REACTION_EMOJIS = {
                     const isFromCurrentUser = reactionUserIdStr === currentUserIdStr && reactionUserIdStr !== '';
 
                     if (isFromCurrentUser) {
-                        console.log('⏭️ SKIPPING WebSocket reaction (userId match)', {
-                            reactionUserId: reactionUserIdStr,
-                            currentUserId: currentUserIdStr,
-                            reactionType
-                        });
                         return;
                     }
 
                     // Only show floating animation for reactions from OTHER users (real-time view)
-                    console.log('🎬 Showing floating reaction from WebSocket: other user');
                     handleReactionClick(null, reactionType, {
                         ...data.reaction,
                         isLocal: false, // Mark as not local since it came from WebSocket
@@ -476,7 +442,6 @@ const REACTION_EMOJIS = {
     // No grouping - each click creates a reaction at a unique position
     const allFloatingReactions = useMemo(() => {
         if (!floatingReactions || floatingReactions.length === 0) {
-            console.log('📭 No floating reactions to display');
             return [];
         }
         // Return all reactions, each will have its own position
@@ -519,8 +484,6 @@ const REACTION_EMOJIS = {
                     const positionX = reaction.positionX || 0;
                     const rotation = reaction.rotation || 0;
                     const baseDelay = index * 50; // Smaller delay for smoother appearance
-
-                    console.log('🎬 Rendering floating reaction on video:', reaction.type, 'at position', positionX + '%');
 
                     return (
                         <div
@@ -568,23 +531,23 @@ const REACTION_EMOJIS = {
             {/* Reactions Buttons Panel */}
             <div className={`bg-transparent flex ${horizontal ? 'flex-row items-center justify-center gap-2 flex-wrap' : 'flex-col items-center gap-3'}`}>
                 {REACTION_TYPES.map((type) => {
-                const emoji = REACTION_EMOJIS[type];
+                    const emoji = REACTION_EMOJIS[type];
 
-                return (
-                    <button
-                        key={type}
+                    return (
+                        <button
+                            key={type}
                             className={`relative bg-black/60 backdrop-blur-md rounded-full hover:bg-black/80 transition-all duration-300 group flex flex-col items-center justify-center border border-white/10 shadow-lg hover:shadow-red-500/30 hover:scale-110 transform hover:border-red-500/50 ${horizontal ? 'p-2.5 w-12 h-12' : 'p-3.5 w-16 h-16'
                                 }`}
-                        onMouseDown={(e) => handleMouseDown(type, e)}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseUp}
+                            onMouseDown={(e) => handleMouseDown(type, e)}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseUp}
                         >
                             <span className={`leading-none transform group-hover:scale-125 transition-transform duration-200 ${horizontal ? 'text-2xl' : 'text-3xl'
                                 }`}>{emoji}</span>
-                    </button>
-                );
-            })}
-        </div>
+                        </button>
+                    );
+                })}
+            </div>
         </>
     );
 };
