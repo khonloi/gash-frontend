@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 const API_BASE_URL = import.meta.env.VITE_API_URL ||
   (/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
     ? "http://localhost:5000"
-    : "https://gash-pi.vercel.app");
+    : "https://gash-be.onrender.com");
 
 // Debug once at runtime to verify which URL is used in each env
 if (typeof window !== "undefined") {
