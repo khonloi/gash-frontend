@@ -139,7 +139,8 @@ const LiveStreamDetail = () => {
                         if (publication.track) {
                             if (publication.track.kind === 'video' && videoRef.current) {
                                 publication.track.attach(videoRef.current);
-                                videoRef.current.muted = false; // Ensure not muted
+                                // Keep muted to satisfy autoplay policies across browsers
+                                videoRef.current.muted = true;
                                 videoRef.current.play().catch(() => { });
                             } else if (publication.track.kind === 'audio' && audioRef.current) {
                                 // attach audio to a dedicated audio element so we don't replace the video element's srcObject
@@ -168,12 +169,7 @@ const LiveStreamDetail = () => {
                     });
                 });
 
-                // Double-check video is not muted after a short delay
-                setTimeout(() => {
-                    if (videoRef.current) {
-                        videoRef.current.muted = false;
-                    }
-                }, 1000);
+                // Keep video muted; audio is handled via separate audio element
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
@@ -207,8 +203,8 @@ const LiveStreamDetail = () => {
                         track.attach(videoRef.current);
                         setTimeout(() => {
                             if (videoRef.current) {
-                                // Ensure video is not muted when playing
-                                videoRef.current.muted = false;
+                                // Keep muted to allow autoplay
+                                videoRef.current.muted = true;
                                 videoRef.current.play().catch(err => {
                                     if (err.name !== 'AbortError') {
                                         console.error('Video play failed:', err);
