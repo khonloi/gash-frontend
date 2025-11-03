@@ -32,6 +32,7 @@ const LiveStreamDetail = () => {
     const [_room, setRoom] = useState(null);
 
     const videoRef = useRef(null);
+    const audioRef = useRef(null); // separate audio element to avoid replacing video stream
     const containerRef = useRef(null);
     const roomRef = useRef(null);
     const isReconnectingRef = useRef(false);
@@ -136,17 +137,21 @@ const LiveStreamDetail = () => {
                                 publication.track.attach(videoRef.current);
                                 videoRef.current.muted = false; // Ensure not muted
                                 videoRef.current.play().catch(() => { });
-                            } else if (publication.track.kind === 'audio' && videoRef.current) {
-                                publication.track.attach(videoRef.current);
+                            } else if (publication.track.kind === 'audio' && audioRef.current) {
+                                // attach audio to a dedicated audio element so we don't replace the video element's srcObject
+                                publication.track.attach(audioRef.current);
 
                                 // CRITICAL: Enable audio track
                                 if (publication.track instanceof MediaStreamTrack) {
                                     publication.track.enabled = true;
                                 }
 
-                                // CRITICAL: Ensure video is not muted
-                                if (videoRef.current) {
-                                    videoRef.current.muted = false;
+                                // make sure audio element is playing
+                                if (audioRef.current) {
+                                    const playPromise = audioRef.current.play?.();
+                                    if (playPromise && typeof playPromise.catch === 'function') {
+                                        playPromise.catch(() => undefined);
+                                    }
                                 }
 
                                 console.log('✅ Audio track attached on connect', {
@@ -196,28 +201,22 @@ const LiveStreamDetail = () => {
                             }
                         }, 100);
                     } else if (track.kind === 'audio') {
-                        // Attach audio track to video element
-                        track.attach(videoRef.current);
+                        // Attach audio track to hidden audio element, not the video element
+                        if (audioRef.current) {
+                            track.attach(audioRef.current);
+                        }
 
                         // CRITICAL: Ensure audio track is enabled
                         if (track instanceof MediaStreamTrack) {
                             track.enabled = true;
                         }
 
-                        // CRITICAL: Ensure video element is not muted
-                        if (videoRef.current) {
-                            videoRef.current.muted = false;
-                            // Force unmute multiple times to ensure it sticks
-                            setTimeout(() => {
-                                if (videoRef.current) {
-                                    videoRef.current.muted = false;
-                                }
-                            }, 100);
-                            setTimeout(() => {
-                                if (videoRef.current) {
-                                    videoRef.current.muted = false;
-                                }
-                            }, 500);
+                        // Ensure audio element is playing
+                        if (audioRef.current) {
+                            const playPromise = audioRef.current.play?.();
+                            if (playPromise && typeof playPromise.catch === 'function') {
+                                playPromise.catch(() => undefined);
+                            }
                         }
                     }
                 }
@@ -232,13 +231,18 @@ const LiveStreamDetail = () => {
                         publication.setSubscribed(true);
                     }
 
-                    // If audio track is already available, attach and enable it
-                    if (publication.track && publication.track.kind === 'audio' && videoRef.current) {
-                        publication.track.attach(videoRef.current);
+                    // If audio track is already available, attach and enable it on the audio element
+                    if (publication.track && publication.track.kind === 'audio' && audioRef.current) {
+                        publication.track.attach(audioRef.current);
                         if (publication.track instanceof MediaStreamTrack) {
                             publication.track.enabled = true;
                         }
-                        videoRef.current.muted = false;
+                        if (audioRef.current) {
+                            const playPromise = audioRef.current.play?.();
+                            if (playPromise && typeof playPromise.catch === 'function') {
+                                playPromise.catch(() => undefined);
+                            }
+                        }
                     }
                 });
             });
@@ -247,8 +251,8 @@ const LiveStreamDetail = () => {
                 if (videoRef.current) {
                     if (track.kind === 'video') {
                         track.detach(videoRef.current);
-                    } else if (track.kind === 'audio') {
-                        track.detach(videoRef.current);
+                    } else if (track.kind === 'audio' && audioRef.current) {
+                        track.detach(audioRef.current);
                     }
                 }
             });
@@ -584,6 +588,8 @@ const LiveStreamDetail = () => {
                             e.stopPropagation();
                         }}
                     />
+                    {/* Hidden audio element to carry remote audio; prevents replacing the video element's srcObject */}
+                    <audio ref={audioRef} autoPlay playsInline style={{ display: 'none' }} />
 
                     {/* Back Button */}
                     <button
