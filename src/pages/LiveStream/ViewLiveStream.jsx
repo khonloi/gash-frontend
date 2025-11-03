@@ -183,6 +183,17 @@ const LiveStreamDetail = () => {
                 // Keep video muted; audio is handled via separate audio element
             });
 
+            // Handle transient reconnect
+            newRoom.on(RoomEvent.Reconnecting, () => {
+                console.log('↺ Reconnecting to LiveKit...');
+                setConnectionState('connecting');
+            });
+
+            newRoom.on(RoomEvent.Reconnected, () => {
+                console.log('✅ Reconnected to LiveKit');
+                setConnectionState('connected');
+            });
+
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
                 console.log('❌ Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
@@ -679,9 +690,9 @@ const LiveStreamDetail = () => {
                                     <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
                                 </div>
                                 <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                                    Livestream has ended
+                                    {connectionState === 'connecting' ? 'Reconnecting…' : 'Connecting…'}
                                 </h3>
-                                <p className="text-gray-300 mb-6">Thank you for watching!</p>
+                                <p className="text-gray-300 mb-6">Please wait a moment</p>
                                 <button
                                     type="button"
                                     onClick={goBack}
