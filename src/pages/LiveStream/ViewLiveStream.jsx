@@ -38,6 +38,8 @@ const LiveStreamDetail = () => {
     const isReconnectingRef = useRef(false);
     const streamEndedRef = useRef(false);
     const socketRef = useRef(null);
+    const lastConnectionRef = useRef({ roomName: null, token: null });
+    const reconnectAttemptsRef = useRef(0);
 
     // Helper: Format date/time to dd/mm/yyyy HH:mm
     const formatDateTime = (dateString) => {
@@ -86,6 +88,8 @@ const LiveStreamDetail = () => {
             isReconnectingRef.current = true;
             console.log('🔗 Connecting to LiveKit room:', roomName);
             setConnectionState('connecting');
+            // Remember last successful params for reconnect
+            lastConnectionRef.current = { roomName, token: viewerToken };
 
             const existingRoom = roomRef.current;
             if (existingRoom) {
@@ -182,6 +186,18 @@ const LiveStreamDetail = () => {
                     streamEndedRef.current = true;
                     setStreamEnded(true);
                     setSelectedStream(prev => prev ? { ...prev, status: 'ended' } : null);
+                } else if (!streamEndedRef.current) {
+                    // Attempt to auto reconnect with backoff
+                    const attempt = (reconnectAttemptsRef.current || 0) + 1;
+                    reconnectAttemptsRef.current = attempt;
+                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+                    setTimeout(() => {
+                        if (streamEndedRef.current) return;
+                        const { roomName: lastRoom, token } = lastConnectionRef.current || {};
+                        if (!lastRoom || !token) return;
+                        console.log(`↻ Reconnecting to LiveKit (attempt ${attempt})...`);
+                        connectToLiveKit(lastRoom, token).catch(() => { });
+                    }, delay);
                 }
             });
 
@@ -299,6 +315,7 @@ const LiveStreamDetail = () => {
             roomRef.current = newRoom;
             isReconnectingRef.current = false;
             console.error = originalConsoleError;
+            reconnectAttemptsRef.current = 0;
             return newRoom;
         } catch (error) {
             if (typeof originalConsoleError !== 'undefined') {
