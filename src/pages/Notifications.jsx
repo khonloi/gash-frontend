@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosClient from "../common/axiosClient";
 
 export default function Notifications() {
   const [tab, setTab] = useState("list");
@@ -12,7 +12,7 @@ export default function Notifications() {
     const fetchNotifications = async () => {
       try {
         const accountId = localStorage.getItem("accountId");
-        const res = await axios.get(`http://localhost:5000/notifications/${accountId}`);
+        const res = await axiosClient.get(`/notifications/${accountId}`);
         setNotifications(res.data.notifications || []);
       } catch (err) {
         console.error("Error loading notifications:", err);
@@ -27,7 +27,7 @@ export default function Notifications() {
     const fetchPrefs = async () => {
       try {
         const accountId = localStorage.getItem("accountId");
-        const res = await axios.get(`http://localhost:5000/notifications/preferences/${accountId}`);
+        const res = await axiosClient.get(`/notifications/preferences/${accountId}`);
         setPrefs(res.data.preferences || { email: true, web: true });
       } catch (err) {
         console.error("Error loading preferences:", err);
@@ -39,7 +39,7 @@ export default function Notifications() {
   const handleSavePrefs = async () => {
     try {
       const accountId = localStorage.getItem("accountId");
-      await axios.put(`http://localhost:5000/notifications/preferences/${accountId}`, prefs);
+      await axiosClient.put(`/notifications/preferences/${accountId}`, prefs);
       alert("Cài đặt thông báo đã được lưu!");
     } catch (err) {
       console.error("Error saving preferences:", err);
@@ -62,11 +62,10 @@ export default function Notifications() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`pb-2 font-semibold transition-colors border-b-2 ${
-                  tab === t.key
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-blue-500"
-                }`}
+                className={`pb-2 font-semibold transition-colors border-b-2 ${tab === t.key
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-blue-500"
+                  }`}
               >
                 {t.label}
               </button>
@@ -90,9 +89,8 @@ export default function Notifications() {
                   {notifications.map((n) => (
                     <li
                       key={n._id}
-                      className={`p-4 border rounded-xl transition shadow-sm hover:shadow-md ${
-                        n.isRead ? "bg-gray-50" : "bg-blue-50 border-blue-200"
-                      }`}
+                      className={`p-4 border rounded-xl transition shadow-sm hover:shadow-md ${n.isRead ? "bg-gray-50" : "bg-blue-50 border-blue-200"
+                        }`}
                     >
                       <div className="flex justify-between items-start">
                         <div>
