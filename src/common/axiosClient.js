@@ -1,6 +1,5 @@
 import axios from "axios";
 import { io } from "socket.io-client";
-// Prefer env; fallback: localhost in dev, https://gash-pi.vercel.app in production
 const API_BASE_URL = import.meta.env.VITE_API_URL ||
   (/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
     ? "http://localhost:5000"
