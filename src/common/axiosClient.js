@@ -1,6 +1,9 @@
 import axios from "axios";
 import { io } from "socket.io-client";
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://localhost:5000" : "https://gash-be.onrender.com");
 
 // Export SOCKET_URL for use in other files
 export const SOCKET_URL = API_BASE_URL;

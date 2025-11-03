@@ -3,6 +3,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
+import axiosClient from "../common/axiosClient";
 
 export default function NotificationsDropdown({ user }) {
   const [notifications, setNotifications] = useState([]);
@@ -15,10 +16,8 @@ export default function NotificationsDropdown({ user }) {
     const fetchNotifications = async () => {
       if (!user?._id) return;
       try {
-        const res = await fetch(`http://localhost:5000/notifications/user/${user._id}`);
-        if (!res.ok) throw new Error("Failed to fetch notifications");
-        const data = await res.json();
-        setNotifications(data);
+        const res = await axiosClient.get(`/notifications/user/${user._id}`);
+        setNotifications(res.data || []);
       } catch (err) {
         // Error handling without console log
       }
@@ -46,7 +45,7 @@ export default function NotificationsDropdown({ user }) {
   // Mark as read
   const markAsRead = async (id) => {
     try {
-      await fetch(`http://localhost:5000/notifications/mark-read/${id}`, { method: "PUT" });
+      await axiosClient.put(`/notifications/mark-read/${id}`);
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
@@ -59,7 +58,7 @@ export default function NotificationsDropdown({ user }) {
   // Delete one notification
   const deleteNotification = async (id) => {
     try {
-      await fetch(`http://localhost:5000/notifications/admin/${id}`, { method: "DELETE" });
+      await axiosClient.delete(`/notifications/admin/${id}`);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
       window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
     } catch (err) {
@@ -70,7 +69,7 @@ export default function NotificationsDropdown({ user }) {
   // Clear all notifications
   const clearAll = async () => {
     try {
-      await fetch(`http://localhost:5000/notifications/clear/${user._id}`, { method: "DELETE" });
+      await axiosClient.delete(`/notifications/clear/${user._id}`);
       setNotifications([]);
       window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
     } catch (err) {
@@ -114,9 +113,8 @@ export default function NotificationsDropdown({ user }) {
                 <li
                   key={n._id}
                   onClick={() => markAsRead(n._id)}
-                  className={`group flex items-start gap-3 px-5 py-4 hover:bg-[#fff6eb] transition-all cursor-pointer ${
-                    !n.isRead ? "bg-[#fffaf0]" : "bg-white"
-                  }`}
+                  className={`group flex items-start gap-3 px-5 py-4 hover:bg-[#fff6eb] transition-all cursor-pointer ${!n.isRead ? "bg-[#fffaf0]" : "bg-white"
+                    }`}
                 >
                   {/* Icon */}
                   <div className="flex-shrink-0 w-10 h-10 bg-[#ffb300]/10 text-[#ffb300] rounded-full flex items-center justify-center text-lg">
