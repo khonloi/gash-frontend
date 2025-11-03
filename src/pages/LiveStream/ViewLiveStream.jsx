@@ -14,7 +14,6 @@ import {
 } from '@mui/icons-material';
 import { LIVEKIT_CONFIG } from '../../config/livekit';
 import LiveStreamComments from './LiveStreamComments';
-import LiveStreamReactions from './LiveStreamReactions';
 import LiveStreamProducts from './LiveStreamProducts';
 
 const LiveStreamDetail = () => {
@@ -181,7 +180,7 @@ const LiveStreamDetail = () => {
                 }
             });
 
-            newRoom.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+            newRoom.on(RoomEvent.TrackSubscribed, (track) => {
                 if (videoRef.current) {
                     if (track.kind === 'video') {
                         track.attach(videoRef.current);
@@ -526,25 +525,29 @@ const LiveStreamDetail = () => {
                         ? 'ml-80'
                         : ''
                         } ${showComments && showProducts
-                            ? 'mr-[40rem]'
+                            ? 'mr-[640px]'
                             : showComments
-                                ? 'mr-80'
+                                ? 'mr-[352px]'
                                 : showProducts
-                                    ? 'mr-80'
+                                    ? 'mr-[288px]'
                                     : ''
                         }`}
                     style={{
                         width: showInfo && showComments && showProducts
                             ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
-                            : showInfo && (showComments || showProducts)
-                                ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
-                                : showInfo
-                                    ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
-                                    : showComments && showProducts
-                                        ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
-                                        : showComments || showProducts
-                                            ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
-                                            : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
+                            : showInfo && showComments
+                                ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
+                                : showInfo && showProducts
+                                    ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
+                                    : showInfo
+                                        ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
+                                        : showComments && showProducts
+                                            ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
+                                            : showComments
+                                                ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
+                                                : showProducts
+                                                    ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
+                                                    : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
                         aspectRatio: '9/16',
                         maxWidth: '90vw',
                         maxHeight: 'calc(100vh - 2rem)'
@@ -799,7 +802,7 @@ const LiveStreamDetail = () => {
 
                 {/* Products Panel - Between Video and Comments */}
                 {showProducts && (selectedStream?._id || id) && (
-                    <div className={`fixed top-0 h-full w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-80' : 'right-0'
+                    <div className={`fixed top-0 h-full w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-[352px]' : 'right-0'
                         } border-l border-gray-800/50`}>
                         <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                             <div className="flex items-center gap-2">
