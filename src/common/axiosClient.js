@@ -1,9 +1,10 @@
 import axios from "axios";
 import { io } from "socket.io-client";
 
+// Luôn dùng production BE, hoặc override bằng VITE_API_URL nếu có
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:5000" : "https://gash-pi.vercel.app");
+  (import.meta.env.DEV ? "http://localhost:5000" : "https://gash-be.onrender.com");
 
 // Export SOCKET_URL for use in other files
 export const SOCKET_URL = API_BASE_URL;
