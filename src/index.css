@@ -1,10 +1,196 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: "Font"; /* Choose a name for your font family */
+  font-family: "Font";
+  /* Choose a name for your font family */
   src: url("./assets/fonts/Lexend-VariableFont_wght.ttf") format("truetype"),
 }
 
 body {
   font-family: "Font", sans-serif;
+}
+
+/* Scrollbar styling for livestream comments - Tailwind doesn't support scrollbar pseudo-elements */
+.scrollbar-livestream::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-livestream::-webkit-scrollbar-track {
+  background: rgba(17, 24, 39, 0.5);
+  border-radius: 10px;
+}
+
+.scrollbar-livestream::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.5);
+  border-radius: 10px;
+}
+
+.scrollbar-livestream::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.8);
+}
+
+.scrollbar-livestream {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 68, 68, 0.5) rgba(17, 24, 39, 0.5);
+}
+
+/* Optimized TikTok-style floating reaction animations - GPU accelerated */
+@keyframes floatUpCenter {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(var(--rotation, 0deg)) scale(0.6);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+    transform: translate3d(0, -30px, 0) rotate(var(--rotation, 0deg)) scale(0.9);
+  }
+
+  50% {
+    transform: translate3d(0, -150px, 0) rotate(var(--rotation, 0deg)) scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(0, -350px, 0) rotate(calc(var(--rotation, 0deg) * 0.5)) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes floatUpLeft {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translate3d(-60px, -150px, 0) rotate(var(--rotation, 0deg)) scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(var(--end-x, -80px), -300px, 0) rotate(0deg) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes floatUpRight {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translate3d(60px, -150px, 0) rotate(var(--rotation, 0deg)) scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(var(--end-x, 80px), -300px, 0) rotate(0deg) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Base floating reaction styles - optimized for performance */
+.floating-reaction {
+  position: absolute;
+  pointer-events: none;
+  z-index: 60;
+  font-size: 2rem;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform: translateZ(0);
+  animation: floatUpCenter 2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* Different path animations */
+.floating-reaction.path-center {
+  animation: floatUpCenter 2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.floating-reaction.path-left {
+  animation: floatUpLeft 2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.floating-reaction.path-right {
+  animation: floatUpRight 2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* Animation for reactions flowing down from top right */
+@keyframes floatDown {
+  0% {
+    transform: translate3d(0, -100px, 0) scale(0.3);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translate3d(0, -40px, 0) scale(1.1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate3d(0, 20px, 0) scale(1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: translate3d(0, 100px, 0) scale(0.9);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate3d(0, 180px, 0) scale(0.7);
+    opacity: 0;
+  }
+}
+
+.animate-float-down {
+  animation: floatDown 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-float-up-center {
+  animation: floatUpCenter 2.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Simple bounce animation for reactions below video */
+@keyframes bounceSimple {
+  0% {
+    transform: scale(0.5) translateY(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2) translateY(-10px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 0.8;
+  }
+}
+
+.animate-bounce-simple {
+  animation: bounceSimple 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  will-change: transform, opacity;
+}
+
+/* Fade in animation for new comments */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
 }

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ToastProvider } from "./components/Toast";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
@@ -30,7 +30,8 @@ import VNPayReturn from "./pages/VNPayReturn";
 import Bill from "./pages/customer/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
 import Notifications from "./pages/Notifications";
-import LiveStream from "./pages/ViewLiveStream";
+import ListLiveStream from "./pages/LiveStream/ListLiveStream";
+import ViewLiveStream from "./pages/LiveStream/ViewLiveStream";
 
 // ==== Components ====
 import UserChat from "./components/UserChat";
@@ -38,9 +39,15 @@ import UserChat from "./components/UserChat";
 // Component: chỉ hiển thị chat nếu user đã đăng nhập
 function ChatIfLoggedIn() {
   const auth = useContext(AuthContext);
+  const location = useLocation();
 
   // Nếu context chưa load hoặc chưa login => không render chat
   if (!auth || !auth.user || !auth.user._id) {
+    return null;
+  }
+
+  // Ẩn chat khi ở trang LiveStream detail
+  if (location.pathname.startsWith("/live/")) {
     return null;
   }
 
@@ -84,7 +91,9 @@ const App = () => {
                 <Route path="/vnpay-return" element={<VNPayReturn />} />
                 <Route path="/vouchers" element={<UserVoucherPage />} />
                 <Route path="/notifications" element={<Notifications />} />
-                <Route path="/live" element={<LiveStream />} />
+                <Route path="/live" element={<ListLiveStream />} />
+                <Route path="/live/:id" element={<ViewLiveStream />} />
+                {/* <Route path="/live" element={<LiveStream />} /> */}
               </Routes>
               <ChatIfLoggedIn />
             </Layout>
