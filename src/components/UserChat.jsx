@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import EmojiPicker from "emoji-picker-react";
-import { SOCKET_URL } from "../common/axiosClient";
-import axiosClient from "../common/axiosClient";
+
+const SOCKET_URL = "http://localhost:5000";
 
 export default function UserChat({ userId }) {
   const [conversation, setConversation] = useState(null);
@@ -93,12 +93,11 @@ export default function UserChat({ userId }) {
     formData.append("image", file);
 
     try {
-      const res = await axiosClient.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData,
       });
-      const data = res.data;
+      const data = await res.json();
 
       if (data?.success && data.url) {
         socket.current.emit("send_message", {
@@ -129,10 +128,11 @@ export default function UserChat({ userId }) {
     <>
       {/* Toggle button */}
       <button
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center ${isOpen
-          ? "bg-red-500 hover:bg-red-600 text-white"
-          : "bg-yellow-500 hover:bg-yellow-600 text-white hover:scale-110"
-          }`}
+        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center ${
+          isOpen
+            ? "bg-red-500 hover:bg-red-600 text-white"
+            : "bg-yellow-500 hover:bg-yellow-600 text-white hover:scale-110"
+        }`}
         onClick={toggleChat}
       >
         {isOpen ? (
@@ -187,10 +187,11 @@ export default function UserChat({ userId }) {
               return (
                 <div key={msg._id || i} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-xs px-4 py-2 rounded-2xl ${isMe
-                      ? "bg-yellow-500 text-white rounded-br-md"
-                      : "bg-white text-gray-800 rounded-bl-md border border-gray-200"
-                      }`}
+                    className={`max-w-xs px-4 py-2 rounded-2xl ${
+                      isMe
+                        ? "bg-yellow-500 text-white rounded-br-md"
+                        : "bg-white text-gray-800 rounded-bl-md border border-gray-200"
+                    }`}
                   >
                     {msg.type === "image" ? (
                       <img
@@ -202,8 +203,9 @@ export default function UserChat({ userId }) {
                       <p className="text-sm">{msg.messageText}</p>
                     )}
                     <p
-                      className={`text-xs mt-1 ${isMe ? "text-yellow-100" : "text-gray-400"
-                        }`}
+                      className={`text-xs mt-1 ${
+                        isMe ? "text-yellow-100" : "text-gray-400"
+                      }`}
                     >
                       {new Date(msg.createdAt || Date.now()).toLocaleTimeString("en-US", {
                         hour: "2-digit",
