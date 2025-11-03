@@ -94,7 +94,7 @@ export default function UserChat({ userId }) {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/upload", {
+      const res = await fetch(`${SOCKET_URL}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -130,8 +130,8 @@ export default function UserChat({ userId }) {
       {/* Toggle button */}
       <button
         className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center ${isOpen
-            ? "bg-red-500 hover:bg-red-600 text-white"
-            : "bg-yellow-500 hover:bg-yellow-600 text-white hover:scale-110"
+          ? "bg-red-500 hover:bg-red-600 text-white"
+          : "bg-yellow-500 hover:bg-yellow-600 text-white hover:scale-110"
           }`}
         onClick={toggleChat}
       >
@@ -188,8 +188,8 @@ export default function UserChat({ userId }) {
                 <div key={msg._id || i} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-xs px-4 py-2 rounded-2xl ${isMe
-                        ? "bg-yellow-500 text-white rounded-br-md"
-                        : "bg-white text-gray-800 rounded-bl-md border border-gray-200"
+                      ? "bg-yellow-500 text-white rounded-br-md"
+                      : "bg-white text-gray-800 rounded-bl-md border border-gray-200"
                       }`}
                   >
                     {msg.type === "image" ? (
