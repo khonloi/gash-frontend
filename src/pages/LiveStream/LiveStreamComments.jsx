@@ -123,11 +123,6 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                         className="w-9 h-9 rounded-lg object-cover border-2 border-white/10 shadow-lg"
                         onError={(e) => { e.target.src = '/default-avatar.png'; }}
                     />
-                    {comment.isPinned && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-gray-900 flex items-center justify-center shadow-lg">
-                            <PushPin className="w-2.5 h-2.5 text-white" />
-                        </div>
-                    )}
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
@@ -188,8 +183,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState(null);
     const commentsEndRef = useRef(null);
+    const commentsContainerRef = useRef(null);
     const refreshIntervalRef = useRef(null);
     const socketRef = useRef(null);
+    const previousCommentsLengthRef = useRef(0);
 
     const fetchComments = useCallback(async () => {
         if (!liveId || !user) return;
@@ -293,22 +290,35 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 if (newComment.sender && !newComment.senderId) {
                     newComment.senderId = newComment.sender;
                 }
+                // Ensure createdAt exists
+                if (!newComment.createdAt) {
+                    newComment.createdAt = new Date().toISOString();
+                }
+
                 setComments(prev => {
                     // Check if comment already exists (prevent duplicates)
                     const exists = prev.some(c => c._id === newComment._id);
-                    if (exists) return prev;
+                    if (exists) {
+                        console.log('⚠️ Duplicate comment ignored:', newComment._id);
+                        return prev;
+                    }
                     // Add new comment and maintain sort (pinned first, then oldest to newest)
                     const updated = [...prev, newComment].sort((a, b) => {
                         if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
                         return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                     });
-                    console.log('📝 Real-time comment added via WebSocket');
+                    console.log('📝 Real-time comment added via WebSocket:', newComment.commentText?.substring(0, 50));
                     return updated;
                 });
+
                 // Auto scroll to bottom when new comment arrives
                 setTimeout(() => {
-                    if (commentsEndRef.current) {
-                        commentsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                    if (commentsContainerRef.current) {
+                        const container = commentsContainerRef.current;
+                        container.scrollTo({
+                            top: container.scrollHeight,
+                            behavior: 'smooth'
+                        });
                     }
                 }, 100);
             }
@@ -393,10 +403,34 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
         }
     }, [isVisible, liveId, fetchComments]);
 
+    // Auto-scroll when new comments arrive (only when not pinned)
+    useEffect(() => {
+        const currentLength = comments.filter(c => !c.isPinned).length;
+        const previousLength = previousCommentsLengthRef.current;
+
+        // Only auto-scroll if:
+        // 1. Comments length increased (new comment added)
+        // 2. Comments container is visible
+        // 3. Not initial load (previousLength > 0)
+        if (previousLength > 0 && currentLength > previousLength && isVisible && commentsContainerRef.current) {
+            setTimeout(() => {
+                const container = commentsContainerRef.current;
+                if (container) {
+                    container.scrollTo({
+                        top: container.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 150);
+        }
+
+        previousCommentsLengthRef.current = currentLength;
+    }, [comments.length, isVisible]);
+
     if (!isVisible) return null;
 
     return (
-        <div className="fixed right-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl border-l border-gray-800/50 flex flex-col z-[45] shadow-2xl pointer-events-auto">
+        <div className="fixed right-0 top-0 h-full w-[352px] bg-black/95 backdrop-blur-xl border-l border-gray-800/50 flex flex-col z-[45] shadow-2xl pointer-events-auto">
             <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
@@ -426,15 +460,20 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
             {/* Pinned Comments Section - Sticky below reactions */}
             {comments.some(c => c.isPinned) && (
-                <div className="bg-gradient-to-br from-yellow-900/40 via-yellow-800/30 to-yellow-900/40 border-b border-yellow-500/30 p-2 backdrop-blur-sm max-h-32 overflow-y-auto scrollbar-livestream">
-                    <div className="flex items-center gap-1.5 mb-1.5 px-1">
-                        <PushPin className="w-2.5 h-2.5 text-yellow-400" />
-                        <span className="text-yellow-400 text-[9px] font-bold uppercase tracking-wide">📌 Pinned</span>
+                <div className="bg-yellow-900/30 border-b border-yellow-500/40">
+                    {/* Pinned Header */}
+                    <div className="flex items-center gap-2 px-3 py-2 border-b border-yellow-500/20">
+                        <PushPin className="w-4 h-4 text-yellow-400" />
+                        <span className="text-yellow-300 text-xs font-semibold">
+                            Pinned
+                        </span>
                     </div>
-                    <div className="space-y-1.5">
+                    
+                    {/* Pinned Comment Content */}
+                    <div className="p-3 max-h-40 overflow-y-auto scrollbar-livestream">
                         {comments
                             .filter(c => c.isPinned)
-                            .slice(0, 1) // Show only the first (and should be only) pinned comment
+                            .slice(0, 1)
                             .map((comment) => (
                                 <CommentItem
                                     key={comment._id}
@@ -451,7 +490,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             )}
 
             {/* Regular Comments Section - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-livestream">
+            <div
+                className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-livestream"
+                ref={commentsContainerRef}
+            >
                 {error && (
                     <div className="bg-red-900/30 backdrop-blur-sm border border-red-500/50 text-red-300 p-3 rounded-lg text-xs shadow-lg">
                         <div className="flex items-center gap-2">
@@ -473,18 +515,25 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                     <>
                         {comments
                             .filter(c => !c.isPinned)
-                            .map((comment) => (
-                                <CommentItem
-                                    key={comment._id}
-                                    comment={comment}
-                                    currentUserId={user?._id}
-                                    hostId={hostId}
-                                    onHideComment={handleHideComment}
-                                    onPinComment={undefined}
-                                    onUnpinComment={undefined}
-                                />
-                            ))}
-
+                            .map((comment, index, filteredArray) => {
+                                // Mark last 3 comments as "new" for visual feedback
+                                const isNewComment = index >= filteredArray.length - 3;
+                                return (
+                                    <div
+                                        key={comment._id}
+                                        className={isNewComment ? 'animate-fade-in' : ''}
+                                    >
+                                        <CommentItem
+                                            comment={comment}
+                                            currentUserId={user?._id}
+                                            hostId={hostId}
+                                            onHideComment={handleHideComment}
+                                            onPinComment={undefined}
+                                            onUnpinComment={undefined}
+                                        />
+                                    </div>
+                                );
+                            })}
                         <div ref={commentsEndRef} />
                     </>
                 )}

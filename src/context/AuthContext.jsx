@@ -86,9 +86,7 @@ export const AuthProvider = ({ children }) => {
 
   const googleLogin = async (token) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/google-login', {
-        token,
-      });
+      const response = await axiosClient.post('/auth/google-login', { token });
 
       const { token: jwtToken, account } = response.data;
       const loginTime = Date.now().toString();

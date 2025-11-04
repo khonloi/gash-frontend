@@ -34,7 +34,24 @@ const LiveStreamProducts = ({ liveId }) => {
         return mainImage?.imageUrl || images[0]?.imageUrl || null;
     };
 
-    // Helper: Sort products - pinned first, then by added date
+    // Helper: Get minimum price from product variants
+    const getMinPrice = (product) => {
+        if (!product) return 0;
+        const variants = product.productVariantIds || product.variants || [];
+        if (variants.length === 0) return 0;
+        const prices = variants
+            .filter(v => v && v.variantStatus !== 'discontinued' && v.variantPrice > 0)
+            .map(v => v.variantPrice);
+        return prices.length > 0 ? Math.min(...prices) : 0;
+    };
+
+    // Helper: Format price to VND currency
+    const formatPrice = (price) => {
+        if (!price || price === 0) return '0 ₫';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    };
+
+    // Helper: Sort products - pinned first, then by added date (newest first)
     const sortProducts = (products) => {
         return [...products].sort((a, b) => {
             const aPinned = Boolean(a.isPinned);
@@ -43,8 +60,9 @@ const LiveStreamProducts = ({ liveId }) => {
             if (aPinned !== bPinned) {
                 return Number(bPinned) - Number(aPinned); // true (1) - false (0) = 1 → b before a
             }
-            // If both have same pinned status, sort by added date (oldest first)
-            return new Date(a.addedAt || 0) - new Date(b.addedAt || 0);
+            // If both have same pinned status, sort by added date (newest first)
+            // So newly added products appear at the top
+            return new Date(b.addedAt || 0) - new Date(a.addedAt || 0);
         });
     };
 
@@ -181,13 +199,15 @@ const LiveStreamProducts = ({ liveId }) => {
 
     return (
         <div className="space-y-2">
-            {products.map((lp) => {
+            {products.map((lp, index) => {
                 // Handle both API format (lp.productId as object) and WebSocket format (lp.product as object)
                 const product = lp.product || lp.productId || {};
                 const productName = getProductName(product);
                 // productId can be string ID (WebSocket) or object with _id (API)
                 const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id || lp.productId || '');
                 const productImageUrl = getMainImageUrl(product);
+                const minPrice = getMinPrice(product);
+                const orderNumber = index + 1;
 
                 return (
                     <div
@@ -198,6 +218,14 @@ const LiveStreamProducts = ({ liveId }) => {
                             : 'bg-gradient-to-r from-gray-800/40 via-gray-700/40 to-gray-800/40 border-gray-700/50 hover:border-gray-600/60 hover:bg-gray-800/60'
                             }`}
                     >
+                        {/* Order Number Badge */}
+                        <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] border backdrop-blur-sm shadow-md transition-all duration-300 ${lp.isPinned
+                            ? 'bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-yellow-400/80 shadow-yellow-500/50'
+                            : 'bg-gradient-to-br from-red-500 to-pink-600 text-white border-red-400/80 shadow-red-500/50'
+                            }`}>
+                            {orderNumber}
+                        </div>
+
                         {/* Product Image */}
                         <div className="relative flex-shrink-0">
                             {productImageUrl ? (
@@ -229,6 +257,9 @@ const LiveStreamProducts = ({ liveId }) => {
                         {/* Product Info */}
                         <div className="min-w-0 flex-1">
                             <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight">{productName}</h4>
+                            {minPrice > 0 && (
+                                <p className="text-xs font-bold text-red-400 mt-0.5">{formatPrice(minPrice)}</p>
+                            )}
                             {lp.isPinned && (
                                 <p className="text-[9px] text-yellow-400 font-bold mt-0.5">PINNED</p>
                             )}

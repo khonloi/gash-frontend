@@ -529,20 +529,20 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
             {floatingReactionsPortal}
 
             {/* Reactions Buttons Panel */}
-            <div className={`bg-transparent flex ${horizontal ? 'flex-row items-center justify-center gap-1.5 flex-wrap' : 'flex-col items-center gap-3'}`}>
+            <div className={`bg-transparent flex ${horizontal ? 'flex-row items-center justify-center gap-2' : 'flex-col items-center gap-3'}`}>
                 {REACTION_TYPES.map((type) => {
                     const emoji = REACTION_EMOJIS[type];
 
                     return (
                         <button
                             key={type}
-                            className={`relative bg-black/60 backdrop-blur-md rounded-full hover:bg-black/80 transition-all duration-300 group flex flex-col items-center justify-center border border-white/10 shadow-lg hover:shadow-red-500/30 hover:scale-110 transform hover:border-red-500/50 ${horizontal ? 'p-1 w-8 h-8' : 'p-3.5 w-16 h-16'
+                            className={`relative bg-black/60 backdrop-blur-md rounded-full hover:bg-black/80 transition-all duration-300 group flex flex-col items-center justify-center border border-white/10 shadow-lg hover:shadow-red-500/30 hover:scale-110 transform hover:border-red-500/50 ${horizontal ? 'p-1.5 w-12 h-12' : 'p-3.5 w-16 h-16'
                                 }`}
                             onMouseDown={(e) => handleMouseDown(type, e)}
                             onMouseUp={handleMouseUp}
                             onMouseLeave={handleMouseUp}
                         >
-                            <span className={`leading-none transform group-hover:scale-125 transition-transform duration-200 ${horizontal ? 'text-base' : 'text-3xl'
+                            <span className={`leading-none transform group-hover:scale-125 transition-transform duration-200 ${horizontal ? 'text-2xl' : 'text-3xl'
                                 }`}>{emoji}</span>
                         </button>
                     );
