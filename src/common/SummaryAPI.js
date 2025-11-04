@@ -325,8 +325,8 @@ const Api = {
     getLiveNow: (token) => axiosClient.get("/livestream/live-now", {
       headers: { Authorization: `Bearer ${token}` },
     }),
-    // Join livestream (view)
-    view: (data, token) => axiosClient.post("/livestream/join", data, {
+    // Join livestream
+    join: (data, token) => axiosClient.post("/livestream/join", data, {
       headers: { Authorization: `Bearer ${token}` },
     }),
     // Leave livestream
@@ -356,7 +356,7 @@ const Api = {
     // Hide comment
     hideComment: (commentId, token) => axiosClient.delete(`/livestream-comments/${commentId}/hide-comment`, {
       headers: { Authorization: `Bearer ${token}` },
-    }),
+    })
   },
 };
 
