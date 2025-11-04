@@ -30,6 +30,7 @@ const LiveStreamDetail = () => {
     const [connectionState, setConnectionState] = useState('disconnected');
     const [streamEnded, setStreamEnded] = useState(false);
     const [_room, setRoom] = useState(null);
+    const [remoteParticipants, setRemoteParticipants] = useState([]);
 
     const videoRef = useRef(null);
     const containerRef = useRef(null);
@@ -37,6 +38,7 @@ const LiveStreamDetail = () => {
     const isReconnectingRef = useRef(false);
     const streamEndedRef = useRef(false);
     const socketRef = useRef(null);
+    const hasJoinedRef = useRef(false);
 
     // Helper: Format date/time to dd/mm/yyyy HH:mm
     const formatDateTime = (dateString) => {
@@ -117,6 +119,10 @@ const LiveStreamDetail = () => {
                 console.log('✅ Connected to LiveKit room');
                 setConnectionState('connected');
 
+                // Initialize remote participants list (exclude local participant)
+                const initialParticipants = Array.from(newRoom.remoteParticipants.values());
+                setRemoteParticipants(initialParticipants);
+
                 // CRITICAL: Ensure video element is not muted (audio always enabled)
                 if (videoRef.current) {
                     videoRef.current.muted = false;
@@ -171,6 +177,23 @@ const LiveStreamDetail = () => {
                 console.log('❌ Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
+                
+                // Clear remote participants
+                setRemoteParticipants([]);
+
+                // Leave livestream via API
+                if (hasJoinedRef.current && selectedStream?._id) {
+                    try {
+                        const token = localStorage.getItem('token');
+                        if (token) {
+                            await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
+                            hasJoinedRef.current = false;
+                            console.log('✅ Left livestream via API');
+                        }
+                    } catch (error) {
+                        console.error('Error leaving livestream:', error);
+                    }
+                }
 
                 if (reason === 'SERVER_SHUTDOWN' || reason === 'ROOM_DELETED') {
                     showToast('Livestream has ended', 'info');
@@ -226,6 +249,16 @@ const LiveStreamDetail = () => {
             // Handle participant connected - subscribe to their tracks
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
                 console.log('👤 Participant connected:', participant.identity);
+                
+                // Add participant to remote participants list
+                setRemoteParticipants(prev => {
+                    // Check if participant already exists (avoid duplicates)
+                    if (prev.find(p => p.identity === participant.identity)) {
+                        return prev;
+                    }
+                    return [...prev, participant];
+                });
+                
                 // Subscribe to all their tracks
                 participant.trackPublications.forEach((publication) => {
                     if (!publication.isSubscribed) {
@@ -251,6 +284,12 @@ const LiveStreamDetail = () => {
                         track.detach(videoRef.current);
                     }
                 }
+            });
+
+            // Handle participant disconnected - remove from list
+            newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
+                console.log('👤 Participant disconnected:', participant.identity);
+                setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
             });
 
             console.error = (...args) => {
@@ -328,7 +367,7 @@ const LiveStreamDetail = () => {
                     return;
                 }
 
-                const response = await Api.livestream.view({ livestreamId: id }, token);
+                const response = await Api.livestream.join({ livestreamId: id }, token);
 
                 if (response.data?.success) {
                     const streamData = response.data.data;
@@ -341,8 +380,9 @@ const LiveStreamDetail = () => {
                     }
 
                     setSelectedStream(streamData);
+                    hasJoinedRef.current = true; // Mark as joined
 
-                    // Auto-join livestream
+                    // Connect to LiveKit
                     await connectToLiveKit(streamData.roomName, streamData.viewerToken);
                     showToast('Joined livestream!', 'success');
                 } else {
@@ -392,11 +432,13 @@ const LiveStreamDetail = () => {
 
     const leaveLivestream = async () => {
         try {
-            if (selectedStream?._id) {
+            // Leave via API
+            if (hasJoinedRef.current && selectedStream?._id) {
                 const token = localStorage.getItem('token');
                 if (token) {
                     try {
                         await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
+                        hasJoinedRef.current = false;
                     } catch (apiError) {
                         console.error('Error calling leave API:', apiError);
                     }
@@ -431,6 +473,15 @@ const LiveStreamDetail = () => {
         const socket = socketRef.current;
 
         return () => {
+            // Leave livestream if still joined
+            if (hasJoinedRef.current && selectedStream?._id) {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    Api.livestream.leave({ livestreamId: selectedStream._id }, token).catch(console.error);
+                    hasJoinedRef.current = false;
+                }
+            }
+            
             if (room) {
                 room.disconnect().catch(console.error);
             }
@@ -438,7 +489,7 @@ const LiveStreamDetail = () => {
                 socket.disconnect();
             }
         };
-    }, []);
+    }, [selectedStream?._id]);
 
     if (isLoading) {
         return (
@@ -620,7 +671,7 @@ const LiveStreamDetail = () => {
                         {selectedStream && (
                             <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
                                 <Videocam className="w-4 h-4 text-blue-400" />
-                                <span className="text-white font-semibold">{selectedStream.currentViewers !== undefined ? selectedStream.currentViewers : 0}</span>
+                                <span className="text-white font-semibold">{remoteParticipants.length}</span>
                                 <span className="text-xs text-gray-300">viewers</span>
                             </div>
                         )}
@@ -685,14 +736,6 @@ const LiveStreamDetail = () => {
                                     }`}
                             >
                                 <Chat className="w-5 h-5" />
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={toggleFullscreen}
-                                className="bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform"
-                            >
-                                {isFullscreen ? <FullscreenExit className="w-5 h-5" /> : <Fullscreen className="w-5 h-5" />}
                             </button>
                         </div>
                     </div>
@@ -844,4 +887,3 @@ const LiveStreamDetail = () => {
 };
 
 export default LiveStreamDetail;
-

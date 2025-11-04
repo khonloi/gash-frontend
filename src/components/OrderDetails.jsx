@@ -200,7 +200,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             try {
                 const token = localStorage.getItem("token");
                 await Api.order.cancel(orderId, token);
-                showToast("Order canceled successfully", "success");
+                showToast("Order cancelled successfully!", "success");
                 fetchOrderDetails();
                 setShowConfirmModal(false);
             } catch {
@@ -595,7 +595,7 @@ const handleSubmitCancel = async () => {
             : cancelFormData.cancelReason;
         console.log("Sending cancel request with reason:", reason); // Debug log
         await Api.order.cancel(orderId, reason, token);
-        showToast("Order canceled successfully", "success");
+        showToast("Order cancelled successfully!", "success");
         fetchOrderDetails();
         setShowConfirmModal(false);
     } catch (err) {

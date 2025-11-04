@@ -107,7 +107,7 @@ const Signup = () => {
         // For development: Skip EmailJS and show OTP in console
         if (!emailJsPublicKey || emailJsPublicKey === 'your_emailjs_public_key_here') {
           console.log('📧 OTP for development:', otp);
-          showToast(`OTP sent successfully! Check console for OTP: ${otp}`, 'success', 5000);
+          showToast(`OTP sent successfully!`, 'success', 5000);
         } else {
           // Send OTP email via EmailJS
           const emailjsResponse = await emailjs.send(

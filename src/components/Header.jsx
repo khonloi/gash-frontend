@@ -60,9 +60,12 @@ export default function Header() {
             const cartData = await fetchWithRetry(() =>
                 Api.newCart.getByAccount(user._id, user.token)
             );
+
+            // NEW: count *different* products only
             const itemCount = Array.isArray(cartData.data)
-                ? cartData.data.reduce((sum, item) => sum + parseInt(item.productQuantity || 0, 10), 0)
+                ? cartData.data.filter(item => (item.productQuantity ?? 0) > 0).length
                 : 0;
+
             setCartItemCount(itemCount);
         } catch (error) {
             setCartItemCount(0);
@@ -108,45 +111,42 @@ export default function Header() {
     // Debounced fetch functions
     const debouncedFetchCartItemCount = useCallback(() => {
         if (fetchTimeoutRef.current.cart) clearTimeout(fetchTimeoutRef.current.cart);
-        fetchTimeoutRef.current.cart = setTimeout(fetchCartItemCount, 300);
+        fetchTimeoutRef.current.cart = setTimeout(fetchCartItemCount, 10);
     }, [fetchCartItemCount]);
 
     const debouncedFetchNotificationCount = useCallback(() => {
         if (fetchTimeoutRef.current.notification) clearTimeout(fetchTimeoutRef.current.notification);
-        fetchTimeoutRef.current.notification = setTimeout(fetchNotificationCount, 300);
+        fetchTimeoutRef.current.notification = setTimeout(fetchNotificationCount, 10);
     }, [fetchNotificationCount]);
 
     const debouncedFetchLivestreamCount = useCallback(() => {
         if (fetchTimeoutRef.current.livestream) clearTimeout(fetchTimeoutRef.current.livestream);
-        fetchTimeoutRef.current.livestream = setTimeout(fetchLivestreamCount, 300);
+        fetchTimeoutRef.current.livestream = setTimeout(fetchLivestreamCount, 10);
     }, [fetchLivestreamCount]);
 
     // Fetch counts on mount, location change, or update events
     useEffect(() => {
+
         fetchCartItemCount();
-        fetchNotificationCount();
+        fetchNotificationCount();   // guaranteed to run
         fetchLivestreamCount();
 
-        const handleCartUpdate = () => {
-            debouncedFetchCartItemCount();
-        };
-        const handleNotificationUpdate = () => {
-            debouncedFetchNotificationCount();
-        };
-        const handleLivestreamUpdate = () => {
-            debouncedFetchLivestreamCount();
-        };
+        // ---- 2. EVENT LISTENERS (debounced) ----
+        const handleCartUpdate = () => debouncedFetchCartItemCount();
+        const handleNotificationUpdate = () => debouncedFetchNotificationCount();
+        const handleLivestreamUpdate = () => debouncedFetchLivestreamCount();
 
         window.addEventListener(CART_UPDATE_EVENT, handleCartUpdate);
         window.addEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
         window.addEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
 
+        // ---- 3. POLLING (raw fetchers, every 3 s) ----
         let pollInterval;
         if (user) {
             pollInterval = setInterval(() => {
-                debouncedFetchCartItemCount();
-                debouncedFetchNotificationCount();
-                debouncedFetchLivestreamCount();
+                fetchCartItemCount();        // raw
+                fetchNotificationCount();    // raw
+                fetchLivestreamCount();      // raw
             }, 3000);
         }
 
@@ -155,9 +155,18 @@ export default function Header() {
             window.removeEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
             window.removeEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
             clearInterval(pollInterval);
-            Object.values(fetchTimeoutRef.current).forEach(timeout => timeout && clearTimeout(timeout));
+            Object.values(fetchTimeoutRef.current).forEach(t => t && clearTimeout(t));
         };
-    }, [debouncedFetchCartItemCount, debouncedFetchNotificationCount, debouncedFetchLivestreamCount, location, user]);       
+    }, [
+        fetchCartItemCount,
+        fetchNotificationCount,
+        fetchLivestreamCount,
+        debouncedFetchCartItemCount,
+        debouncedFetchNotificationCount,
+        debouncedFetchLivestreamCount,
+        location,
+        user
+    ]);       
     
     useEffect(() => {
         setSearch("");
