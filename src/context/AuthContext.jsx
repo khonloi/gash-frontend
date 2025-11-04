@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }) => {
             ? '/auth/register/request-otp'
             : '/auth/forgot-password/request-otp';
         const response = await axiosClient.post(endpoint, { email });
-        showToast('OTP resent successfully.', 'info');
+        showToast('OTP resent successfully!', 'info');
         return response;
       }
 
@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
         response = await axiosClient.post('/auth/forgot-password/verify-otp', { email, otp });
       }
 
-      showToast('OTP verified successfully.', 'success');
+      showToast('OTP verified successfully!', 'success');
       return response;
     } catch (error) {
       const msg = error.response?.data?.message || 'Invalid or expired OTP.';
@@ -204,7 +204,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
     setUser(null);
-    showToast('Logged out successfully.', 'info');
     navigate('/login');
   };
 
