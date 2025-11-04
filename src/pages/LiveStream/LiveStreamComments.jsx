@@ -123,11 +123,6 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                         className="w-9 h-9 rounded-lg object-cover border-2 border-white/10 shadow-lg"
                         onError={(e) => { e.target.src = '/default-avatar.png'; }}
                     />
-                    {comment.isPinned && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-gray-900 flex items-center justify-center shadow-lg">
-                            <PushPin className="w-2.5 h-2.5 text-white" />
-                        </div>
-                    )}
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
@@ -465,15 +460,20 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
             {/* Pinned Comments Section - Sticky below reactions */}
             {comments.some(c => c.isPinned) && (
-                <div className="bg-gradient-to-br from-yellow-900/40 via-yellow-800/30 to-yellow-900/40 border-b border-yellow-500/30 p-2 backdrop-blur-sm max-h-32 overflow-y-auto scrollbar-livestream">
-                    <div className="flex items-center gap-1.5 mb-1.5 px-1">
-                        <PushPin className="w-2.5 h-2.5 text-yellow-400" />
-                        <span className="text-yellow-400 text-[9px] font-bold uppercase tracking-wide">📌 Pinned</span>
+                <div className="bg-yellow-900/30 border-b border-yellow-500/40">
+                    {/* Pinned Header */}
+                    <div className="flex items-center gap-2 px-3 py-2 border-b border-yellow-500/20">
+                        <PushPin className="w-4 h-4 text-yellow-400" />
+                        <span className="text-yellow-300 text-xs font-semibold">
+                            Pinned
+                        </span>
                     </div>
-                    <div className="space-y-1.5">
+                    
+                    {/* Pinned Comment Content */}
+                    <div className="p-3 max-h-40 overflow-y-auto scrollbar-livestream">
                         {comments
                             .filter(c => c.isPinned)
-                            .slice(0, 1) // Show only the first (and should be only) pinned comment
+                            .slice(0, 1)
                             .map((comment) => (
                                 <CommentItem
                                     key={comment._id}

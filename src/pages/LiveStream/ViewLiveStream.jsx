@@ -24,24 +24,21 @@ const LiveStreamDetail = () => {
     const [selectedStream, setSelectedStream] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
     const [showComments, setShowComments] = useState(true);
     const [showProducts, setShowProducts] = useState(true);
     const [showInfo, setShowInfo] = useState(true);
     const [connectionState, setConnectionState] = useState('disconnected');
-    const [needsInteraction, setNeedsInteraction] = useState(false);
     const [streamEnded, setStreamEnded] = useState(false);
     const [_room, setRoom] = useState(null);
+    const [remoteParticipants, setRemoteParticipants] = useState([]);
 
     const videoRef = useRef(null);
-    const audioRef = useRef(null); // separate audio element to avoid replacing video stream
     const containerRef = useRef(null);
     const roomRef = useRef(null);
     const isReconnectingRef = useRef(false);
     const streamEndedRef = useRef(false);
     const socketRef = useRef(null);
-    const lastConnectionRef = useRef({ roomName: null, token: null });
-    const reconnectAttemptsRef = useRef(0);
+    const hasJoinedRef = useRef(false);
 
     // Helper: Format date/time to dd/mm/yyyy HH:mm
     const formatDateTime = (dateString) => {
@@ -86,26 +83,10 @@ const LiveStreamDetail = () => {
 
         const originalConsoleError = console.error;
 
-        // Helper to safely play media and request user interaction when blocked
-        const safePlay = (el) => {
-            if (!el || typeof el.play !== 'function') return;
-            const p = el.play();
-            if (p && typeof p.catch === 'function') {
-                p.catch((err) => {
-                    const name = err?.name || '';
-                    if (String(name).includes('NotAllowedError')) {
-                        setNeedsInteraction(true);
-                    }
-                });
-            }
-        };
-
         try {
             isReconnectingRef.current = true;
             console.log('🔗 Connecting to LiveKit room:', roomName);
             setConnectionState('connecting');
-            // Remember last successful params for reconnect
-            lastConnectionRef.current = { roomName, token: viewerToken };
 
             const existingRoom = roomRef.current;
             if (existingRoom) {
@@ -138,6 +119,10 @@ const LiveStreamDetail = () => {
                 console.log('✅ Connected to LiveKit room');
                 setConnectionState('connected');
 
+                // Initialize remote participants list (exclude local participant)
+                const initialParticipants = Array.from(newRoom.remoteParticipants.values());
+                setRemoteParticipants(initialParticipants);
+
                 // CRITICAL: Ensure video element is not muted (audio always enabled)
                 if (videoRef.current) {
                     videoRef.current.muted = false;
@@ -155,20 +140,20 @@ const LiveStreamDetail = () => {
                         if (publication.track) {
                             if (publication.track.kind === 'video' && videoRef.current) {
                                 publication.track.attach(videoRef.current);
-                                // Keep muted to satisfy autoplay policies across browsers
-                                videoRef.current.muted = true;
-                                safePlay(videoRef.current);
-                            } else if (publication.track.kind === 'audio' && audioRef.current) {
-                                // attach audio to a dedicated audio element so we don't replace the video element's srcObject
-                                publication.track.attach(audioRef.current);
+                                videoRef.current.muted = false; // Ensure not muted
+                                videoRef.current.play().catch(() => { });
+                            } else if (publication.track.kind === 'audio' && videoRef.current) {
+                                publication.track.attach(videoRef.current);
 
                                 // CRITICAL: Enable audio track
                                 if (publication.track instanceof MediaStreamTrack) {
                                     publication.track.enabled = true;
                                 }
 
-                                // make sure audio element is playing
-                                safePlay(audioRef.current);
+                                // CRITICAL: Ensure video is not muted
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
 
                                 console.log('✅ Audio track attached on connect', {
                                     trackId: publication.track.id,
@@ -180,42 +165,41 @@ const LiveStreamDetail = () => {
                     });
                 });
 
-                // Keep video muted; audio is handled via separate audio element
-            });
-
-            // Handle transient reconnect
-            newRoom.on(RoomEvent.Reconnecting, () => {
-                console.log('↺ Reconnecting to LiveKit...');
-                setConnectionState('connecting');
-            });
-
-            newRoom.on(RoomEvent.Reconnected, () => {
-                console.log('✅ Reconnected to LiveKit');
-                setConnectionState('connected');
+                // Double-check video is not muted after a short delay
+                setTimeout(() => {
+                    if (videoRef.current) {
+                        videoRef.current.muted = false;
+                    }
+                }, 1000);
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
                 console.log('❌ Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
+                
+                // Clear remote participants
+                setRemoteParticipants([]);
+
+                // Leave livestream via API
+                if (hasJoinedRef.current && selectedStream?._id) {
+                    try {
+                        const token = localStorage.getItem('token');
+                        if (token) {
+                            await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
+                            hasJoinedRef.current = false;
+                            console.log('✅ Left livestream via API');
+                        }
+                    } catch (error) {
+                        console.error('Error leaving livestream:', error);
+                    }
+                }
 
                 if (reason === 'SERVER_SHUTDOWN' || reason === 'ROOM_DELETED') {
                     showToast('Livestream has ended', 'info');
                     streamEndedRef.current = true;
                     setStreamEnded(true);
                     setSelectedStream(prev => prev ? { ...prev, status: 'ended' } : null);
-                } else if (!streamEndedRef.current) {
-                    // Attempt to auto reconnect with backoff
-                    const attempt = (reconnectAttemptsRef.current || 0) + 1;
-                    reconnectAttemptsRef.current = attempt;
-                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
-                    setTimeout(() => {
-                        if (streamEndedRef.current) return;
-                        const { roomName: lastRoom, token } = lastConnectionRef.current || {};
-                        if (!lastRoom || !token) return;
-                        console.log(`↻ Reconnecting to LiveKit (attempt ${attempt})...`);
-                        connectToLiveKit(lastRoom, token).catch(() => { });
-                    }, delay);
                 }
             });
 
@@ -225,24 +209,39 @@ const LiveStreamDetail = () => {
                         track.attach(videoRef.current);
                         setTimeout(() => {
                             if (videoRef.current) {
-                                // Keep muted to allow autoplay
-                                videoRef.current.muted = true;
-                                safePlay(videoRef.current);
+                                // Ensure video is not muted when playing
+                                videoRef.current.muted = false;
+                                videoRef.current.play().catch(err => {
+                                    if (err.name !== 'AbortError') {
+                                        console.error('Video play failed:', err);
+                                    }
+                                });
                             }
                         }, 100);
                     } else if (track.kind === 'audio') {
-                        // Attach audio track to hidden audio element, not the video element
-                        if (audioRef.current) {
-                            track.attach(audioRef.current);
-                        }
+                        // Attach audio track to video element
+                        track.attach(videoRef.current);
 
                         // CRITICAL: Ensure audio track is enabled
                         if (track instanceof MediaStreamTrack) {
                             track.enabled = true;
                         }
 
-                        // Ensure audio element is playing
-                        safePlay(audioRef.current);
+                        // CRITICAL: Ensure video element is not muted
+                        if (videoRef.current) {
+                            videoRef.current.muted = false;
+                            // Force unmute multiple times to ensure it sticks
+                            setTimeout(() => {
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
+                            }, 100);
+                            setTimeout(() => {
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
+                            }, 500);
+                        }
                     }
                 }
             });
@@ -250,19 +249,29 @@ const LiveStreamDetail = () => {
             // Handle participant connected - subscribe to their tracks
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
                 console.log('👤 Participant connected:', participant.identity);
+                
+                // Add participant to remote participants list
+                setRemoteParticipants(prev => {
+                    // Check if participant already exists (avoid duplicates)
+                    if (prev.find(p => p.identity === participant.identity)) {
+                        return prev;
+                    }
+                    return [...prev, participant];
+                });
+                
                 // Subscribe to all their tracks
                 participant.trackPublications.forEach((publication) => {
                     if (!publication.isSubscribed) {
                         publication.setSubscribed(true);
                     }
 
-                    // If audio track is already available, attach and enable it on the audio element
-                    if (publication.track && publication.track.kind === 'audio' && audioRef.current) {
-                        publication.track.attach(audioRef.current);
+                    // If audio track is already available, attach and enable it
+                    if (publication.track && publication.track.kind === 'audio' && videoRef.current) {
+                        publication.track.attach(videoRef.current);
                         if (publication.track instanceof MediaStreamTrack) {
                             publication.track.enabled = true;
                         }
-                        safePlay(audioRef.current);
+                        videoRef.current.muted = false;
                     }
                 });
             });
@@ -271,10 +280,16 @@ const LiveStreamDetail = () => {
                 if (videoRef.current) {
                     if (track.kind === 'video') {
                         track.detach(videoRef.current);
-                    } else if (track.kind === 'audio' && audioRef.current) {
-                        track.detach(audioRef.current);
+                    } else if (track.kind === 'audio') {
+                        track.detach(videoRef.current);
                     }
                 }
+            });
+
+            // Handle participant disconnected - remove from list
+            newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
+                console.log('👤 Participant disconnected:', participant.identity);
+                setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
             });
 
             console.error = (...args) => {
@@ -319,7 +334,6 @@ const LiveStreamDetail = () => {
             roomRef.current = newRoom;
             isReconnectingRef.current = false;
             console.error = originalConsoleError;
-            reconnectAttemptsRef.current = 0;
             return newRoom;
         } catch (error) {
             if (typeof originalConsoleError !== 'undefined') {
@@ -341,14 +355,6 @@ const LiveStreamDetail = () => {
         }
     }, [showToast]);
 
-    // Responsive: detect mobile and update on resize
-    useEffect(() => {
-        const updateIsMobile = () => setIsMobile(window.matchMedia('(max-width: 640px)').matches);
-        updateIsMobile();
-        window.addEventListener('resize', updateIsMobile);
-        return () => window.removeEventListener('resize', updateIsMobile);
-    }, []);
-
     // Load stream details
     useEffect(() => {
         const loadStream = async () => {
@@ -361,7 +367,7 @@ const LiveStreamDetail = () => {
                     return;
                 }
 
-                const response = await Api.livestream.view({ livestreamId: id }, token);
+                const response = await Api.livestream.join({ livestreamId: id }, token);
 
                 if (response.data?.success) {
                     const streamData = response.data.data;
@@ -374,8 +380,9 @@ const LiveStreamDetail = () => {
                     }
 
                     setSelectedStream(streamData);
+                    hasJoinedRef.current = true; // Mark as joined
 
-                    // Auto-join livestream
+                    // Connect to LiveKit
                     await connectToLiveKit(streamData.roomName, streamData.viewerToken);
                     showToast('Joined livestream!', 'success');
                 } else {
@@ -425,11 +432,13 @@ const LiveStreamDetail = () => {
 
     const leaveLivestream = async () => {
         try {
-            if (selectedStream?._id) {
+            // Leave via API
+            if (hasJoinedRef.current && selectedStream?._id) {
                 const token = localStorage.getItem('token');
                 if (token) {
                     try {
                         await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
+                        hasJoinedRef.current = false;
                     } catch (apiError) {
                         console.error('Error calling leave API:', apiError);
                     }
@@ -464,6 +473,15 @@ const LiveStreamDetail = () => {
         const socket = socketRef.current;
 
         return () => {
+            // Leave livestream if still joined
+            if (hasJoinedRef.current && selectedStream?._id) {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    Api.livestream.leave({ livestreamId: selectedStream._id }, token).catch(console.error);
+                    hasJoinedRef.current = false;
+                }
+            }
+            
             if (room) {
                 room.disconnect().catch(console.error);
             }
@@ -471,7 +489,7 @@ const LiveStreamDetail = () => {
                 socket.disconnect();
             }
         };
-    }, []);
+    }, [selectedStream?._id]);
 
     if (isLoading) {
         return (
@@ -554,36 +572,36 @@ const LiveStreamDetail = () => {
                 }}
             >
                 <div
-                    className={`relative bg-black/90 backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50 ${isMobile ? '' : (showInfo ? 'ml-80' : '')
-                        } ${isMobile ? '' : (showComments && showProducts
+                    className={`relative bg-black/90 backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50 ${showInfo
+                        ? 'ml-80'
+                        : ''
+                        } ${showComments && showProducts
                             ? 'mr-[640px]'
                             : showComments
                                 ? 'mr-[352px]'
                                 : showProducts
                                     ? 'mr-[288px]'
-                                    : '')
+                                    : ''
                         }`}
                     style={{
-                        width: isMobile
-                            ? '100vw'
-                            : (showInfo && showComments && showProducts
-                                ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
-                                : showInfo && showComments
-                                    ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
-                                    : showInfo && showProducts
-                                        ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
-                                        : showInfo
-                                            ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
-                                            : showComments && showProducts
-                                                ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
-                                                : showComments
-                                                    ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
-                                                    : showProducts
-                                                        ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
-                                                        : 'min(90vw, calc((100vh - 2rem) * 9 / 16))'),
+                        width: showInfo && showComments && showProducts
+                            ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
+                            : showInfo && showComments
+                                ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
+                                : showInfo && showProducts
+                                    ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
+                                    : showInfo
+                                        ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
+                                        : showComments && showProducts
+                                            ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
+                                            : showComments
+                                                ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
+                                                : showProducts
+                                                    ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
+                                                    : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
                         aspectRatio: '9/16',
-                        maxWidth: isMobile ? '100vw' : '90vw',
-                        maxHeight: isMobile ? '100vh' : 'calc(100vh - 2rem)'
+                        maxWidth: '90vw',
+                        maxHeight: 'calc(100vh - 2rem)'
                     }}
                     ref={containerRef}
                     onClick={(e) => {
@@ -617,26 +635,6 @@ const LiveStreamDetail = () => {
                             e.stopPropagation();
                         }}
                     />
-                    {/* Hidden audio element to carry remote audio; prevents replacing the video element's srcObject */}
-                    <audio ref={audioRef} autoPlay playsInline style={{ display: 'none' }} />
-
-                    {needsInteraction && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                            <button
-                                type="button"
-                                className="px-6 py-3 rounded-xl bg-white/90 hover:bg-white text-black font-semibold shadow"
-                                onClick={() => {
-                                    const vp = videoRef.current?.play?.();
-                                    if (vp && typeof vp.catch === 'function') vp.catch(() => undefined);
-                                    const ap = audioRef.current?.play?.();
-                                    if (ap && typeof ap.catch === 'function') ap.catch(() => undefined);
-                                    setNeedsInteraction(false);
-                                }}
-                            >
-                                Tap to play
-                            </button>
-                        </div>
-                    )}
 
                     {/* Back Button */}
                     <button
@@ -673,7 +671,7 @@ const LiveStreamDetail = () => {
                         {selectedStream && (
                             <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
                                 <Videocam className="w-4 h-4 text-blue-400" />
-                                <span className="text-white font-semibold">{selectedStream.currentViewers !== undefined ? selectedStream.currentViewers : 0}</span>
+                                <span className="text-white font-semibold">{remoteParticipants.length}</span>
                                 <span className="text-xs text-gray-300">viewers</span>
                             </div>
                         )}
@@ -690,9 +688,9 @@ const LiveStreamDetail = () => {
                                     <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
                                 </div>
                                 <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                                    {connectionState === 'connecting' ? 'Reconnecting…' : 'Connecting…'}
+                                    Livestream has ended
                                 </h3>
-                                <p className="text-gray-300 mb-6">Please wait a moment</p>
+                                <p className="text-gray-300 mb-6">Thank you for watching!</p>
                                 <button
                                     type="button"
                                     onClick={goBack}
@@ -706,26 +704,26 @@ const LiveStreamDetail = () => {
 
                     {/* Controls */}
                     <div
-                        className={`absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-auto z-10 ${isMobile ? 'gap-1' : ''}`}
+                        className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-auto z-10"
                         onClick={(e) => e.stopPropagation()}
                         onMouseDown={(e) => e.stopPropagation()}
                     >
-                        <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
+                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={() => setShowInfo(!showInfo)}
-                                className={`bg-black/60 backdrop-blur-md text-white ${isMobile ? 'p-2' : 'p-2.5'} rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showInfo ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border-blue-500/50' : ''
+                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showInfo ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border-blue-500/50' : ''
                                     }`}
                             >
                                 <Info className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
+                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={() => setShowProducts(!showProducts)}
-                                className={`bg-black/60 backdrop-blur-md text-white ${isMobile ? 'p-2' : 'p-2.5'} rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showProducts ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border-green-500/50' : ''
+                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showProducts ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border-green-500/50' : ''
                                     }`}
                             >
                                 <ShoppingBag className="w-5 h-5" />
@@ -734,25 +732,17 @@ const LiveStreamDetail = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowComments(!showComments)}
-                                className={`bg-black/60 backdrop-blur-md text-white ${isMobile ? 'p-2' : 'p-2.5'} rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
+                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
                                     }`}
                             >
                                 <Chat className="w-5 h-5" />
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={toggleFullscreen}
-                                className={`bg-black/60 backdrop-blur-md text-white ${isMobile ? 'p-2' : 'p-2.5'} rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform`}
-                            >
-                                {isFullscreen ? <FullscreenExit className="w-5 h-5" /> : <Fullscreen className="w-5 h-5" />}
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {/* Info Panel - Left side of Video */}
-                {!isMobile && showInfo && selectedStream && (
+                {showInfo && selectedStream && (
                     <div className="fixed left-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto border-r border-gray-800/50">
                         <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                             <div className="flex items-center gap-2">
@@ -854,7 +844,7 @@ const LiveStreamDetail = () => {
                 )}
 
                 {/* Products Panel - Between Video and Comments */}
-                {!isMobile && showProducts && (selectedStream?._id || id) && (
+                {showProducts && (selectedStream?._id || id) && (
                     <div className={`fixed top-0 h-full w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-[352px]' : 'right-0'
                         } border-l border-gray-800/50`}>
                         <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
@@ -887,7 +877,7 @@ const LiveStreamDetail = () => {
                     <LiveStreamComments
                         liveId={selectedStream?._id || id}
                         hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
-                        isVisible={isMobile ? false : showComments}
+                        isVisible={showComments}
                         onToggle={() => setShowComments(!showComments)}
                     />
                 )}
@@ -897,4 +887,3 @@ const LiveStreamDetail = () => {
 };
 
 export default LiveStreamDetail;
-
