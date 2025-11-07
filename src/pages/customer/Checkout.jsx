@@ -197,8 +197,8 @@ const Checkout = () => {
   const validateName = useCallback((name) => {
     const trimmed = name.trim();
     if (!trimmed) return 'Recipient name is required';
-    if (trimmed.length < 3) return 'Recipient name must be at least 3 characters';
-    if (trimmed.length > 30) return 'Recipient name cannot exceed 30 characters';
+    if (trimmed.length < 5) return 'Recipient name must be at least 5 characters';
+    if (trimmed.length > 50) return 'Recipient name cannot exceed 50 characters';
     if (!/^[\p{L}\s]+$/u.test(trimmed)) return 'Recipient name can only contain letters and spaces';
     return null;
   }, []);
@@ -207,13 +207,16 @@ const Checkout = () => {
     const trimmed = address.trim();
     if (!trimmed) return 'Address is required';
     if (trimmed.length < 5) return 'Address must be at least 5 characters';
+    if (trimmed.length > 150) return 'Address cannot exceed 150 characters';
     return null;
   }, []);
 
   const validatePhone = useCallback((phone) => {
     const trimmed = phone.trim();
     if (!trimmed) return 'Phone number is required';
-    if (!/^(0|\+84)[1-9]\d{8}$/.test(trimmed)) return 'Invalid Vietnamese phone number';
+    if (!/^\d+$/.test(trimmed)) return 'Phone number must contain only digits';
+    if (trimmed.length < 7) return 'Phone number must be at least 7 digits';
+    if (trimmed.length > 20) return 'Phone number must not exceed 20 digits';
     return null;
   }, []);
 
