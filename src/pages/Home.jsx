@@ -74,25 +74,30 @@ const Home = () => {
     try {
       const response = await fetchWithRetry(() => Api.newProducts.getAll());
       const productsData = response?.data || response || [];
-      
+
       if (!Array.isArray(productsData) || productsData.length === 0) {
         setError("No products available at this time");
         setProducts([]);
         setCategories([]);
         return;
       }
-      
+
       // Filter active products with variants
       const activeProducts = productsData.filter(
-        (product) => product.productStatus === "active" && 
-        product.productVariantIds?.length > 0
+        (product) => product.productStatus === "active" &&
+          product.productVariantIds?.length > 0
       );
-      
+
       setProducts(activeProducts);
-      
-      // Extract unique categories from products
+
+      // Extract unique categories from products, filter out deleted categories (isDeleted: false)
       const uniqueCategories = [
-        ...new Set(activeProducts.map((product) => product.categoryId?.cat_name).filter(Boolean)),
+        ...new Set(
+          activeProducts
+            .filter((product) => product.categoryId && !product.categoryId.isDeleted)
+            .map((product) => product.categoryId?.cat_name)
+            .filter(Boolean)
+        ),
       ];
       setCategories(uniqueCategories);
     } catch (err) {

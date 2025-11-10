@@ -112,8 +112,13 @@ const ProductDetail = () => {
     );
 
     activeVariants.forEach((variant) => {
-      const color = variant.productColorId?.color_name;
-      const size = variant.productSizeId?.size_name;
+      // Only index variants with non-deleted colors and sizes
+      const color = variant.productColorId && !variant.productColorId.isDeleted
+        ? variant.productColorId.color_name
+        : null;
+      const size = variant.productSizeId && !variant.productSizeId.isDeleted
+        ? variant.productSizeId.size_name
+        : null;
       if (color) {
         index.byColor[color] = index.byColor[color] || [];
         index.byColor[color].push(variant);
@@ -218,14 +223,22 @@ const ProductDetail = () => {
           !v.variantStatus || v.variantStatus === 'active'
         );
 
+        // Extract colors, filter out deleted colors (isDeleted: false)
         const uniqueColors = [
           ...new Set(
-            activeVariants.map((v) => v.productColorId?.color_name).filter(Boolean)
+            activeVariants
+              .filter((v) => v.productColorId && !v.productColorId.isDeleted)
+              .map((v) => v.productColorId?.color_name)
+              .filter(Boolean)
           ),
         ].sort();
+        // Extract sizes, filter out deleted sizes (isDeleted: false)
         const uniqueSizes = [
           ...new Set(
-            activeVariants.map((v) => v.productSizeId?.size_name).filter(Boolean)
+            activeVariants
+              .filter((v) => v.productSizeId && !v.productSizeId.isDeleted)
+              .map((v) => v.productSizeId?.size_name)
+              .filter(Boolean)
           ),
         ].sort();
         setAvailableColors(uniqueColors);
@@ -743,9 +756,8 @@ const ProductDetail = () => {
           </div>
           <div className="product-detail-stock-status">
             <span
-              className={`product-detail-stock ${
-                colorStockInfo.inStock ? "in-stock" : "out-of-stock"
-              }`}
+              className={`product-detail-stock ${colorStockInfo.inStock ? "in-stock" : "out-of-stock"
+                }`}
             >
               {colorStockInfo.message}
             </span>
@@ -758,9 +770,8 @@ const ProductDetail = () => {
                   {availableColors.map((color) => (
                     <button
                       key={color}
-                      className={`product-detail-color-button ${selectedColor === color ? "selected" : ""} ${
-                        !isColorInStock(color) ? "opacity-50" : ""
-                      }`}
+                      className={`product-detail-color-button ${selectedColor === color ? "selected" : ""} ${!isColorInStock(color) ? "opacity-50" : ""
+                        }`}
                       onClick={() => handleColorClick(color)}
                       type="button"
                       aria-label={`Select ${color} color`}
@@ -779,9 +790,8 @@ const ProductDetail = () => {
                   {availableSizes.map((size) => (
                     <button
                       key={size}
-                      className={`product-detail-size-button ${selectedSize === size ? "selected" : ""} ${
-                        !isSizeInStock(size) ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      className={`product-detail-size-button ${selectedSize === size ? "selected" : ""} ${!isSizeInStock(size) ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                       onClick={() => isSizeInStock(size) && handleSizeClick(size)}
                       disabled={!isSizeInStock(size) || (selectedColor && !isValidCombination(selectedColor, size))}
                       type="button"
