@@ -126,17 +126,23 @@ const ProductList = () => {
     try {
       const response = await fetchWithRetry(() => Api.newProducts.getAll());
       const productsData = response?.data || response || [];
-      
+
       if (!Array.isArray(productsData) || productsData.length === 0) {
         setError("No products available at this time");
         setProducts([]);
         setCategories([]);
         return;
       }
-      
+
       setProducts(productsData);
+      // Extract categories, filter out deleted categories (isDeleted: false)
       const uniqueCategories = [
-        ...new Set(productsData.map((product) => product.categoryId?.cat_name).filter(Boolean)),
+        ...new Set(
+          productsData
+            .filter((product) => product.categoryId && !product.categoryId.isDeleted)
+            .map((product) => product.categoryId?.cat_name)
+            .filter(Boolean)
+        ),
       ].sort();
       setCategories(uniqueCategories);
     } catch (err) {
@@ -150,19 +156,31 @@ const ProductList = () => {
     try {
       const response = await fetchWithRetry(() => Api.newVariants.getAll());
       const variantsData = response?.data || response || [];
-      
+
       if (!Array.isArray(variantsData)) {
         console.warn("Invalid variants data received");
         setError("Failed to load product variants");
         return;
       }
-      
+
       setVariants(variantsData);
+      // Extract colors, filter out deleted colors (isDeleted: false)
       const uniqueColors = [
-        ...new Set(variantsData.map((variant) => variant.productColorId?.color_name).filter(Boolean)),
+        ...new Set(
+          variantsData
+            .filter((variant) => variant.productColorId && !variant.productColorId.isDeleted)
+            .map((variant) => variant.productColorId?.color_name)
+            .filter(Boolean)
+        ),
       ].sort();
+      // Extract sizes, filter out deleted sizes (isDeleted: false)
       const uniqueSizes = [
-        ...new Set(variantsData.map((variant) => variant.productSizeId?.size_name).filter(Boolean)),
+        ...new Set(
+          variantsData
+            .filter((variant) => variant.productSizeId && !variant.productSizeId.isDeleted)
+            .map((variant) => variant.productSizeId?.size_name)
+            .filter(Boolean)
+        ),
       ].sort();
       setColors(uniqueColors);
       setSizes(uniqueSizes);
@@ -206,20 +224,8 @@ const ProductList = () => {
     }
   }, [error]);
 
-  // Pre-index variants for efficient filtering
-  const variantIndex = useMemo(() => {
-    const index = {};
-    variants.forEach((variant) => {
-      if (variant.productId?._id) {
-        index[variant.productId._id] = index[variant.productId._id] || [];
-        index[variant.productId._id].push(variant);
-      } else if (variant.productId && typeof variant.productId === 'string') {
-        index[variant.productId] = index[variant.productId] || [];
-        index[variant.productId].push(variant);
-      }
-    });
-    return index;
-  }, [variants]);
+  // Note: variantIndex removed as it's not used in current filtering logic
+  // Variants are accessed directly from product.productVariantIds in filterProducts
 
   // Optimized product filtering
   const { activeProducts, unavailableProducts } = useMemo(() => {
@@ -240,18 +246,30 @@ const ProductList = () => {
       let filtered = [...productList];
 
       if (debouncedCategory !== "All Categories") {
-        filtered = filtered.filter((product) => product.categoryId?.cat_name === debouncedCategory);
+        filtered = filtered.filter(
+          (product) =>
+            product.categoryId?.cat_name === debouncedCategory &&
+            product.categoryId &&
+            !product.categoryId.isDeleted
+        );
       }
 
       if ((debouncedColor !== "All Colors" || debouncedSize !== "All Sizes") && variants.length) {
         filtered = filtered.filter((product) => {
           const productVariants = product.productVariantIds || [];
           return productVariants.some((variant) => {
-            const matchesColor =
-              debouncedColor === "All Colors" || variant.productColorId?.color_name === debouncedColor;
-            const matchesSize =
-              debouncedSize === "All Sizes" || variant.productSizeId?.size_name === debouncedSize;
-            return matchesColor && matchesSize;
+            // Filter out deleted colors and sizes
+            const colorMatches =
+              debouncedColor === "All Colors" ||
+              (variant.productColorId?.color_name === debouncedColor &&
+                variant.productColorId &&
+                !variant.productColorId.isDeleted);
+            const sizeMatches =
+              debouncedSize === "All Sizes" ||
+              (variant.productSizeId?.size_name === debouncedSize &&
+                variant.productSizeId &&
+                !variant.productSizeId.isDeleted);
+            return colorMatches && sizeMatches;
           });
         });
       }
