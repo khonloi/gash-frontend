@@ -5,6 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 import Api from "../../common/SummaryAPI";
 import FavoriteProductCard from "../../components/FavoriteProductCard";
 import ProductCardSkeleton from "../../components/ProductCardSkeleton";
+import ProductButton from "../../components/ProductButton";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -146,14 +147,16 @@ const ProductFavorite = () => {
           >
             <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
-            <button
+            <ProductButton
+              variant="default"
+              size="sm"
               onClick={handleRetry}
-              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
               disabled={loading}
+              className="text-blue-600"
               aria-label="Retry loading favorites"
             >
               Retry
-            </button>
+            </ProductButton>
           </div>
         )}
 
@@ -161,12 +164,14 @@ const ProductFavorite = () => {
         {!loading && favorites.length === 0 && !error && (
           <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
             <p>No favorite products found.</p>
-            <button
+            <ProductButton
+              variant="default"
+              size="sm"
               onClick={() => navigate("/products")}
-              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+              className="text-blue-600"
             >
               Browse Products
-            </button>
+            </ProductButton>
           </div>
         )}
 

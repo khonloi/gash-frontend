@@ -8,6 +8,7 @@ import {
 } from "../constants/constants";
 import ProductCard from "../components/ProductCard";
 import ProductCardSkeleton from "../components/ProductCardSkeleton";
+import ProductButton from "../components/ProductButton";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
@@ -497,12 +498,14 @@ const Home = () => {
             </div>
             {!loading && (
               <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
-                <button
-                  className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] text-sm sm:text-base bg-amber-400 text-gray-900 py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg hover:bg-amber-500 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                <ProductButton
+                  variant="primary"
+                  size="lg"
                   onClick={handleViewAll}
+                  className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px]"
                 >
                   View All
-                </button>
+                </ProductButton>
               </div>
             )}
           </section>

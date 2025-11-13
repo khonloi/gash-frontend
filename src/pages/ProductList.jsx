@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../components/ProductCard";
 import ProductCardSkeleton from "../components/ProductCardSkeleton";
+import ProductButton from "../components/ProductButton";
 import {
   FILTER_STORAGE_KEY,
   DEFAULT_FILTERS,
@@ -386,19 +387,21 @@ const ProductList = () => {
   }, [debouncedCategory, debouncedColor, debouncedSize]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full mx-auto p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="flex flex-col md:flex-row w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
       <aside className="w-full md:w-60 lg:w-64 px-0 md:px-4 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
         <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6">
           <div className="flex justify-between items-center mb-4 h-8">
             <h1 className="text-2xl m-0">Filters</h1>
             {hasActiveFilters && (
-              <button
+              <ProductButton
+                variant="default"
+                size="sm"
                 onClick={clearAllFilters}
-                className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                className="text-blue-600"
                 aria-label="Clear all filters"
               >
                 Clear All
-              </button>
+              </ProductButton>
             )}
           </div>
 
@@ -451,14 +454,16 @@ const ProductList = () => {
             >
               <span className="text-lg" aria-hidden="true">⚠</span>
               {error}
-              <button
+              <ProductButton
+                variant="default"
+                size="sm"
                 onClick={handleRetry}
-                className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
                 disabled={loading}
+                className="text-blue-600"
                 aria-label="Retry loading products"
               >
                 Retry
-              </button>
+              </ProductButton>
             </div>
           )}
 
@@ -467,12 +472,14 @@ const ProductList = () => {
             <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
               <p>No active products found for selected filters</p>
               {hasActiveFilters && (
-                <button 
-                  onClick={clearAllFilters} 
-                  className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                <ProductButton
+                  variant="default"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="text-blue-600"
                 >
                   Clear Filters
-                </button>
+                </ProductButton>
               )}
             </div>
           )}

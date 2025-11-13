@@ -15,6 +15,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductFeedback from "../components/ProductFeedback";
+import ProductButton from "../components/ProductButton";
 import {
   DETAIL_STORAGE_KEY,
   API_RETRY_COUNT,
@@ -839,8 +840,8 @@ const ProductDetail = () => {
         </div>
 
         <div className="flex-1 min-w-[200px] max-w-full sm:max-w-[260px] p-4 sm:p-5 border-2 border-gray-300 rounded-xl bg-gray-50 flex flex-col gap-2">
-          <button
-            className="px-3 py-2.5 sm:py-3 border-2 rounded-full cursor-pointer text-sm font-semibold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-teal-700 border-teal-800 text-white hover:bg-teal-600 hover:border-teal-700"
+          <ProductButton
+            variant="secondary"
             onClick={handleAddToFavorites}
             disabled={isAddingToFavorites}
             type="button"
@@ -853,25 +854,25 @@ const ProductDetail = () => {
               : isFavorited
                 ? "Remove from Favorites"
                 : "Add to Favorites"}
-          </button>
-          <button
-            className="px-3 py-2.5 sm:py-3 border-2 rounded-full cursor-pointer text-sm font-semibold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-amber-400 border-amber-500 text-gray-900 hover:bg-amber-500 hover:border-amber-600"
+          </ProductButton>
+          <ProductButton
+            variant="primary"
             onClick={handleAddToCart}
             disabled={!selectedVariant || !isInStock || isAddingToCart}
             type="button"
             aria-label="Add to cart"
           >
             {isAddingToCart ? "Adding..." : "Add to Cart"}
-          </button>
-          <button
-            className="px-3 py-2.5 sm:py-3 border-2 rounded-full cursor-pointer text-sm font-semibold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-orange-500 border-orange-600 text-gray-900 hover:bg-orange-600 hover:border-orange-700"
+          </ProductButton>
+          <ProductButton
+            variant="default"
             onClick={handleBuyNow}
             disabled={!selectedVariant || !isInStock}
             type="button"
             aria-label="Buy now"
           >
             Buy Now
-          </button>
+          </ProductButton>
           <div className="text-xs sm:text-sm text-gray-600 text-center mt-3 space-y-2">
             <div className="leading-relaxed">
               <strong className="text-green-700">FREE delivery</strong> by tomorrow
