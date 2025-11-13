@@ -290,7 +290,7 @@ const Home = () => {
 
         {/* Category Section */}
         {!error && (
-          <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-lg">
+          <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Categories</h2>
             {loading ? (
               <>
@@ -447,7 +447,7 @@ const Home = () => {
 
         {/* For You Section */}
         {!error && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-lg">
+          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
@@ -474,7 +474,7 @@ const Home = () => {
 
         {/* Recommendations Section */}
         {!error && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-lg">
+          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommendations</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"

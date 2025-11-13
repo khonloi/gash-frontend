@@ -653,7 +653,7 @@ const ProductDetail = () => {
   if (error && !product) {
     return (
       <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-lg">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
         <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
           <span className="text-lg" aria-hidden="true">⚠</span>
           {error}
@@ -678,7 +678,7 @@ const ProductDetail = () => {
 
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-lg">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 w-full">
         <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex gap-2 sm:gap-3">
           <div className="flex flex-col items-center justify-start gap-2">
@@ -892,7 +892,7 @@ const ProductDetail = () => {
       {isLightboxOpen && (
         <div className="fixed top-0 left-0 w-full h-full z-[1000] flex items-center justify-center" role="dialog" aria-label="Image lightbox">
           <div className="absolute top-0 left-0 w-full h-full bg-black/80 cursor-pointer" onClick={handleCloseLightbox}></div>
-          <div className="relative max-w-[90%] max-h-[90%] bg-white rounded-xl p-4 sm:p-5 flex items-center justify-center shadow-lg">
+          <div className="relative max-w-[90%] max-h-[90%] bg-white rounded-xl p-4 sm:p-5 flex items-center justify-center shadow-md">
             <button
               className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
               onClick={handleCloseLightbox}
@@ -952,7 +952,7 @@ const ProductDetail = () => {
       )}
 
       {product?.description && (
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-lg">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
           <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900">Product Description</h2>
           <div className="leading-relaxed text-base text-gray-700 [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-semibold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_h4]:mt-4 [&_h4]:mb-2 [&_h4]:font-semibold [&_h5]:mt-4 [&_h5]:mb-2 [&_h5]:font-semibold [&_h6]:mt-4 [&_h6]:mb-2 [&_h6]:font-semibold [&_p]:my-2 [&_ul]:my-2 [&_ul]:pl-8 [&_ol]:my-2 [&_ol]:pl-8 [&_li]:mb-1 [&_a]:text-blue-600 [&_a]:no-underline [&_a:hover]:underline [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-gray-100 [&_pre]:p-4 [&_pre]:rounded [&_pre]:overflow-x-auto [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:my-4 [&_blockquote]:pl-4 [&_blockquote]:pr-4 [&_blockquote]:bg-gray-50 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_br]:block [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded [&_img]:my-2">
             <ReactMarkdown 
@@ -965,7 +965,7 @@ const ProductDetail = () => {
         </section>
       )}
 
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-lg">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
         <ProductFeedback productId={id} />
       </section>
     </div>
