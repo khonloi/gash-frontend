@@ -7,6 +7,7 @@ import {
   API_RETRY_DELAY
 } from "../constants/constants";
 import ProductCard from "../components/ProductCard";
+import ProductCardSkeleton from "../components/ProductCardSkeleton";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
@@ -270,7 +271,7 @@ const Home = () => {
         </div>
       </div>
       {/* Main Home Content */}
-      <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 bg-white text-gray-900">
+      <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
         {error && (
           <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
             <span className="text-lg" aria-hidden="true">⚠</span>
@@ -286,180 +287,224 @@ const Home = () => {
           </div>
         )}
 
-        {loading && (
-          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 flex-wrap" role="status" aria-live="polite">
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-            Loading recommendations...
-          </div>
-        )}
-
         {/* Category Section */}
-        {!loading && !error && randomCategories.length > 0 && (
-          <section className="w-full mt-0">
+        {!error && (
+          <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Categories</h2>
-            {/* Mobile: Horizontal slider with navigation */}
-            <div className="lg:hidden relative">
-              <div
-                ref={categorySliderRef}
-                onScroll={handleCategoryScroll}
-                className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-                role="list"
-                aria-label={`${randomCategories.length} categories`}
-              >
-                {randomCategories.map((category) => {
-                  const categoryProduct = getRandomProductForCategory(category);
-                  const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
-                  
-                  return (
-                    <div
-                      key={category}
-                      className="w-[9em] flex-shrink-0 border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
-                      tabIndex={0}
-                      role="listitem"
-                      aria-label={`View products in ${category}`}
-                      onClick={() => handleCategoryClick(category)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
-                      }}
-                    >
-                      {/* Square image thumbnail */}
-                      <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
-                        <img
-                          src={categoryImageUrl}
-                          alt={`${category} category`}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = "/placeholder-image.png";
-                            e.target.alt = `Image not available for ${category}`;
-                          }}
-                        />
+            {loading ? (
+              <>
+                {/* Category skeleton - Mobile */}
+                <div className="lg:hidden">
+                  <div className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    {[...Array(8)].map((_, index) => (
+                      <div
+                        key={index}
+                        className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col"
+                      >
+                        <div className="w-[9em] h-[9em] bg-gray-200 animate-pulse" />
+                        <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+                        </div>
                       </div>
-                      {/* Category name */}
-                      <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
-                        <span className="font-semibold text-sm text-center line-clamp-2">
-                          {category}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Navigation buttons for mobile */}
-              {categoryScrollPosition > 0 && (
-                <button
-                  className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
-                  onClick={handleCategoryPrev}
-                  aria-label="Previous categories"
-                >
-                  <i className="lni lni-chevron-left text-lg sm:text-xl"></i>
-                </button>
-              )}
-              {canScrollNext && (
-                <button
-                  className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
-                  onClick={handleCategoryNext}
-                  aria-label="Next categories"
-                >
-                  <i className="lni lni-chevron-right text-lg sm:text-xl"></i>
-                </button>
-              )}
-            </div>
-            {/* Desktop: Grid layout */}
-            <div
-              className="hidden lg:grid lg:grid-cols-8 gap-4 lg:gap-5"
-              role="list"
-              aria-label={`${randomCategories.length} categories`}
-            >
-              {randomCategories.map((category) => {
-                const categoryProduct = getRandomProductForCategory(category);
-                const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
-                
-                return (
-                  <div
-                    key={category}
-                    className="w-[9em] border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
-                    tabIndex={0}
-                    role="listitem"
-                    aria-label={`View products in ${category}`}
-                    onClick={() => handleCategoryClick(category)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
-                    }}
-                  >
-                    {/* Square image thumbnail */}
-                    <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
-                      <img
-                        src={categoryImageUrl}
-                        alt={`${category} category`}
-                        loading="lazy"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = "/placeholder-image.png";
-                          e.target.alt = `Image not available for ${category}`;
-                        }}
-                      />
-                    </div>
-                    {/* Category name */}
-                    <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
-                      <span className="font-semibold text-sm text-center line-clamp-2">
-                        {category}
-                      </span>
-                    </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+                {/* Category skeleton - Desktop */}
+                <div className="hidden lg:grid lg:grid-cols-8 gap-4 lg:gap-5">
+                  {[...Array(8)].map((_, index) => (
+                    <div
+                      key={index}
+                      className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col"
+                    >
+                      <div className="w-[9em] h-[9em] bg-gray-200 animate-pulse" />
+                      <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                        <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Mobile: Horizontal slider with navigation */}
+                <div className="lg:hidden relative">
+                  <div
+                    ref={categorySliderRef}
+                    onScroll={handleCategoryScroll}
+                    className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    role="list"
+                    aria-label={`${randomCategories.length} categories`}
+                  >
+                    {randomCategories.map((category) => {
+                      const categoryProduct = getRandomProductForCategory(category);
+                      const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
+                      
+                      return (
+                        <div
+                          key={category}
+                          className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
+                          tabIndex={0}
+                          role="listitem"
+                          aria-label={`View products in ${category}`}
+                          onClick={() => handleCategoryClick(category)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
+                          }}
+                        >
+                          {/* Square image thumbnail */}
+                          <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
+                            <img
+                              src={categoryImageUrl}
+                              alt={`${category} category`}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = "/placeholder-image.png";
+                                e.target.alt = `Image not available for ${category}`;
+                              }}
+                            />
+                          </div>
+                          {/* Category name */}
+                          <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                            <span className="font-semibold text-sm text-center line-clamp-2">
+                              {category}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Navigation buttons for mobile */}
+                  {categoryScrollPosition > 0 && (
+                    <button
+                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                      onClick={handleCategoryPrev}
+                      aria-label="Previous categories"
+                    >
+                      <i className="lni lni-chevron-left text-lg sm:text-xl"></i>
+                    </button>
+                  )}
+                  {canScrollNext && (
+                    <button
+                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                      onClick={handleCategoryNext}
+                      aria-label="Next categories"
+                    >
+                      <i className="lni lni-chevron-right text-lg sm:text-xl"></i>
+                    </button>
+                  )}
+                </div>
+                {/* Desktop: Grid layout */}
+                <div
+                  className="hidden lg:grid lg:grid-cols-8 gap-4 lg:gap-5"
+                  role="list"
+                  aria-label={`${randomCategories.length} categories`}
+                >
+                  {randomCategories.map((category) => {
+                    const categoryProduct = getRandomProductForCategory(category);
+                    const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
+                    
+                    return (
+                      <div
+                        key={category}
+                        className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
+                        tabIndex={0}
+                        role="listitem"
+                        aria-label={`View products in ${category}`}
+                        onClick={() => handleCategoryClick(category)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
+                        }}
+                      >
+                        {/* Square image thumbnail */}
+                        <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
+                          <img
+                            src={categoryImageUrl}
+                            alt={`${category} category`}
+                            loading="lazy"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src = "/placeholder-image.png";
+                              e.target.alt = `Image not available for ${category}`;
+                            }}
+                          />
+                        </div>
+                        {/* Category name */}
+                        <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                          <span className="font-semibold text-sm text-center line-clamp-2">
+                            {category}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </section>
         )}
 
         {/* For You Section */}
-        {!loading && !error && forYouProducts.length > 0 && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10">
+        {!error && (
+          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5"
               role="grid"
-              aria-label={`${forYouProducts.length} personalized products`}
+              aria-label={loading ? "Loading products" : `${forYouProducts.length} personalized products`}
             >
-              {forYouProducts.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  handleProductClick={handleProductClick}
-                  handleKeyDown={handleKeyDown}
-                />
-              ))}
+              {loading ? (
+                [...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))
+              ) : (
+                forYouProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    handleProductClick={handleProductClick}
+                    handleKeyDown={handleKeyDown}
+                  />
+                ))
+              )}
             </div>
           </section>
         )}
 
         {/* Recommendations Section */}
-        {!loading && !error && recommendedProducts.length > 0 && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10">
+        {!error && (
+          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommendations</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5"
               role="grid"
-              aria-label={`${recommendedProducts.length} recommended products`}
+              aria-label={loading ? "Loading products" : `${recommendedProducts.length} recommended products`}
             >
-              {recommendedProducts.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  handleProductClick={handleProductClick}
-                  handleKeyDown={handleKeyDown}
-                />
-              ))}
+              {loading ? (
+                [...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))
+              ) : (
+                recommendedProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    handleProductClick={handleProductClick}
+                    handleKeyDown={handleKeyDown}
+                  />
+                ))
+              )}
             </div>
-            <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
-              <button
-                className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] text-sm sm:text-base bg-amber-400 text-gray-900 py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg hover:bg-amber-500 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
-                onClick={handleViewAll}
-              >
-                View All
-              </button>
-            </div>
+            {!loading && (
+              <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
+                <button
+                  className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] text-sm sm:text-base bg-amber-400 text-gray-900 py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg hover:bg-amber-500 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                  onClick={handleViewAll}
+                >
+                  View All
+                </button>
+              </div>
+            )}
           </section>
         )}
       </div>

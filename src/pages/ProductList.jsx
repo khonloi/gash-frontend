@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../components/ProductCard";
+import ProductCardSkeleton from "../components/ProductCardSkeleton";
 import {
   FILTER_STORAGE_KEY,
   DEFAULT_FILTERS,
@@ -352,7 +353,7 @@ const ProductList = () => {
   // Filter section component
   const FilterSection = ({ title, options, selectedValue, filterType }) => (
     <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
-      <legend className="text-sm font-semibold mb-2">{title}</legend>
+      <legend className="text-md font-semibold">{title}</legend>
       {["All", ...options].map((option) => {
         const value = option === "All" ? `All ${title}` : option;
         return (
@@ -385,116 +386,118 @@ const ProductList = () => {
   }, [debouncedCategory, debouncedColor, debouncedSize]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 bg-white text-gray-900">
-      <aside className="w-full md:w-60 lg:w-64 px-0 md:px-4 flex-shrink-0 border-0 md:border-r-2 border-gray-300 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
-        <div className="flex justify-between items-center mb-4 h-8">
-          <h1 className="text-2xl m-0">Filters</h1>
-          {hasActiveFilters && (
-            <button
-              onClick={clearAllFilters}
-              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
-              aria-label="Clear all filters"
-            >
-              Clear All
-            </button>
-          )}
-        </div>
-
-        <FilterSection
-          title="Categories"
-          options={categories}
-          selectedValue={selectedCategory}
-          filterType="category"
-        />
-
-        <FilterSection
-          title="Colors"
-          options={colors}
-          selectedValue={selectedColor}
-          filterType="color"
-        />
-
-        <FilterSection
-          title="Sizes"
-          options={sizes}
-          selectedValue={selectedSize}
-          filterType="size"
-        />
-      </aside>
-
-      <main className="flex-1 px-0 md:px-4 min-w-0" role="main">
-        <header className="mb-4">
-          <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Product Listings</h1>
-          <p className="text-sm text-gray-600 mb-4">
-            Explore our range of products below. Select a product to view detailed information,
-            pricing, and available variations.
-          </p>
-          {activeProducts.length > 0 && !loading && !isFiltering && (
-            <p className="text-sm text-gray-600 mb-4">
-              Showing {activeProducts.length} product{activeProducts.length !== 1 ? "s" : ""}
-              {hasActiveFilters && " matching your filters"}
-            </p>
-          )}
-        </header>
-
-        {error && (
-          <div 
-            ref={errorRef}
-            className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" 
-            role="alert" 
-            tabIndex={0} 
-            aria-live="polite"
-          >
-            <span className="text-lg" aria-hidden="true">⚠</span>
-            {error}
-            <button
-              onClick={handleRetry}
-              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
-              disabled={loading}
-              aria-label="Retry loading products"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        {(loading || isFiltering) && (
-          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 flex-wrap min-h-[100px]" role="status" aria-live="polite">
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" aria-hidden="true"></div>
-            {loading ? "Loading products..." : "Applying filters..."}
-          </div>
-        )}
-
-        {!loading && !isFiltering && activeProducts.length === 0 && !error && (
-          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
-            <p>No active products found for selected filters</p>
+    <div className="flex flex-col md:flex-row w-full mx-auto p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <aside className="w-full md:w-60 lg:w-64 px-0 md:px-4 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
+        <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6">
+          <div className="flex justify-between items-center mb-4 h-8">
+            <h1 className="text-2xl m-0">Filters</h1>
             {hasActiveFilters && (
-              <button 
-                onClick={clearAllFilters} 
+              <button
+                onClick={clearAllFilters}
                 className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                aria-label="Clear all filters"
               >
-                Clear Filters
+                Clear All
               </button>
             )}
           </div>
-        )}
 
-        {!loading && !isFiltering && activeProducts.length > 0 && (
+          <FilterSection
+            title="Categories"
+            options={categories}
+            selectedValue={selectedCategory}
+            filterType="category"
+          />
+
+          <FilterSection
+            title="Colors"
+            options={colors}
+            selectedValue={selectedColor}
+            filterType="color"
+          />
+
+          <FilterSection
+            title="Sizes"
+            options={sizes}
+            selectedValue={selectedSize}
+            filterType="size"
+          />
+        </div>
+      </aside>
+
+      <main className="flex-1 px-0 md:px-4 min-w-0" role="main">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6">
+          <header className="mb-4">
+            <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Product Listings</h1>
+            <p className="text-sm text-gray-600 mb-4">
+              Explore our range of products below. Select a product to view detailed information,
+              pricing, and available variations.
+            </p>
+            {activeProducts.length > 0 && !loading && !isFiltering && (
+              <p className="text-sm text-gray-600 mb-4">
+                Showing {activeProducts.length} product{activeProducts.length !== 1 ? "s" : ""}
+                {hasActiveFilters && " matching your filters"}
+              </p>
+            )}
+          </header>
+
+          {error && (
+            <div 
+              ref={errorRef}
+              className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" 
+              role="alert" 
+              tabIndex={0} 
+              aria-live="polite"
+            >
+              <span className="text-lg" aria-hidden="true">⚠</span>
+              {error}
+              <button
+                onClick={handleRetry}
+                className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+                disabled={loading}
+                aria-label="Retry loading products"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Product Grid Section - Always visible */}
+          {!loading && !isFiltering && activeProducts.length === 0 && !error && (
+            <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+              <p>No active products found for selected filters</p>
+              {hasActiveFilters && (
+                <button 
+                  onClick={clearAllFilters} 
+                  className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          )}
+
           <div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 py-3 justify-items-center"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 justify-items-center"
             role="grid"
-            aria-label={`${activeProducts.length} products`}
+            aria-label={(loading || isFiltering) ? "Loading products" : `${activeProducts.length} products`}
           >
-            {activeProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                handleProductClick={handleProductClick}
-                handleKeyDown={handleKeyDown}
-              />
-            ))}
+            {(loading || isFiltering) ? (
+              [...Array(8)].map((_, index) => (
+                <ProductCardSkeleton key={index} />
+              ))
+            ) : (
+              activeProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  handleProductClick={handleProductClick}
+                  handleKeyDown={handleKeyDown}
+                />
+              ))
+            )}
           </div>
-        )}
+        </section>
       </main>
     </div>
   );

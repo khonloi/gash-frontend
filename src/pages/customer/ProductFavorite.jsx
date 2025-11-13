@@ -1,15 +1,20 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback, useContext, useRef } from "react";
 import { useToast } from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import axiosClient from "../../common/axiosClient";
-import "../../styles/ProductList.css";
+import Api from "../../common/SummaryAPI";
+import FavoriteProductCard from "../../components/FavoriteProductCard";
+import ProductCardSkeleton from "../../components/ProductCardSkeleton";
+import {
+  API_RETRY_COUNT,
+  API_RETRY_DELAY,
+} from "../../constants/constants";
 
 // API functions
-const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
+const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await axiosClient({ url, ...options });
+      const response = await apiCall();
       return response.data;
     } catch (error) {
       if (i === retries - 1) throw error;
@@ -18,25 +23,6 @@ const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
   }
 };
 
-// Helper function to get minimum price from product variants
-const getMinPrice = (product) => {
-  if (!product || !product.productVariantIds || product.productVariantIds.length === 0) {
-    return 0;
-  }
-  const prices = product.productVariantIds
-    .filter(v => v && v.variantStatus === 'active' && v.variantPrice > 0 && v.stockQuantity > 0)
-    .map(v => v.variantPrice);
-  return prices.length > 0 ? Math.min(...prices) : 0;
-};
-
-// Helper function to get main image URL
-const getMainImageUrl = (product) => {
-  if (!product || !product.productImageIds || product.productImageIds.length === 0) {
-    return "/placeholder-image.png";
-  }
-  const mainImage = product.productImageIds.find(img => img && img.isMain === true);
-  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-};
 
 const ProductFavorite = () => {
   const { user } = useContext(AuthContext);
@@ -56,10 +42,15 @@ const ProductFavorite = () => {
     setLoading(true);
     setError(null);
     try {
-      const favoritesData = await fetchWithRetry("/favorites", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication token missing");
+        setFavorites([]);
+        return;
+      }
+      const response = await fetchWithRetry(() => Api.favorites.fetch(token));
+      const favoritesData = response?.favorites || response?.data || response || [];
+      
       if (!Array.isArray(favoritesData)) {
         setError("No favorite products found");
         setFavorites([]);
@@ -67,7 +58,7 @@ const ProductFavorite = () => {
       }
       setFavorites(favoritesData);
     } catch (err) {
-      setError(err.message || "Failed to fetch favorite products");
+      setError(err.response?.data?.message || err.message || "Failed to fetch favorite products");
       setFavorites([]);
     } finally {
       setLoading(false);
@@ -86,14 +77,17 @@ const ProductFavorite = () => {
       return;
     }
     try {
-      await fetchWithRetry(`/favorites/${favoriteId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showToast("Authentication token missing", "error", 3000);
+        navigate("/login");
+        return;
+      }
+      await fetchWithRetry(() => Api.favorites.remove(favoriteId, token));
       setFavorites((prev) => prev.filter((fav) => fav._id !== favoriteId));
       showToast("Product removed from favorites!", "success", 3000);
     } catch (err) {
-      const errorMessage = err.message || "Failed to remove from favorites";
+      const errorMessage = err.response?.data?.message || err.message || "Failed to remove from favorites";
       setError(errorMessage);
       showToast(errorMessage, "error", 3000);
     }
@@ -119,132 +113,92 @@ const ProductFavorite = () => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  // Helpers
-  const formatPrice = useCallback((price) => {
-    if (typeof price !== "number" || isNaN(price)) return "N/A";
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  }, []);
-
   // Focus error notification
+  const errorRef = useRef(null);
   useEffect(() => {
-    if (error) {
-      const errorElement = document.querySelector(".product-list-error");
-      errorElement?.focus();
+    if (error && errorRef.current) {
+      errorRef.current.focus();
     }
   }, [error]);
 
   return (
-    <div className="product-list-container">
-      {/* Toast Notification */}
-      {/* ...global toast handled by ToastProvider... */}
-      <main className="product-list-main-content" role="main">
-        <header className="product-list-results-header">
-          <h1>Your Favorite Products</h1>
-          <p>
+    <div className="flex flex-col items-center w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full">
+        <header className="mb-4">
+          <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Your Favorite Products</h1>
+          <p className="text-sm text-gray-600 mb-4">
             Browse your favorite products below. Click a product to view details or remove it from your favorites.
           </p>
           {favorites.length > 0 && !loading && (
-            <p className="product-list-results-count">
+            <p className="text-sm text-gray-600 mb-4">
               Showing {favorites.length} favorite product{favorites.length !== 1 ? "s" : ""}
             </p>
           )}
         </header>
 
-        {error && !favorites.length && (
-          <div className="product-list-error" role="alert" tabIndex={0} aria-live="polite">
-            <span className="product-list-error-icon" aria-hidden="true">⚠</span>
+        {error && (
+          <div 
+            ref={errorRef}
+            className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" 
+            role="alert" 
+            tabIndex={0} 
+            aria-live="polite"
+          >
+            <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
             <button
               onClick={handleRetry}
-              className="product-list-retry-button"
-              aria-label="Retry loading favorites"
+              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
               disabled={loading}
+              aria-label="Retry loading favorites"
             >
               Retry
             </button>
           </div>
         )}
 
-        {loading && (
-          <div className="product-list-loading" role="status" aria-live="polite">
-            <div className="product-list-loading-spinner" aria-hidden="true"></div>
-            Loading favorite products...
-          </div>
-        )}
-
+        {/* Product Grid Section - Always visible */}
         {!loading && favorites.length === 0 && !error && (
-          <div className="product-list-no-products" role="status">
+          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
             <p>No favorite products found.</p>
             <button
               onClick={() => navigate("/products")}
-              className="product-list-clear-filters-button"
+              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
             >
               Browse Products
             </button>
           </div>
         )}
 
-        {!loading && favorites.length > 0 && (
-          <div
-            className="product-list-product-grid"
-            role="grid"
-            aria-label={`${favorites.length} favorite products`}
-          >
-            {favorites.map((favorite) => {
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-items-center"
+          role="grid"
+          aria-label={loading ? "Loading favorites" : `${favorites.length} favorite products`}
+        >
+          {loading ? (
+            [...Array(8)].map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))
+          ) : (
+            favorites.map((favorite) => {
               if (!favorite.pro_id) {
                 return null; // Skip rendering if pro_id is missing
               }
               const product = favorite.pro_id;
-              const minPrice = getMinPrice(product);
-              const imageUrl = getMainImageUrl(product);
               return (
-                <article
+                <FavoriteProductCard
                   key={favorite._id}
-                  className="product-list-product-card"
-                  role="gridcell"
-                  aria-label={`View ${product?.productName || "product"} details`}
-                  style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
-                >
-                  <div
-                    className="product-list-image-container"
-                    onClick={() => handleProductClick(product?._id)}
-                    onKeyDown={(e) => handleKeyDown(e, product?._id)}
-                    tabIndex={0}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <img
-                      src={imageUrl}
-                      alt={product?.productName || "Product image"}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.src = "/placeholder-image.png";
-                        e.target.alt = `Image not available for ${product?.productName || "product"}`;
-                      }}
-                    />
-                  </div>
-                  <div className="product-list-content">
-                    <h2 title={product?.productName}>{product?.productName || "Unnamed Product"}</h2>
-                    <p
-                      className="product-list-price"
-                      aria-label={`Price: ${formatPrice(minPrice)}`}
-                    >
-                      {formatPrice(minPrice)}
-                    </p>
-                  </div>
-                  <button
-                    className="product-list-clear-filters-button"
-                    style={{ background: "#fff", borderColor: "#b12704", color: "#b12704" }}
-                    onClick={() => handleDeleteFavorite(favorite._id)}
-                    aria-label={`Remove ${product?.productName || "product"} from favorites`}
-                  >
-                    Remove
-                  </button>
-                </article>
+                  product={product}
+                  favoriteId={favorite._id}
+                  handleProductClick={handleProductClick}
+                  handleKeyDown={handleKeyDown}
+                  handleRemove={handleDeleteFavorite}
+                />
               );
-            })}
-          </div>
-        )}
-      </main>
+            })
+          )}
+        </div>
+      </section>
     </div>
   );
 };
