@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import axiosClient, { SOCKET_URL } from "../common/axiosClient";
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import { io } from "socket.io-client";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
 
@@ -11,24 +12,75 @@ export default function NotificationsDropdown({ user }) {
   const notificationRef = useRef(null);
   const navigate = useNavigate();
 
-  // Fetch notifications from backend
+  // 🧩 Socket.IO: kết nối realtime
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // ✅ Lấy URL backend chính xác
+    const baseURL =
+      import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
+    const SOCKET_URL = baseURL.replace("http", "ws"); // tự chuyển sang ws:// hoặc wss://
+
+    console.log("🔌 Connecting socket to:", SOCKET_URL);
+
+    const socket = io(baseURL, {
+      transports: ["websocket", "polling"], // fallback an toàn
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      withCredentials: true,
+    });
+
+    // Khi user kết nối, gửi userId lên server
+    socket.on("connect", () => {
+      console.log("✅ Socket connected:", socket.id);
+      socket.emit("userConnected", user._id);
+      socket.emit("joinRoom", user._id); // 🧩 THÊM DÒNG NÀY để user join vào room riêng, nhận realtime ngay
+    });
+
+    // Nhận thông báo realtime
+    socket.on("newNotification", (data) => {
+      console.log("🔔 Nhận thông báo realtime:", data);
+      setNotifications((prev) => [data, ...prev]);
+    });
+
+    // Log lỗi
+    socket.on("connect_error", (err) => {
+      console.error("❌ Socket connection error:", err.message);
+    });
+
+    // Ngắt kết nối
+    socket.on("disconnect", (reason) => {
+      console.warn("⚠️ Socket disconnected:", reason);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
+
+  // 🧠 Lấy danh sách thông báo từ backend
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!user?._id) return;
       try {
-        const { data } = await axiosClient.get(`/notifications/user/${user._id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch notifications");
+        const data = await res.json();
         setNotifications(data);
-      } catch {
-        // Error handling without console log
+      } catch (err) {
+        console.error("❌ Lỗi khi lấy thông báo:", err);
       }
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // refresh every 30s
+    const interval = setInterval(fetchNotifications, 30000); // refresh mỗi 30s
     return () => clearInterval(interval);
   }, [user]);
 
-  // Click outside to close dropdown
+  // 🧱 Click ngoài để đóng dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (notificationRef.current && !notificationRef.current.contains(e.target)) {
@@ -39,89 +91,110 @@ export default function NotificationsDropdown({ user }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Number of unread notifications
+  // 🔢 Số lượng chưa đọc
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // Mark as read
+  // ✅ Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
-      await axiosClient.put(`/notifications/mark-read/${id}`);
+      await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/mark-read/${id}`,
+        { method: "PUT" }
+      );
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
-      window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
-    } catch {
-      // Error handling without console log
+    } catch (err) {
+      console.error("❌ Lỗi khi đánh dấu đã đọc:", err);
     }
   };
 
-  // Delete one notification
+  // ❌ Xóa 1 thông báo (cho user)
   const deleteNotification = async (id) => {
     try {
-      await axiosClient.delete(`/notifications/admin/${id}`);
+      await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}/${id}`,
+        { method: "DELETE" }
+      );
       setNotifications((prev) => prev.filter((n) => n._id !== id));
-      window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
-    } catch {
-      // Error handling without console log
+    } catch (err) {
+      console.error("❌ Lỗi khi xóa thông báo:", err);
     }
   };
 
-  // Clear all notifications
+  // 🧹 Xóa toàn bộ thông báo
   const clearAll = async () => {
     try {
-      await axiosClient.delete(`/notifications/clear/${user._id}`);
+      await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/clear/${user._id}`,
+        { method: "DELETE" }
+      );
       setNotifications([]);
-      window.dispatchEvent(new Event('notificationUpdated')); // Trigger update
-    } catch {
-      // Error handling without console log
+    } catch (err) {
+      console.error("❌ Lỗi khi clear all:", err);
     }
   };
 
   return (
     <div className="relative" ref={notificationRef}>
-      {/* Notification Icon with Badge */}
+      {/* 🔔 Icon chuông */}
       <IconButton
         onClick={() => (user ? setShowNotifications((prev) => !prev) : navigate("/login"))}
         title="Notifications"
-        badge={unreadCount > 0 ? unreadCount : null}
-        badgeColor="bg-amber-500"
       >
         <NotificationsNoneOutlinedIcon />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+            {unreadCount}
+          </span>
+        )}
       </IconButton>
 
-      {/* Dropdown list */}
+      {/* 📜 Dropdown danh sách */}
       {user && showNotifications && (
         <div className="absolute right-0 mt-3 w-96 bg-white text-gray-900 rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100 animate-[fadeDown_0.25s_ease-out]">
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-3 bg-gray-50 border-b">
             <h3 className="font-semibold text-gray-800 text-sm">Notifications</h3>
-            {notifications.length > 0 && (
+            <div className="flex items-center gap-2">
               <button
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#ff4d4d] transition"
-                onClick={clearAll}
+                className="text-gray-500 hover:text-indigo-600 transition"
+                title="Notification Settings"
+                onClick={() => {
+                  setShowNotifications(false);
+                  navigate("/notifications");
+                }}
               >
-                <DeleteIcon fontSize="small" />
-                Clear all
+                <SettingsIcon fontSize="small" />
               </button>
-            )}
+
+              {notifications.length > 0 && (
+                <button
+                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#ff4d4d] transition"
+                  onClick={clearAll}
+                  title="Clear all notifications"
+                >
+                  <DeleteIcon fontSize="small" />
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* List */}
+          {/* Danh sách */}
           {notifications.length > 0 ? (
             <ul className="max-h-96 overflow-y-auto divide-y divide-gray-100 scrollbar-thin scrollbar-thumb-gray-300">
               {notifications.map((n) => (
                 <li
                   key={n._id}
                   onClick={() => markAsRead(n._id)}
-                  className={`group flex items-start gap-3 px-5 py-4 hover:bg-[#fff6eb] transition-all cursor-pointer ${!n.isRead ? "bg-[#fffaf0]" : "bg-white"
-                    }`}
+                  className={`group flex items-start gap-3 px-5 py-4 hover:bg-[#fff6eb] transition-all cursor-pointer ${
+                    !n.isRead ? "bg-[#fffaf0]" : "bg-white"
+                  }`}
                 >
-                  {/* Icon */}
                   <div className="flex-shrink-0 w-10 h-10 bg-[#ffb300]/10 text-[#ffb300] rounded-full flex items-center justify-center text-lg">
                     <NotificationsNoneOutlinedIcon fontSize="small" />
                   </div>
 
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p className="text-gray-800 text-sm leading-snug">
                       <strong>{n.title}</strong>
@@ -147,7 +220,6 @@ export default function NotificationsDropdown({ user }) {
                     </div>
                   </div>
 
-                  {/* Delete button */}
                   <button
                     className="ml-auto text-gray-400 hover:text-red-500 transition"
                     onClick={(e) => {
@@ -166,19 +238,6 @@ export default function NotificationsDropdown({ user }) {
               No new notifications 🎉
             </div>
           )}
-
-          {/* Footer */}
-          <div className="border-t bg-gray-50 px-4 py-3 flex justify-center">
-            <button
-              onClick={() => {
-                setShowNotifications(false);
-                navigate("/notifications");
-              }}
-              className="w-full text-sm py-2 rounded-lg font-medium text-gray-700 bg-white border hover:bg-[#ffb300]/10 hover:text-[#ffb300] transition"
-            >
-              View All
-            </button>
-          </div>
         </div>
       )}
     </div>
