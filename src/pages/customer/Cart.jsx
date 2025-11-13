@@ -494,7 +494,7 @@ const Cart = () => {
 
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-lg">
         <h2 className="text-xl sm:text-2xl font-md mb-4 sm:mb-5 md:mb-6 m-0">
           Shopping Cart
         </h2>

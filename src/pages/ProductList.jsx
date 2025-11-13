@@ -388,8 +388,8 @@ const ProductList = () => {
 
   return (
     <div className="flex flex-col md:flex-row w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <aside className="w-full md:w-60 lg:w-64 px-0 md:px-4 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
-        <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6">
+      <aside className="w-full md:w-60 lg:w-64 px-0 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
+        <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-lg w-full">
           <div className="flex justify-between items-center mb-4 h-8">
             <h1 className="text-2xl m-0">Filters</h1>
             {hasActiveFilters && (
@@ -429,7 +429,7 @@ const ProductList = () => {
       </aside>
 
       <main className="flex-1 px-0 md:px-4 min-w-0" role="main">
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-lg">
           <header className="mb-4">
             <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Product Listings</h1>
             <p className="text-sm text-gray-600 mb-4">

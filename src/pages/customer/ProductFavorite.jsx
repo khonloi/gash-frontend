@@ -124,17 +124,12 @@ const ProductFavorite = () => {
 
   return (
     <div className="flex flex-col items-center w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-lg">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Your Favorite Products</h1>
           <p className="text-sm text-gray-600 mb-4">
             Browse your favorite products below. Click a product to view details or remove it from your favorites.
           </p>
-          {favorites.length > 0 && !loading && (
-            <p className="text-sm text-gray-600 mb-4">
-              Showing {favorites.length} favorite product{favorites.length !== 1 ? "s" : ""}
-            </p>
-          )}
         </header>
 
         {error && (

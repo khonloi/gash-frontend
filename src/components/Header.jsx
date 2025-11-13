@@ -12,7 +12,7 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import LiveTvIcon from '@mui/icons-material/LiveTv';
+import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import NotificationsDropdown from "./NotificationsDropdown";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
@@ -574,7 +574,7 @@ export default function Header() {
                                 title="Live Stream"
                                 className="p-2 text-white hover:text-amber-500"
                             >
-                                <LiveTvIcon />
+                                <TvOutlinedIcon />
                                 {livestreamCount > 0 && (
                                     <span className={`${badgeClass} -top-1 -right-1`}>
                                         {livestreamCount}
