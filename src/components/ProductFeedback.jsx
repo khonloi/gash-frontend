@@ -112,7 +112,7 @@ const ProductFeedback = ({ productId }) => {
     // Early return if no productId (after all hooks)
     if (!productId) {
         return (
-            <div className="product-detail-feedback">
+            <div className="mt-4 sm:mt-5 md:mt-6 pt-4 sm:pt-5 border-t-2 border-gray-300 w-full px-0 sm:px-2">
                 <div className="text-center py-8">
                     <p className="text-gray-500">No product ID provided</p>
                 </div>
@@ -122,7 +122,7 @@ const ProductFeedback = ({ productId }) => {
 
     if (feedbackLoading) {
         return (
-            <div className="product-detail-feedback">
+            <div className="mt-4 sm:mt-5 md:mt-6 pt-4 sm:pt-5 border-t-2 border-gray-300 w-full px-0 sm:px-2">
                 <LoadingForm
                     text="Loading reviews..."
                     height="h-32"
@@ -135,7 +135,7 @@ const ProductFeedback = ({ productId }) => {
 
     if (feedbackError) {
         return (
-            <div className="product-detail-feedback">
+            <div className="mt-4 sm:mt-5 md:mt-6 pt-4 sm:pt-5 border-t-2 border-gray-300 w-full px-0 sm:px-2">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                     <div className="flex items-center">
                         <i className="lni lni-warning text-red-500 text-xl mr-3"></i>
@@ -157,7 +157,7 @@ const ProductFeedback = ({ productId }) => {
 
     if (feedbacks.length === 0) {
         return (
-            <div className="product-detail-feedback">
+            <div className="mt-4 sm:mt-5 md:mt-6 pt-4 sm:pt-5 border-t-2 border-gray-300 w-full px-0 sm:px-2">
                 <div className="text-center py-12">
                     <div className="mb-6">
                         <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
@@ -172,7 +172,7 @@ const ProductFeedback = ({ productId }) => {
     }
 
     return (
-        <div className="product-detail-feedback">
+        <div className="mt-4 sm:mt-5 md:mt-6 pt-4 sm:pt-5 border-t-2 border-gray-300 w-full px-0 sm:px-2">
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">Product Reviews</h3>

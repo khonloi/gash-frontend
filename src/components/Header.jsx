@@ -278,7 +278,7 @@ export default function Header() {
 
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
-            <div className="max-w-7xl mx-auto h-20 sm:h-24 flex items-center px-4 sm:px-6 lg:px-12">
+            <div className="max-w-7xl mx-auto h-16 sm:h-20 md:h-24 flex items-center px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12">
                 {/* ==== MOBILE HEADER ==== */}
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
@@ -296,7 +296,7 @@ export default function Header() {
                                     }}
                                     placeholder="Search..."
                                     autoFocus
-                                    className="flex-1 pl-4 pr-12 py-2 text-base text-gray-900 focus:outline-none"
+                                    className="flex-1 pl-3 pr-10 sm:pr-12 py-2 text-sm sm:text-base text-gray-900 focus:outline-none"
                                 />
                                 {search ? (
                                     <button
@@ -393,7 +393,7 @@ export default function Header() {
                                 <SearchIcon />
                             </button>
                             <Link to="/" className="flex items-center justify-center">
-                                <img src={gashLogo} alt="Gash Logo" className="h-7" />
+                                <img src={gashLogo} alt="Gash Logo" className="h-6 sm:h-7" />
                             </Link>
                             <div className="relative" ref={userMenuRef}>
                                 <button
@@ -487,9 +487,9 @@ export default function Header() {
                 {/* ==== DESKTOP HEADER ==== */}
                 <div className="hidden sm:flex w-full items-center justify-between">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={gashLogo} alt="Gash Logo" className="h-7" />
+                        <img src={gashLogo} alt="Gash Logo" className="h-6 md:h-7" />
                     </Link>
-                    <div className="relative flex-1 mx-12 max-w-2xl" ref={dropdownRef}>
+                    <div className="relative flex-1 mx-4 sm:mx-6 md:mx-8 lg:mx-12 max-w-2xl" ref={dropdownRef}>
                         <form
                             onSubmit={handleSearchSubmit}
                             className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden"
@@ -502,7 +502,7 @@ export default function Header() {
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
-                                className="flex-1 pl-5 pr-12 py-2 text-base text-gray-900 focus:outline-none"
+                                className="flex-1 pl-3 sm:pl-4 md:pl-5 pr-10 sm:pr-12 py-1.5 sm:py-2 text-sm sm:text-base text-gray-900 focus:outline-none"
                             />
                             <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500">
                                 <SearchIcon fontSize="small" />
@@ -564,7 +564,7 @@ export default function Header() {
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center gap-4 sm:gap-6" ref={userMenuRef}>
+                    <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
                             <button
                                 onClick={() => {
@@ -643,7 +643,7 @@ export default function Header() {
                                 <PermIdentityOutlinedIcon />
                             </button>
                             {user && (
-                                <span className="hidden sm:block text-sm text-gray-200">
+                                <span className="hidden md:block text-xs md:text-sm text-gray-200">
                                     <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
                                 </span>
                             )}

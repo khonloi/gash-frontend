@@ -246,22 +246,22 @@ const Home = () => {
   };
 
   return (
-    <>
+    <div>
       {/* Carousel Section - full viewport width */}
       <div className="w-full overflow-x-hidden">
-        <div className="relative w-full min-h-[340px] h-[36vw] max-h-[400px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 overflow-hidden box-border">
+        <div className="relative w-full min-h-[200px] sm:min-h-[280px] md:min-h-[340px] h-[40vw] sm:h-[38vw] md:h-[36vw] max-h-[300px] sm:max-h-[350px] md:max-h-[400px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 overflow-hidden box-border">
           <button
-            className="absolute left-8 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-2xl"
+            className="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-xl sm:text-2xl"
             onClick={handlePrevCarousel}
             aria-label="Previous announcement"
           >
             <i className="lni lni-chevron-left"></i>
           </button>
-          <div className="w-full max-w-[900px] text-center text-4xl font-bold text-gray-900 letter-spacing tracking-wide leading-tight px-16 select-none box-border m-0 overflow-hidden md:text-2xl">
+          <div className="w-full max-w-[900px] text-center text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 letter-spacing tracking-wide leading-tight px-4 sm:px-8 md:px-12 lg:px-16 select-none box-border m-0 overflow-hidden">
             {carouselMessages[carouselIndex]}
           </div>
           <button
-            className="absolute right-8 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-2xl"
+            className="absolute right-2 sm:right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-xl sm:text-2xl"
             onClick={handleNextCarousel}
             aria-label="Next announcement"
           >
@@ -270,9 +270,9 @@ const Home = () => {
         </div>
       </div>
       {/* Main Home Content */}
-      <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-5 p-4 bg-white text-gray-900">
+      <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 bg-white text-gray-900">
         {error && (
-          <div className="text-center text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-8 mb-4 w-full flex items-center justify-center gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
+          <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
             <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
             <button
@@ -287,7 +287,7 @@ const Home = () => {
         )}
 
         {loading && (
-          <div className="text-center text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-8 mb-4 w-full flex items-center justify-center gap-2 flex-wrap" role="status" aria-live="polite">
+          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 flex-wrap" role="status" aria-live="polite">
             <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
             Loading recommendations...
           </div>
@@ -296,13 +296,13 @@ const Home = () => {
         {/* Category Section */}
         {!loading && !error && randomCategories.length > 0 && (
           <section className="w-full mt-0">
-            <h2 className="text-left mb-6 text-xl font-semibold">Categories</h2>
+            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Categories</h2>
             {/* Mobile: Horizontal slider with navigation */}
-            <div className="md:hidden relative">
+            <div className="lg:hidden relative">
               <div
                 ref={categorySliderRef}
                 onScroll={handleCategoryScroll}
-                className="flex overflow-x-auto gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                 role="list"
                 aria-label={`${randomCategories.length} categories`}
               >
@@ -348,26 +348,26 @@ const Home = () => {
               {/* Navigation buttons for mobile */}
               {categoryScrollPosition > 0 && (
                 <button
-                  className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                  className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
                   onClick={handleCategoryPrev}
                   aria-label="Previous categories"
                 >
-                  <i className="lni lni-chevron-left text-xl"></i>
+                  <i className="lni lni-chevron-left text-lg sm:text-xl"></i>
                 </button>
               )}
               {canScrollNext && (
                 <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                  className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
                   onClick={handleCategoryNext}
                   aria-label="Next categories"
                 >
-                  <i className="lni lni-chevron-right text-xl"></i>
+                  <i className="lni lni-chevron-right text-lg sm:text-xl"></i>
                 </button>
               )}
             </div>
             {/* Desktop: Grid layout */}
             <div
-              className="hidden md:grid md:grid-cols-8 gap-5"
+              className="hidden lg:grid lg:grid-cols-8 gap-4 lg:gap-5"
               role="list"
               aria-label={`${randomCategories.length} categories`}
             >
@@ -415,10 +415,10 @@ const Home = () => {
 
         {/* For You Section */}
         {!loading && !error && forYouProducts.length > 0 && (
-          <section className="w-full mt-10">
-            <h2 className="text-left mb-6 text-xl font-semibold">For You</h2>
+          <section className="w-full mt-6 sm:mt-8 md:mt-10">
+            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
             <div
-              className="grid grid-cols-2 gap-5 md:grid-cols-5"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5"
               role="grid"
               aria-label={`${forYouProducts.length} personalized products`}
             >
@@ -436,10 +436,10 @@ const Home = () => {
 
         {/* Recommendations Section */}
         {!loading && !error && recommendedProducts.length > 0 && (
-          <section className="w-full mt-10">
-            <h2 className="text-left mb-6 text-xl font-semibold">Recommendations</h2>
+          <section className="w-full mt-6 sm:mt-8 md:mt-10">
+            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommendations</h2>
             <div
-              className="grid grid-cols-2 gap-5 md:grid-cols-5"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5"
               role="grid"
               aria-label={`${recommendedProducts.length} recommended products`}
             >
@@ -452,9 +452,9 @@ const Home = () => {
                 />
               ))}
             </div>
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
               <button
-                className="min-w-[180px] text-base bg-amber-400 text-gray-900 py-2 px-4 rounded-lg hover:bg-amber-500 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] text-sm sm:text-base bg-amber-400 text-gray-900 py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg hover:bg-amber-500 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
                 onClick={handleViewAll}
               >
                 View All
@@ -463,7 +463,7 @@ const Home = () => {
           </section>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
