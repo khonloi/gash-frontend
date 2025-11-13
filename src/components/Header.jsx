@@ -644,7 +644,7 @@ export default function Header() {
                             </button>
                             {user && (
                                 <span className="hidden sm:block text-sm text-gray-200">
-                                    Hello, <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
+                                    <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
                                 </span>
                             )}
                             {user && showUserMenu && (

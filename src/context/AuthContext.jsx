@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Login successful!', 'success');
+
 
       setTimeout(() => {
         handleForcedLogout('Your session has expired. You will be logged out.');

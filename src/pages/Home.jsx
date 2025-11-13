@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+// Home.jsx
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY
 } from "../constants/constants";
+import ProductCard from "../components/ProductCard";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
@@ -16,26 +18,6 @@ const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RE
       await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
     }
   }
-};
-
-// Helper function to get minimum price from product variants
-const getMinPrice = (product) => {
-  if (!product.productVariantIds || product.productVariantIds.length === 0) {
-    return 0;
-  }
-  const prices = product.productVariantIds
-    .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
-    .map(v => v.variantPrice);
-  return prices.length > 0 ? Math.min(...prices) : 0;
-};
-
-// Helper function to get main image URL
-const getMainImageUrl = (product) => {
-  if (!product.productImageIds || product.productImageIds.length === 0) {
-    return "/placeholder-image.png";
-  }
-  const mainImage = product.productImageIds.find(img => img.isMain);
-  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
 };
 
 const carouselMessages = [
@@ -119,10 +101,32 @@ const Home = () => {
     return shuffled.slice(0, count);
   };
 
+  // Helper function to get main image URL from product
+  const getMainImageUrl = (product) => {
+    if (!product.productImageIds || product.productImageIds.length === 0) {
+      return "/placeholder-image.png";
+    }
+    const mainImage = product.productImageIds.find(img => img.isMain);
+    return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
+  };
+
+  // Helper function to get a random product from a category
+  const getRandomProductForCategory = (categoryName) => {
+    const categoryProducts = products.filter(
+      (product) => product.categoryId?.cat_name === categoryName
+    );
+    if (categoryProducts.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * categoryProducts.length);
+    return categoryProducts[randomIndex];
+  };
+
   // State for randomized sections
   const [forYouProducts, setForYouProducts] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [randomCategories, setRandomCategories] = useState([]);
+  const categorySliderRef = useRef(null);
+  const [categoryScrollPosition, setCategoryScrollPosition] = useState(0);
+  const [canScrollNext, setCanScrollNext] = useState(false);
 
   // Randomize once after products/categories are loaded
   useEffect(() => {
@@ -135,7 +139,7 @@ const Home = () => {
 
   useEffect(() => {
     if (categories.length > 0) {
-      setRandomCategories(getRandomItems(categories, 5));
+      setRandomCategories(getRandomItems(categories, 16));
     }
   }, [categories]);
 
@@ -169,10 +173,67 @@ const Home = () => {
     navigate(`/products?category=${encodeURIComponent(category)}`);
   };
 
-  const formatPrice = (price) => {
-    if (typeof price !== "number" || isNaN(price)) return "N/A";
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  // Category slider navigation
+  const handleCategoryPrev = () => {
+    if (categorySliderRef.current) {
+      const cardWidth = 144; // 9em ≈ 144px (assuming 1em = 16px)
+      const gap = 20; // gap-5 = 1.25rem = 20px
+      const scrollAmount = cardWidth + gap;
+      const newPosition = Math.max(0, categoryScrollPosition - scrollAmount);
+      categorySliderRef.current.scrollTo({
+        left: newPosition,
+        behavior: 'smooth'
+      });
+      setCategoryScrollPosition(newPosition);
+    }
   };
+
+  const handleCategoryNext = () => {
+    if (categorySliderRef.current) {
+      const cardWidth = 144;
+      const gap = 20;
+      const scrollAmount = cardWidth + gap;
+      const maxScroll = categorySliderRef.current.scrollWidth - categorySliderRef.current.clientWidth;
+      const newPosition = Math.min(maxScroll, categoryScrollPosition + scrollAmount);
+      categorySliderRef.current.scrollTo({
+        left: newPosition,
+        behavior: 'smooth'
+      });
+      setCategoryScrollPosition(newPosition);
+    }
+  };
+
+  // Update scroll position on scroll
+  const handleCategoryScroll = () => {
+    if (categorySliderRef.current) {
+      const scrollLeft = categorySliderRef.current.scrollLeft;
+      const scrollWidth = categorySliderRef.current.scrollWidth;
+      const clientWidth = categorySliderRef.current.clientWidth;
+      setCategoryScrollPosition(scrollLeft);
+      setCanScrollNext(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  // Check scroll position on mount and when categories change
+  useEffect(() => {
+    if (categorySliderRef.current && randomCategories.length > 0) {
+      const checkScroll = () => {
+        if (categorySliderRef.current) {
+          const scrollWidth = categorySliderRef.current.scrollWidth;
+          const clientWidth = categorySliderRef.current.clientWidth;
+          setCanScrollNext(scrollWidth > clientWidth);
+        }
+      };
+      // Check after a short delay to ensure DOM is updated
+      const timer = setTimeout(checkScroll, 100);
+      // Also check on window resize
+      window.addEventListener('resize', checkScroll);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', checkScroll);
+      };
+    }
+  }, [randomCategories]);
 
   // Carousel controls
   const handlePrevCarousel = () => {
@@ -236,26 +297,118 @@ const Home = () => {
         {!loading && !error && randomCategories.length > 0 && (
           <section className="w-full mt-0">
             <h2 className="text-left mb-6 text-xl font-semibold">Categories</h2>
+            {/* Mobile: Horizontal slider with navigation */}
+            <div className="md:hidden relative">
+              <div
+                ref={categorySliderRef}
+                onScroll={handleCategoryScroll}
+                className="flex overflow-x-auto gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                role="list"
+                aria-label={`${randomCategories.length} categories`}
+              >
+                {randomCategories.map((category) => {
+                  const categoryProduct = getRandomProductForCategory(category);
+                  const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
+                  
+                  return (
+                    <div
+                      key={category}
+                      className="w-[9em] flex-shrink-0 border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
+                      tabIndex={0}
+                      role="listitem"
+                      aria-label={`View products in ${category}`}
+                      onClick={() => handleCategoryClick(category)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
+                      }}
+                    >
+                      {/* Square image thumbnail */}
+                      <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
+                        <img
+                          src={categoryImageUrl}
+                          alt={`${category} category`}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = "/placeholder-image.png";
+                            e.target.alt = `Image not available for ${category}`;
+                          }}
+                        />
+                      </div>
+                      {/* Category name */}
+                      <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                        <span className="font-semibold text-sm text-center line-clamp-2">
+                          {category}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Navigation buttons for mobile */}
+              {categoryScrollPosition > 0 && (
+                <button
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                  onClick={handleCategoryPrev}
+                  aria-label="Previous categories"
+                >
+                  <i className="lni lni-chevron-left text-xl"></i>
+                </button>
+              )}
+              {canScrollNext && (
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                  onClick={handleCategoryNext}
+                  aria-label="Next categories"
+                >
+                  <i className="lni lni-chevron-right text-xl"></i>
+                </button>
+              )}
+            </div>
+            {/* Desktop: Grid layout */}
             <div
-              className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-5"
+              className="hidden md:grid md:grid-cols-8 gap-5"
               role="list"
               aria-label={`${randomCategories.length} categories`}
             >
-              {randomCategories.map((category) => (
-                <div
-                  key={category}
-                  className="border-2 border-gray-300 rounded-xl p-4 flex items-center justify-center min-h-[30px] font-semibold text-lg cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
-                  tabIndex={0}
-                  role="listitem"
-                  aria-label={`View products in ${category}`}
-                  onClick={() => handleCategoryClick(category)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
-                  }}
-                >
-                  {category}
-                </div>
-              ))}
+              {randomCategories.map((category) => {
+                const categoryProduct = getRandomProductForCategory(category);
+                const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
+                
+                return (
+                  <div
+                    key={category}
+                    className="w-[9em] border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
+                    tabIndex={0}
+                    role="listitem"
+                    aria-label={`View products in ${category}`}
+                    onClick={() => handleCategoryClick(category)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
+                    }}
+                  >
+                    {/* Square image thumbnail */}
+                    <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
+                      <img
+                        src={categoryImageUrl}
+                        alt={`${category} category`}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = "/placeholder-image.png";
+                          e.target.alt = `Image not available for ${category}`;
+                        }}
+                      />
+                    </div>
+                    {/* Category name */}
+                    <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                      <span className="font-semibold text-sm text-center line-clamp-2">
+                        {category}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
@@ -269,48 +422,14 @@ const Home = () => {
               role="grid"
               aria-label={`${forYouProducts.length} personalized products`}
             >
-              {forYouProducts.map((product) => {
-                const minPrice = getMinPrice(product);
-                const imageUrl = getMainImageUrl(product);
-                return (
-                  <article
-                    key={product._id}
-                    className="border-2 border-gray-300 rounded-xl p-4 hover:shadow-md focus:shadow-md focus:outline-none cursor-pointer"
-                    onClick={() => handleProductClick(product._id)}
-                    onKeyDown={(e) => handleKeyDown(e, product._id)}
-                    role="gridcell"
-                    tabIndex={0}
-                    aria-label={`View ${product.productName || "product"} details`}
-                  >
-                    <div className="mb-3">
-                      <img
-                        src={imageUrl}
-                        alt={product.productName || "Product image"}
-                        loading="lazy"
-                        className="w-full max-h-[180px] object-contain rounded"
-                        onError={(e) => {
-                          e.target.src = "/placeholder-image.png";
-                          e.target.alt = `Image not available for ${product.productName || "product"}`;
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <h2
-                        title={product.productName}
-                        className="text-black line-clamp-2 min-h-[2.6em] leading-tight"
-                      >
-                        {product.productName || "Unnamed Product"}
-                      </h2>
-                      <p
-                        className="text-red-600 text-lg font-semibold mt-2"
-                        aria-label={`Price: ${formatPrice(minPrice)}`}
-                      >
-                        {formatPrice(minPrice)}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
+              {forYouProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  handleProductClick={handleProductClick}
+                  handleKeyDown={handleKeyDown}
+                />
+              ))}
             </div>
           </section>
         )}
@@ -324,48 +443,14 @@ const Home = () => {
               role="grid"
               aria-label={`${recommendedProducts.length} recommended products`}
             >
-              {recommendedProducts.map((product) => {
-                const minPrice = getMinPrice(product);
-                const imageUrl = getMainImageUrl(product);
-                return (
-                  <article
-                    key={product._id}
-                    className="border-2 border-gray-300 rounded-xl p-4 hover:shadow-md focus:shadow-md focus:outline-none cursor-pointer"
-                    onClick={() => handleProductClick(product._id)}
-                    onKeyDown={(e) => handleKeyDown(e, product._id)}
-                    role="gridcell"
-                    tabIndex={0}
-                    aria-label={`View ${product.productName || "product"} details`}
-                  >
-                    <div className="mb-3">
-                      <img
-                        src={imageUrl}
-                        alt={product.productName || "Product image"}
-                        loading="lazy"
-                        className="w-full max-h-[180px] object-contain rounded"
-                        onError={(e) => {
-                          e.target.src = "/placeholder-image.png";
-                          e.target.alt = `Image not available for ${product.productName || "product"}`;
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <h2
-                        title={product.productName}
-                        className="text-black line-clamp-2 min-h-[2.6em] leading-tight"
-                      >
-                        {product.productName || "Unnamed Product"}
-                      </h2>
-                      <p
-                        className="text-red-600 text-lg font-semibold mt-2"
-                        aria-label={`Price: ${formatPrice(minPrice)}`}
-                      >
-                        {formatPrice(minPrice)}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
+              {recommendedProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  handleProductClick={handleProductClick}
+                  handleKeyDown={handleKeyDown}
+                />
+              ))}
             </div>
             <div className="flex justify-center mt-8">
               <button
