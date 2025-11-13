@@ -29,22 +29,26 @@ const ProductButton = ({
     primary: {
       base: "border-2 rounded-lg cursor-pointer font-semibold transition-colors text-gray-900 hover:opacity-90",
       style: { backgroundColor: "#E9A319", borderColor: "#A86523" },
-      disabled: "disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+      disabledStyle: { backgroundColor: "#C88A15", borderColor: "#8B5420" },
+      disabled: "disabled:text-gray-700 disabled:cursor-not-allowed disabled:opacity-70",
     },
     secondary: {
       base: "border-2 border-gray-300 rounded-lg cursor-pointer font-semibold transition-colors bg-gray-50 text-gray-900 hover:bg-gray-100 hover:border-blue-600",
       style: {},
-      disabled: "disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+      disabledStyle: {},
+      disabled: "disabled:bg-gray-400 disabled:border-gray-500 disabled:text-gray-600 disabled:cursor-not-allowed",
     },
     danger: {
       base: "border-2 border-gray-300 rounded-lg cursor-pointer font-semibold transition-colors text-red-600 hover:bg-gray-50 hover:border-red-600",
       style: {},
-      disabled: "disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+      disabledStyle: {},
+      disabled: "disabled:bg-gray-400 disabled:border-gray-500 disabled:text-red-800 disabled:cursor-not-allowed",
     },
     default: {
       base: "border-2 border-gray-300 rounded-lg cursor-pointer font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-50 hover:border-blue-600",
       style: {},
-      disabled: "disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+      disabledStyle: {},
+      disabled: "disabled:bg-gray-400 disabled:border-gray-500 disabled:text-gray-600 disabled:cursor-not-allowed",
     },
   };
 
@@ -53,10 +57,15 @@ const ProductButton = ({
 
   const baseClasses = "focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2";
 
+  // Combine styles - use disabled style when disabled
+  const buttonStyle = disabled && variantConfig.disabledStyle
+    ? { ...variantConfig.style, ...variantConfig.disabledStyle }
+    : variantConfig.style;
+
   return (
     <button
       className={`${sizeClass} ${variantConfig.base} ${variantConfig.disabled} ${baseClasses} ${className}`}
-      style={variantConfig.style}
+      style={buttonStyle}
       disabled={disabled}
       {...props}
     >

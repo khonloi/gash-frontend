@@ -53,6 +53,8 @@ const Cart = () => {
   const [updatingQuantities, setUpdatingQuantities] = useState(new Set());
   const [error, setError] = useState(null);
   const [quantityValues, setQuantityValues] = useState({});
+  // Track last saved quantities to compare against (not optimistic updates)
+  const lastSavedQuantities = useRef({});
 
   // Cache for cart items
   const cartCache = useRef({ items: [], timestamp: 0 });
@@ -98,26 +100,30 @@ const Cart = () => {
         const data = response?.data || response;
         const items = Array.isArray(data)
           ? data
-              .map((i) => {
-                if (!i.variantId) {
-                  console.warn("Cart item missing variantId:", i);
-                  return null;
-                }
+            .map((i) => {
+              if (!i.variantId) {
+                console.warn("Cart item missing variantId:", i);
+                return null;
+              }
                 return { ...i, checked: i.selected || false };
-              })
-              .filter((item) => item !== null)
+            })
+            .filter((item) => item !== null)
           : [];
 
         console.log("Processed cart items:", items);
         setCartItems(items);
         cartCache.current = { items, timestamp: now };
 
-        // Initialize quantity values
+        // Initialize quantity values and last saved quantities
         const initialQuantities = {};
+        const savedQuantities = {};
         items.forEach((item) => {
-          initialQuantities[item._id] = parseInt(item.productQuantity, 10) || 1;
+          const qty = parseInt(item.productQuantity, 10) || 1;
+          initialQuantities[item._id] = qty;
+          savedQuantities[item._id] = qty;
         });
         setQuantityValues(initialQuantities);
+        lastSavedQuantities.current = savedQuantities;
       } catch (err) {
         console.error("Fetch cart error:", err);
         const errorMessage =
@@ -146,14 +152,15 @@ const Cart = () => {
     const updateQuantities = async () => {
       if (!user?._id || Object.keys(debouncedQuantities).length === 0) return;
 
-      const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
       if (!token) return;
 
-      const updates = [];
-      const updatingIds = new Set();
-
-      // Get current cart items state
+      // Use functional update to get the latest cartItems state
       setCartItems((currentItems) => {
+        const updates = [];
+        const updatingIds = new Set();
+
+        // Prepare updates by comparing debounced values with last saved quantities
         for (const [cartId, newQuantityRaw] of Object.entries(debouncedQuantities)) {
           const item = currentItems.find((i) => i._id === cartId);
           if (!item) continue;
@@ -167,10 +174,19 @@ const Cart = () => {
           
           if (isNaN(newQuantity) || newQuantity < 1) continue;
 
-          const currentQuantity = parseInt(item.productQuantity, 10) || 1;
-          if (newQuantity === currentQuantity) continue;
+          // Compare against last saved quantity (not optimistic update)
+          const lastSavedQty = lastSavedQuantities.current[cartId];
+          const savedQuantity = lastSavedQty !== undefined ? lastSavedQty : (parseInt(item.productQuantity, 10) || 1);
+          
+          // Only update if different from what was last saved
+          if (newQuantity === savedQuantity) continue;
 
-          updates.push({ cartId, newQuantity, originalQuantity: currentQuantity });
+          updates.push({ 
+          cartId,
+            newQuantity, 
+            originalQuantity: savedQuantity,
+            item 
+          });
           updatingIds.add(cartId);
         }
 
@@ -179,50 +195,116 @@ const Cart = () => {
         // Mark items as updating
         setUpdatingQuantities(updatingIds);
 
+        // Invalidate cache to force fresh fetch on next page load
+        cartCache.current = { items: [], timestamp: 0 };
+
         // Perform API updates
         Promise.all(
-          updates.map(({ cartId, newQuantity }) =>
-            Api.newCart.update(
-              cartId,
-              { productQuantity: newQuantity },
-              token
-            )
-          )
-        )
-          .then(() => {
-            // Update local state on success
-            setCartItems((prevItems) => {
-              const updatedItems = prevItems.map((item) => {
-                const update = updates.find((u) => u.cartId === item._id);
-                return update
-                  ? { ...item, productQuantity: update.newQuantity }
-                  : item;
-              });
-              cartCache.current = { items: updatedItems, timestamp: Date.now() };
-              return updatedItems;
-            });
+          updates.map(async ({ cartId, newQuantity }) => {
+            console.log("Updating cart item:", cartId, "to quantity:", newQuantity);
+            try {
+              const response = await Api.newCart.update(
+                cartId,
+                { productQuantity: newQuantity.toString() },
+                token
+              );
+              return { cartId, response, newQuantity, success: true };
+      } catch (err) {
+              console.error("API update error for", cartId, ":", err);
+              return { cartId, error: err, newQuantity, success: false };
+            }
           })
-          .catch((err) => {
-            console.error("Update quantity error:", err);
-            const errorMessage =
-              err.response?.data?.message || err.message || "Failed to update quantity";
-            showToast(errorMessage, "error", TOAST_TIMEOUT);
+        )
+          .then((results) => {
+            console.log("Update results:", results);
 
-            // Revert to original quantities
-            setCartItems((prevItems) => {
-              const revertedItems = prevItems.map((item) => {
-                const update = updates.find((u) => u.cartId === item._id);
-                if (update) {
-                  setQuantityValues((prev) => ({
-                    ...prev,
-                    [item._id]: update.originalQuantity,
-                  }));
-                  return { ...item, productQuantity: update.originalQuantity };
-                }
-                return item;
+            // Check if all updates succeeded
+            const allSucceeded = results.every(r => r.success);
+            
+            if (allSucceeded) {
+              // Update local state using API response data when available
+              setCartItems((prevItems) => {
+                const updatedItems = prevItems.map((item) => {
+                  const result = results.find((r) => r.cartId === item._id);
+                  if (result && result.success) {
+                    // Try to get updated quantity from API response
+                    let updatedQuantity = result.newQuantity;
+                    
+                    if (result.response?.data) {
+                      const responseData = result.response.data?.data || result.response.data;
+                      if (responseData?.productQuantity !== undefined) {
+                        updatedQuantity = parseInt(responseData.productQuantity, 10);
+                        console.log("Using API response quantity:", updatedQuantity);
+                      }
+                    }
+
+                    const updatedItem = { 
+                      ...item, 
+                      productQuantity: updatedQuantity.toString()
+                    };
+                    console.log("Updated item:", updatedItem);
+                    return updatedItem;
+                  }
+                  return item;
+                });
+                
+                // Update cache with fresh data
+                cartCache.current = { items: updatedItems, timestamp: 0 };
+                
+                // Update last saved quantities
+                results.forEach(({ cartId, newQuantity }) => {
+                  if (newQuantity !== undefined) {
+                    lastSavedQuantities.current[cartId] = newQuantity;
+                  }
+                });
+                
+                // Sync quantityValues with updated quantities
+                setQuantityValues((prev) => {
+                  const updated = { ...prev };
+                  results.forEach(({ cartId, newQuantity }) => {
+                    if (newQuantity !== undefined) {
+                      updated[cartId] = newQuantity;
+                    }
+                  });
+                  return updated;
+                });
+                
+                return updatedItems;
               });
-              return revertedItems;
-            });
+            } else {
+              // Some updates failed - revert all
+              const failedResults = results.filter(r => !r.success);
+              console.error("Some updates failed:", failedResults);
+              
+              const errorMessage = "Failed to update quantity";
+              showToast(errorMessage, "error", TOAST_TIMEOUT);
+
+              // Revert to original quantities
+              setCartItems((prevItems) => {
+                const revertedItems = prevItems.map((item) => {
+                  const update = updates.find((u) => u.cartId === item._id);
+                  if (update) {
+                    return { 
+                      ...item, 
+                      productQuantity: update.originalQuantity.toString() 
+                    };
+                  }
+                  return item;
+                });
+                
+                // Also revert quantityValues and last saved quantities
+                setQuantityValues((prev) => {
+                  const updated = { ...prev };
+                  updates.forEach(({ cartId, originalQuantity }) => {
+                    updated[cartId] = originalQuantity;
+                    lastSavedQuantities.current[cartId] = originalQuantity;
+                  });
+                  return updated;
+                });
+                
+                return revertedItems;
+              });
+            }
           })
           .finally(() => {
             setUpdatingQuantities((prev) => {
@@ -349,14 +431,17 @@ const Cart = () => {
       }
 
       // Update local state immediately for responsive UI
+      // Only update quantityValues - let the debounced effect handle cartItems update
       setQuantityValues((prev) => ({ ...prev, [cartId]: newQuantity }));
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item._id === cartId
-            ? { ...item, productQuantity: newQuantity }
-            : item
-        )
-      );
+      
+      // Optimistically update cartItems for immediate UI feedback
+        setCartItems((prev) =>
+          prev.map((item) =>
+            item._id === cartId
+            ? { ...item, productQuantity: newQuantity.toString() }
+              : item
+          )
+        );
     },
     [cartItems, showToast]
   );
@@ -414,30 +499,30 @@ const Cart = () => {
           Shopping Cart
         </h2>
 
-        {error && (
-          <div
+      {error && (
+        <div
             ref={errorRef}
             className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap"
-            role="alert"
-            tabIndex={0}
-            aria-live="polite"
-          >
+          role="alert"
+          tabIndex={0}
+          aria-live="polite"
+        >
             <span className="text-lg" aria-hidden="true">
-              ⚠
-            </span>
-            {error}
-            <button
+            ⚠
+          </span>
+          {error}
+          <button
               className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
-              onClick={handleRetry}
+            onClick={handleRetry}
               disabled={loading}
-              aria-label="Retry loading cart items"
-            >
-              Retry
-            </button>
-          </div>
-        )}
+            aria-label="Retry loading cart items"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
-        {!loading && cartItems.length === 0 && !error ? (
+      {!loading && cartItems.length === 0 && !error ? (
           <div
             className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
             role="status"
@@ -445,15 +530,15 @@ const Cart = () => {
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 m-0">
               Your cart is empty.
             </h3>
-            <button
+          <button
               className="px-3 py-1.5 bg-amber-400 border-2 border-amber-500 text-gray-900 text-sm rounded-lg cursor-pointer hover:bg-amber-500 hover:border-amber-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors font-semibold"
-              onClick={() => navigate("/products")}
-              aria-label="Continue shopping"
-            >
-              Continue Shopping
-            </button>
-          </div>
-        ) : (
+            onClick={() => navigate("/products")}
+            aria-label="Continue shopping"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      ) : (
           <main className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8" role="main">
             <section className="flex-1 min-w-0" aria-label="Cart items">
               {loading ? (
@@ -471,24 +556,24 @@ const Cart = () => {
                 const maxQuantity = item.variantId?.stockQuantity || Infinity;
                 const isUpdating = updatingQuantities.has(item._id);
 
-                return (
-                  <article
-                    key={item._id}
+              return (
+                <article
+                  key={item._id}
                     className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-md focus-within:shadow-md"
-                    tabIndex={0}
+                  tabIndex={0}
                     aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
-                  >
+                >
                     <div className="flex items-stretch gap-6 flex-1">
-                      <input
-                        type="checkbox"
-                        checked={item.checked || false}
-                        onChange={() => toggleChecked(item._id)}
+                  <input
+                    type="checkbox"
+                    checked={item.checked || false}
+                    onChange={() => toggleChecked(item._id)}
                         className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center"
                         aria-label={`Select ${item.variantId?.productId?.productName || "product"} for checkout`}
-                      />
-                      <img
+                  />
+                  <img
                         src={item.variantId?.variantImage || "/placeholder-image.png"}
-                        alt={item.variantId?.productId?.productName || "Product"}
+                    alt={item.variantId?.productId?.productName || "Product"}
                         className="w-20 sm:w-24 object-cover rounded-lg flex-shrink-0"
                         onError={(e) => {
                           e.target.src = "/placeholder-image.png";
@@ -496,19 +581,19 @@ const Cart = () => {
                       />
                       <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
                         <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
-                          {item.variantId?.productId?.productName || "Unnamed Product"}
-                        </p>
+                      {item.variantId?.productId?.productName || "Unnamed Product"}
+                    </p>
                         <p className="text-sm text-gray-600 m-0">
                           Color: {item.variantId?.productColorId?.color_name || "N/A"}, Size:{" "}
                           {item.variantId?.productSizeId?.size_name || "N/A"}
                         </p>
                         <p className="text-sm text-gray-600 m-0">
-                          Price: {formatPrice(item.productPrice)}
-                        </p>
+                      Price: {formatPrice(item.productPrice)}
+                    </p>
                         <p className="text-base font-semibold text-red-600 m-0">
                           Total: {formatPrice((item.productPrice || 0) * quantity)}
-                        </p>
-                      </div>
+                    </p>
+                  </div>
                     </div>
 
                     <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
@@ -541,12 +626,12 @@ const Cart = () => {
                       >
                         Remove
                       </button>
-                    </div>
-                  </article>
-                );
+                  </div>
+                </article>
+              );
               })
               )}
-            </section>
+          </section>
 
             {!loading && cartItems.length > 0 && (
               <aside
@@ -556,25 +641,25 @@ const Cart = () => {
                 <p className="text-lg sm:text-xl font-bold text-red-600 mb-4 m-0">
                   Total: {formatPrice(totalPrice)}
                 </p>
-                <button
+              <button
                   className="w-full px-3 py-2.5 sm:py-3 border-2 rounded-full cursor-pointer text-sm font-semibold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-amber-400 border-amber-500 text-gray-900 hover:bg-amber-500 hover:border-amber-600"
-                  onClick={() => {
-                    const selectedItems = cartItems.filter((i) => i.checked);
-                    navigate("/checkout", { state: { selectedItems } });
-                  }}
-                  disabled={
-                    cartItems.filter((i) => i.checked).length === 0 ||
-                    loading ||
-                    actionInProgress
-                  }
-                  aria-label="Proceed to checkout"
-                >
-                  Proceed to Checkout
-                </button>
-              </aside>
-            )}
-          </main>
-        )}
+                onClick={() => {
+                  const selectedItems = cartItems.filter((i) => i.checked);
+                  navigate("/checkout", { state: { selectedItems } });
+                }}
+                disabled={
+                  cartItems.filter((i) => i.checked).length === 0 ||
+                  loading ||
+                  actionInProgress
+                }
+                aria-label="Proceed to checkout"
+              >
+                Proceed to Checkout
+              </button>
+            </aside>
+          )}
+        </main>
+      )}
       </section>
     </div>
   );
