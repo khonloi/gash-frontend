@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { Bell, Mail, Globe, Save } from "lucide-react";
+import ProductButton from "../components/ProductButton";
 
 export default function Notifications() {
   const { user } = useContext(AuthContext);
@@ -142,14 +143,12 @@ export default function Notifications() {
 
               {/* Save button */}
               <div className="pt-4">
-                <button
+                <ProductButton
+                  variant="primary"
+                  size="lg"
                   onClick={handleSavePrefs}
                   disabled={loading}
-                  className={`w-full flex items-center justify-center gap-2 px-6 py-3 text-white font-medium rounded-xl shadow-md transition-all duration-200 ${
-                    loading
-                      ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:scale-[1.02]"
-                  }`}
+                  className="w-full flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -162,7 +161,7 @@ export default function Notifications() {
                       Save Changes
                     </>
                   )}
-                </button>
+                </ProductButton>
               </div>
             </>
           )}

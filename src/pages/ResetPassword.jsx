@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import ProductButton from '../components/ProductButton';
 import '../styles/ResetPassword.css';
 
 const ResetPassword = () => {
@@ -153,19 +154,16 @@ const ResetPassword = () => {
               />
             </div>
           ))}
-          <button
+          <ProductButton
             type="submit"
-            className="reset-password-button"
+            variant="primary"
+            size="lg"
             disabled={isLoading}
             aria-busy={isLoading}
+            className="w-full"
           >
-            {isLoading ? (
-              // Removed spinner, only show text
-              'Resetting Password...'
-            ) : (
-              'Reset Password'
-            )}
-          </button>
+            {isLoading ? 'Resetting Password...' : 'Reset Password'}
+          </ProductButton>
         </form>
         <p className="reset-password-login-prompt">
           Remember your password?{' '}

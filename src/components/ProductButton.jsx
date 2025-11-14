@@ -19,9 +19,11 @@ const ProductButton = ({
 }) => {
   // Size classes
   const sizeClasses = {
+    xs: "px-2 py-1 text-xs",
     sm: "px-3 py-1.5 text-sm",
     md: "px-3 py-2.5 sm:py-3 text-sm",
     lg: "px-4 py-3 text-base",
+    xl: "px-6 py-4 text-lg",
   };
 
   // Variant classes

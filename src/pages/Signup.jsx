@@ -3,6 +3,7 @@ import { useToast } from '../hooks/useToast';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
+import ProductButton from '../components/ProductButton';
 import '../styles/Signup.css';
 
 // Initialize EmailJS with Public API Key
@@ -171,21 +172,18 @@ const Signup = () => {
               placeholder="Enter your email"
             />
           </div>
-          <button
+          <ProductButton
             type="submit"
-            className="signup-continue-button"
+            variant="primary"
+            size="lg"
             disabled={isLoading}
             aria-busy={isLoading}
+            className="w-full"
           >
             <span aria-live="polite">
-              {isLoading ? (
-                // Removed spinner, only show text
-                'Sending OTP...'
-              ) : (
-                'Continue'
-              )}
+              {isLoading ? 'Sending OTP...' : 'Continue'}
             </span>
-          </button>
+          </ProductButton>
         </form>
         <p className="signup-login-prompt">
           Already have an account?{' '}

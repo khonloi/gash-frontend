@@ -478,12 +478,14 @@ const Checkout = () => {
               {appliedVoucher && (
                 <div className="mt-2 flex justify-between items-center text-green-600">
                   <span className="text-sm">Applied: {appliedVoucher.code}</span>
-                  <button
+                  <ProductButton
+                    variant="danger"
+                    size="xs"
                     onClick={handleRemoveVoucher}
-                    className="text-sm text-red-500 hover:text-red-700"
+                    className="text-sm"
                   >
                     Remove
-                  </button>
+                  </ProductButton>
                 </div>
               )}
             </fieldset>

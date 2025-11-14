@@ -11,6 +11,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import ProductButton from "../../components/ProductButton";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -511,14 +512,15 @@ const Cart = () => {
             ⚠
           </span>
           {error}
-          <button
-              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+          <ProductButton
+            variant="secondary"
+            size="sm"
             onClick={handleRetry}
-              disabled={loading}
+            disabled={loading}
             aria-label="Retry loading cart items"
           >
             Retry
-          </button>
+          </ProductButton>
         </div>
       )}
 
@@ -530,13 +532,14 @@ const Cart = () => {
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 m-0">
               Your cart is empty.
             </h3>
-          <button
-              className="px-3 py-1.5 bg-amber-400 border-2 border-amber-500 text-gray-900 text-sm rounded-lg cursor-pointer hover:bg-amber-500 hover:border-amber-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors font-semibold"
+          <ProductButton
+            variant="primary"
+            size="md"
             onClick={() => navigate("/products")}
             aria-label="Continue shopping"
           >
             Continue Shopping
-          </button>
+          </ProductButton>
         </div>
       ) : (
           <main className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8" role="main">
@@ -618,14 +621,15 @@ const Cart = () => {
                           disabled={isUpdating || actionInProgress}
                         />
                       </div>
-                      <button
-                        className="px-3 py-1.5 border-2 border-gray-300 text-red-600 text-sm rounded-lg cursor-pointer hover:bg-gray-50 hover:border-red-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors font-semibold"
+                      <ProductButton
+                        variant="danger"
+                        size="sm"
                         onClick={() => handleRemoveItem(item._id)}
                         aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
                         disabled={isUpdating || actionInProgress}
                       >
                         Remove
-                      </button>
+                      </ProductButton>
                   </div>
                 </article>
               );
@@ -641,8 +645,9 @@ const Cart = () => {
                 <p className="text-lg sm:text-xl font-bold text-red-600 mb-4 m-0">
                   Total: {formatPrice(totalPrice)}
                 </p>
-              <button
-                  className="w-full px-3 py-2.5 sm:py-3 border-2 rounded-full cursor-pointer text-sm font-semibold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-amber-400 border-amber-500 text-gray-900 hover:bg-amber-500 hover:border-amber-600"
+              <ProductButton
+                variant="primary"
+                size="lg"
                 onClick={() => {
                   const selectedItems = cartItems.filter((i) => i.checked);
                   navigate("/checkout", { state: { selectedItems } });
@@ -653,9 +658,10 @@ const Cart = () => {
                   actionInProgress
                 }
                 aria-label="Proceed to checkout"
+                className="w-full"
               >
                 Proceed to Checkout
-              </button>
+              </ProductButton>
             </aside>
           )}
         </main>

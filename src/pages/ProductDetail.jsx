@@ -105,6 +105,11 @@ const ProductDetail = () => {
     setFavoriteId(null);
   }, [id]);
 
+  // Reset thumbnail index when product or images change to show main image at top
+  useEffect(() => {
+    setThumbnailIndex(0);
+  }, [id, images, variants]);
+
   // Pre-index variants (only active variants)
   const variantIndex = useMemo(() => {
     const index = { byColor: {}, bySize: {}, byColorSize: {} };
@@ -135,11 +140,14 @@ const ProductDetail = () => {
     return index;
   }, [variants]);
 
-  // Get all thumbnails: main product image + active variant images
+  // Get all thumbnails: all product images + active variant images
+  // Main image is always first at the top
   const allThumbnails = useMemo(() => {
     const thumbnails = [];
+    const seenImages = new Set();
 
-    const mainImage = images.find(img => img.isMain);
+    // First, add the main image if it exists
+    const mainImage = images.find(img => img.isMain && img.imageUrl);
     if (mainImage) {
       thumbnails.push({
         _id: mainImage._id,
@@ -147,16 +155,23 @@ const ProductDetail = () => {
         isMain: true,
         variant: null
       });
-    } else if (images.length > 0) {
-      thumbnails.push({
-        _id: images[0]._id,
-        imageUrl: images[0].imageUrl,
-        isMain: true,
-        variant: null
-      });
+      seenImages.add(mainImage.imageUrl);
     }
 
-    const seenImages = new Set([thumbnails[0]?.imageUrl]);
+    // Then add all other product images (excluding main image)
+    images.forEach((img) => {
+      if (img.imageUrl && !seenImages.has(img.imageUrl)) {
+        thumbnails.push({
+          _id: img._id,
+          imageUrl: img.imageUrl,
+          isMain: img.isMain || false,
+          variant: null
+        });
+        seenImages.add(img.imageUrl);
+      }
+    });
+
+    // Finally, add variant images that aren't duplicates
     variants
       .filter(v => (!v.variantStatus || v.variantStatus === 'active') && v.variantImage)
       .forEach(variant => {
@@ -636,18 +651,132 @@ const ProductDetail = () => {
     return { inStock: true, message: "In Stock" };
   }, [selectedColor, selectedSize, selectedVariant, isColorInStock]);
 
+  // Product Detail Skeleton Component
+  const ProductDetailSkeleton = () => (
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      {/* Breadcrumb Skeleton */}
+      <nav className="w-full mb-3 sm:mb-4" aria-label="Breadcrumb skeleton">
+        <div className="flex items-center gap-2 text-sm">
+          <div className="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-1 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-1 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+        </div>
+      </nav>
+
+      {/* Main Product Section Skeleton */}
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 w-full">
+          {/* Image Gallery Skeleton */}
+          <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex gap-2 sm:gap-3">
+            {/* Thumbnail Navigation Skeleton */}
+            <div className="flex flex-col items-center justify-start gap-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-[72px] flex flex-col gap-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="w-[60px] h-[60px] bg-gray-200 rounded animate-pulse"></div>
+                ))}
+              </div>
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 rounded-full animate-pulse"></div>
+            </div>
+            {/* Main Image Skeleton */}
+            <div className="flex justify-center items-start w-full">
+              <div className="w-full h-[400px] bg-gray-200 rounded-xl animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Product Info Skeleton */}
+          <div className="flex-1 sm:flex-[3] px-0 sm:px-3 space-y-4 sm:space-y-5">
+            {/* Product Name Skeleton */}
+            <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            {/* Price Skeleton */}
+            <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+            {/* Stock Status Skeleton */}
+            <div className="h-6 bg-gray-200 rounded w-24 animate-pulse"></div>
+            
+            {/* Color Selection Skeleton */}
+            <div className="space-y-3 sm:space-y-4">
+              <div className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+                <div className="h-5 bg-gray-200 rounded w-16 mb-3 animate-pulse"></div>
+                <div className="flex flex-wrap gap-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-8 bg-gray-200 rounded-md w-20 animate-pulse"></div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Size Selection Skeleton */}
+              <div className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+                <div className="h-5 bg-gray-200 rounded w-12 mb-3 animate-pulse"></div>
+                <div className="flex flex-wrap gap-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-8 bg-gray-200 rounded-md w-16 animate-pulse"></div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Quantity Skeleton */}
+              <div className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+                <div className="h-5 bg-gray-200 rounded w-20 mb-3 animate-pulse"></div>
+                <div className="h-10 bg-gray-200 rounded-md w-20 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons Sidebar Skeleton */}
+          <div className="flex-1 min-w-[200px] max-w-full sm:max-w-[260px] p-4 sm:p-5 border-2 border-gray-300 rounded-xl bg-gray-50 flex flex-col gap-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-10 bg-gray-200 rounded animate-pulse"></div>
+            ))}
+            <div className="mt-3 space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Description Section Skeleton */}
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
+        <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse"></div>
+        </div>
+      </section>
+
+      {/* Feedback Section Skeleton */}
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
+        <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="border-2 border-gray-200 rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-32 mb-2 animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 rounded w-24 animate-pulse"></div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+
   // Render
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <LoadingSpinner
-          size="xl"
-          color="blue"
-          text="Loading product details..."
-          fullScreen={false}
-        />
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error && !product) {
@@ -676,8 +805,55 @@ const ProductDetail = () => {
     return null;
   }
 
+  // Get category name for breadcrumb
+  const categoryName = product?.categoryId?.cat_name || null;
+  const categoryLink = categoryName 
+    ? `/products?category=${encodeURIComponent(categoryName)}`
+    : null;
+
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      {/* Breadcrumbs */}
+      <nav className="w-full mb-3 sm:mb-4" aria-label="Breadcrumb">
+        <ol className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+          <li>
+            <button
+              onClick={() => navigate("/")}
+              className="hover:text-blue-600 transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+              aria-label="Go to home"
+            >
+              Home
+            </button>
+          </li>
+          {categoryName && (
+            <>
+              <li aria-hidden="true">
+                <span className="text-gray-400">/</span>
+              </li>
+              <li>
+                {categoryLink ? (
+                  <button
+                    onClick={() => navigate(categoryLink)}
+                    className="hover:text-blue-600 transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+                    aria-label={`Go to ${categoryName} category`}
+                  >
+                    {categoryName}
+                  </button>
+                ) : (
+                  <span>{categoryName}</span>
+                )}
+              </li>
+            </>
+          )}
+          <li aria-hidden="true">
+            <span className="text-gray-400">/</span>
+          </li>
+          <li className="text-gray-900 font-medium" aria-current="page">
+            {product?.productName || "Product"}
+          </li>
+        </ol>
+      </nav>
+
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 w-full">
         <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex gap-2 sm:gap-3">

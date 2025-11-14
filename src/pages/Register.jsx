@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
+import ProductButton from '../components/ProductButton';
 import '../styles/Register.css';
 
 const Register = () => {
@@ -259,14 +260,16 @@ const Register = () => {
               )}
             </div>
           ))}
-          <button
+          <ProductButton
             type="submit"
-            className="create-account-button"
+            variant="primary"
+            size="lg"
             disabled={isLoading}
             aria-busy={isLoading}
+            className="w-full"
           >
             {isLoading ? 'Creating Account...' : 'Create your GASH account'}
-          </button>
+          </ProductButton>
         </form>
         <p className="signup-login-prompt">
           Already have an account?{' '}

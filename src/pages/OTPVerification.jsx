@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
+import ProductButton from '../components/ProductButton';
 import '../styles/OTPVerification.css';
 
 // Initialize EmailJS with Public API Key
@@ -191,32 +192,29 @@ const OTPVerification = () => {
               aria-invalid={!!error}
             />
           </div>
-          <button
+          <ProductButton
             type="submit"
-            className="otp-verify-button"
+            variant="primary"
+            size="lg"
             disabled={isLoading}
             aria-busy={isLoading}
+            className="w-full"
           >
-            {isLoading ? (
-              <>
-                <span className="otp-loading-spinner" aria-hidden="true" />
-                Verifying...
-              </>
-            ) : (
-              'Verify OTP'
-            )}
-          </button>
+            {isLoading ? 'Verifying...' : 'Verify OTP'}
+          </ProductButton>
         </form>
         <p className="otp-resend-prompt">
           Didn't receive an OTP?{' '}
-          <button
+          <ProductButton
             type="button"
-            className="otp-resend-link"
+            variant="secondary"
+            size="sm"
             onClick={handleResendOTP}
             disabled={isLoading}
+            className="inline"
           >
             Resend OTP
-          </button>
+          </ProductButton>
         </p>
       </div>
     </div>

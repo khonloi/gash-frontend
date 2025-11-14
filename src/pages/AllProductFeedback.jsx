@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import Api from '../common/SummaryAPI';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ProductButton from '../components/ProductButton';
 
 const AllProductFeedback = () => {
   const { id } = useParams();
@@ -272,13 +273,14 @@ const AllProductFeedback = () => {
             <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
               <span className="text-lg" aria-hidden="true">⚠</span>
               {feedbackError}
-              <button
+              <ProductButton
+                variant="secondary"
+                size="sm"
                 onClick={() => fetchFeedbacks(id)}
-                className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 aria-label="Retry loading feedback"
               >
                 Retry
-              </button>
+              </ProductButton>
             </div>
           )}
 
@@ -447,13 +449,15 @@ const AllProductFeedback = () => {
             </AnimatePresence>)}
             {filteredFeedbacks.length > feedbacksToShow && (
               <div className="text-center mt-6 sm:mt-8">
-                <button
+                <ProductButton
+                  variant="primary"
+                  size="md"
                   onClick={handleShowMore}
-                  className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                  className="inline-flex items-center"
                 >
                   Show More Reviews
                   <i className="lni lni-arrow-down ml-2"></i>
-                </button>
+                </ProductButton>
               </div>
             )}
         </div>

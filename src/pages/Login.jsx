@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../constants/constants";
+import ProductButton from "../components/ProductButton";
 import "../styles/Login.css";
 
 const Login = () => {
@@ -159,21 +160,18 @@ const Login = () => {
               Forgot Password?
             </Link>
           </div>
-          <button
+          <ProductButton
             type="submit"
-            className="sign-in-button"
+            variant="primary"
+            size="lg"
             disabled={isLoading}
             aria-busy={isLoading}
+            className="w-full"
           >
             <span aria-live="polite">
-              {isLoading ? (
-                // Removed spinner, only show text
-                "Signing In..."
-              ) : (
-                "Sign In"
-              )}
+              {isLoading ? "Signing In..." : "Sign In"}
             </span>
-          </button>
+          </ProductButton>
         </form>
         <div className="google-login-container">
           <GoogleLogin

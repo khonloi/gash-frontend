@@ -1,6 +1,7 @@
 // src/pages/Contact.jsx
 import React, { useState, useCallback } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import ProductButton from "../components/ProductButton";
 import "../styles/Contact.css";
 
 const Contact = () => {
@@ -272,31 +273,15 @@ const Contact = () => {
               style={{ ...inputStyle, resize: "none" }}
             ></textarea>
 
-            <button
+            <ProductButton
               type="submit"
-              className="contact-submit-button"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                background:
-                  "linear-gradient(90deg, #ff9900, #f08804, #ffa41c)",
-                color: "white",
-                fontSize: "1rem",
-                fontWeight: "600",
-                border: "none",
-                borderRadius: "8px",
-                padding: "12px 20px",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-              onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              variant="primary"
+              size="lg"
+              className="flex items-center justify-center gap-2"
             >
               <Send size={18} />
               Send Message
-            </button>
+            </ProductButton>
           </form>
         </main>
       </div>

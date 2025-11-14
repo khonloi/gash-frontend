@@ -13,6 +13,7 @@ import { useToast } from "../../hooks/useToast";
 // Import modal
 import EditProfileModal from "../../components/EditProfileModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
+import ProductButton from "../../components/ProductButton";
 
 const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -318,24 +319,30 @@ const Profile = () => {
                 {/* Action Buttons */}
                 {!isDeleted ? (
                   <div className="p-6 space-y-3 flex-grow flex flex-col justify-end">
-                    <button
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
+                    <ProductButton
+                      variant="primary"
+                      size="lg"
                       onClick={() => setEditMode(true)}
+                      className="w-full"
                     >
                       Edit Profile
-                    </button>
-                    <button
-                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-md transition-colors duration-200"
+                    </ProductButton>
+                    <ProductButton
+                      variant="secondary"
+                      size="lg"
                       onClick={() => setShowChangePassword(true)}
+                      className="w-full"
                     >
                       Change Password
-                    </button>
-                    <button
-                      className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
+                    </ProductButton>
+                    <ProductButton
+                      variant="danger"
+                      size="lg"
                       onClick={() => setShowDeleteConfirm(true)}
+                      className="w-full"
                     >
                       Close Account
-                    </button>
+                    </ProductButton>
                   </div>
                 ) : (
                   <div className="p-6 flex-grow flex flex-col justify-end">
@@ -350,12 +357,14 @@ const Profile = () => {
                         This account has been soft deleted and is no longer active.
                       </p>
                     </div>
-                    <button
-                      className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200"
+                    <ProductButton
+                      variant="default"
+                      size="lg"
                       onClick={logout}
+                      className="w-full"
                     >
                       Return to Login
-                    </button>
+                    </ProductButton>
                   </div>
                 )}
               </div>
@@ -531,18 +540,20 @@ const Profile = () => {
               Are you sure you want to delete your account? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <ProductButton
+                variant="secondary"
+                size="md"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
               >
                 Cancel
-              </button>
-              <button
+              </ProductButton>
+              <ProductButton
+                variant="danger"
+                size="md"
                 onClick={handleDeleteConfirm}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete Account
-              </button>
+              </ProductButton>
             </div>
           </div>
         </div>
