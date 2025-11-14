@@ -13,49 +13,110 @@ export default function NotificationsDropdown({ user }) {
   const navigate = useNavigate();
 
   // 🧩 Socket.IO: kết nối realtime
+  const socketRef = useRef(null);
+
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?._id) {
+      // Cleanup socket if user logs out
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      return;
+    }
 
     // ✅ Lấy URL backend chính xác
     const baseURL =
       import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
-    const SOCKET_URL = baseURL.replace("http", "ws"); // tự chuyển sang ws:// hoặc wss://
 
-    console.log("🔌 Connecting socket to:", SOCKET_URL);
+    console.log("🔌 Connecting notification socket to:", baseURL);
 
-    const socket = io(baseURL, {
-      transports: ["websocket", "polling"], // fallback an toàn
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 2000,
-      withCredentials: true,
-    });
+    // Create socket if it doesn't exist
+    if (!socketRef.current) {
+      socketRef.current = io(baseURL, {
+        transports: ["websocket", "polling"], // fallback an toàn
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
+        withCredentials: true,
+      });
+    }
+
+    const socket = socketRef.current;
 
     // Khi user kết nối, gửi userId lên server
-    socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket.id);
+    const handleConnect = () => {
+      console.log("✅ Notification Socket connected:", socket.id);
+      // Emit user connection to join notification room
       socket.emit("userConnected", user._id);
-      socket.emit("joinRoom", user._id); // 🧩 THÊM DÒNG NÀY để user join vào room riêng, nhận realtime ngay
-    });
+      console.log(`🔔 Emitted userConnected for user: ${user._id}`);
+    };
 
     // Nhận thông báo realtime
-    socket.on("newNotification", (data) => {
+    const handleNewNotification = (data) => {
       console.log("🔔 Nhận thông báo realtime:", data);
-      setNotifications((prev) => [data, ...prev]);
-    });
+      // Add notification to the top of the list
+      setNotifications((prev) => {
+        // Check if notification already exists to avoid duplicates
+        const exists = prev.some(n => n._id === data._id || (n._id?.toString() === data._id?.toString()));
+        if (exists) {
+          console.log("⚠️ Notification already exists, skipping:", data._id);
+          return prev;
+        }
+        return [data, ...prev];
+      });
+    };
+
+    // Listen for badge updates to refresh notification list
+    const handleBadgeUpdate = (data) => {
+      console.log("🔔 Notification badge update received:", data);
+      // Refresh notifications list when badge updates
+      const fetchNotifications = async () => {
+        try {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
+          );
+          if (!res.ok) throw new Error("Failed to fetch notifications");
+          const notificationData = await res.json();
+          setNotifications(notificationData);
+        } catch (err) {
+          console.error("❌ Lỗi khi refresh thông báo:", err);
+        }
+      };
+      fetchNotifications();
+    };
 
     // Log lỗi
-    socket.on("connect_error", (err) => {
-      console.error("❌ Socket connection error:", err.message);
-    });
+    const handleConnectError = (err) => {
+      console.error("❌ Notification Socket connection error:", err.message);
+    };
 
     // Ngắt kết nối
-    socket.on("disconnect", (reason) => {
-      console.warn("⚠️ Socket disconnected:", reason);
-    });
+    const handleDisconnect = (reason) => {
+      console.warn("⚠️ Notification Socket disconnected:", reason);
+    };
 
+    // Set up event listeners
+    socket.on("connect", handleConnect);
+    socket.on("newNotification", handleNewNotification);
+    socket.on("notificationBadgeUpdate", handleBadgeUpdate);
+    socket.on("connect_error", handleConnectError);
+    socket.on("disconnect", handleDisconnect);
+
+    // If already connected, emit userConnected immediately
+    if (socket.connected) {
+      socket.emit("userConnected", user._id);
+      console.log(`🔔 Emitted userConnected immediately for user: ${user._id}`);
+    }
+
+    // Cleanup
     return () => {
-      socket.disconnect();
+      socket.off("connect", handleConnect);
+      socket.off("newNotification", handleNewNotification);
+      socket.off("notificationBadgeUpdate", handleBadgeUpdate);
+      socket.off("connect_error", handleConnectError);
+      socket.off("disconnect", handleDisconnect);
+      // Don't disconnect here - keep socket alive for component lifecycle
     };
   }, [user]);
 
