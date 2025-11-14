@@ -206,7 +206,7 @@ const AllProductFeedback = () => {
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
       <div className="w-full">
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
               {product?.name || product?.pro_name || 'Product'} Feedback

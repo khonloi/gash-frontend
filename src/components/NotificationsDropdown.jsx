@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
-import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { Bell, Trash2, Settings, X } from "lucide-react";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
 
@@ -204,34 +202,36 @@ export default function NotificationsDropdown({ user }) {
         title="Notifications"
         badge={unreadCount > 0 ? unreadCount : undefined}
       >
-        <NotificationsNoneOutlinedIcon />
+        <Bell className="w-5 h-5" />
       </IconButton>
 
       {/* 📜 Dropdown danh sách */}
       {user && showNotifications && (
-        <div className="absolute right-0 mt-3 w-96 bg-white text-gray-900 rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100 animate-[fadeDown_0.25s_ease-out]">
+        <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden z-50 border-2 border-gray-200">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-3 bg-gray-50 border-b">
-            <h3 className="font-semibold text-gray-800 text-sm">Notifications</h3>
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 bg-gray-50 border-b-2 border-gray-200">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900">Notifications</h3>
             <div className="flex items-center gap-2">
               <button
-                className="text-gray-500 hover:text-indigo-600 transition"
+                className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                 title="Notification Settings"
                 onClick={() => {
                   setShowNotifications(false);
                   navigate("/notifications");
                 }}
+                aria-label="Notification Settings"
               >
-                <SettingsIcon fontSize="small" />
+                <Settings className="w-4 h-4" />
               </button>
 
               {notifications.length > 0 && (
                 <button
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#ff4d4d] transition"
+                  className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                   onClick={clearAll}
                   title="Clear all notifications"
+                  aria-label="Clear all notifications"
                 >
-                  <DeleteIcon fontSize="small" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -239,27 +239,30 @@ export default function NotificationsDropdown({ user }) {
 
           {/* Danh sách */}
           {notifications.length > 0 ? (
-            <ul className="max-h-96 overflow-y-auto divide-y divide-gray-100 scrollbar-thin scrollbar-thumb-gray-300">
+            <ul className="max-h-96 overflow-y-auto divide-y divide-gray-200">
               {notifications.map((n) => (
                 <li
                   key={n._id}
                   onClick={() => markAsRead(n._id)}
-                  className={`group flex items-start gap-3 px-5 py-4 hover:bg-[#fff6eb] transition-all cursor-pointer ${
-                    !n.isRead ? "bg-[#fffaf0]" : "bg-white"
+                  className={`group flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
+                    !n.isRead ? "bg-amber-50/50" : "bg-white"
                   }`}
                 >
-                  <div className="flex-shrink-0 w-10 h-10 bg-[#ffb300]/10 text-[#ffb300] rounded-full flex items-center justify-center text-lg">
-                    <NotificationsNoneOutlinedIcon fontSize="small" />
+                  <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center self-center ${
+                    !n.isRead ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-800 text-sm leading-snug">
-                      <strong>{n.title}</strong>
-                      <br />
-                      <span className="text-gray-600">{n.message}</span>
+                    <p className="text-gray-900 text-sm sm:text-base leading-snug mb-1">
+                      <strong className="font-semibold">{n.title}</strong>
+                    </p>
+                    <p className="text-gray-600 text-xs sm:text-sm mb-2">
+                      {n.message}
                     </p>
 
-                    <div className="flex items-center justify-between mt-1 text-[11px] text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-gray-500">
                       <span>
                         {new Date(n.createdAt).toLocaleTimeString([], {
                           hour: "2-digit",
@@ -267,32 +270,27 @@ export default function NotificationsDropdown({ user }) {
                         })}{" "}
                         {new Date(n.createdAt).toLocaleDateString()}
                       </span>
-
-                      {!n.isRead && (
-                        <span className="flex items-center gap-1 text-[#ff4d4d] font-medium">
-                          <span className="w-2 h-2 bg-[#ff4d4d] rounded-full animate-pulse" />
-                          New
-                        </span>
-                      )}
                     </div>
                   </div>
 
                   <button
-                    className="ml-auto text-gray-400 hover:text-red-500 transition"
+                    className="ml-2 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors flex-shrink-0 self-center flex items-center justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
                       deleteNotification(n._id);
                     }}
                     title="Delete notification"
+                    aria-label="Delete notification"
                   >
-                    <DeleteIcon fontSize="small" />
+                    <X className="w-4 h-4" />
                   </button>
                 </li>
               ))}
             </ul>
           ) : (
             <div className="p-8 text-center text-gray-500 text-sm">
-              No new notifications 🎉
+              <Bell className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <p>No new notifications</p>
             </div>
           )}
         </div>

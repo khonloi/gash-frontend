@@ -2,7 +2,6 @@
 import React, { useState, useCallback } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import ProductButton from "../components/ProductButton";
-import "../styles/Contact.css";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -54,250 +53,146 @@ const Contact = () => {
   );
 
   return (
-    <div className="contact-container" style={{ backgroundColor: "#f7f8fa" }}>
-      {/* --- Header --- */}
-      <header className="contact-header" style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1
-          style={{
-            fontSize: "2.2rem",
-            fontWeight: "700",
-            color: "#232f3e",
-            marginBottom: "8px",
-          }}
-        >
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      {/* Header */}
+      <header className="text-center mb-6 sm:mb-8 md:mb-10 w-full">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
           Get in Touch
         </h1>
-        <div
-          style={{
-            width: "80px",
-            height: "4px",
-            background:
-              "linear-gradient(90deg, #ff9900, #f08804, #ffa41c)",
-            borderRadius: "2px",
-            margin: "0 auto 20px",
-          }}
-        ></div>
-        <p style={{ color: "#555", fontSize: "1.05rem", maxWidth: "700px", margin: "0 auto" }}>
+        <div className="w-20 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 rounded mx-auto mb-5"></div>
+        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
           We'd love to hear from you. Whether you have a question, feedback, or a business inquiry —
           feel free to contact us anytime.
         </p>
       </header>
 
-      {/* --- Content --- */}
-      <div
-        className="contact-content"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1.2fr",
-          gap: "40px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-          background: "white",
-          borderRadius: "16px",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-          padding: "40px",
-        }}
-      >
-        {/* --- Left: Info --- */}
-        <aside
-          className="contact-info"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <div className="contact-info-item" style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-              <div
-                className="contact-info-icon"
-                style={{
-                  background: "#ff9900",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  marginRight: "15px",
-                }}
-              >
-                <Mail size={22} color="white" />
+      {/* Content */}
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 lg:p-10 w-full shadow-sm border border-gray-200">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 sm:gap-8 md:gap-10">
+          {/* Left: Info */}
+          <aside className="flex flex-col justify-between">
+            <div>
+              <div className="flex items-center mb-5">
+                <div className="bg-amber-400 rounded-full p-2.5 mr-4 flex-shrink-0">
+                  <Mail size={22} color="white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 m-0">Email</h3>
+                  <p className="text-sm text-gray-600 m-0">fptuniversityct@gmail.com</p>
+                </div>
               </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: "1rem", color: "#111" }}>Email</h3>
-                <p style={{ color: "#555" }}>fptuniversityct@gmail.com</p>
-              </div>
-            </div>
 
-            <div className="contact-info-item" style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-              <div
-                className="contact-info-icon"
-                style={{
-                  background: "#ff9900",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  marginRight: "15px",
-                }}
-              >
-                <Phone size={22} color="white" />
+              <div className="flex items-center mb-5">
+                <div className="bg-amber-400 rounded-full p-2.5 mr-4 flex-shrink-0">
+                  <Phone size={22} color="white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 m-0">Phone</h3>
+                  <p className="text-sm text-gray-600 m-0">0292 730 1866</p>
+                </div>
               </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: "1rem", color: "#111" }}>Phone</h3>
-                <p style={{ color: "#555" }}>0292 730 1866</p>
+
+              <div className="flex items-center">
+                <div className="bg-amber-400 rounded-full p-2.5 mr-4 flex-shrink-0">
+                  <MapPin size={22} color="white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 m-0">Address</h3>
+                  <a
+                    href="https://www.google.com/maps/place/FPT+University+Can+Tho,+Street+600+Nguyen+Van+Cu,+An+Binh+Ward,+Ninh+Kieu,+Can+Tho/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                  >
+                    FPT University Can Tho, Street 600 Nguyen Van Cu, An Binh Ward,
+                    Ninh Kieu District, Can Tho City
+                  </a>
+                </div>
               </div>
             </div>
 
-            <div className="contact-info-item" style={{ display: "flex", alignItems: "center" }}>
-              <div
-                className="contact-info-icon"
-                style={{
-                  background: "#ff9900",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  marginRight: "15px",
-                }}
-              >
-                <MapPin size={22} color="white" />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: "1rem", color: "#111" }}>Address</h3>
-                <a
-                  href="https://www.google.com/maps/place/FPT+University+Can+Tho,+Street+600+Nguyen+Van+Cu,+An+Binh+Ward,+Ninh+Kieu,+Can+Tho/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: "#007185",
-                    textDecoration: "none",
-                  }}
-                >
-                  FPT University Can Tho, Street 600 Nguyen Van Cu, An Binh Ward,
-                  Ninh Kieu District, Can Tho City
-                </a>
-              </div>
+            {/* Map */}
+            <div className="mt-6 sm:mt-8 rounded-xl overflow-hidden shadow-md">
+              <iframe
+                title="FPT University Can Tho Map"
+                width="100%"
+                height="250"
+                className="border-0"
+                loading="lazy"
+                allowFullScreen
+                src="https://www.google.com/maps?q=FPT+University+Can+Tho&output=embed"
+              ></iframe>
             </div>
-          </div>
+          </aside>
 
-          {/* --- Map --- */}
-          <div
-            className="contact-map-preview"
-            style={{
-              marginTop: "30px",
-              borderRadius: "12px",
-              overflow: "hidden",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-          >
-            <iframe
-              title="FPT University Can Tho Map"
-              width="100%"
-              height="250"
-              style={{ border: 0 }}
-              loading="lazy"
-              allowFullScreen
-              src="https://www.google.com/maps?q=FPT+University+Can+Tho&output=embed"
-            ></iframe>
-          </div>
-        </aside>
+          {/* Right: Form */}
+          <main>
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+              Send Us a Message
+            </h2>
+            <div className="w-15 h-0.5 bg-amber-400 rounded mb-6"></div>
 
-        {/* --- Right: Form --- */}
-        <main className="contact-form-section">
-          <h2
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: "600",
-              color: "#232f3e",
-              marginBottom: "10px",
-            }}
-          >
-            Send Us a Message
-          </h2>
-          <div
-            style={{
-              width: "60px",
-              height: "3px",
-              background: "#ff9900",
-              borderRadius: "2px",
-              marginBottom: "25px",
-            }}
-          ></div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {error && (
+                <div className="text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-3 sm:p-4 text-sm">
+                  {error}
+                </div>
+              )}
 
-          <form onSubmit={handleSubmit} className="contact-form" style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-            {error && (
-              <div
-                className="contact-error"
-                style={{
-                  color: "#b12704",
-                  background: "#fff4f1",
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  fontSize: "0.95rem",
-                }}
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              />
+
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              />
+
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Your Phone (optional)"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              />
+
+              <textarea
+                name="message"
+                placeholder="Your Message"
+                value={formData.message}
+                onChange={handleInputChange}
+                rows={6}
+                required
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed resize-none"
+              ></textarea>
+
+              <ProductButton
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="flex items-center justify-center gap-2"
               >
-                {error}
-              </div>
-            )}
-
-            <input
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              style={inputStyle}
-            />
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Your Email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              style={inputStyle}
-            />
-
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Your Phone (optional)"
-              value={formData.phone}
-              onChange={handleInputChange}
-              style={inputStyle}
-            />
-
-            <textarea
-              name="message"
-              placeholder="Your Message"
-              value={formData.message}
-              onChange={handleInputChange}
-              rows={6}
-              required
-              style={{ ...inputStyle, resize: "none" }}
-            ></textarea>
-
-            <ProductButton
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="flex items-center justify-center gap-2"
-            >
-              <Send size={18} />
-              Send Message
-            </ProductButton>
-          </form>
-        </main>
-      </div>
+                <Send size={18} />
+                Send Message
+              </ProductButton>
+            </form>
+          </main>
+        </div>
+      </section>
     </div>
   );
-};
-
-// ✨ Shared Input Style
-const inputStyle = {
-  padding: "12px 16px",
-  borderRadius: "8px",
-  border: "1px solid #ddd",
-  fontSize: "1rem",
-  transition: "all 0.3s ease",
-  outline: "none",
-  background: "#fff",
 };
 
 export default Contact;

@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import { useToast } from "../hooks/useToast";
 import { Bell, Mail, Globe, Save } from "lucide-react";
 import ProductButton from "../components/ProductButton";
 
 export default function Notifications() {
   const { user } = useContext(AuthContext);
+  const { showToast } = useToast();
+  const navigate = useNavigate();
   const [prefs, setPrefs] = useState({ email: true, web: true });
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +36,7 @@ export default function Notifications() {
   const handleSavePrefs = async () => {
     try {
       if (!user?._id) {
-        alert("Please log in to save your preferences.");
+        showToast("Please log in to save your preferences.", "error", 3000);
         return;
       }
       setLoading(true);
@@ -40,133 +44,131 @@ export default function Notifications() {
         `http://localhost:5000/notifications/preferences/${user._id}`,
         prefs
       );
-      alert("✅ Your notification settings have been saved!");
+      showToast("Your notification settings have been saved!", "success", 3000);
     } catch (err) {
       console.error("Error saving preferences:", err);
-      alert("❌ Something went wrong while saving your settings.");
+      const errorMessage = err.response?.data?.message || "Something went wrong while saving your settings.";
+      showToast(errorMessage, "error", 3000);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-xl border border-gray-200 shadow-xl rounded-3xl overflow-hidden">
-        {/* Header */}
-        <div className="relative overflow-hidden border-b border-gray-200">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 opacity-80" />
-          <div className="relative flex items-center gap-3 px-6 py-5">
-            <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full">
-              <Bell className="text-white w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-semibold text-white drop-shadow-sm">
-              Notification Settings
-            </h2>
+    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-2xl shadow-sm border border-gray-200">
+        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900 flex items-center justify-center gap-2">
+          <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
+          Notification Settings
+        </h1>
+
+        {!user ? (
+          <div className="text-center py-8 sm:py-10">
+            <p className="text-sm sm:text-base text-gray-600 mb-4">
+              Please log in to manage your notification preferences.
+            </p>
+            <ProductButton
+              variant="primary"
+              size="md"
+              onClick={() => navigate("/login")}
+            >
+              Go to Login
+            </ProductButton>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-5">
+            <p className="text-sm text-gray-600 mb-4 sm:mb-6">
+              Customize how you receive updates from the system. You can turn
+              on or off any notification channels below.
+            </p>
 
-        {/* Content */}
-        <div className="p-8 space-y-6">
-          {!user ? (
-            <div className="text-center py-10">
-              <p className="text-gray-500 text-lg">
-                ⚠️ Please log in to manage your notification preferences.
-              </p>
+            {/* Preferences */}
+            <div className="space-y-4">
+              {/* Email */}
+              <div className="flex items-center justify-between p-4 sm:p-5 bg-white rounded-xl border-2 border-gray-300 hover:border-blue-600 transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4 flex-1">
+                  <div className="p-2.5 sm:p-3 bg-blue-100 text-blue-600 rounded-lg flex-shrink-0">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-gray-900 mb-1">
+                      Receive notifications via Email
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-600">
+                      Get updates delivered directly to your inbox.
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer ml-4 flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={prefs.email}
+                    onChange={(e) =>
+                      setPrefs({ ...prefs, email: e.target.checked })
+                    }
+                    className="sr-only peer"
+                    disabled={loading}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:outline-2 peer-focus:outline-blue-600 peer-focus:outline-offset-2 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* Web */}
+              <div className="flex items-center justify-between p-4 sm:p-5 bg-white rounded-xl border-2 border-gray-300 hover:border-blue-600 transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4 flex-1">
+                  <div className="p-2.5 sm:p-3 bg-indigo-100 text-indigo-600 rounded-lg flex-shrink-0">
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-gray-900 mb-1">
+                      Receive notifications on the Web
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-600">
+                      Show in-app notifications while you're online.
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer ml-4 flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={prefs.web}
+                    onChange={(e) =>
+                      setPrefs({ ...prefs, web: e.target.checked })
+                    }
+                    className="sr-only peer"
+                    disabled={loading}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:outline-2 peer-focus:outline-blue-600 peer-focus:outline-offset-2 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
             </div>
-          ) : (
-            <>
-              <p className="text-gray-600 text-sm mb-4">
-                Customize how you receive updates from the system. You can turn
-                on or off any notification channels below.
-              </p>
 
-              {/* Preferences */}
-              <div className="grid gap-4">
-                {/* Email */}
-                <div className="group flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-sm border border-gray-200 transition-all duration-200">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-500 text-white rounded-xl shadow-sm">
-                      <Mail className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        Receive notifications via Email
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Get updates delivered directly to your inbox.
-                      </p>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={prefs.email}
-                      onChange={(e) =>
-                        setPrefs({ ...prefs, email: e.target.checked })
-                      }
-                      className="sr-only peer"
-                      disabled={loading}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                {/* Web */}
-                <div className="group flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-sm border border-gray-200 transition-all duration-200">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-tr from-indigo-500 to-purple-500 text-white rounded-xl shadow-sm">
-                      <Globe className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        Receive notifications on the Web
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Show in-app notifications while you’re online.
-                      </p>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={prefs.web}
-                      onChange={(e) =>
-                        setPrefs({ ...prefs, web: e.target.checked })
-                      }
-                      className="sr-only peer"
-                      disabled={loading}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Save button */}
-              <div className="pt-4">
-                <ProductButton
-                  variant="primary"
-                  size="lg"
-                  onClick={handleSavePrefs}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-5 h-5" />
-                      Save Changes
-                    </>
-                  )}
-                </ProductButton>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+            {/* Save button */}
+            <div className="pt-4 sm:pt-6">
+              <ProductButton
+                type="button"
+                variant="primary"
+                size="lg"
+                onClick={handleSavePrefs}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-5 h-5" />
+                    Save Changes
+                  </>
+                )}
+              </ProductButton>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

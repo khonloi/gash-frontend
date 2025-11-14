@@ -20,14 +20,11 @@ const Orders = () => {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [searchType, setSearchType] = useState("phone");
-  const [showFilterPanel, setShowFilterPanel] = useState(false);
   const socketRef = useRef(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const itemsPerPage = 5; // Fixed items per page
 
   const fetchOrders = useCallback(
     async () => {
@@ -195,22 +192,38 @@ const Orders = () => {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter((order) => {
-        if (searchType === "phone") {
-          return order.phone?.toLowerCase().includes(query);
-        } else {
-          return order.addressReceive?.toLowerCase().includes(query);
+        // Search by Order ID
+        if (order._id?.toLowerCase().includes(query)) {
+          return true;
         }
+
+        // Search by Order Status
+        if (order.order_status?.toLowerCase().includes(query)) {
+          return true;
+        }
+
+        // Search by Payment Status
+        if (order.pay_status?.toLowerCase().includes(query)) {
+          return true;
+        }
+
+        // Search by Product Name in orderDetails
+        if (order.orderDetails && order.orderDetails.length > 0) {
+          const hasMatchingProduct = order.orderDetails.some((detail) => {
+            const productName = detail.variant_id?.productId?.productName;
+            return productName?.toLowerCase().includes(query);
+          });
+          if (hasMatchingProduct) {
+            return true;
+          }
+        }
+
+        return false;
       });
     }
 
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(
-        (order) => order.order_status?.toLowerCase() === statusFilter.toLowerCase()
-      );
-    }
-
     setFilteredOrders(filtered);
-  }, [orders, searchQuery, searchType, statusFilter]);
+  }, [orders, searchQuery]);
 
   useEffect(() => {
     handleSearchAndFilter();
@@ -227,56 +240,59 @@ const Orders = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleItemsPerPageChange = (newItemsPerPage) => {
-    setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1);
-  };
-
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-GB", {
       year: "numeric",
-      month: "short",
-      day: "2-digit",
+      month: "long",
+      day: "numeric",
     });
 
+  // Format price helper
+  const formatPrice = useCallback((price) => {
+    if (typeof price !== "number" || isNaN(price)) return "N/A";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  }, []);
+
   const getStatusBadge = (status, type = "order") => {
-    const base =
-      "px-3 py-1 rounded-full text-xs font-semibold border inline-block";
+    const base = "inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium";
     if (type === "order") {
       switch (status?.toLowerCase()) {
         case "pending":
           return (
-            <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-300`}>
+            <span className={`${base} bg-yellow-100 text-yellow-800`}>
               Pending
             </span>
           );
         case "confirmed":
           return (
-            <span className={`${base} bg-blue-100 text-blue-700 border-blue-300`}>
+            <span className={`${base} bg-blue-100 text-blue-800`}>
               Confirmed
             </span>
           );
         case "shipping":
           return (
-            <span className={`${base} bg-indigo-100 text-indigo-700 border-indigo-300`}>
+            <span className={`${base} bg-indigo-100 text-indigo-800`}>
               Shipping
             </span>
           );
         case "delivered":
           return (
-            <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
+            <span className={`${base} bg-green-100 text-green-800`}>
               Delivered
             </span>
           );
         case "cancelled":
           return (
-            <span className={`${base} bg-red-100 text-red-700 border-red-300`}>
+            <span className={`${base} bg-red-100 text-red-800`}>
               Cancelled
             </span>
           );
         default:
           return (
-            <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+            <span className={`${base} bg-gray-100 text-gray-800`}>
               Unknown
             </span>
           );
@@ -285,25 +301,25 @@ const Orders = () => {
       switch (status?.toLowerCase()) {
         case "unpaid":
           return (
-            <span className={`${base} bg-orange-100 text-orange-700 border-orange-300`}>
+            <span className={`${base} bg-orange-100 text-orange-800`}>
               Unpaid
             </span>
           );
         case "paid":
           return (
-            <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
+            <span className={`${base} bg-green-100 text-green-800`}>
               Paid
             </span>
           );
         case "refunded":
           return (
-            <span className={`${base} bg-purple-100 text-purple-700 border-purple-300`}>
+            <span className={`${base} bg-purple-100 text-purple-800`}>
               Refunded
             </span>
           );
         default:
           return (
-            <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+            <span className={`${base} bg-gray-100 text-gray-800`}>
               Unknown
             </span>
           );
@@ -322,7 +338,7 @@ const Orders = () => {
 
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Orders</h1>
           <p className="text-sm text-gray-600 mb-4">
@@ -332,142 +348,61 @@ const Orders = () => {
 
         <div className="mb-6 space-y-4">
           <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-            <legend className="text-sm sm:text-base font-semibold">Search & Filter</legend>
+            <legend className="text-sm sm:text-base font-semibold">Search</legend>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder={`Search by ${searchType}...`}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-1.5 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
+                <fieldset className="flex flex-col">
+                  <div className="relative">
+                    <input
+                      id="search-input"
+                      type="text"
+                      placeholder="Search by product name, order ID, or status..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </div>
+                </fieldset>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div className="flex bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setSearchType("phone")}
-                    className={`px-3 py-1 text-sm font-medium rounded-md transition ${
-                      searchType === "phone"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
-                    }`}
-                  >
-                    Phone
-                  </button>
-                  <button
-                    onClick={() => setSearchType("address")}
-                    className={`px-3 py-1 text-sm font-medium rounded-md transition ${
-                      searchType === "address"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
-                    }`}
-                  >
-                    Address
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => setShowFilterPanel(!showFilterPanel)}
-                  className={`px-3 py-1.5 border-2 border-gray-300 rounded-lg font-semibold transition flex items-center gap-2 text-sm ${
-                    showFilterPanel || statusFilter !== "all"
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-900 hover:bg-gray-50 hover:border-blue-600"
-                  } focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
-                    />
-                  </svg>
-                  Filter
-                  {statusFilter !== "all" && (
-                    <span className="bg-white text-gray-900 text-xs px-1.5 py-0.5 rounded-full">
-                      {statusFilter}
-                    </span>
-                  )}
-                </button>
-
-                {(searchQuery || statusFilter !== "all") && (
+              {searchQuery && (
+                <div className="flex items-end">
                   <ProductButton
                     variant="default"
-                    size="sm"
+                    size="md"
                     onClick={() => {
                       setSearchQuery("");
-                      setStatusFilter("all");
-                      setSearchType("phone");
                     }}
                   >
                     Clear
                   </ProductButton>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-
-            {showFilterPanel && (
-              <div className="mt-4 pt-4 border-t border-gray-300">
-                <fieldset className="border-2 border-gray-300 rounded-xl p-3">
-                  <legend className="text-sm font-semibold">Order Status</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {["all", "pending", "confirmed", "shipping", "delivered", "cancelled"].map((status) => (
-                      <label key={status} className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="statusFilter"
-                          value={status}
-                          checked={statusFilter === status}
-                          onChange={(e) => setStatusFilter(e.target.value)}
-                          className="mr-2 accent-amber-400"
-                        />
-                        <span className="text-sm capitalize">{status}</span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              </div>
-            )}
           </fieldset>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
+        <div className="mb-6">
           <p className="text-sm text-gray-600">
             Showing {Math.min(startIndex + 1, filteredOrders.length)}–
             {Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length}{" "}
             orders
           </p>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Items per page:</span>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
         </div>
 
         {loading ? (
@@ -509,81 +444,85 @@ const Orders = () => {
                   size="sm"
                   onClick={() => {
                     setSearchQuery("");
-                    setStatusFilter("all");
-                    setSearchType("phone");
                   }}
                   className="text-blue-600"
                 >
-                  Clear Filters
+                  Clear Search
                 </ProductButton>
               </>
             )}
           </div>
         ) : (
           <div className="space-y-4">
-            {currentOrders.map((order) => (
+            {currentOrders.map((order) => {
+              // Get first product from orderDetails
+              // Note: getUserOrdersService returns variant_id (not variant) with populated productId
+              const firstProduct = order.orderDetails?.[0];
+              const productImage = firstProduct?.variant_id?.variantImage || "/placeholder.png";
+              const productName = firstProduct?.variant_id?.productId?.productName || "Product (Variant not available)";
+
+              return (
               <article
                 key={order._id}
-                className="border-2 border-gray-300 rounded-xl p-4 sm:p-5 bg-white hover:shadow-sm border border-gray-200 transition"
+                className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
+                tabIndex={0}
+                aria-label={`Order: ${order._id}`}
               >
-                <div className="flex justify-between items-center border-b pb-2 mb-3">
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm text-gray-500">Order #{order._id}</p>
+                <div className="flex items-stretch gap-6 flex-1">
+                  {/* Product Image */}
+                  {firstProduct && (
+                    <img
+                      src={productImage}
+                      alt={productName}
+                      className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
+                      onError={(e) => {
+                        e.target.src = "/placeholder.png";
+                      }}
+                    />
+                  )}
+                  
+                  {/* Order Details */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
+                        {productName || "Order"}
+                      </p>
+                      {order.orderDetails?.length > 1 && (
+                        <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                          +{order.orderDetails.length - 1} more
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm text-gray-600 m-0">
+                        Order #{order._id.slice(-8).toUpperCase()}
+                      </p>
+                      <span className="text-gray-400">•</span>
+                      <p className="text-sm text-gray-600 m-0">
+                        {formatDate(order.orderDate)}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 flex-wrap mt-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Status:</span>
+                        {getStatusBadge(order.order_status, "order")}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Payment:</span>
+                        {getStatusBadge(order.pay_status, "pay")}
+                      </div>
+                    </div>
+                    
+                    <p className="text-base font-semibold text-red-600 m-0 mt-1">
+                      Total: {formatPrice(order.finalPrice)}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500">{formatDate(order.orderDate)}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
-                  <p>
-                    <strong>Address: </strong>
-                    {searchType === "address" && searchQuery ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: order.addressReceive?.replace(
-                            new RegExp(`(${searchQuery})`, "gi"),
-                            '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-                          ),
-                        }}
-                      />
-                    ) : (
-                      <span>{order.addressReceive}</span>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Phone: </strong>
-                    {searchType === "phone" && searchQuery ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: order.phone?.replace(
-                            new RegExp(`(${searchQuery})`, "gi"),
-                            '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-                          ),
-                        }}
-                      />
-                    ) : (
-                      <span>{order.phone}</span>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Payment:</strong> {order.payment_method}
-                  </p>
-                  <p>
-                    <strong>Total:</strong>{" "}
-                    {order.finalPrice
-                      ? order.finalPrice.toLocaleString() + "₫"
-                      : "—"}
-                  </p>
-                  <p>
-                    <strong>Order Status:</strong>{" "}
-                    {getStatusBadge(order.order_status, "order")}
-                  </p>
-                  <p>
-                    <strong>Payment Status:</strong>{" "}
-                    {getStatusBadge(order.pay_status, "pay")}
-                  </p>
-                </div>
-
-                <div className="flex justify-end gap-3 mt-4">
+                {/* Action Buttons */}
+                <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
                   {order.pay_status?.toLowerCase() === "paid" && (
                     <ProductButton
                       variant="default"
@@ -637,7 +576,8 @@ const Orders = () => {
                   </ProductButton>
                 </div>
               </article>
-            ))}
+            );
+            })}
           </div>
         )}
 

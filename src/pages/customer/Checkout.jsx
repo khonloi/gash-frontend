@@ -7,6 +7,8 @@ import { useToast } from '../../hooks/useToast';
 import Api from "../../common/SummaryAPI";
 import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/LoadingSpinner';
 import ProductButton from '../../components/ProductButton';
+import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 
 // === LocalStorage Helpers ===
 const CHECKOUT_STORAGE_KEY = 'checkout_persistent_data';
@@ -143,6 +145,15 @@ const Checkout = () => {
       fetchCartItems();
     }
   }, [user, navigate, buyNowState, selectedItems.length, fetchCartItems, showToast, location.pathname]);
+
+  // Format price helper
+  const formatPrice = useCallback((price) => {
+    if (typeof price !== "number" || isNaN(price)) return "N/A";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  }, []);
 
   // === Calculate total price ===
   const totalPrice = useMemo(() => {
@@ -430,24 +441,39 @@ const Checkout = () => {
                 const variantData = item.variantId || item.variant;
                 const quantity = item.productQuantity || item.quantity;
                 const price = item.productPrice || variantData?.variantPrice || 0;
+                const totalItemPrice = price * quantity;
                 return (
-                  <div key={item._id || variantData?._id} className="flex gap-4 py-4 border-b">
-                    <img
-                      src={variantData?.variantImage || ''}
-                      alt={productData?.productName || ''}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-medium">{productData?.productName || ''}</h3>
-                      <p className="text-sm text-gray-600">
-                        Variant: {variantData?.productColorId?.color_name || 'N/A'} - Size: {variantData?.productSizeId?.size_name || 'N/A'}
-                      </p>
-                      <p className="text-sm text-gray-600">Quantity: {quantity}</p>
-                      <p className="font-medium text-yellow-600">
-                        Price: {price.toLocaleString()}₫
-                      </p>
+                  <article
+                    key={item._id || variantData?._id}
+                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 transition-shadow hover:shadow-sm"
+                    tabIndex={0}
+                    aria-label={`Checkout item: ${productData?.productName || 'Unnamed Product'}`}
+                  >
+                    <div className="flex items-stretch gap-6">
+                      <img
+                        src={variantData?.variantImage || '/placeholder.png'}
+                        alt={productData?.productName || 'Product'}
+                        className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
+                        onError={(e) => {
+                          e.target.src = '/placeholder.png';
+                        }}
+                      />
+                      <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                        <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
+                          {productData?.productName || 'Unnamed Product'}
+                        </p>
+                        <p className="text-sm text-gray-600 m-0">
+                          Color: {variantData?.productColorId?.color_name || 'N/A'}, Size: {variantData?.productSizeId?.size_name || 'N/A'}
+                        </p>
+                        <p className="text-sm text-gray-600 m-0">
+                          Price: {formatPrice(price)}
+                        </p>
+                        <p className="text-base font-semibold text-red-600 m-0">
+                          Total: {formatPrice(totalItemPrice)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </article>
                 );
               })
             )}
@@ -463,7 +489,7 @@ const Checkout = () => {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value)}
                   placeholder="Enter voucher code"
-                  className="flex-1 px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading}
                 />
                 <ProductButton
@@ -495,17 +521,17 @@ const Checkout = () => {
           <div className="mt-6 pt-6 border-t border-gray-300 space-y-4">
             <div className="flex justify-between text-base">
               <span>Subtotal:</span>
-              <span>{totalPrice.toLocaleString()}₫</span>
+              <span>{formatPrice(totalPrice)}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-green-600 text-base">
                 <span>Discount:</span>
-                <span>-{discount.toLocaleString()}₫</span>
+                <span>-{formatPrice(discount)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg sm:text-xl pt-4 border-t border-gray-300">
               <span>Total:</span>
-              <span>{(totalPrice - discount).toLocaleString()}₫</span>
+              <span className="text-red-600">{formatPrice(Math.max(totalPrice - discount, 0))}</span>
             </div>
           </div>
         </section>
@@ -539,7 +565,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your recipient name"
-                    className="w-full px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -556,7 +582,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your delivery address"
-                    className="w-full px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -573,7 +599,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your phone number"
-                    className="w-full px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -593,9 +619,14 @@ const Checkout = () => {
                       className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
                       disabled={loading}
                     />
-                    <div className="ml-3">
-                      <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
-                      <p className="text-xs text-gray-500">Pay when you receive the order</p>
+                    <div className="ml-3 flex items-center gap-3 flex-1">
+                      <div className="p-2 bg-blue-100 text-blue-600 rounded-lg flex-shrink-0">
+                        <LocalAtmOutlinedIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
+                        <p className="text-xs text-gray-500">Pay when you receive the order</p>
+                      </div>
                     </div>
                   </label>
 
@@ -609,9 +640,14 @@ const Checkout = () => {
                       className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
                       disabled={loading}
                     />
-                    <div className="ml-3">
-                      <span className="text-sm font-medium text-gray-900">VNPay</span>
-                      <p className="text-xs text-gray-500">Pay online with VNPay</p>
+                    <div className="ml-3 flex items-center gap-3 flex-1">
+                      <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg flex-shrink-0">
+                        <AccountBalanceOutlinedIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-900">VNPay (Bank Transfer)</span>
+                        <p className="text-xs text-gray-500">Pay online with VNPay</p>
+                      </div>
                     </div>
                   </label>
                 </div>

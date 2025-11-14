@@ -285,11 +285,11 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-gray-50 pt-6 pb-4 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <div className="w-full">
         {loading ? (
           <div className="flex justify-center items-center min-h-[200px]">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mb-4"></div>
               <p className="text-gray-600">Loading your profile...</p>
             </div>
@@ -298,7 +298,7 @@ const Profile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
             {/* Profile Card */}
             <div className="lg:col-span-1 flex">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col">
                 {/* Header */}
                 <div className="bg-gray-50 p-8 text-center border-b border-gray-200">
                   <div className="relative inline-block">
@@ -372,7 +372,7 @@ const Profile = () => {
 
             {/* Profile Details */}
             <div className="lg:col-span-2 flex">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col">
                 <div className="bg-gray-50 border-b border-gray-200 p-5">
                   <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
                 </div>
@@ -500,7 +500,7 @@ const Profile = () => {
           </div>
         ) : (
           <div className="flex justify-center items-center min-h-[200px]">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center max-w-md">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center max-w-md">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -534,7 +534,7 @@ const Profile = () => {
       {/* Modal Delete Confirmation */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Account Deletion</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete your account? This action cannot be undone.
