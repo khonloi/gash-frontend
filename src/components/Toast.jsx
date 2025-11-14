@@ -7,6 +7,7 @@ export const ToastProvider = ({ children }) => {
     type: "",
     visible: false,
     isClosing: false,
+    isEntering: false,
   });
 
   // keep the current timer so we can cancel it
@@ -22,24 +23,31 @@ export const ToastProvider = ({ children }) => {
       type: "",
       visible: false,
       isClosing: false,
+      isEntering: false,
     });
 
-    // 3. Show the new toast on the next paint
+    // 3. Show the new toast on the next paint with entering state
     requestAnimationFrame(() => {
       setToast({
         message,
         type,
         visible: true,
         isClosing: false,
+        isEntering: true,
       });
 
-      // 4. Start a fresh auto-close timer
+      // 4. Remove entering state after animation completes
+      setTimeout(() => {
+        setToast((prev) => ({ ...prev, isEntering: false }));
+      }, 350);
+
+      // 5. Start a fresh auto-close timer
       closeTimerRef.current = setTimeout(() => {
         setToast((prev) => ({ ...prev, isClosing: true }));
         setTimeout(() => {
-          setToast({ message: "", type: "", visible: false, isClosing: false });
+          setToast({ message: "", type: "", visible: false, isClosing: false, isEntering: false });
           closeTimerRef.current = null;
-        }, 300); // fade-out duration
+        }, 350); // fade-out duration
       }, timeout);
     });
   }, []);
@@ -51,8 +59,8 @@ export const ToastProvider = ({ children }) => {
     }
     setToast((prev) => ({ ...prev, isClosing: true }));
     setTimeout(() => {
-      setToast({ message: "", type: "", visible: false, isClosing: false });
-    }, 300);
+      setToast({ message: "", type: "", visible: false, isClosing: false, isEntering: false });
+    }, 350);
   }, []);
 
   const toastStyles = {
@@ -98,21 +106,28 @@ export const ToastProvider = ({ children }) => {
       {toast.visible && (
         <div
           className={`
-            fixed top-6 right-6 z-[9999]
-            max-w-sm
+            fixed bottom-6 left-1/2 z-[9999]
+            max-w-sm w-[calc(100%-3rem)]
             rounded-xl p-4 border-l-4
             shadow-xl bg-white backdrop-blur-sm
-            transition-opacity duration-300
             ${toastStyles[toast.type] || toastStyles.info}
-            ${toast.isClosing ? "opacity-0" : "opacity-100"}
-            ${toast.isClosing ? "-translate-y-4 scale-95" : "translate-y-0 scale-100"}
+            ${toast.isClosing 
+              ? "opacity-0 translate-y-4" 
+              : toast.isEntering 
+                ? "opacity-0 translate-y-4" 
+                : "opacity-100 translate-y-0"}
           `}
           style={{
             transform: toast.isClosing
-              ? "translateY(-16px) scale(0.95)"
-              : "translateY(0) scale(1)",
-            transition:
-              "opacity 300ms ease-out, transform 300ms cubic-bezier(0.2, 0.8, 0.4, 1)",
+              ? "translateX(-50%) translateY(20px)"
+              : toast.isEntering
+                ? "translateX(-50%) translateY(20px)"
+                : "translateX(-50%) translateY(0)",
+            transition: toast.isClosing
+              ? "opacity 350ms cubic-bezier(0.68, -0.275, 0.115, 0.825), transform 350ms cubic-bezier(0.68, -0.275, 0.115, 0.825)"
+              : toast.isEntering
+                ? "opacity 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+                : "opacity 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275)",
           }}
           role="alert"
           tabIndex={0}

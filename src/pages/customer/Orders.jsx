@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import OrderDetailsModal from "../../components/OrderDetails";
 import LoadingSpinner, { LoadingSkeleton } from "../../components/LoadingSpinner";
+import ProductButton from "../../components/ProductButton";
+import { io } from "socket.io-client";
+import { SOCKET_URL } from "../../common/axiosClient";
 
 const Orders = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -17,13 +20,11 @@ const Orders = () => {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [searchType, setSearchType] = useState("phone");
-  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const socketRef = useRef(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const itemsPerPage = 5; // Fixed items per page
 
   const fetchOrders = useCallback(
     async () => {
@@ -43,10 +44,6 @@ const Orders = () => {
           setFilteredOrders([]);
           setLoading(false);
           return;
-        }
-
-        if (data.length === 0) {
-          showToast("No orders found for this user", "info");
         }
 
         const sorted = data.sort(
@@ -72,28 +69,161 @@ const Orders = () => {
     }
   }, [isAuthLoading, user, fetchOrders]);
 
+  // Setup Socket.IO for real-time order updates
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // Initialize socket if not already created
+    if (!socketRef.current) {
+      const token = localStorage.getItem("token");
+      socketRef.current = io(SOCKET_URL, {
+        transports: ["websocket", "polling"],
+        auth: { token },
+        withCredentials: true,
+      });
+    }
+
+    const socket = socketRef.current;
+
+    // Connect and authenticate
+    socket.on("connect", () => {
+      console.log("✅ Orders Socket connected:", socket.id);
+      // Emit user connection
+      socket.emit("userConnected", user._id);
+      // Also try authentication if token available
+      const token = localStorage.getItem("token");
+      if (token) {
+        socket.emit("authenticate", token);
+      }
+    });
+
+    // Listen for order updates
+    socket.on("orderUpdated", (payload) => {
+      const updatedOrder = payload.order || payload;
+      const orderUserId = payload.userId || updatedOrder.acc_id?._id || updatedOrder.acc_id;
+
+      // Only update if this order belongs to the current user
+      if (orderUserId && orderUserId.toString() === user._id.toString()) {
+        console.log("📦 Order updated via Socket.IO:", updatedOrder._id);
+        
+        setOrders((prevOrders) => {
+          const existingIndex = prevOrders.findIndex((o) => o._id === updatedOrder._id);
+          
+          if (existingIndex !== -1) {
+            // Update existing order
+            const updated = [...prevOrders];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              ...updatedOrder,
+            };
+            // Re-sort by orderDate
+            return updated.sort(
+              (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+            );
+          } else {
+            // New order - add to beginning
+            return [
+              updatedOrder,
+              ...prevOrders,
+            ].sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+          }
+        });
+
+        // Also update filtered orders if applicable
+        setFilteredOrders((prevFiltered) => {
+          const existingIndex = prevFiltered.findIndex((o) => o._id === updatedOrder._id);
+          
+          if (existingIndex !== -1) {
+            const updated = [...prevFiltered];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              ...updatedOrder,
+            };
+            return updated.sort(
+              (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+            );
+          } else {
+            return [
+              updatedOrder,
+              ...prevFiltered,
+            ].sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+          }
+        });
+
+        // Show toast notification for status changes
+        if (updatedOrder.order_status) {
+          const statusMessages = {
+            pending: "Your order is pending",
+            confirmed: "Your order has been confirmed",
+            shipping: "Your order is on the way!",
+            delivered: "Your order has been delivered!",
+            cancelled: "Your order has been cancelled",
+          };
+          const message = statusMessages[updatedOrder.order_status] || "Order status updated";
+          showToast(message, "info");
+        }
+      }
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("❌ Orders Socket connection error:", err.message);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.warn("⚠️ Orders Socket disconnected:", reason);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("connect");
+      socket.off("orderUpdated");
+      socket.off("connect_error");
+      socket.off("disconnect");
+      if (socket.connected) {
+        socket.disconnect();
+      }
+      socketRef.current = null;
+    };
+  }, [user, showToast]);
+
   const handleSearchAndFilter = useCallback(() => {
     let filtered = [...orders];
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter((order) => {
-        if (searchType === "phone") {
-          return order.phone?.toLowerCase().includes(query);
-        } else {
-          return order.addressReceive?.toLowerCase().includes(query);
+        // Search by Order ID
+        if (order._id?.toLowerCase().includes(query)) {
+          return true;
         }
+
+        // Search by Order Status
+        if (order.order_status?.toLowerCase().includes(query)) {
+          return true;
+        }
+
+        // Search by Payment Status
+        if (order.pay_status?.toLowerCase().includes(query)) {
+          return true;
+        }
+
+        // Search by Product Name in orderDetails
+        if (order.orderDetails && order.orderDetails.length > 0) {
+          const hasMatchingProduct = order.orderDetails.some((detail) => {
+            const productName = detail.variant_id?.productId?.productName;
+            return productName?.toLowerCase().includes(query);
+          });
+          if (hasMatchingProduct) {
+            return true;
+          }
+        }
+
+        return false;
       });
     }
 
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(
-        (order) => order.order_status?.toLowerCase() === statusFilter.toLowerCase()
-      );
-    }
-
     setFilteredOrders(filtered);
-  }, [orders, searchQuery, searchType, statusFilter]);
+  }, [orders, searchQuery]);
 
   useEffect(() => {
     handleSearchAndFilter();
@@ -110,56 +240,59 @@ const Orders = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleItemsPerPageChange = (newItemsPerPage) => {
-    setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1);
-  };
-
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-GB", {
       year: "numeric",
-      month: "short",
-      day: "2-digit",
+      month: "long",
+      day: "numeric",
     });
 
+  // Format price helper
+  const formatPrice = useCallback((price) => {
+    if (typeof price !== "number" || isNaN(price)) return "N/A";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  }, []);
+
   const getStatusBadge = (status, type = "order") => {
-    const base =
-      "px-3 py-1 rounded-full text-xs font-semibold border inline-block";
+    const base = "inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium";
     if (type === "order") {
       switch (status?.toLowerCase()) {
         case "pending":
           return (
-            <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-300`}>
+            <span className={`${base} bg-yellow-100 text-yellow-800`}>
               Pending
             </span>
           );
         case "confirmed":
           return (
-            <span className={`${base} bg-blue-100 text-blue-700 border-blue-300`}>
+            <span className={`${base} bg-blue-100 text-blue-800`}>
               Confirmed
             </span>
           );
         case "shipping":
           return (
-            <span className={`${base} bg-indigo-100 text-indigo-700 border-indigo-300`}>
+            <span className={`${base} bg-indigo-100 text-indigo-800`}>
               Shipping
             </span>
           );
         case "delivered":
           return (
-            <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
+            <span className={`${base} bg-green-100 text-green-800`}>
               Delivered
             </span>
           );
         case "cancelled":
           return (
-            <span className={`${base} bg-red-100 text-red-700 border-red-300`}>
+            <span className={`${base} bg-red-100 text-red-800`}>
               Cancelled
             </span>
           );
         default:
           return (
-            <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+            <span className={`${base} bg-gray-100 text-gray-800`}>
               Unknown
             </span>
           );
@@ -168,25 +301,25 @@ const Orders = () => {
       switch (status?.toLowerCase()) {
         case "unpaid":
           return (
-            <span className={`${base} bg-orange-100 text-orange-700 border-orange-300`}>
+            <span className={`${base} bg-orange-100 text-orange-800`}>
               Unpaid
             </span>
           );
         case "paid":
           return (
-            <span className={`${base} bg-green-100 text-green-700 border-green-300`}>
+            <span className={`${base} bg-green-100 text-green-800`}>
               Paid
             </span>
           );
         case "refunded":
           return (
-            <span className={`${base} bg-purple-100 text-purple-700 border-purple-300`}>
+            <span className={`${base} bg-purple-100 text-purple-800`}>
               Refunded
             </span>
           );
         default:
           return (
-            <span className={`${base} bg-gray-100 text-gray-600 border-gray-300`}>
+            <span className={`${base} bg-gray-100 text-gray-800`}>
               Unknown
             </span>
           );
@@ -204,128 +337,79 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white py-10 px-6">
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-yellow-200">
-        <h1 className="text-3xl font-bold text-yellow-600 text-center mb-8">
-          My Orders
-        </h1>
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
+        <header className="mb-4">
+          <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Orders</h1>
+          <p className="text-sm text-gray-600 mb-4">
+            View and manage your order history. Click on an order to see detailed information.
+          </p>
+        </header>
 
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={`Search by ${searchType}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+        <div className="mb-6 space-y-4">
+          <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+            <legend className="text-sm sm:text-base font-semibold">Search</legend>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex-1">
+                <fieldset className="flex flex-col">
+                  <div className="relative">
+                    <input
+                      id="search-input"
+                      type="text"
+                      placeholder="Search by product name, order ID, or status..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </fieldset>
               </div>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setSearchType("phone")}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition ${
-                  searchType === "phone"
-                    ? "bg-white text-yellow-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Phone
-              </button>
-              <button
-                onClick={() => setSearchType("address")}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition ${
-                  searchType === "address"
-                    ? "bg-white text-yellow-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Address
-              </button>
-            </div>
-
-            <button
-              onClick={() => setShowFilterPanel(!showFilterPanel)}
-              className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-                showFilterPanel || statusFilter !== "all"
-                  ? "bg-yellow-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
-                />
-              </svg>
-              Filter
-              {statusFilter !== "all" && (
-                <span className="bg-white text-yellow-600 text-xs px-1.5 py-0.5 rounded-full">
-                  {statusFilter}
-                </span>
+              {searchQuery && (
+                <div className="flex items-end">
+                  <ProductButton
+                    variant="default"
+                    size="md"
+                    onClick={() => {
+                      setSearchQuery("");
+                    }}
+                  >
+                    Clear
+                  </ProductButton>
+                </div>
               )}
-            </button>
-
-            {(searchQuery || statusFilter !== "all") && (
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setStatusFilter("all");
-                  setSearchType("phone");
-                }}
-                className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition text-sm"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+            </div>
+          </fieldset>
         </div>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
           <p className="text-sm text-gray-600">
             Showing {Math.min(startIndex + 1, filteredOrders.length)}–
             {Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length}{" "}
             orders
           </p>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Items per page:</span>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="border border-yellow-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
         </div>
 
         {loading ? (
           <LoadingSkeleton count={3} />
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
+          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+            <div className="text-gray-400">
               <svg
                 className="w-16 h-16 mx-auto"
                 fill="none"
@@ -355,92 +439,100 @@ const Orders = () => {
                 <p className="text-gray-400 text-sm mt-2">
                   Try adjusting your search criteria or filters
                 </p>
-                <button
+                <ProductButton
+                  variant="default"
+                  size="sm"
                   onClick={() => {
                     setSearchQuery("");
-                    setStatusFilter("all");
-                    setSearchType("phone");
                   }}
-                  className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition"
+                  className="text-blue-600"
                 >
-                  Clear Filters
-                </button>
+                  Clear Search
+                </ProductButton>
               </>
             )}
           </div>
         ) : (
-          <div className="space-y-5">
-            {currentOrders.map((order) => (
+          <div className="space-y-4">
+            {currentOrders.map((order) => {
+              // Get first product from orderDetails
+              // Note: getUserOrdersService returns variant_id (not variant) with populated productId
+              const firstProduct = order.orderDetails?.[0];
+              const productImage = firstProduct?.variant_id?.variantImage || "/placeholder.png";
+              const productName = firstProduct?.variant_id?.productId?.productName || "Product (Variant not available)";
+
+              return (
               <article
                 key={order._id}
-                className="border border-yellow-200 rounded-xl p-5 bg-white hover:shadow-lg transition transform hover:-translate-y-1"
+                className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
+                tabIndex={0}
+                aria-label={`Order: ${order._id}`}
               >
-                <div className="flex justify-between items-center border-b pb-2 mb-3">
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm text-gray-500">Order #{order._id}</p>
+                <div className="flex items-stretch gap-6 flex-1">
+                  {/* Product Image */}
+                  {firstProduct && (
+                    <img
+                      src={productImage}
+                      alt={productName}
+                      className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
+                      onError={(e) => {
+                        e.target.src = "/placeholder.png";
+                      }}
+                    />
+                  )}
+                  
+                  {/* Order Details */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
+                        {productName || "Order"}
+                      </p>
+                      {order.orderDetails?.length > 1 && (
+                        <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                          +{order.orderDetails.length - 1} more
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm text-gray-600 m-0">
+                        Order #{order._id.slice(-8).toUpperCase()}
+                      </p>
+                      <span className="text-gray-400">•</span>
+                      <p className="text-sm text-gray-600 m-0">
+                        {formatDate(order.orderDate)}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 flex-wrap mt-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Status:</span>
+                        {getStatusBadge(order.order_status, "order")}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Payment:</span>
+                        {getStatusBadge(order.pay_status, "pay")}
+                      </div>
+                    </div>
+                    
+                    <p className="text-base font-semibold text-red-600 m-0 mt-1">
+                      Total: {formatPrice(order.finalPrice)}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500">{formatDate(order.orderDate)}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
-                  <p>
-                    <strong>Address: </strong>
-                    {searchType === "address" && searchQuery ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: order.addressReceive?.replace(
-                            new RegExp(`(${searchQuery})`, "gi"),
-                            '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-                          ),
-                        }}
-                      />
-                    ) : (
-                      <span>{order.addressReceive}</span>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Phone: </strong>
-                    {searchType === "phone" && searchQuery ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: order.phone?.replace(
-                            new RegExp(`(${searchQuery})`, "gi"),
-                            '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-                          ),
-                        }}
-                      />
-                    ) : (
-                      <span>{order.phone}</span>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Payment:</strong> {order.payment_method}
-                  </p>
-                  <p>
-                    <strong>Total:</strong>{" "}
-                    {order.finalPrice
-                      ? order.finalPrice.toLocaleString() + "₫"
-                      : "—"}
-                  </p>
-                  <p>
-                    <strong>Order Status:</strong>{" "}
-                    {getStatusBadge(order.order_status, "order")}
-                  </p>
-                  <p>
-                    <strong>Payment Status:</strong>{" "}
-                    {getStatusBadge(order.pay_status, "pay")}
-                  </p>
-                </div>
-
-                <div className="flex justify-end gap-3 mt-4">
+                {/* Action Buttons */}
+                <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
                   {order.pay_status?.toLowerCase() === "paid" && (
-                    <button
+                    <ProductButton
+                      variant="default"
+                      size="sm"
                       onClick={() => navigate(`/bills/${order._id}`)}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
+                      className="text-green-600"
                       title="View Bill"
                     >
                       <svg
-                        className="w-4 h-4"
+                        className="w-4 h-4 inline mr-2"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -453,15 +545,16 @@ const Orders = () => {
                         />
                       </svg>
                       View Bill
-                    </button>
+                    </ProductButton>
                   )}
-                  <button
+                  <ProductButton
+                    variant="primary"
+                    size="sm"
                     onClick={() => setSelectedOrderId(order._id)}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition flex items-center gap-2"
                     title="View Details"
                   >
                     <svg
-                      className="w-4 h-4"
+                      className="w-4 h-4 inline mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -480,30 +573,28 @@ const Orders = () => {
                       />
                     </svg>
                     View Details
-                  </button>
+                  </ProductButton>
                 </div>
               </article>
-            ))}
+            );
+            })}
           </div>
         )}
 
         {filteredOrders.length > itemsPerPage && (
-          <div className="mt-8 flex items-center justify-between">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-gray-600">
               Page {currentPage} of {totalPages}
             </div>
 
             <div className="flex items-center gap-2">
-              <button
+              <ProductButton
+                variant="default"
+                size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${
-                  currentPage === 1
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-yellow-500 text-white hover:bg-yellow-600"
-                }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -512,7 +603,7 @@ const Orders = () => {
                   />
                 </svg>
                 Previous
-              </button>
+              </ProductButton>
 
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
@@ -533,32 +624,26 @@ const Orders = () => {
                   }
 
                   return (
-                    <button
+                    <ProductButton
                       key={page}
+                      variant={page === currentPage ? "primary" : "default"}
+                      size="sm"
                       onClick={() => handlePageChange(page)}
-                      className={`px-3 py-2 rounded-lg font-medium transition ${
-                        page === currentPage
-                          ? "bg-yellow-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
                     >
                       {page}
-                    </button>
+                    </ProductButton>
                   );
                 })}
               </div>
 
-              <button
+              <ProductButton
+                variant="default"
+                size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${
-                  currentPage === totalPages
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-yellow-500 text-white hover:bg-yellow-600"
-                }`}
               >
                 Next
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -566,11 +651,11 @@ const Orders = () => {
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </button>
+              </ProductButton>
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {selectedOrderId && (
         <OrderDetailsModal

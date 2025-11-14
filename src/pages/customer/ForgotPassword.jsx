@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../hooks/useToast';
 import emailjs from '@emailjs/browser';
-import '../../styles/Signup.css';
+import ProductButton from '../../components/ProductButton';
 
 // Initialize EmailJS with Public API Key
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -16,9 +17,9 @@ if (!publicKey) {
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { requestSignupOTP } = React.useContext(AuthContext);
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const emailRef = useRef(null);
 
@@ -26,16 +27,8 @@ const ForgotPassword = () => {
     emailRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    if (error) {
-      const timeout = setTimeout(() => setError(''), 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [error]);
-
   const handleChange = useCallback((e) => {
     setEmail(e.target.value);
-    setError('');
   }, []);
 
   const validateEmail = useCallback(() => {
@@ -49,7 +42,7 @@ const ForgotPassword = () => {
       e.preventDefault();
       const validationError = validateEmail();
       if (validationError) {
-        setError(validationError);
+        showToast(validationError, 'error', 5000);
         emailRef.current?.focus();
         return;
       }
@@ -77,53 +70,49 @@ const ForgotPassword = () => {
           templateParams
         );
         console.log('EmailJS Success:', emailjsResponse);
+        showToast('OTP sent successfully!', 'success', 3000);
 
         navigate('/otp-verification', {
           state: { email, type: 'forgot-password' },
         });
       } catch (err) {
         console.error('Error:', err.status, err.text || err.message);
+        let errorMsg = '';
         if (err.status === 422) {
-          setError('Failed to send OTP: Invalid email configuration. Please check your email and try again.');
+          errorMsg = 'Failed to send OTP: Invalid email configuration. Please check your email and try again.';
         } else if (err.response?.data?.message) {
-          setError(err.response.data.message);
+          errorMsg = err.response.data.message;
         } else {
-          setError(err.message || 'Failed to send OTP. Please try again.');
+          errorMsg = err.message || 'Failed to send OTP. Please try again.';
         }
+        showToast(errorMsg, 'error', 5000);
         emailRef.current?.focus();
       } finally {
         setIsLoading(false);
       }
     },
-    [email, requestSignupOTP, navigate, validateEmail]
+    [email, requestSignupOTP, navigate, validateEmail, showToast]
   );
 
   return (
-    <div className="signup-container">
-      {/* Toast error notification */}
-      {error && (
-        <div
-          className="signup-toast signup-toast-error"
-          role="alert"
-          tabIndex={0}
-          style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000, minWidth: 220, maxWidth: 350 }}
-        >
-          <span className="signup-error-icon" aria-hidden="true">⚠️</span>
-          {error}
-        </div>
-      )}
-      <div className="signup-box">
-        <h1 className="signup-title">Reset Your Password</h1>
-        <p className="signup-info">Enter your email address to receive a password reset OTP.</p>
+    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
+        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
+          Reset Your Password
+        </h1>
+        
+        <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
+          Enter your email address to receive a password reset OTP.
+        </p>
+
         <form
-          className="signup-form"
           onSubmit={handleSubmit}
-          aria-describedby={error ? 'error-message' : undefined}
           aria-label="Forgot Password form"
+          className="space-y-4 sm:space-y-5"
         >
-          <div className="signup-form-group">
-            <label htmlFor="email" className="signup-form-label">
-              Email <span className="signup-required-indicator">*</span>
+          <fieldset className="flex flex-col">
+            <label htmlFor="email" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
+              Email <span className="text-red-600">*</span>
             </label>
             <input
               id="email"
@@ -133,35 +122,36 @@ const ForgotPassword = () => {
               onChange={handleChange}
               ref={emailRef}
               required
-              className="signup-form-input"
+              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               aria-required="true"
-              aria-invalid={!!error}
               placeholder="Enter your email"
             />
-          </div>
-          <button
+          </fieldset>
+
+          <ProductButton
             type="submit"
-            className="signup-continue-button"
+            variant="primary"
+            size="lg"
             disabled={isLoading}
             aria-busy={isLoading}
+            className="w-full"
           >
             <span aria-live="polite">
-              {isLoading ? (
-                // Removed spinner, only show text
-                'Sending OTP...'
-              ) : (
-                'Continue'
-              )}
+              {isLoading ? 'Sending OTP...' : 'Continue'}
             </span>
-          </button>
+          </ProductButton>
         </form>
-        <p className="signup-login-prompt">
+
+        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Remember your password?{' '}
-          <Link to="/login" className="signup-login-link">
+          <Link 
+            to="/login" 
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+          >
             Sign In
           </Link>
         </p>
-      </div>
+      </section>
     </div>
   );
 };

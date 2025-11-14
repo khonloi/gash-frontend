@@ -1,3 +1,4 @@
+// Updated AuthContext.jsx (updated interceptor to handle 403 for inactive/suspended, added polling for status check every 1 minute, renamed handleSessionExpired to handleForcedLogout for generality)
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +11,8 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const { showToast } = useContext(ToastContext); // Get showToast
 
-  const handleSessionExpired = () => {
-    showToast('Your session has expired. You will be logged out.', 'error');
+  const handleForcedLogout = (message) => {
+    showToast(message, 'error');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
@@ -30,12 +31,12 @@ export const AuthProvider = ({ children }) => {
       const timeElapsed = currentTime - parseInt(loginTime);
 
       if (timeElapsed >= sessionDuration) {
-        handleSessionExpired();
+        handleForcedLogout('Your session has expired. You will be logged out.');
       } else {
         setUser(JSON.parse(storedUser));
         const remainingTime = sessionDuration - timeElapsed;
         setTimeout(() => {
-          handleSessionExpired();
+          handleForcedLogout('Your session has expired. You will be logged out.');
         }, remainingTime);
       }
     }
@@ -45,8 +46,17 @@ export const AuthProvider = ({ children }) => {
     const interceptor = axiosClient.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401 && localStorage.getItem('token')) {
-          handleSessionExpired();
+        if (error.response) {
+          const status = error.response.status;
+          const msg = error.response.data?.message || '';
+          if (status === 401 || (status === 403 && msg.includes('inactive'))) {
+            if (localStorage.getItem('token')) {
+              const logoutMessage = status === 401 
+                ? 'Your session has expired or token is invalid. You will be logged out.'
+                : 'Your account has been suspended or deactivated. You will be logged out.';
+              handleForcedLogout(logoutMessage);
+            }
+          }
         }
         return Promise.reject(error);
       }
@@ -54,6 +64,21 @@ export const AuthProvider = ({ children }) => {
 
     return () => axiosClient.interceptors.response.eject(interceptor);
   }, [showToast]);
+
+  // Added: Polling to check account status every 1 minute for near-immediate logout if status changes
+  useEffect(() => {
+    let interval;
+    if (user) {
+      interval = setInterval(async () => {
+        try {
+          await axiosClient.get('/auth/check-status');
+        } catch (error) {
+          // Interceptor will handle logout if 403 due to inactive
+        }
+      }, 60000); // Every 1 minute
+    }
+    return () => clearInterval(interval);
+  }, [user]);
 
   const login = async (username, password) => {
     try {
@@ -70,10 +95,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Login successful!', 'success');
+
 
       setTimeout(() => {
-        handleSessionExpired();
+        handleForcedLogout('Your session has expired. You will be logged out.');
       }, 24 * 60 * 60 * 1000);
 
       navigate('/');
@@ -99,7 +124,7 @@ export const AuthProvider = ({ children }) => {
       showToast('Google login successful!', 'success');
 
       setTimeout(() => {
-        handleSessionExpired();
+        handleForcedLogout('Your session has expired. You will be logged out.');
       }, 24 * 60 * 60 * 1000);
 
       navigate('/');
@@ -171,7 +196,7 @@ export const AuthProvider = ({ children }) => {
       showToast('Account created successfully!', 'success');
 
       setTimeout(() => {
-        handleSessionExpired();
+        handleForcedLogout('Your session has expired. You will be logged out.');
       }, 24 * 60 * 60 * 1000);
 
       navigate('/');

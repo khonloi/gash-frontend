@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
+import ProductButton from "./ProductButton";
 
 const EditProfileModal = ({
   formData,
@@ -43,13 +44,15 @@ const EditProfileModal = ({
               }}
             />
           </div>
-          <button
+          <ProductButton
             type="button"
-            className="mt-3 px-4 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition"
+            variant="secondary"
+            size="sm"
+            className="mt-3"
             onClick={() => fileInputRef.current?.click()}
           >
             Change Avatar
-          </button>
+          </ProductButton>
           <input
             ref={fileInputRef}
             type="file"
@@ -114,19 +117,21 @@ const EditProfileModal = ({
 
           {/* Buttons */}
           <div className="flex justify-end gap-3 mt-6 sticky bottom-0 bg-white pt-4">
-            <button
+            <ProductButton
               type="button"
+              variant="secondary"
+              size="md"
               onClick={handleCancel}
-              className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm transition"
             >
               Cancel
-            </button>
-            <button
+            </ProductButton>
+            <ProductButton
               type="submit"
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-400 hover:opacity-90 text-white font-semibold text-sm shadow"
+              variant="primary"
+              size="md"
             >
               Save
-            </button>
+            </ProductButton>
           </div>
         </form>
       </motion.div>

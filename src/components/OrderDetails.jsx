@@ -5,6 +5,7 @@ import { useToast } from "../hooks/useToast";
 import FeedbackForm from "./FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
 import ImageModal from "./ImageModal";
+import ProductButton from "./ProductButton";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
@@ -88,7 +89,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         const isEditing = editingFeedback[variantId];
 
         return (
-            <div className="mt-3 p-3 bg-grey border border-black rounded-lg">
+            <div className="mt-3 p-3 sm:p-4 bg-gray-50 border-2 border-gray-300 rounded-xl">
                 {/* ===== Your Feedback Section ===== */}
                 <div className="space-y-3">
                     {/* --- Your Feedback --- */}
@@ -610,12 +611,12 @@ const handleSubmitCancel = async () => {
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto relative animate-fadeIn border-t-4 border-yellow-400"
+                className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-3xl max-h-[85vh] overflow-y-auto relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-500 hover:text-yellow-600 text-2xl font-bold"
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
                 >
                     ×
                 </button>
@@ -635,30 +636,32 @@ const handleSubmitCancel = async () => {
                 ) : (
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-yellow-600">
+                            <h2 className="text-xl sm:text-2xl font-normal text-gray-900">
                                 Order #{order._id}
                             </h2>
                             {/* View Bill button in header - only show if order is paid */}
                             {order.pay_status?.toLowerCase() === 'paid' && (
-                                <button
+                                <ProductButton
+                                    variant="primary"
+                                    size="md"
                                     onClick={() => {
                                         onClose(); // Close the modal first
                                         navigate(`/bills/${orderId}`); // Then navigate to bill
                                     }}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
                                     title="View Bill"
+                                    className="flex items-center gap-2"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     View Bill
-                                </button>
+                                </ProductButton>
                             )}
                         </div>
 
                         {/* Order Status */}
                         <div>
-                                    <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center justify-between mb-4 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200">
                                         <div className="flex items-center space-x-4">
                                             <span className="text-gray-600 font-medium">Order Status:</span>
                                             {getStatusBadge(order.order_status, "order")}
@@ -670,7 +673,7 @@ const handleSubmitCancel = async () => {
                                         </span>
                                     </div>
                                     {order.order_status?.toLowerCase() === "cancelled" && order.cancelReason && (
-                                        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex items-center justify-between mb-4 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200">
                                             <div className="flex items-center space-x-4">
                                                 <span className="text-gray-600 font-medium">Cancel Reason:</span>
                                                 <span className="text-gray-600">{order.cancelReason}</span>
@@ -681,8 +684,8 @@ const handleSubmitCancel = async () => {
 
                         {/* Customer & Payment Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
-                                <h4 className="font-semibold text-blue-800 mb-2">Customer Information</h4>
+                            <div className="bg-gray-50 p-4 sm:p-5 rounded-xl mb-6 border border-gray-200">
+                                <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">Customer Information</h4>
                                 <div className="space-y-1">
                                     <p className="text-gray-700">
                                         <span className="font-medium">Name:</span> {order.customer?.name || order.customer?.username}
@@ -695,8 +698,8 @@ const handleSubmitCancel = async () => {
                                     </p>
                                 </div>
                             </div>
-                            <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
-                                <h4 className="font-semibold text-green-800 mb-2">Payment Information</h4>
+                            <div className="bg-gray-50 p-4 sm:p-5 rounded-xl mb-6 border border-gray-200">
+                                <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">Payment Information</h4>
                                 <div className="space-y-1">
                                     <p className="text-gray-700">
                                         <span className="font-medium">Method:</span> {order.payment_method}
@@ -711,8 +714,8 @@ const handleSubmitCancel = async () => {
                         </div>
 
                         {/* Price Summary */}
-                        <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
-                            <h4 className="font-semibold text-yellow-800 mb-3">Order Summary</h4>
+                        <div className="bg-gray-50 p-4 sm:p-5 rounded-xl mb-6 border border-gray-200">
+                            <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">Order Summary</h4>
                             <div className="space-y-2">
                                 {order.summary && (
                                     <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
@@ -733,7 +736,7 @@ const handleSubmitCancel = async () => {
                                 <hr className="border-gray-300 my-2" />
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-bold text-gray-900">Total Amount to Pay:</span>
-                                    <span className="text-xl font-bold text-yellow-600">{formatPrice(order.finalPrice)}</span>
+                                    <span className="text-xl font-bold text-red-600">{formatPrice(order.finalPrice)}</span>
                                 </div>
                             </div>
                         </div>
@@ -747,7 +750,7 @@ const handleSubmitCancel = async () => {
                                     const feedbackKey = d.variant?._id || `item_${index}`;
 
                                     return (
-                                        <div key={d._id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                                        <div key={d._id} className="flex items-center space-x-3 p-3 sm:p-4 border-2 border-gray-300 rounded-xl">
                                             <img
                                                 src={d.variant?.image || "/placeholder.png"}
                                                 alt={d.variant?.product?.name || "Product"}
@@ -784,7 +787,7 @@ const handleSubmitCancel = async () => {
                                                 <p className="text-sm text-gray-500">
                                                     <span className="font-medium">Unit Price:</span> {formatPrice(d.unitPrice)}
                                                 </p>
-                                                <p className="font-semibold text-yellow-600">
+                                                <p className="font-semibold text-red-600">
                                                     <span className="font-medium">Total:</span> {formatPrice(d.totalPrice)}
                                                 </p>
                                             </div>
@@ -801,7 +804,7 @@ const handleSubmitCancel = async () => {
 
                         {/* Refund Status */}
                         {order.refund_status && order.refund_status !== "not_applicable" && (
-                            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                            <div className="mt-4 p-4 sm:p-5 bg-gray-50 rounded-xl border border-gray-200">
                                 <h4 className="font-semibold text-gray-700 mb-2">Refund Information</h4>
                                 <div className="flex items-center gap-3">
                                     <span className="text-gray-600 font-medium">Status:</span>
@@ -826,7 +829,7 @@ const handleSubmitCancel = async () => {
 
                         {/* Order Feedback */}
                         {order.feedback_order && (
-                            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <div className="mt-4 p-4 sm:p-5 bg-blue-50 rounded-xl border border-blue-200">
                                 <h4 className="font-semibold text-blue-700 mb-2">Order Feedback</h4>
                                 <p className="text-gray-700">{order.feedback_order}</p>
                             </div>
@@ -834,12 +837,14 @@ const handleSubmitCancel = async () => {
 
                         {(order.order_status?.toLowerCase() === "pending" ||
                             order.order_status?.toLowerCase() === "confirmed") && (
-                                <LoadingButton
-                                    className="mt-6 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg transition font-medium"
+                                <ProductButton
+                                    variant="danger"
+                                    size="md"
                                     onClick={handleCancelOrder}
+                                    className="mt-6"
                                 >
                                     Cancel Order
-                                </LoadingButton>
+                                </ProductButton>
                             )}
                     </div>
                 )}
@@ -853,17 +858,17 @@ const handleSubmitCancel = async () => {
 
             {/* Confirmation Modal */}
 {showConfirmModal && (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60 p-4">
-        <div 
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn"
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+            <div 
+            className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-4 sm:p-5 md:p-6"
             onClick={(e) => e.stopPropagation()} // Prevent clicks from closing the modal
         >
-            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <div className="bg-gray-50 p-4 sm:p-5 rounded-xl border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-gray-900">Cancel Order #{orderId}</h3>
                     <button
                         onClick={() => setShowConfirmModal(false)}
-                        className="text-gray-500 hover:text-gray-600 transition p-2 rounded-lg"
+                        className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-md focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
                         aria-label="Close cancel modal"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -906,12 +911,12 @@ const handleSubmitCancel = async () => {
                             value={cancelFormData.customReason}
                             onChange={(e) => setCancelFormData({ ...cancelFormData, customReason: e.target.value })}
                             placeholder="Enter custom reason"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 text-sm"
+                            className="w-full px-3 py-2 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
                             rows={3}
                         />
                     )}
                     {error && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="p-3 sm:p-4 bg-red-50 border-2 border-red-200 rounded-xl">
                             <div className="flex items-center">
                                 <svg className="h-5 w-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -922,22 +927,25 @@ const handleSubmitCancel = async () => {
                     )}
                 </div>
                 <div className="flex gap-3 justify-end mt-6">
-                    <button
+                    <ProductButton
+                        variant="secondary"
+                        size="md"
                         onClick={() => setShowConfirmModal(false)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </ProductButton>
+                    <ProductButton
+                        variant="danger"
+                        size="md"
                         onClick={handleSubmitCancel}
                         disabled={!cancelFormData.cancelReason || (cancelFormData.cancelReason === "other" && !cancelFormData.customReason.trim())}
-                        className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        className="flex items-center space-x-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>Confirm Cancel</span>
-                    </button>
+                    </ProductButton>
                 </div>
             </div>
         </div>

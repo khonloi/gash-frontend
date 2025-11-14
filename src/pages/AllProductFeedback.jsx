@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import Api from '../common/SummaryAPI';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ProductButton from '../components/ProductButton';
 
 const AllProductFeedback = () => {
   const { id } = useParams();
@@ -169,7 +170,7 @@ const AllProductFeedback = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Product ID</h2>
           <Link
             to="/products"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
           >
             Back to Products
           </Link>
@@ -193,7 +194,7 @@ const AllProductFeedback = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
           <Link
             to="/products"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
           >
             Back to Products
           </Link>
@@ -203,16 +204,16 @@ const AllProductFeedback = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <div className="w-full">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
               {product?.name || product?.pro_name || 'Product'} Feedback
             </h2>
             <Link
               to={`/product/${id}`}
-              className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors font-medium border-2 border-gray-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
             >
               <i className="lni lni-arrow-left mr-2"></i>
               Back to Product
@@ -226,7 +227,7 @@ const AllProductFeedback = () => {
               <select
                 value={ratingFilter}
                 onChange={(e) => setRatingFilter(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border-2 border-gray-300 rounded-xl focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 focus:border-blue-600 transition-colors hover:bg-gray-50"
               >
                 <option value="">All Ratings</option>
                 {[1, 2, 3, 4, 5].map(rating => (
@@ -239,7 +240,7 @@ const AllProductFeedback = () => {
               <select
                 value={colorFilter}
                 onChange={(e) => setColorFilter(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border-2 border-gray-300 rounded-xl focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 focus:border-blue-600 transition-colors hover:bg-gray-50"
               >
                 <option value="">All Colors</option>
                 {uniqueColors.map(color => (
@@ -252,7 +253,7 @@ const AllProductFeedback = () => {
               <select
                 value={sizeFilter}
                 onChange={(e) => setSizeFilter(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border-2 border-gray-300 rounded-xl focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 focus:border-blue-600 transition-colors hover:bg-gray-50"
               >
                 <option value="">All Sizes</option>
                 {uniqueSizes.map(size => (
@@ -269,20 +270,17 @@ const AllProductFeedback = () => {
           )}
 
           {feedbackError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center">
-                <i className="lni lni-warning text-red-500 text-xl mr-3"></i>
-                <div>
-                  <h3 className="text-red-800 font-medium">Error Loading Feedback</h3>
-                  <p className="text-red-600 text-sm mt-1">{feedbackError}</p>
-                </div>
-              </div>
-              <button
+            <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
+              <span className="text-lg" aria-hidden="true">⚠</span>
+              {feedbackError}
+              <ProductButton
+                variant="secondary"
+                size="sm"
                 onClick={() => fetchFeedbacks(id)}
-                className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                aria-label="Retry loading feedback"
               >
                 Retry
-              </button>
+              </ProductButton>
             </div>
           )}
 
@@ -297,7 +295,7 @@ const AllProductFeedback = () => {
           )}
 
           {!feedbackLoading && !feedbackError && feedbackStats && filteredFeedbacks.length > 0 && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-8">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6 border-2 border-blue-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="flex items-center mr-6">
@@ -356,7 +354,7 @@ const AllProductFeedback = () => {
                   .map((feedback) => (
                     <div
                       key={feedback._id}
-                      className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+                      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 hover:shadow-sm border border-gray-200 transition-shadow duration-200"
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">
@@ -433,7 +431,14 @@ const AllProductFeedback = () => {
                       )}
                       {feedback.feedback?.has_content && (
                         <div className="mb-4">
-                          <p className="text-gray-800 text-lg leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-400">
+                          <p 
+                            className="text-gray-800 text-base sm:text-lg leading-relaxed bg-gray-50 p-4 rounded-xl border-l-4 border-yellow-400 break-words whitespace-pre-wrap max-w-full"
+                            style={{ 
+                              wordBreak: 'break-word',
+                              overflowWrap: 'anywhere',
+                              wordWrap: 'break-word'
+                            }}
+                          >
                             {feedback.feedback.content}
                           </p>
                         </div>
@@ -443,17 +448,18 @@ const AllProductFeedback = () => {
               </div>
             </AnimatePresence>)}
             {filteredFeedbacks.length > feedbacksToShow && (
-              <div className="text-center mt-8">
-                <button
+              <div className="text-center mt-6 sm:mt-8">
+                <ProductButton
+                  variant="primary"
+                  size="md"
                   onClick={handleShowMore}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center"
                 >
                   Show More Reviews
                   <i className="lni lni-arrow-down ml-2"></i>
-                </button>
+                </ProductButton>
               </div>
             )}
-          
         </div>
       </div>
     </div>

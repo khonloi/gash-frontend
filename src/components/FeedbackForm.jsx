@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
+import ProductButton from "./ProductButton";
 
 const FeedbackForm = ({
     variantId,
@@ -35,12 +36,14 @@ const FeedbackForm = ({
     return (
         <>
             {!showForm && (
-                <button
+                <ProductButton
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setOpen(true)}
-                    className="mt-2 text-sm font-medium text-yellow-600 hover:text-yellow-700 transition"
+                    className="mt-2"
                 >
                     Write a Review
-                </button>
+                </ProductButton>
             )}
 
             <AnimatePresence>
@@ -92,23 +95,25 @@ const FeedbackForm = ({
                                 />
 
                                 <div className="flex justify-end space-x-3">
-                                    <button
+                                    <ProductButton
                                         type="button"
+                                        variant="secondary"
+                                        size="md"
                                         onClick={() => {
                                             setOpen(false);
                                             onCancel?.();
                                         }}
-                                        className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-gray-700 font-medium"
                                     >
                                         Cancel
-                                    </button>
+                                    </ProductButton>
 
-                                    <button
+                                    <ProductButton
                                         type="submit"
-                                        className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md transition"
+                                        variant="primary"
+                                        size="md"
                                     >
                                         {submitText}
-                                    </button>
+                                    </ProductButton>
                                 </div>
                             </form>
 

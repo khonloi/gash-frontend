@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import LoadingForm from './LoadingSpinner';
+import ProductButton from './ProductButton';
 
 const ProductFeedback = ({ productId }) => {
     const { showToast } = useToast();
@@ -112,7 +113,7 @@ const ProductFeedback = ({ productId }) => {
     // Early return if no productId (after all hooks)
     if (!productId) {
         return (
-            <div className="product-detail-feedback">
+            <div className="w-full">
                 <div className="text-center py-8">
                     <p className="text-gray-500">No product ID provided</p>
                 </div>
@@ -122,7 +123,7 @@ const ProductFeedback = ({ productId }) => {
 
     if (feedbackLoading) {
         return (
-            <div className="product-detail-feedback">
+            <div className="w-full">
                 <LoadingForm
                     text="Loading reviews..."
                     height="h-32"
@@ -135,21 +136,18 @@ const ProductFeedback = ({ productId }) => {
 
     if (feedbackError) {
         return (
-            <div className="product-detail-feedback">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                    <div className="flex items-center">
-                        <i className="lni lni-warning text-red-500 text-xl mr-3"></i>
-                        <div>
-                            <h3 className="text-red-800 font-medium">Error Loading Reviews</h3>
-                            <p className="text-red-600 text-sm mt-1">{feedbackError}</p>
-                        </div>
-                    </div>
-                    <button
+            <div className="w-full">
+                <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
+                    <span className="text-lg" aria-hidden="true">⚠</span>
+                    {feedbackError}
+                    <ProductButton
+                        variant="secondary"
+                        size="sm"
                         onClick={() => fetchFeedbacks(productId)}
-                        className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        aria-label="Retry loading reviews"
                     >
                         Retry
-                    </button>
+                    </ProductButton>
                 </div>
             </div>
         );
@@ -157,9 +155,9 @@ const ProductFeedback = ({ productId }) => {
 
     if (feedbacks.length === 0) {
         return (
-            <div className="product-detail-feedback">
-                <div className="text-center py-12">
-                    <div className="mb-6">
+            <div className="w-full">
+                <div className="text-center">
+                    <div>
                         <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
                         <h3 className="text-xl font-medium text-gray-900 mb-2">No Reviews Yet</h3>
                         <p className="text-gray-500 text-sm">
@@ -172,126 +170,178 @@ const ProductFeedback = ({ productId }) => {
     }
 
     return (
-        <div className="product-detail-feedback">
+        <div className="w-full">
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">Product Reviews</h3>
-                    <div className="flex items-center gap-4">
-                        {feedbackStats?.average_rating && (
-                            <div className="flex items-center gap-1">
-                                <span className="text-sm text-gray-500">Average:</span>
-                                <div className="flex items-center gap-1">
-                                    {[...Array(5)].map((_, i) => (
-                                        <svg
-                                            key={i}
-                                            className={`w-3 h-3 ${i < Math.round(feedbackStats.average_rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    ))}
-                                    <span className="text-sm font-medium text-gray-700">
-                                        {feedbackStats.average_rating.toFixed(1)}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-                        <span className="text-sm text-gray-500">
-                            {feedbackStats?.total_feedbacks || feedbacks.length} review{(feedbackStats?.total_feedbacks || feedbacks.length) !== 1 ? 's' : ''}
-                        </span>
-                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">Product Reviews</h3>
+                    <span className="text-sm text-gray-500">
+                        {feedbackStats?.total_feedbacks || feedbacks.length} review{(feedbackStats?.total_feedbacks || feedbacks.length) !== 1 ? 's' : ''}
+                    </span>
                 </div>
 
-                {feedbacks.slice(0, 3).map((feedback) => {
-                    if (!feedback || !feedback._id) return null;
-
-                    return (
-                        <div key={feedback._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                                        {feedback.customer?.image ? (
-                                            <img
-                                                src={feedback.customer.image}
-                                                alt={feedback.customer?.username || 'User'}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.nextSibling.style.display = 'flex';
-                                                }}
-                                            />
-                                        ) : null}
-                                        <div
-                                            className={`w-full h-full flex items-center justify-center text-white font-bold ${feedback.customer?.image ? 'hidden' : 'flex'}`}
-                                        >
-                                            {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                {/* Rating Statistics and Reviews Layout */}
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6">
+                    {/* Rating Statistics - Left side on desktop, top on mobile */}
+                    {feedbackStats && feedbacks.length > 0 && (
+                        <div className="w-full lg:w-1/3 flex-shrink-0">
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-5 md:p-6 border-2 border-blue-200">
+                                <div className="flex flex-col gap-4">
+                                    {/* Rating Stats Section */}
+                                    <div className="flex flex-col items-center lg:items-start">
+                                        <div className="flex items-center mb-3">
+                                            <span className="text-4xl font-bold text-yellow-600 mr-3">
+                                                {feedbackStats.average_rating.toFixed(1)}
+                                            </span>
+                                            <div className="flex">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <svg
+                                                        key={i}
+                                                        className={`w-6 h-6 ${i < Math.floor(feedbackStats.average_rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="text-gray-700 text-center lg:text-left">
+                                            <div className="text-lg font-medium">
+                                                Based on {feedbackStats.total_feedbacks} review{feedbackStats.total_feedbacks !== 1 ? 's' : ''}
+                                            </div>
+                                            <div className="text-sm text-gray-600">
+                                                {feedbackStats.total_ratings} with ratings
+                                            </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <div className="font-semibold text-gray-900">
-                                            {feedback.customer?.username || "Anonymous"}
+                                    
+                                    {/* Rating Distribution - Below on desktop, below on mobile */}
+                                    <div className="flex flex-col w-full">
+                                        <div className="text-lg font-medium text-gray-700 mb-2 text-center lg:text-left">Rating Distribution</div>
+                                        <div className="flex flex-col gap-2">
+                                            {[5, 4, 3, 2, 1].map((rating) => (
+                                                <div key={rating} className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500 w-4 text-right">{rating}</span>
+                                                    <div className="flex-1 h-4 bg-gray-200 rounded-sm overflow-hidden">
+                                                        <div
+                                                            className="bg-yellow-400 h-full rounded-sm transition-all duration-500"
+                                                            style={{
+                                                                width: `${feedbackStats.rating_percentage?.[rating] || 0}%`
+                                                            }}
+                                                        ></div>
+                                                    </div>
+                                                    <span className="text-xs text-gray-500 w-8 text-right">{feedbackStats.rating_percentage?.[rating] || 0}%</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="text-sm text-gray-500">
-                                            {feedback.feedback?.created_at
-                                                ? formatDate(feedback.feedback.created_at)
-                                                : feedback.order_date
-                                                    ? formatDate(feedback.order_date)
-                                                    : 'Unknown Date'}
-                                        </div>
-                                        {feedback.variant && (
-                                            <div className="text-xs text-gray-400 mt-1">
-                                                {feedback.variant.color} • {feedback.variant.size}
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
-                                {feedback.feedback?.has_rating && feedback.feedback?.rating && (
-                                    <div className="flex items-center gap-1">
-                                        {[...Array(5)].map((_, i) => (
-                                            <svg
-                                                key={i}
-                                                className={`w-4 h-4 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        ))}
-                                        <span className="text-sm text-gray-600 ml-1">
-                                            ({feedback.feedback.rating}/5)
-                                        </span>
-                                    </div>
-                                )}
                             </div>
-                            {feedback.feedback?.has_content && feedback.feedback?.content && (
-                                <p className="text-gray-700 text-sm leading-relaxed">
-                                    "{feedback.feedback.content}"
-                                </p>
-                            )}
+                        </div>
+                    )}
 
-                            {!feedback.feedback?.has_content && !feedback.feedback?.has_rating && (
-                                <p className="text-gray-500 text-sm italic">
-                                    No review provided
-                                </p>
+                    {/* Reviews - Right side on desktop, below stats on mobile */}
+                    <div className={`flex-1 ${feedbackStats && feedbacks.length > 0 ? 'lg:w-2/3' : 'w-full'}`}>
+                        <div className="space-y-4">
+                            {feedbacks.slice(0, 3).map((feedback) => {
+                                if (!feedback || !feedback._id) return null;
+
+                                return (
+                                    <div key={feedback._id} className="bg-white border-2 border-gray-300 rounded-xl p-3 hover:shadow-sm border border-gray-200 transition-shadow duration-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                                                    {feedback.customer?.image ? (
+                                                        <img
+                                                            src={feedback.customer.image}
+                                                            alt={feedback.customer?.username || 'User'}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                                e.target.nextSibling.style.display = 'flex';
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                    <div
+                                                        className={`w-full h-full flex items-center justify-center text-white font-bold ${feedback.customer?.image ? 'hidden' : 'flex'}`}
+                                                    >
+                                                        {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-gray-900">
+                                                        {feedback.customer?.username || "Anonymous"}
+                                                    </div>
+                                                    <div className="text-sm text-gray-500">
+                                                        {feedback.feedback?.created_at
+                                                            ? formatDate(feedback.feedback.created_at)
+                                                            : feedback.order_date
+                                                                ? formatDate(feedback.order_date)
+                                                                : 'Unknown Date'}
+                                                    </div>
+                                                    {feedback.variant && (
+                                                        <div className="text-xs text-gray-400 mt-1">
+                                                            {feedback.variant.color} • {feedback.variant.size}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {feedback.feedback?.has_rating && feedback.feedback?.rating && (
+                                                <div className="flex items-center gap-1">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <svg
+                                                            key={i}
+                                                            className={`w-4 h-4 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                        </svg>
+                                                    ))}
+                                                    <span className="text-sm text-gray-600 ml-1">
+                                                        ({feedback.feedback.rating}/5)
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {feedback.feedback?.has_content && feedback.feedback?.content && (
+                                            <p 
+                                                className="text-gray-700 text-sm leading-relaxed break-words whitespace-pre-wrap max-w-full"
+                                                style={{ 
+                                                    wordBreak: 'break-word',
+                                                    overflowWrap: 'anywhere',
+                                                    wordWrap: 'break-word'
+                                                }}
+                                            >
+                                                "{feedback.feedback.content}"
+                                            </p>
+                                        )}
+
+                                        {!feedback.feedback?.has_content && !feedback.feedback?.has_rating && (
+                                            <p className="text-gray-500 text-sm italic">
+                                                No review provided
+                                            </p>
+                                        )}
+                                    </div>
+                                );
+                            })}
+
+                            {/* View All Feedback Button - only show if more than 3 feedbacks */}
+                            {feedbacks.length > 3 && (
+                                <div className="text-center mt-6">
+                                    <Link
+                                        to={`/product/${productId}/all-feedback`}
+                                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                                    >
+                                        <i className="lni lni-comments mr-2"></i>
+                                        View All Feedback
+                                        <i className="lni lni-arrow-right ml-2"></i>
+                                    </Link>
+                                </div>
                             )}
                         </div>
-                    );
-                })}
-
-                {/* View All Feedback Button - only show if more than 3 feedbacks */}
-                {feedbacks.length > 3 && (
-                    <div className="text-center mt-6">
-                        <Link
-                            to={`/product/${productId}/all-feedback`}
-                            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                        >
-                            <i className="lni lni-comments mr-2"></i>
-                            View All Feedback
-                            <i className="lni lni-arrow-right ml-2"></i>
-                        </Link>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

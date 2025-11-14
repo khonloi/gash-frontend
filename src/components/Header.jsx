@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { io } from "socket.io-client";
 import { AuthContext } from "../context/AuthContext";
 import Api from "../common/SummaryAPI";
 import gashLogo from "../assets/image/gash-logo.svg";
@@ -12,8 +13,9 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import LiveTvIcon from '@mui/icons-material/LiveTv';
+import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import NotificationsDropdown from "./NotificationsDropdown";
+import IconButton from "./IconButton";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
     for (let i = 0; i < retries; i++) {
@@ -43,12 +45,14 @@ export default function Header() {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [notificationCount, setNotificationCount] = useState(0);
     const [livestreamCount, setLivestreamCount] = useState(0);
+    const [favoriteCount, setFavoriteCount] = useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
     const userMenuRef = useRef(null);
-    const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null });
+    const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null, favorite: null });
+    const socketRef = useRef(null);
 
     // Fetch cart item count
     const fetchCartItemCount = useCallback(async () => {
@@ -108,6 +112,23 @@ export default function Header() {
         }
     }, [user]);
 
+    // Fetch favorite count
+    const fetchFavoriteCount = useCallback(async () => {
+        if (!user) {
+            setFavoriteCount(0);
+            return;
+        }
+        try {
+            const favoritesData = await fetchWithRetry(() =>
+                Api.favorites.fetch(user.token)
+            );
+            const itemCount = Array.isArray(favoritesData) ? favoritesData.length : 0;
+            setFavoriteCount(itemCount);
+        } catch (error) {
+            setFavoriteCount(0);
+        }
+    }, [user]);
+
     // Debounced fetch functions
     const debouncedFetchCartItemCount = useCallback(() => {
         if (fetchTimeoutRef.current.cart) clearTimeout(fetchTimeoutRef.current.cart);
@@ -124,14 +145,106 @@ export default function Header() {
         fetchTimeoutRef.current.livestream = setTimeout(fetchLivestreamCount, 10);
     }, [fetchLivestreamCount]);
 
+    const debouncedFetchFavoriteCount = useCallback(() => {
+        if (fetchTimeoutRef.current.favorite) clearTimeout(fetchTimeoutRef.current.favorite);
+        fetchTimeoutRef.current.favorite = setTimeout(fetchFavoriteCount, 10);
+    }, [fetchFavoriteCount]);
+
+    // 🔔 Socket.IO: Setup real-time updates for badges
+    useEffect(() => {
+        if (!user?._id) {
+            // Disconnect socket if user logs out
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+            return;
+        }
+
+        // Get backend URL
+        const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
+        
+        // Connect to Socket.IO
+        const socket = io(baseURL, {
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 2000,
+            withCredentials: true,
+        });
+
+        socketRef.current = socket;
+
+        // Join user's room for targeted updates
+        socket.on("connect", () => {
+            console.log("✅ Header Socket connected:", socket.id);
+            socket.emit("userConnected", user._id);
+            socket.emit("joinRoom", user._id);
+        });
+
+        // Listen for cart updates
+        socket.on("cartUpdated", (data) => {
+            console.log("🛒 Cart updated via Socket.IO:", data);
+            // Immediately fetch updated cart count
+            debouncedFetchCartItemCount();
+        });
+
+        // Listen for livestream count changes
+        socket.on("livestreamCountChanged", (data) => {
+            console.log("📺 Livestream count changed via Socket.IO:", data);
+            // Update livestream count directly if count is provided, otherwise fetch
+            if (typeof data.count === 'number') {
+                setLivestreamCount(data.count);
+            } else {
+                debouncedFetchLivestreamCount();
+            }
+        });
+
+        // Listen for notification updates (already handled by NotificationsDropdown, but keep for consistency)
+        socket.on("newNotification", () => {
+            console.log("🔔 New notification via Socket.IO");
+            debouncedFetchNotificationCount();
+        });
+
+        // Listen for notification badge updates (when notifications are marked as read/deleted)
+        socket.on("notificationBadgeUpdate", (data) => {
+            console.log("🔔 Notification badge update via Socket.IO:", data);
+            // Only update if it's for this user or global
+            if (!data.userId || data.userId === user._id) {
+                debouncedFetchNotificationCount();
+            }
+        });
+
+        // Listen for favorite updates
+        socket.on("favoriteUpdated", (data) => {
+            console.log("❤️ Favorite updated via Socket.IO:", data);
+            // Immediately fetch updated favorite count
+            debouncedFetchFavoriteCount();
+        });
+
+        socket.on("connect_error", (err) => {
+            console.error("❌ Header Socket connection error:", err.message);
+        });
+
+        socket.on("disconnect", (reason) => {
+            console.warn("⚠️ Header Socket disconnected:", reason);
+        });
+
+        return () => {
+            socket.disconnect();
+            socketRef.current = null;
+        };
+    }, [user, debouncedFetchCartItemCount, debouncedFetchNotificationCount, debouncedFetchLivestreamCount, debouncedFetchFavoriteCount]);
+
     // Fetch counts on mount, location change, or update events
     useEffect(() => {
 
         fetchCartItemCount();
         fetchNotificationCount();   // guaranteed to run
         fetchLivestreamCount();
+        fetchFavoriteCount();
 
-        // ---- 2. EVENT LISTENERS (debounced) ----
+        // ---- 2. EVENT LISTENERS (debounced) - Keep for backward compatibility ----
         const handleCartUpdate = () => debouncedFetchCartItemCount();
         const handleNotificationUpdate = () => debouncedFetchNotificationCount();
         const handleLivestreamUpdate = () => debouncedFetchLivestreamCount();
@@ -140,20 +253,27 @@ export default function Header() {
         window.addEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
         window.addEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
 
-        // ---- 3. POLLING (raw fetchers, every 3 s) ----
+        // ---- 3. POLLING (fallback, reduced frequency - every 30s instead of 3s) ----
         let pollInterval;
         if (user) {
             pollInterval = setInterval(() => {
                 fetchCartItemCount();        // raw
                 fetchNotificationCount();    // raw
                 fetchLivestreamCount();      // raw
-            }, 3000);
+                fetchFavoriteCount();        // raw
+            }, 30000); // Increased from 3000 to 30000 (30 seconds) as fallback
         }
+
+        // Also listen for custom events for backward compatibility
+        const FAVORITE_UPDATE_EVENT = 'favoriteUpdated';
+        const handleFavoriteUpdate = () => debouncedFetchFavoriteCount();
+        window.addEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
 
         return () => {
             window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
             window.removeEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
             window.removeEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
+            window.removeEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
             clearInterval(pollInterval);
             Object.values(fetchTimeoutRef.current).forEach(t => t && clearTimeout(t));
         };
@@ -161,9 +281,11 @@ export default function Header() {
         fetchCartItemCount,
         fetchNotificationCount,
         fetchLivestreamCount,
+        fetchFavoriteCount,
         debouncedFetchCartItemCount,
         debouncedFetchNotificationCount,
         debouncedFetchLivestreamCount,
+        debouncedFetchFavoriteCount,
         location,
         user
     ]);       
@@ -278,14 +400,14 @@ export default function Header() {
 
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
-            <div className="max-w-7xl mx-auto h-20 sm:h-24 flex items-center px-4 sm:px-6 lg:px-12">
+            <div className="max-w-7xl mx-auto h-16 sm:h-20 md:h-24 flex items-center px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12">
                 {/* ==== MOBILE HEADER ==== */}
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
                         <div className="relative w-full">
                             <form
                                 onSubmit={handleSearchSubmit}
-                                className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden relative"
+                                className="flex items-center w-full bg-white rounded-full shadow-sm border border-gray-200 overflow-hidden relative"
                             >
                                 <input
                                     type="text"
@@ -296,7 +418,7 @@ export default function Header() {
                                     }}
                                     placeholder="Search..."
                                     autoFocus
-                                    className="flex-1 pl-4 pr-12 py-2 text-base text-gray-900 focus:outline-none"
+                                    className="flex-1 pl-3 pr-10 sm:pr-12 py-2 text-sm sm:text-base text-gray-900 focus:outline-none"
                                 />
                                 {search ? (
                                     <button
@@ -393,7 +515,7 @@ export default function Header() {
                                 <SearchIcon />
                             </button>
                             <Link to="/" className="flex items-center justify-center">
-                                <img src={gashLogo} alt="Gash Logo" className="h-7" />
+                                <img src={gashLogo} alt="Gash Logo" className="h-6 sm:h-7" />
                             </Link>
                             <div className="relative" ref={userMenuRef}>
                                 <button
@@ -487,12 +609,12 @@ export default function Header() {
                 {/* ==== DESKTOP HEADER ==== */}
                 <div className="hidden sm:flex w-full items-center justify-between">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={gashLogo} alt="Gash Logo" className="h-7" />
+                        <img src={gashLogo} alt="Gash Logo" className="h-6 md:h-7" />
                     </Link>
-                    <div className="relative flex-1 mx-12 max-w-2xl" ref={dropdownRef}>
+                    <div className="relative flex-1 mx-4 sm:mx-6 md:mx-8 lg:mx-12 max-w-2xl" ref={dropdownRef}>
                         <form
                             onSubmit={handleSearchSubmit}
-                            className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden"
+                            className="flex items-center w-full bg-white rounded-full shadow-sm border border-gray-200 overflow-hidden"
                         >
                             <input
                                 type="text"
@@ -502,7 +624,7 @@ export default function Header() {
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
-                                className="flex-1 pl-5 pr-12 py-2 text-base text-gray-900 focus:outline-none"
+                                className="flex-1 pl-3 sm:pl-4 md:pl-5 pr-10 sm:pr-12 py-1.5 sm:py-2 text-sm sm:text-base text-gray-900 focus:outline-none"
                             />
                             <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500">
                                 <SearchIcon fontSize="small" />
@@ -564,17 +686,53 @@ export default function Header() {
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center gap-4 sm:gap-6" ref={userMenuRef}>
+                    <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
                             <button
-                                onClick={() => {
+                                onClick={async () => {
                                     console.log("Live Stream clicked");
-                                    navigate("/live");
+                                    try {
+                                        const token = localStorage.getItem('token');
+                                        if (!token) {
+                                            navigate("/login");
+                                            return;
+                                        }
+                                        
+                                        const response = await Api.livestream.getLiveNow(token);
+                                        
+                                        if (response.data?.success) {
+                                            let streams = [];
+                                            
+                                            if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
+                                                streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
+                                            } else if (response.data?.data?.livestream) {
+                                                const livestream = response.data.data.livestream;
+                                                if (livestream && livestream.status === 'live') {
+                                                    streams = [livestream];
+                                                }
+                                            }
+                                            
+                                            if (streams.length > 0) {
+                                                // Navigate to the first live stream
+                                                navigate(`/live/${streams[0]._id}`);
+                                            } else {
+                                                // No live streams available, navigate to list page
+                                                navigate("/live");
+                                            }
+                                        } else {
+                                            // Fallback to list page if API fails
+                                            navigate("/live");
+                                        }
+                                    } catch (error) {
+                                        console.error("Error fetching live streams:", error);
+                                        // Fallback to list page on error
+                                        navigate("/live");
+                                    }
                                 }}
                                 title="Live Stream"
                                 className="p-2 text-white hover:text-amber-500"
                             >
-                                <LiveTvIcon />
+                                <TvOutlinedIcon />
                                 {livestreamCount > 0 && (
                                     <span className={`${badgeClass} -top-1 -right-1`}>
                                         {livestreamCount}
@@ -582,16 +740,19 @@ export default function Header() {
                                 )}
                             </button>
                         </div>
-                        <button
-                            onClick={() => {
-                                console.log("Favorites clicked, user:", !!user);
-                                user ? navigate("/favorites") : navigate("/login");
-                            }}
-                            title="Favorites"
-                            className="p-2 text-white hover:text-amber-500"
-                        >
-                            <FavoriteBorderIcon />
-                        </button>
+                        <div className="relative">
+                            <IconButton
+                                onClick={() => {
+                                    console.log("Favorites clicked, user:", !!user);
+                                    user ? navigate("/favorites") : navigate("/login");
+                                }}
+                                title="Favorites"
+                                badge={favoriteCount > 0 ? favoriteCount : undefined}
+                                badgeColor="bg-amber-500"
+                            >
+                                <FavoriteBorderIcon />
+                            </IconButton>
+                        </div>
                         <div className="relative">
                             <button
                                 onClick={() => {
@@ -643,8 +804,8 @@ export default function Header() {
                                 <PermIdentityOutlinedIcon />
                             </button>
                             {user && (
-                                <span className="hidden sm:block text-sm text-gray-200">
-                                    Hello, <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
+                                <span className="hidden md:block text-xs md:text-sm text-gray-200">
+                                    <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
                                 </span>
                             )}
                             {user && showUserMenu && (

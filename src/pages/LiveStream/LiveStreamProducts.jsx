@@ -219,7 +219,7 @@ const LiveStreamProducts = ({ liveId }) => {
                             }`}
                     >
                         {/* Order Number Badge */}
-                        <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] border backdrop-blur-sm shadow-md transition-all duration-300 ${lp.isPinned
+                        <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] border backdrop-blur-sm shadow-sm border border-gray-200 transition-all duration-300 ${lp.isPinned
                             ? 'bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-yellow-400/80 shadow-yellow-500/50'
                             : 'bg-gradient-to-br from-red-500 to-pink-600 text-white border-red-400/80 shadow-red-500/50'
                             }`}>
@@ -232,14 +232,14 @@ const LiveStreamProducts = ({ liveId }) => {
                                 <img
                                     src={productImageUrl}
                                     alt={productName}
-                                    className="w-12 h-12 object-cover rounded-lg border border-gray-700/50 shadow-md group-hover:scale-105 transition-transform duration-300"
+                                    className="w-12 h-12 object-cover rounded-lg border border-gray-700/50 shadow-sm border border-gray-200 group-hover:scale-105 transition-transform duration-300"
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%23999" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/%3E%3C/svg%3E';
                                     }}
                                 />
                             ) : (
-                                <div className="w-12 h-12 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-lg border border-gray-700/50 items-center justify-center flex shadow-md">
+                                <div className="w-12 h-12 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-lg border border-gray-700/50 items-center justify-center flex shadow-sm border border-gray-200">
                                     <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
