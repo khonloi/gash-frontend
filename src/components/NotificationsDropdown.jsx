@@ -141,13 +141,9 @@ export default function NotificationsDropdown({ user }) {
       <IconButton
         onClick={() => (user ? setShowNotifications((prev) => !prev) : navigate("/login"))}
         title="Notifications"
+        badge={unreadCount > 0 ? unreadCount : undefined}
       >
         <NotificationsNoneOutlinedIcon />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-            {unreadCount}
-          </span>
-        )}
       </IconButton>
 
       {/* 📜 Dropdown danh sách */}

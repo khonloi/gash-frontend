@@ -2,6 +2,11 @@ import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import { SOCKET_URL } from "../common/axiosClient";
 import EmojiPicker from "emoji-picker-react";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import CloseIcon from "@mui/icons-material/Close";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
+import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
 
 // use shared SOCKET_URL (same as API base)
 
@@ -131,23 +136,16 @@ export default function UserChat({ userId }) {
       <button
         className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center ${isOpen
           ? "bg-red-500 hover:bg-red-600 text-white"
-          : "bg-yellow-500 hover:bg-yellow-600 text-white hover:scale-110"
+          : "bg-amber-500 hover:bg-amber-600 text-white hover:scale-110"
           }`}
         onClick={toggleChat}
+        title={isOpen ? "Close chat" : "Open chat"}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         {isOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <CloseIcon fontSize="medium" />
         ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
+          <ChatBubbleOutlineIcon fontSize="medium" />
         )}
       </button>
 
@@ -155,28 +153,24 @@ export default function UserChat({ userId }) {
       {isOpen && (
         <div className="fixed bottom-24 right-6 z-40 w-[400px] h-[550px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 px-4 py-3 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <ChatBubbleOutlineIcon fontSize="small" className="text-amber-600" />
               </div>
               <div>
                 <h3 className="text-white font-semibold text-sm">Customer Support</h3>
-                <p className="text-yellow-100 text-xs">
+                <p className="text-amber-100 text-xs">
                   {conversation?.status === "closed" ? "Conversation ended" : "Online now"}
                 </p>
               </div>
             </div>
-            <button className="text-white hover:text-yellow-200" onClick={toggleChat}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button 
+              className="text-white hover:text-amber-200 transition-colors" 
+              onClick={toggleChat}
+              aria-label="Close chat"
+            >
+              <CloseIcon fontSize="small" />
             </button>
           </div>
 
@@ -188,7 +182,7 @@ export default function UserChat({ userId }) {
                 <div key={msg._id || i} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-xs px-4 py-2 rounded-2xl ${isMe
-                      ? "bg-yellow-500 text-white rounded-br-md"
+                      ? "bg-amber-500 text-white rounded-br-md"
                       : "bg-white text-gray-800 rounded-bl-md border border-gray-200"
                       }`}
                   >
@@ -202,7 +196,7 @@ export default function UserChat({ userId }) {
                       <p className="text-sm">{msg.messageText}</p>
                     )}
                     <p
-                      className={`text-xs mt-1 ${isMe ? "text-yellow-100" : "text-gray-400"
+                      className={`text-xs mt-1 ${isMe ? "text-amber-100" : "text-gray-400"
                         }`}
                     >
                       {new Date(msg.createdAt || Date.now()).toLocaleTimeString("en-US", {
@@ -220,14 +214,24 @@ export default function UserChat({ userId }) {
           {/* Footer */}
           <div className="p-3 bg-white border-t border-gray-200 relative">
             <div className="flex items-center space-x-2">
-              {/* Upload ảnh */}
-              <button onClick={() => fileInputRef.current.click()} className="text-gray-500 hover:text-yellow-500">
-                📷
+              {/* Upload image */}
+              <button 
+                onClick={() => fileInputRef.current.click()} 
+                className="p-2 text-gray-500 hover:text-amber-500 transition-colors rounded-full hover:bg-amber-50"
+                title="Upload image"
+                aria-label="Upload image"
+              >
+                <PhotoCameraOutlinedIcon fontSize="small" />
               </button>
 
               {/* Emoji */}
-              <button onClick={() => setShowEmoji(!showEmoji)} className="text-gray-500 hover:text-yellow-500">
-                😊
+              <button 
+                onClick={() => setShowEmoji(!showEmoji)} 
+                className={`p-2 text-gray-500 hover:text-amber-500 transition-colors rounded-full hover:bg-amber-50 ${showEmoji ? 'bg-amber-50 text-amber-500' : ''}`}
+                title="Add emoji"
+                aria-label="Add emoji"
+              >
+                <EmojiEmotionsOutlinedIcon fontSize="small" />
               </button>
 
               <input
@@ -237,34 +241,35 @@ export default function UserChat({ userId }) {
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
                 disabled={conversation?.status === "closed"}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
 
-              {/* Nút gửi */}
+              {/* Send button */}
               <button
                 onClick={conversation ? sendMessage : startChat}
                 disabled={conversation?.status === "closed" || !input.trim()}
-                className="w-10 h-10 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white rounded-full flex items-center justify-center transition"
+                className="w-10 h-10 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors"
+                title="Send message"
+                aria-label="Send message"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
+                <SendOutlinedIcon fontSize="small" />
               </button>
             </div>
 
-            {/* Emoji Picker lớn hơn và có nút tắt */}
+            {/* Emoji Picker with close button */}
             {showEmoji && (
               <div
                 className="absolute bottom-16 right-0 z-50 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden p-2"
                 style={{ width: "350px", height: "450px" }}
               >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-500 ml-2">Choose emoji</span>
+                <div className="flex justify-between items-center mb-2 px-2">
+                  <span className="text-sm text-gray-600 font-medium">Choose emoji</span>
                   <button
                     onClick={() => setShowEmoji(false)}
-                    className="text-gray-400 hover:text-red-500 text-sm font-semibold"
+                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100"
+                    aria-label="Close emoji picker"
                   >
-                    ✕
+                    <CloseIcon fontSize="small" />
                   </button>
                 </div>
                 <EmojiPicker

@@ -183,9 +183,10 @@ const ProductFeedback = ({ productId }) => {
                     {feedbackStats && feedbacks.length > 0 && (
                         <div className="w-full lg:w-1/3 flex-shrink-0">
                             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-5 md:p-6 border-2 border-blue-200">
-                                <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-4">
+                                <div className="flex flex-col gap-4">
+                                    {/* Rating Stats Section */}
                                     <div className="flex flex-col items-center lg:items-start">
-                                        <div className="flex items-center mb-4 lg:mb-0">
+                                        <div className="flex items-center mb-3">
                                             <span className="text-4xl font-bold text-yellow-600 mr-3">
                                                 {feedbackStats.average_rating.toFixed(1)}
                                             </span>
@@ -203,7 +204,7 @@ const ProductFeedback = ({ productId }) => {
                                             </div>
                                         </div>
                                         <div className="text-gray-700 text-center lg:text-left">
-                                            <div className="text-lg font-semibold">
+                                            <div className="text-lg font-medium">
                                                 Based on {feedbackStats.total_feedbacks} review{feedbackStats.total_feedbacks !== 1 ? 's' : ''}
                                             </div>
                                             <div className="text-sm text-gray-600">
@@ -211,20 +212,23 @@ const ProductFeedback = ({ productId }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center lg:items-end">
-                                        <div className="text-sm font-medium text-gray-700 mb-2">Rating Distribution</div>
-                                        <div className="flex space-x-2">
-                                            {[1, 2, 3, 4, 5].map((rating) => (
-                                                <div key={rating} className="flex flex-col items-center">
-                                                    <span className="text-xs text-gray-500 mb-1">{rating}</span>
-                                                    <div className="w-3 h-12 bg-gray-200 rounded">
+                                    
+                                    {/* Rating Distribution - Below on desktop, below on mobile */}
+                                    <div className="flex flex-col w-full">
+                                        <div className="text-lg font-medium text-gray-700 mb-2 text-center lg:text-left">Rating Distribution</div>
+                                        <div className="flex flex-col gap-2">
+                                            {[5, 4, 3, 2, 1].map((rating) => (
+                                                <div key={rating} className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500 w-4 text-right">{rating}</span>
+                                                    <div className="flex-1 h-4 bg-gray-200 rounded-sm overflow-hidden">
                                                         <div
-                                                            className="bg-yellow-400 rounded transition-all duration-500"
+                                                            className="bg-yellow-400 h-full rounded-sm transition-all duration-500"
                                                             style={{
-                                                                height: `${feedbackStats.rating_percentage?.[rating] || 0}%`
+                                                                width: `${feedbackStats.rating_percentage?.[rating] || 0}%`
                                                             }}
                                                         ></div>
                                                     </div>
+                                                    <span className="text-xs text-gray-500 w-8 text-right">{feedbackStats.rating_percentage?.[rating] || 0}%</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -241,7 +245,7 @@ const ProductFeedback = ({ productId }) => {
                                 if (!feedback || !feedback._id) return null;
 
                                 return (
-                                    <div key={feedback._id} className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-md transition-shadow duration-200">
+                                    <div key={feedback._id} className="bg-white border-2 border-gray-300 rounded-xl p-3 hover:shadow-md transition-shadow duration-200">
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">

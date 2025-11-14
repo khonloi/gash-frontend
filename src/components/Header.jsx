@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { io } from "socket.io-client";
 import { AuthContext } from "../context/AuthContext";
 import Api from "../common/SummaryAPI";
 import gashLogo from "../assets/image/gash-logo.svg";
@@ -14,6 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import NotificationsDropdown from "./NotificationsDropdown";
+import IconButton from "./IconButton";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
     for (let i = 0; i < retries; i++) {
@@ -43,12 +45,14 @@ export default function Header() {
     const [cartItemCount, setCartItemCount] = useState(0);
     const [notificationCount, setNotificationCount] = useState(0);
     const [livestreamCount, setLivestreamCount] = useState(0);
+    const [favoriteCount, setFavoriteCount] = useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
     const userMenuRef = useRef(null);
-    const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null });
+    const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null, favorite: null });
+    const socketRef = useRef(null);
 
     // Fetch cart item count
     const fetchCartItemCount = useCallback(async () => {
@@ -108,6 +112,23 @@ export default function Header() {
         }
     }, [user]);
 
+    // Fetch favorite count
+    const fetchFavoriteCount = useCallback(async () => {
+        if (!user) {
+            setFavoriteCount(0);
+            return;
+        }
+        try {
+            const favoritesData = await fetchWithRetry(() =>
+                Api.favorites.fetch(user.token)
+            );
+            const itemCount = Array.isArray(favoritesData) ? favoritesData.length : 0;
+            setFavoriteCount(itemCount);
+        } catch (error) {
+            setFavoriteCount(0);
+        }
+    }, [user]);
+
     // Debounced fetch functions
     const debouncedFetchCartItemCount = useCallback(() => {
         if (fetchTimeoutRef.current.cart) clearTimeout(fetchTimeoutRef.current.cart);
@@ -124,14 +145,106 @@ export default function Header() {
         fetchTimeoutRef.current.livestream = setTimeout(fetchLivestreamCount, 10);
     }, [fetchLivestreamCount]);
 
+    const debouncedFetchFavoriteCount = useCallback(() => {
+        if (fetchTimeoutRef.current.favorite) clearTimeout(fetchTimeoutRef.current.favorite);
+        fetchTimeoutRef.current.favorite = setTimeout(fetchFavoriteCount, 10);
+    }, [fetchFavoriteCount]);
+
+    // 🔔 Socket.IO: Setup real-time updates for badges
+    useEffect(() => {
+        if (!user?._id) {
+            // Disconnect socket if user logs out
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+            return;
+        }
+
+        // Get backend URL
+        const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
+        
+        // Connect to Socket.IO
+        const socket = io(baseURL, {
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 2000,
+            withCredentials: true,
+        });
+
+        socketRef.current = socket;
+
+        // Join user's room for targeted updates
+        socket.on("connect", () => {
+            console.log("✅ Header Socket connected:", socket.id);
+            socket.emit("userConnected", user._id);
+            socket.emit("joinRoom", user._id);
+        });
+
+        // Listen for cart updates
+        socket.on("cartUpdated", (data) => {
+            console.log("🛒 Cart updated via Socket.IO:", data);
+            // Immediately fetch updated cart count
+            debouncedFetchCartItemCount();
+        });
+
+        // Listen for livestream count changes
+        socket.on("livestreamCountChanged", (data) => {
+            console.log("📺 Livestream count changed via Socket.IO:", data);
+            // Update livestream count directly if count is provided, otherwise fetch
+            if (typeof data.count === 'number') {
+                setLivestreamCount(data.count);
+            } else {
+                debouncedFetchLivestreamCount();
+            }
+        });
+
+        // Listen for notification updates (already handled by NotificationsDropdown, but keep for consistency)
+        socket.on("newNotification", () => {
+            console.log("🔔 New notification via Socket.IO");
+            debouncedFetchNotificationCount();
+        });
+
+        // Listen for notification badge updates (when notifications are marked as read/deleted)
+        socket.on("notificationBadgeUpdate", (data) => {
+            console.log("🔔 Notification badge update via Socket.IO:", data);
+            // Only update if it's for this user or global
+            if (!data.userId || data.userId === user._id) {
+                debouncedFetchNotificationCount();
+            }
+        });
+
+        // Listen for favorite updates
+        socket.on("favoriteUpdated", (data) => {
+            console.log("❤️ Favorite updated via Socket.IO:", data);
+            // Immediately fetch updated favorite count
+            debouncedFetchFavoriteCount();
+        });
+
+        socket.on("connect_error", (err) => {
+            console.error("❌ Header Socket connection error:", err.message);
+        });
+
+        socket.on("disconnect", (reason) => {
+            console.warn("⚠️ Header Socket disconnected:", reason);
+        });
+
+        return () => {
+            socket.disconnect();
+            socketRef.current = null;
+        };
+    }, [user, debouncedFetchCartItemCount, debouncedFetchNotificationCount, debouncedFetchLivestreamCount, debouncedFetchFavoriteCount]);
+
     // Fetch counts on mount, location change, or update events
     useEffect(() => {
 
         fetchCartItemCount();
         fetchNotificationCount();   // guaranteed to run
         fetchLivestreamCount();
+        fetchFavoriteCount();
 
-        // ---- 2. EVENT LISTENERS (debounced) ----
+        // ---- 2. EVENT LISTENERS (debounced) - Keep for backward compatibility ----
         const handleCartUpdate = () => debouncedFetchCartItemCount();
         const handleNotificationUpdate = () => debouncedFetchNotificationCount();
         const handleLivestreamUpdate = () => debouncedFetchLivestreamCount();
@@ -140,20 +253,27 @@ export default function Header() {
         window.addEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
         window.addEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
 
-        // ---- 3. POLLING (raw fetchers, every 3 s) ----
+        // ---- 3. POLLING (fallback, reduced frequency - every 30s instead of 3s) ----
         let pollInterval;
         if (user) {
             pollInterval = setInterval(() => {
                 fetchCartItemCount();        // raw
                 fetchNotificationCount();    // raw
                 fetchLivestreamCount();      // raw
-            }, 3000);
+                fetchFavoriteCount();        // raw
+            }, 30000); // Increased from 3000 to 30000 (30 seconds) as fallback
         }
+
+        // Also listen for custom events for backward compatibility
+        const FAVORITE_UPDATE_EVENT = 'favoriteUpdated';
+        const handleFavoriteUpdate = () => debouncedFetchFavoriteCount();
+        window.addEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
 
         return () => {
             window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
             window.removeEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
             window.removeEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
+            window.removeEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
             clearInterval(pollInterval);
             Object.values(fetchTimeoutRef.current).forEach(t => t && clearTimeout(t));
         };
@@ -161,9 +281,11 @@ export default function Header() {
         fetchCartItemCount,
         fetchNotificationCount,
         fetchLivestreamCount,
+        fetchFavoriteCount,
         debouncedFetchCartItemCount,
         debouncedFetchNotificationCount,
         debouncedFetchLivestreamCount,
+        debouncedFetchFavoriteCount,
         location,
         user
     ]);       
@@ -582,16 +704,19 @@ export default function Header() {
                                 )}
                             </button>
                         </div>
-                        <button
-                            onClick={() => {
-                                console.log("Favorites clicked, user:", !!user);
-                                user ? navigate("/favorites") : navigate("/login");
-                            }}
-                            title="Favorites"
-                            className="p-2 text-white hover:text-amber-500"
-                        >
-                            <FavoriteBorderIcon />
-                        </button>
+                        <div className="relative">
+                            <IconButton
+                                onClick={() => {
+                                    console.log("Favorites clicked, user:", !!user);
+                                    user ? navigate("/favorites") : navigate("/login");
+                                }}
+                                title="Favorites"
+                                badge={favoriteCount > 0 ? favoriteCount : undefined}
+                                badgeColor="bg-amber-500"
+                            >
+                                <FavoriteBorderIcon />
+                            </IconButton>
+                        </div>
                         <div className="relative">
                             <button
                                 onClick={() => {

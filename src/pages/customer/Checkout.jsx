@@ -6,6 +6,7 @@ import { useToast } from '../../hooks/useToast';
 // import '../../styles/Checkout.css';
 import Api from "../../common/SummaryAPI";
 import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/LoadingSpinner';
+import ProductButton from '../../components/ProductButton';
 
 // === LocalStorage Helpers ===
 const CHECKOUT_STORAGE_KEY = 'checkout_persistent_data';
@@ -78,13 +79,24 @@ const Checkout = () => {
     name: '',
   });
 
-  // Restore form data on mount
+  // Auto-fill from user account on mount (always use account info, not saved data)
   useEffect(() => {
-    const saved = loadCheckoutData();
-    if (saved?.formData) {
-      setFormData(saved.formData);
+    if (user) {
+      // Always use account information when available
+      const userFormData = {
+        name: user.name || '',
+        phone: user.phone || '',
+        addressReceive: user.address || '',
+      };
+      
+      // Set form data from account
+      setFormData(userFormData);
+      
+      // Update localStorage with account data
+      const saved = loadCheckoutData();
+      saveCheckoutData({ ...saved, formData: userFormData });
     }
-  }, []);
+  }, [user]);
 
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState('COD');
@@ -385,7 +397,7 @@ const Checkout = () => {
       : cartItems;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
       {successInfo && (
         <OrderSuccessModal
           open={!!successInfo}
@@ -398,10 +410,10 @@ const Checkout = () => {
         />
       )}
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
         {/* Order Summary */}
-        <div className="bg-white rounded-xl p-6 shadow-md">
-          <h2 className="text-2xl font-bold mb-6 text-yellow-800">Order Summary</h2>
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
+          <h2 className="text-xl sm:text-2xl font-normal mb-4 text-gray-900">Order Summary</h2>
 
           <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
             {loading ? (
@@ -409,7 +421,9 @@ const Checkout = () => {
                 <LoadingSpinner size="lg" color="yellow" />
               </div>
             ) : itemsToDisplay.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No items in checkout</p>
+              <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+                <p>No items in checkout</p>
+              </div>
             ) : (
               itemsToDisplay.map((item) => {
                 const productData = item.variantId?.productId || item.product;
@@ -440,72 +454,76 @@ const Checkout = () => {
           </div>
 
           {/* Voucher Section */}
-          <div className="mt-6 pt-6 border-t">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={voucherCode}
-                onChange={(e) => setVoucherCode(e.target.value)}
-                placeholder="Enter voucher code"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={loading}
-              />
-              <button
-                onClick={handleApplyVoucher}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
-                disabled={loading}
-              >
-                Apply
-              </button>
-            </div>
-            {appliedVoucher && (
-              <div className="mt-2 flex justify-between items-center text-green-600">
-                <span>Applied: {appliedVoucher.code}</span>
-                <button
-                  onClick={handleRemoveVoucher}
-                  className="text-sm text-red-500 hover:text-red-700"
+          <div className="mt-6 pt-6 border-t border-gray-300">
+            <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+              <legend className="text-sm sm:text-base font-semibold">Voucher Code</legend>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={voucherCode}
+                  onChange={(e) => setVoucherCode(e.target.value)}
+                  placeholder="Enter voucher code"
+                  className="flex-1 px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={loading}
+                />
+                <ProductButton
+                  variant="primary"
+                  size="sm"
+                  onClick={handleApplyVoucher}
+                  disabled={loading}
                 >
-                  Remove
-                </button>
+                  Apply
+                </ProductButton>
               </div>
-            )}
+              {appliedVoucher && (
+                <div className="mt-2 flex justify-between items-center text-green-600">
+                  <span className="text-sm">Applied: {appliedVoucher.code}</span>
+                  <button
+                    onClick={handleRemoveVoucher}
+                    className="text-sm text-red-500 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </fieldset>
           </div>
 
           {/* Total Summary */}
-          <div className="mt-6 pt-6 border-t space-y-4 text-lg">
-            <div className="flex justify-between">
+          <div className="mt-6 pt-6 border-t border-gray-300 space-y-4">
+            <div className="flex justify-between text-base">
               <span>Subtotal:</span>
               <span>{totalPrice.toLocaleString()}₫</span>
             </div>
             {discount > 0 && (
-              <div className="flex justify-between text-green-600">
+              <div className="flex justify-between text-green-600 text-base">
                 <span>Discount:</span>
                 <span>-{discount.toLocaleString()}₫</span>
               </div>
             )}
-            <div className="flex justify-between font-bold text-xl pt-4 border-t">
+            <div className="flex justify-between font-bold text-lg sm:text-xl pt-4 border-t border-gray-300">
               <span>Total:</span>
               <span>{(totalPrice - discount).toLocaleString()}₫</span>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Checkout Form */}
         {itemsToDisplay.length > 0 && (
-          <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-200 relative">
+          <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 border-2 border-gray-300 relative shadow-md">
             {loading && (
               <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-xl">
                 <div className="text-center">
                   <LoadingSpinner size="xl" color="yellow" className="mb-4" />
-                  <p className="text-yellow-600 font-medium">Processing your order...</p>
+                  <p className="text-gray-900 font-medium">Processing your order...</p>
                   <p className="text-gray-500 text-sm mt-2">Please wait while we process your order</p>
                 </div>
               </div>
             )}
             <form onSubmit={handlePlaceOrder} className="space-y-6">
               {/* Shipping Information */}
-              <fieldset className="space-y-4">
-                <legend className="text-xl font-bold text-yellow-800 mb-4">Shipping Information</legend>
+              <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-4">
+                <legend className="text-sm sm:text-base font-semibold">Shipping Information</legend>
 
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -519,7 +537,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your recipient name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -536,7 +554,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your delivery address"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -553,40 +571,40 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your phone number"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
               </fieldset>
 
               {/* Payment Method */}
-              <fieldset className="space-y-4">
-                <legend className="text-xl font-bold text-yellow-800 mb-4">Payment Method</legend>
+              <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-3">
+                <legend className="text-sm sm:text-base font-semibold">Payment Method</legend>
                 <div className="space-y-3">
-                  <label className={`flex items-center p-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="COD"
                       checked={paymentMethod === 'COD'}
                       onChange={handlePaymentMethodChange}
-                      className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
                       disabled={loading}
                     />
-                    <div classaaName="ml-3">
+                    <div className="ml-3">
                       <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
                       <p className="text-xs text-gray-500">Pay when you receive the order</p>
                     </div>
                   </label>
 
-                  <label className={`flex items-center p-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="VNPAY"
                       checked={paymentMethod === 'VNPAY'}
                       onChange={handlePaymentMethodChange}
-                      className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
                       disabled={loading}
                     />
                     <div className="ml-3">
@@ -599,24 +617,36 @@ const Checkout = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">
-                <button
+                <ProductButton
                   type="button"
+                  variant="default"
                   onClick={() => navigate(-1)}
-                  className="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition font-medium"
                   disabled={loading}
+                  className="flex-1"
                 >
                   Back
-                </button>
-                <LoadingButton
-                  type="submit"
-                  loading={loading}
-                  className="flex-1 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition font-medium"
-                >
-                  {paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
-                </LoadingButton>
+                </ProductButton>
+                {loading ? (
+                  <LoadingButton
+                    type="submit"
+                    loading={loading}
+                    className="flex-1"
+                  >
+                    {paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
+                  </LoadingButton>
+                ) : (
+                  <ProductButton
+                    type="submit"
+                    variant="primary"
+                    disabled={loading}
+                    className="flex-1"
+                  >
+                    {paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
+                  </ProductButton>
+                )}
               </div>
             </form>
-          </div>
+          </section>
         )}
       </div>
     </div>

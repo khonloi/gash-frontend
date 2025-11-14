@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import OrderDetailsModal from "../../components/OrderDetails";
 import LoadingSpinner, { LoadingSkeleton } from "../../components/LoadingSpinner";
+import ProductButton from "../../components/ProductButton";
+import { io } from "socket.io-client";
+import { SOCKET_URL } from "../../common/axiosClient";
 
 const Orders = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -20,6 +23,7 @@ const Orders = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchType, setSearchType] = useState("phone");
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const socketRef = useRef(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +75,123 @@ const Orders = () => {
       fetchOrders();
     }
   }, [isAuthLoading, user, fetchOrders]);
+
+  // Setup Socket.IO for real-time order updates
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // Initialize socket if not already created
+    if (!socketRef.current) {
+      const token = localStorage.getItem("token");
+      socketRef.current = io(SOCKET_URL, {
+        transports: ["websocket", "polling"],
+        auth: { token },
+        withCredentials: true,
+      });
+    }
+
+    const socket = socketRef.current;
+
+    // Connect and authenticate
+    socket.on("connect", () => {
+      console.log("✅ Orders Socket connected:", socket.id);
+      // Emit user connection
+      socket.emit("userConnected", user._id);
+      // Also try authentication if token available
+      const token = localStorage.getItem("token");
+      if (token) {
+        socket.emit("authenticate", token);
+      }
+    });
+
+    // Listen for order updates
+    socket.on("orderUpdated", (payload) => {
+      const updatedOrder = payload.order || payload;
+      const orderUserId = payload.userId || updatedOrder.acc_id?._id || updatedOrder.acc_id;
+
+      // Only update if this order belongs to the current user
+      if (orderUserId && orderUserId.toString() === user._id.toString()) {
+        console.log("📦 Order updated via Socket.IO:", updatedOrder._id);
+        
+        setOrders((prevOrders) => {
+          const existingIndex = prevOrders.findIndex((o) => o._id === updatedOrder._id);
+          
+          if (existingIndex !== -1) {
+            // Update existing order
+            const updated = [...prevOrders];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              ...updatedOrder,
+            };
+            // Re-sort by orderDate
+            return updated.sort(
+              (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+            );
+          } else {
+            // New order - add to beginning
+            return [
+              updatedOrder,
+              ...prevOrders,
+            ].sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+          }
+        });
+
+        // Also update filtered orders if applicable
+        setFilteredOrders((prevFiltered) => {
+          const existingIndex = prevFiltered.findIndex((o) => o._id === updatedOrder._id);
+          
+          if (existingIndex !== -1) {
+            const updated = [...prevFiltered];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              ...updatedOrder,
+            };
+            return updated.sort(
+              (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+            );
+          } else {
+            return [
+              updatedOrder,
+              ...prevFiltered,
+            ].sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+          }
+        });
+
+        // Show toast notification for status changes
+        if (updatedOrder.order_status) {
+          const statusMessages = {
+            pending: "Your order is pending",
+            confirmed: "Your order has been confirmed",
+            shipping: "Your order is on the way!",
+            delivered: "Your order has been delivered!",
+            cancelled: "Your order has been cancelled",
+          };
+          const message = statusMessages[updatedOrder.order_status] || "Order status updated";
+          showToast(message, "info");
+        }
+      }
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("❌ Orders Socket connection error:", err.message);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.warn("⚠️ Orders Socket disconnected:", reason);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("connect");
+      socket.off("orderUpdated");
+      socket.off("connect_error");
+      socket.off("disconnect");
+      if (socket.connected) {
+        socket.disconnect();
+      }
+      socketRef.current = null;
+    };
+  }, [user, showToast]);
 
   const handleSearchAndFilter = useCallback(() => {
     let filtered = [...orders];
@@ -204,104 +325,136 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white py-10 px-6">
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-yellow-200">
-        <h1 className="text-3xl font-bold text-yellow-600 text-center mb-8">
-          My Orders
-        </h1>
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
+        <header className="mb-4">
+          <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Orders</h1>
+          <p className="text-sm text-gray-600 mb-4">
+            View and manage your order history. Click on an order to see detailed information.
+          </p>
+        </header>
 
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={`Search by ${searchType}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        <div className="mb-6 space-y-4">
+          <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+            <legend className="text-sm sm:text-base font-semibold">Search & Filter</legend>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder={`Search by ${searchType}...`}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-1.5 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
                   />
-                </svg>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setSearchType("phone")}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition ${
+                      searchType === "phone"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Phone
+                  </button>
+                  <button
+                    onClick={() => setSearchType("address")}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition ${
+                      searchType === "address"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Address
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setShowFilterPanel(!showFilterPanel)}
+                  className={`px-3 py-1.5 border-2 border-gray-300 rounded-lg font-semibold transition flex items-center gap-2 text-sm ${
+                    showFilterPanel || statusFilter !== "all"
+                      ? "bg-gray-900 text-white border-gray-900"
+                      : "bg-white text-gray-900 hover:bg-gray-50 hover:border-blue-600"
+                  } focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
+                    />
+                  </svg>
+                  Filter
+                  {statusFilter !== "all" && (
+                    <span className="bg-white text-gray-900 text-xs px-1.5 py-0.5 rounded-full">
+                      {statusFilter}
+                    </span>
+                  )}
+                </button>
+
+                {(searchQuery || statusFilter !== "all") && (
+                  <ProductButton
+                    variant="default"
+                    size="sm"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setStatusFilter("all");
+                      setSearchType("phone");
+                    }}
+                  >
+                    Clear
+                  </ProductButton>
+                )}
               </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setSearchType("phone")}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition ${
-                  searchType === "phone"
-                    ? "bg-white text-yellow-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Phone
-              </button>
-              <button
-                onClick={() => setSearchType("address")}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition ${
-                  searchType === "address"
-                    ? "bg-white text-yellow-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Address
-              </button>
-            </div>
-
-            <button
-              onClick={() => setShowFilterPanel(!showFilterPanel)}
-              className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-                showFilterPanel || statusFilter !== "all"
-                  ? "bg-yellow-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
-                />
-              </svg>
-              Filter
-              {statusFilter !== "all" && (
-                <span className="bg-white text-yellow-600 text-xs px-1.5 py-0.5 rounded-full">
-                  {statusFilter}
-                </span>
-              )}
-            </button>
-
-            {(searchQuery || statusFilter !== "all") && (
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setStatusFilter("all");
-                  setSearchType("phone");
-                }}
-                className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition text-sm"
-              >
-                Clear
-              </button>
+            {showFilterPanel && (
+              <div className="mt-4 pt-4 border-t border-gray-300">
+                <fieldset className="border-2 border-gray-300 rounded-xl p-3">
+                  <legend className="text-sm font-semibold">Order Status</legend>
+                  <div className="flex flex-wrap gap-2">
+                    {["all", "pending", "confirmed", "shipping", "delivered", "cancelled"].map((status) => (
+                      <label key={status} className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="statusFilter"
+                          value={status}
+                          checked={statusFilter === status}
+                          onChange={(e) => setStatusFilter(e.target.value)}
+                          className="mr-2 accent-amber-400"
+                        />
+                        <span className="text-sm capitalize">{status}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              </div>
             )}
-          </div>
+          </fieldset>
         </div>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
           <p className="text-sm text-gray-600">
             Showing {Math.min(startIndex + 1, filteredOrders.length)}–
             {Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length}{" "}
@@ -312,7 +465,7 @@ const Orders = () => {
             <select
               value={itemsPerPage}
               onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="border border-yellow-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -324,8 +477,8 @@ const Orders = () => {
         {loading ? (
           <LoadingSkeleton count={3} />
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
+          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+            <div className="text-gray-400">
               <svg
                 className="w-16 h-16 mx-auto"
                 fill="none"
@@ -355,25 +508,27 @@ const Orders = () => {
                 <p className="text-gray-400 text-sm mt-2">
                   Try adjusting your search criteria or filters
                 </p>
-                <button
+                <ProductButton
+                  variant="default"
+                  size="sm"
                   onClick={() => {
                     setSearchQuery("");
                     setStatusFilter("all");
                     setSearchType("phone");
                   }}
-                  className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition"
+                  className="text-blue-600"
                 >
                   Clear Filters
-                </button>
+                </ProductButton>
               </>
             )}
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {currentOrders.map((order) => (
               <article
                 key={order._id}
-                className="border border-yellow-200 rounded-xl p-5 bg-white hover:shadow-lg transition transform hover:-translate-y-1"
+                className="border-2 border-gray-300 rounded-xl p-4 sm:p-5 bg-white hover:shadow-md transition"
               >
                 <div className="flex justify-between items-center border-b pb-2 mb-3">
                   <div className="flex items-center gap-3">
@@ -434,13 +589,15 @@ const Orders = () => {
 
                 <div className="flex justify-end gap-3 mt-4">
                   {order.pay_status?.toLowerCase() === "paid" && (
-                    <button
+                    <ProductButton
+                      variant="default"
+                      size="sm"
                       onClick={() => navigate(`/bills/${order._id}`)}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
+                      className="text-green-600"
                       title="View Bill"
                     >
                       <svg
-                        className="w-4 h-4"
+                        className="w-4 h-4 inline mr-2"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -453,15 +610,16 @@ const Orders = () => {
                         />
                       </svg>
                       View Bill
-                    </button>
+                    </ProductButton>
                   )}
-                  <button
+                  <ProductButton
+                    variant="primary"
+                    size="sm"
                     onClick={() => setSelectedOrderId(order._id)}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition flex items-center gap-2"
                     title="View Details"
                   >
                     <svg
-                      className="w-4 h-4"
+                      className="w-4 h-4 inline mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -480,7 +638,7 @@ const Orders = () => {
                       />
                     </svg>
                     View Details
-                  </button>
+                  </ProductButton>
                 </div>
               </article>
             ))}
@@ -488,22 +646,19 @@ const Orders = () => {
         )}
 
         {filteredOrders.length > itemsPerPage && (
-          <div className="mt-8 flex items-center justify-between">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-gray-600">
               Page {currentPage} of {totalPages}
             </div>
 
             <div className="flex items-center gap-2">
-              <button
+              <ProductButton
+                variant="default"
+                size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${
-                  currentPage === 1
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-yellow-500 text-white hover:bg-yellow-600"
-                }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -512,7 +667,7 @@ const Orders = () => {
                   />
                 </svg>
                 Previous
-              </button>
+              </ProductButton>
 
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
@@ -533,32 +688,26 @@ const Orders = () => {
                   }
 
                   return (
-                    <button
+                    <ProductButton
                       key={page}
+                      variant={page === currentPage ? "primary" : "default"}
+                      size="sm"
                       onClick={() => handlePageChange(page)}
-                      className={`px-3 py-2 rounded-lg font-medium transition ${
-                        page === currentPage
-                          ? "bg-yellow-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
                     >
                       {page}
-                    </button>
+                    </ProductButton>
                   );
                 })}
               </div>
 
-              <button
+              <ProductButton
+                variant="default"
+                size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-2 rounded-lg font-medium transition flex items-center gap-1 ${
-                  currentPage === totalPages
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-yellow-500 text-white hover:bg-yellow-600"
-                }`}
               >
                 Next
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -566,11 +715,11 @@ const Orders = () => {
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </button>
+              </ProductButton>
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {selectedOrderId && (
         <OrderDetailsModal
