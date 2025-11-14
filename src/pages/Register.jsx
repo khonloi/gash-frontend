@@ -4,7 +4,6 @@ import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import ProductButton from '../components/ProductButton';
-import '../styles/Register.css';
 
 const Register = () => {
   const location = useLocation();
@@ -24,7 +23,6 @@ const Register = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [invalidFile, setInvalidFile] = useState(false);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = React.useContext(AuthContext);
   const { showToast } = useToast();
@@ -37,13 +35,6 @@ const Register = () => {
     }
     usernameRef.current?.focus();
   }, [location.state, navigate]);
-
-  useEffect(() => {
-    if (error) {
-      const timeout = setTimeout(() => setError(''), 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [error]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -68,7 +59,6 @@ const Register = () => {
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError('');
   }, []);
 
   const validateForm = useCallback(() => {
@@ -120,12 +110,10 @@ const Register = () => {
       e.preventDefault();
       const validationError = validateForm();
       if (validationError) {
-        setError(validationError);
         showToast(validationError, 'error', 3000);
         usernameRef.current?.focus();
         return;
       }
-      setError('');
       setIsLoading(true);
 
       try {
@@ -173,7 +161,6 @@ const Register = () => {
         } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
           errorMessage = 'Network error. Please check if backend is running.';
         }
-        setError(errorMessage);
         showToast(errorMessage, 'error', 4000);
         usernameRef.current?.focus();
       } finally {
@@ -184,16 +171,13 @@ const Register = () => {
   );
 
   return (
-    <div className="signup-container">
-      <div className="signup-box">
-        <h1 className="signup-title">Complete Your Registration</h1>
-        {error && (
-          <div className="signup-error" id="error-message" role="alert">
-            <span className="signup-error-icon" aria-hidden="true">⚠</span>
-            {error}
-          </div>
-        )}
-        <form className="signup-form" onSubmit={handleSubmit} aria-describedby={error ? 'error-message' : undefined}>
+    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-2xl shadow-md">
+        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
+          Complete Your Registration
+        </h1>
+
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           {[
             { id: 'username', label: 'Username', type: 'text', required: true, maxLength: 30 },
             { id: 'name', label: 'Full Name', type: 'text', required: true, maxLength: 50 },
@@ -206,22 +190,24 @@ const Register = () => {
             { id: 'password', label: 'Password', type: 'password', required: true },
             { id: 'repeatPassword', label: 'Repeat Password', type: 'password', required: true },
           ].map(({ id, label, type, required, maxLength, readOnly, options }) => (
-            <div className="signup-form-group" key={id}>
-              <label htmlFor={id} className="signup-form-label">{label}</label>
+            <fieldset key={id} className="flex flex-col">
+              <label htmlFor={id} className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
+                {label} {required && <span className="text-red-600">*</span>}
+              </label>
               {id === 'image' ? (
-                <div className="signup-upload-group">
+                <div className="flex flex-col gap-2">
                   <input
                     id="signup-image-upload"
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="signup-form-input"
+                    className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                     aria-required={required}
                     aria-invalid={invalidFile}
                   />
                   {previewUrl && (
-                    <div className="signup-image-preview">
-                      <img src={previewUrl} alt="Preview" style={{ maxWidth: 120, maxHeight: 120, marginTop: 8 }} />
+                    <div className="mt-2">
+                      <img src={previewUrl} alt="Preview" className="max-w-[120px] max-h-[120px] rounded-lg object-cover border-2 border-gray-300" />
                     </div>
                   )}
                 </div>
@@ -231,9 +217,8 @@ const Register = () => {
                   name={id}
                   value={formData[id]}
                   onChange={handleChange}
-                  className="signup-form-input"
+                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                   aria-required={required}
-                  aria-invalid={!!error}
                 >
                   <option value="">Select {label}</option>
                   {options.map((option) => (
@@ -253,13 +238,13 @@ const Register = () => {
                   required={required}
                   maxLength={maxLength}
                   readOnly={readOnly}
-                  className="signup-form-input"
+                  className={`p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed ${readOnly ? 'bg-gray-100' : ''}`}
                   aria-required={required}
-                  aria-invalid={!!error}
                 />
               )}
-            </div>
+            </fieldset>
           ))}
+          
           <ProductButton
             type="submit"
             variant="primary"
@@ -271,13 +256,17 @@ const Register = () => {
             {isLoading ? 'Creating Account...' : 'Create your GASH account'}
           </ProductButton>
         </form>
-        <p className="signup-login-prompt">
+
+        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Already have an account?{' '}
-          <Link to="/login" className="signup-login-link">
+          <Link 
+            to="/login" 
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+          >
             Sign In
           </Link>
         </p>
-      </div>
+      </section>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import Api from "../common/SummaryAPI";
 import { useToast } from "../hooks/useToast";
 import { AuthContext } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
+import ProductButton from "./ProductButton";
 
 const ChangePasswordModal = ({ handleCancel }) => {
     const [form, setForm] = useState({
@@ -131,20 +132,22 @@ const ChangePasswordModal = ({ handleCancel }) => {
                     ))}
 
                     <div className="flex justify-end gap-3 mt-6">
-                        <button
+                        <ProductButton
                             type="button"
+                            variant="secondary"
+                            size="md"
                             onClick={handleCancel}
-                            className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm transition"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </ProductButton>
+                        <ProductButton
                             type="submit"
+                            variant="primary"
+                            size="md"
                             disabled={loading}
-                            className="px-5 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-400 hover:opacity-90 text-white font-semibold text-sm shadow"
                         >
                             {loading ? "Saving..." : "Save"}
-                        </button>
+                        </ProductButton>
                     </div>
                 </form>
             </motion.div>

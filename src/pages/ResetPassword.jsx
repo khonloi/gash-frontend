@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useToast } from '../hooks/useToast';
 import ProductButton from '../components/ProductButton';
-import '../styles/ResetPassword.css';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -12,10 +12,9 @@ const ResetPassword = () => {
     newPassword: '',
     repeatPassword: '',
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { resetPassword } = React.useContext(AuthContext);
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const passwordRef = useRef(null);
 
@@ -26,21 +25,9 @@ const ResetPassword = () => {
     passwordRef.current?.focus();
   }, [location.state, navigate]);
 
-  useEffect(() => {
-    if (error || success) {
-      const timeout = setTimeout(() => {
-        setError('');
-        setSuccess('');
-      }, 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [error, success]);
-
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError('');
-    setSuccess('');
   }, []);
 
   const validateForm = useCallback(() => {
@@ -69,18 +56,17 @@ const ResetPassword = () => {
       e.preventDefault();
       const validationError = validateForm();
       if (validationError) {
-        setError(validationError);
+        showToast(validationError, 'error', 3000);
         passwordRef.current?.focus();
         return;
       }
-      setError('');
       setIsLoading(true);
       try {
         await resetPassword({
           email: formData.email,
           newPassword: formData.newPassword,
         });
-        setSuccess('Password reset successfully. You can now log in.');
+        showToast('Password reset successfully. You can now log in.', 'success', 3000);
         setTimeout(() => navigate('/login'), 2000);
       } catch (err) {
         let errorMessage = 'Failed to reset password. Please try again.';
@@ -91,55 +77,38 @@ const ResetPassword = () => {
         } else if (err.response?.data?.errors) {
           errorMessage = err.response.data.errors[0]?.msg || errorMessage;
         }
-        setError(errorMessage);
+        showToast(errorMessage, 'error', 3000);
         passwordRef.current?.focus();
       } finally {
         setIsLoading(false);
       }
     },
-    [formData, resetPassword, navigate, validateForm]
+    [formData, resetPassword, navigate, validateForm, showToast]
   );
 
   return (
-    <div className="reset-password-container">
-      {/* Toast error notification */}
-      {error && (
-        <div
-          className="reset-password-toast reset-password-toast-error"
-          role="alert"
-          tabIndex={0}
-          style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000, minWidth: 220, maxWidth: 350 }}
-        >
-          <span className="reset-password-error-icon" aria-hidden="true">⚠</span>
-          {error}
-        </div>
-      )}
-      {/* Toast success notification */}
-      {success && (
-        <div
-          className="reset-password-toast reset-password-toast-success"
-          role="alert"
-          tabIndex={0}
-          style={{ position: 'fixed', top: 64, right: 16, zIndex: 1000, minWidth: 220, maxWidth: 350 }}
-        >
-          <span className="reset-password-success-icon" aria-hidden="true">✓</span>
-          {success}
-        </div>
-      )}
-      <div className="reset-password-box">
-        <h1 className="reset-password-title">Reset Your Password</h1>
-        <p className="reset-password-info">Enter a new password for {formData.email}</p>
+    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-md shadow-md">
+        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
+          Reset Your Password
+        </h1>
+        
+        <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
+          Enter a new password for {formData.email}
+        </p>
+
         <form
-          className="reset-password-form"
           onSubmit={handleSubmit}
-          aria-describedby={error ? 'error-message' : success ? 'success-message' : undefined}
+          className="space-y-4 sm:space-y-5"
         >
           {[
             { id: 'newPassword', label: 'New Password', type: 'password', required: true },
             { id: 'repeatPassword', label: 'Repeat Password', type: 'password', required: true },
           ].map(({ id, label, type, required }) => (
-            <div className="reset-password-form-group" key={id}>
-              <label htmlFor={id} className="reset-password-form-label">{label}</label>
+            <fieldset key={id} className="flex flex-col">
+              <label htmlFor={id} className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
+                {label} <span className="text-red-600">*</span>
+              </label>
               <input
                 id={id}
                 type={type}
@@ -148,12 +117,12 @@ const ResetPassword = () => {
                 onChange={handleChange}
                 ref={id === 'newPassword' ? passwordRef : null}
                 required={required}
-                className="reset-password-form-input"
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 aria-required={required}
-                aria-invalid={!!error}
               />
-            </div>
+            </fieldset>
           ))}
+          
           <ProductButton
             type="submit"
             variant="primary"
@@ -165,13 +134,17 @@ const ResetPassword = () => {
             {isLoading ? 'Resetting Password...' : 'Reset Password'}
           </ProductButton>
         </form>
-        <p className="reset-password-login-prompt">
+
+        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Remember your password?{' '}
-          <Link to="/login" className="reset-password-login-link">
+          <Link 
+            to="/login" 
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+          >
             Sign In
           </Link>
         </p>
-      </div>
+      </section>
     </div>
   );
 };

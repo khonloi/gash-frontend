@@ -298,7 +298,7 @@ const Profile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
             {/* Profile Card */}
             <div className="lg:col-span-1 flex">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col pt-2">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col">
                 {/* Header */}
                 <div className="bg-gray-50 p-8 text-center border-b border-gray-200">
                   <div className="relative inline-block">
@@ -372,7 +372,7 @@ const Profile = () => {
 
             {/* Profile Details */}
             <div className="lg:col-span-2 flex">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col pt-2">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full flex flex-col">
                 <div className="bg-gray-50 border-b border-gray-200 p-5">
                   <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
                 </div>

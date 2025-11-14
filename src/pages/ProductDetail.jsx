@@ -1000,7 +1000,7 @@ const ProductDetail = () => {
                 </div>
               </fieldset>
             )}
-            <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4 flex flex-col">
+            <fieldset className="mb-4 sm:mb-5 flex flex-col">
               <legend className="text-sm sm:text-base font-semibold">Quantity:</legend>
               <input
                 type="number"

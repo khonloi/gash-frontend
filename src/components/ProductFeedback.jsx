@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import LoadingForm from './LoadingSpinner';
+import ProductButton from './ProductButton';
 
 const ProductFeedback = ({ productId }) => {
     const { showToast } = useToast();
@@ -139,13 +140,14 @@ const ProductFeedback = ({ productId }) => {
                 <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
                     <span className="text-lg" aria-hidden="true">⚠</span>
                     {feedbackError}
-                    <button
+                    <ProductButton
+                        variant="secondary"
+                        size="sm"
                         onClick={() => fetchFeedbacks(productId)}
-                        className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         aria-label="Retry loading reviews"
                     >
                         Retry
-                    </button>
+                    </ProductButton>
                 </div>
             </div>
         );
@@ -154,8 +156,8 @@ const ProductFeedback = ({ productId }) => {
     if (feedbacks.length === 0) {
         return (
             <div className="w-full">
-                <div className="text-center py-12">
-                    <div className="mb-6">
+                <div className="text-center">
+                    <div>
                         <i className="lni lni-comments text-6xl text-gray-300 mb-4"></i>
                         <h3 className="text-xl font-medium text-gray-900 mb-2">No Reviews Yet</h3>
                         <p className="text-gray-500 text-sm">

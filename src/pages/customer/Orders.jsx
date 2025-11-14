@@ -48,11 +48,7 @@ const Orders = () => {
           setLoading(false);
           return;
         }
-
-        if (data.length === 0) {
-          showToast("No orders found for this user", "info");
-        }
-
+        
         const sorted = data.sort(
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );

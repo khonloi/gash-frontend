@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useToast } from '../hooks/useToast';
 import emailjs from '@emailjs/browser';
 import ProductButton from '../components/ProductButton';
-import '../styles/OTPVerification.css';
 
 // Initialize EmailJS with Public API Key
 if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
@@ -19,10 +19,9 @@ if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
 
 const OTPVerification = () => {
   const [otp, setOTP] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { verifyOTP } = React.useContext(AuthContext);
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const otpRef = useRef(null);
@@ -36,22 +35,11 @@ const OTPVerification = () => {
     otpRef.current?.focus();
   }, [email, type, navigate]);
 
-  useEffect(() => {
-    if (error || success) {
-      const timeout = setTimeout(() => {
-        setError('');
-        setSuccess('');
-      }, 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [error, success]);
-
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
       if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
-        setError('Please enter a valid 6-digit OTP');
-        setSuccess('');
+        showToast('Please enter a valid 6-digit OTP', 'error', 3000);
         otpRef.current?.focus();
         return;
       }
@@ -60,33 +48,30 @@ const OTPVerification = () => {
       try {
         if (type === 'register') {
           await verifyOTP(email, otp, formData, 'register');
+          showToast('OTP verified successfully!', 'success', 2000);
           navigate('/register', { state: { email, formData } });
         } else if (type === 'forgot-password') {
           await verifyOTP(email, otp, null, 'forgot-password');
+          showToast('OTP verified successfully!', 'success', 2000);
           navigate('/reset-password', { state: { email, otp } });
         }
       } catch (err) {
-        setError(err.response?.data?.message || 'Invalid or expired OTP');
-        setSuccess('');
+        showToast(err.response?.data?.message || 'Invalid or expired OTP', 'error', 3000);
         otpRef.current?.focus();
       } finally {
         setIsLoading(false);
       }
     },
-    [otp, email, type, formData, verifyOTP, navigate]
+    [otp, email, type, formData, verifyOTP, navigate, showToast]
   );
 
   const handleInputChange = useCallback((e) => {
     setOTP(e.target.value);
-    setError('');
-    setSuccess('');
   }, []);
 
   const handleResendOTP = useCallback(
     async () => {
       setIsLoading(true);
-      setError('');
-      setSuccess('');
       try {
         const response = await verifyOTP(email, null, formData, type, true);
         const { otp } = response.data;
@@ -106,10 +91,12 @@ const OTPVerification = () => {
         // For development: Skip EmailJS and show OTP in console
         if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY || import.meta.env.VITE_EMAILJS_PUBLIC_KEY === 'your_emailjs_public_key_here') {
           console.log('📧 New OTP for development:', otp);
-          setSuccess(
+          showToast(
             type === 'forgot-password'
               ? `New OTP for password reset: ${otp} (Check console)`
-              : `New OTP: ${otp} (Check console)`
+              : `New OTP: ${otp} (Check console)`,
+            'success',
+            5000
           );
         } else {
           const emailjsResponse = await emailjs.send(
@@ -119,64 +106,45 @@ const OTPVerification = () => {
           );
           console.log('EmailJS Success (Resend):', emailjsResponse);
 
-          setSuccess(
+          showToast(
             type === 'forgot-password'
               ? 'A new OTP for password reset has been sent to your email.'
-              : 'A new OTP has been sent to your email.'
+              : 'A new OTP has been sent to your email.',
+            'success',
+            3000
           );
         }
         setOTP('');
         otpRef.current?.focus();
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to resend OTP');
+        showToast(err.response?.data?.message || 'Failed to resend OTP', 'error', 3000);
         console.error('Error resending OTP:', err);
       } finally {
         setIsLoading(false);
       }
     },
-    [email, formData, type, verifyOTP]
+    [email, formData, type, verifyOTP, showToast]
   );
 
   return (
-    <div className="otp-container">
-      {/* Toast error notification */}
-      {error && (
-        <div
-          className="otp-toast otp-toast-error"
-          role="alert"
-          tabIndex={0}
-          style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000, minWidth: 220, maxWidth: 350 }}
-        >
-          <span className="otp-error-icon" aria-hidden="true">⚠</span>
-          {error}
-        </div>
-      )}
-      {/* Toast success notification */}
-      {success && (
-        <div
-          className="otp-toast otp-toast-success"
-          role="alert"
-          tabIndex={0}
-          style={{ position: 'fixed', top: 64, right: 16, zIndex: 1000, minWidth: 220, maxWidth: 350 }}
-        >
-          <span className="otp-success-icon" aria-hidden="true">✓</span>
-          {success}
-        </div>
-      )}
-      <div className="otp-box">
-        <h1 className="otp-title">Verify OTP</h1>
-        <p className="otp-info">
+    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-md shadow-md">
+        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
+          Verify OTP
+        </h1>
+        
+        <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
           Enter the 6-digit OTP sent to {email} to{' '}
           {type === 'forgot-password' ? 'reset your password' : 'verify your email'}.
         </p>
+
         <form
-          className="otp-form"
           onSubmit={handleSubmit}
-          aria-describedby={error ? 'error-message' : success ? 'success-message' : undefined}
+          className="space-y-4 sm:space-y-5"
         >
-          <div className="otp-form-group">
-            <label htmlFor="otp" className="otp-form-label">
-              OTP <span className="otp-required-indicator">*</span>
+          <fieldset className="flex flex-col">
+            <label htmlFor="otp" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
+              OTP <span className="text-red-600">*</span>
             </label>
             <input
               id="otp"
@@ -187,11 +155,12 @@ const OTPVerification = () => {
               ref={otpRef}
               required
               maxLength={6}
-              className="otp-form-input"
+              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-center text-2xl tracking-widest"
               aria-required="true"
-              aria-invalid={!!error}
+              placeholder="000000"
             />
-          </div>
+          </fieldset>
+
           <ProductButton
             type="submit"
             variant="primary"
@@ -203,7 +172,8 @@ const OTPVerification = () => {
             {isLoading ? 'Verifying...' : 'Verify OTP'}
           </ProductButton>
         </form>
-        <p className="otp-resend-prompt">
+
+        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Didn't receive an OTP?{' '}
           <ProductButton
             type="button"
@@ -216,7 +186,7 @@ const OTPVerification = () => {
             Resend OTP
           </ProductButton>
         </p>
-      </div>
+      </section>
     </div>
   );
 };

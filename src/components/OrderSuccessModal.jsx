@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle, Home, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ProductButton from './ProductButton';
 
 export default function OrderSuccessModal({ open, info, onClose }) {
     const navigate = useNavigate();
@@ -20,18 +21,22 @@ export default function OrderSuccessModal({ open, info, onClose }) {
                     <p style={{ fontSize: 14, marginBottom: 0, color: '#334155' }}><strong>Payment Method:</strong> {info.paymentMethod}</p>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
-                    <button
-                        style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 24px', fontWeight: 500, fontSize: 16, cursor: 'pointer' }}
+                    <ProductButton
+                        variant="primary"
+                        size="md"
                         onClick={() => { onClose(); navigate('/orders', { state: { forceFetch: true } }); }}
+                        className="flex items-center gap-2"
                     >
                         <Clock size={20} /> View My Orders
-                    </button>
-                    <button
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 24px', borderRadius: 6, border: '1px solid #3b82f6', background: 'transparent', color: '#3b82f6', fontWeight: 500, cursor: 'pointer', fontSize: 16 }}
+                    </ProductButton>
+                    <ProductButton
+                        variant="secondary"
+                        size="md"
                         onClick={() => { onClose(); navigate('/'); }}
+                        className="flex items-center gap-2"
                     >
                         <Home size={20} /> Back to Home
-                    </button>
+                    </ProductButton>
                 </div>
             </div>
         </div>

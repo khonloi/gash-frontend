@@ -5,6 +5,7 @@ import { useToast } from "../hooks/useToast";
 import FeedbackForm from "./FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
 import ImageModal from "./ImageModal";
+import ProductButton from "./ProductButton";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
@@ -640,19 +641,21 @@ const handleSubmitCancel = async () => {
                             </h2>
                             {/* View Bill button in header - only show if order is paid */}
                             {order.pay_status?.toLowerCase() === 'paid' && (
-                                <button
+                                <ProductButton
+                                    variant="primary"
+                                    size="md"
                                     onClick={() => {
                                         onClose(); // Close the modal first
                                         navigate(`/bills/${orderId}`); // Then navigate to bill
                                     }}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center gap-2"
                                     title="View Bill"
+                                    className="flex items-center gap-2"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     View Bill
-                                </button>
+                                </ProductButton>
                             )}
                         </div>
 
@@ -922,22 +925,25 @@ const handleSubmitCancel = async () => {
                     )}
                 </div>
                 <div className="flex gap-3 justify-end mt-6">
-                    <button
+                    <ProductButton
+                        variant="secondary"
+                        size="md"
                         onClick={() => setShowConfirmModal(false)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </ProductButton>
+                    <ProductButton
+                        variant="danger"
+                        size="md"
                         onClick={handleSubmitCancel}
                         disabled={!cancelFormData.cancelReason || (cancelFormData.cancelReason === "other" && !cancelFormData.customReason.trim())}
-                        className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        className="flex items-center space-x-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>Confirm Cancel</span>
-                    </button>
+                    </ProductButton>
                 </div>
             </div>
         </div>
