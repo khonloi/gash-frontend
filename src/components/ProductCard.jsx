@@ -67,7 +67,7 @@ const ProductCard = ({ product, handleProductClick, handleKeyDown }) => {
 
   return (
     <article
-      className="flex flex-col h-[19em] w-[12em] sm:h-[22em] sm:w-[14em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-md focus:shadow-md focus:outline-none cursor-pointer transition-shadow duration-200"
+      className="flex flex-col h-[19em] w-[12em] sm:h-[22em] sm:w-[14em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none cursor-pointer transition-shadow duration-200"
       onClick={() => handleProductClick(product._id)}
       onKeyDown={(e) => handleKeyDown(e, product._id)}
       role="gridcell"

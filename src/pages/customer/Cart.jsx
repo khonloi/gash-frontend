@@ -562,7 +562,7 @@ const Cart = () => {
               return (
                 <article
                   key={item._id}
-                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-md focus-within:shadow-md"
+                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200"
                   tabIndex={0}
                     aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
                 >

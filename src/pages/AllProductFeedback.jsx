@@ -354,7 +354,7 @@ const AllProductFeedback = () => {
                   .map((feedback) => (
                     <div
                       key={feedback._id}
-                      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 md:p-6 shadow-md hover:shadow-md transition-shadow duration-200"
+                      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 hover:shadow-sm border border-gray-200 transition-shadow duration-200"
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">

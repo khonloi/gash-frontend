@@ -48,7 +48,7 @@ const Orders = () => {
           setLoading(false);
           return;
         }
-        
+
         const sorted = data.sort(
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
@@ -322,7 +322,7 @@ const Orders = () => {
 
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Orders</h1>
           <p className="text-sm text-gray-600 mb-4">
@@ -524,7 +524,7 @@ const Orders = () => {
             {currentOrders.map((order) => (
               <article
                 key={order._id}
-                className="border-2 border-gray-300 rounded-xl p-4 sm:p-5 bg-white hover:shadow-md transition"
+                className="border-2 border-gray-300 rounded-xl p-4 sm:p-5 bg-white hover:shadow-sm border border-gray-200 transition"
               >
                 <div className="flex justify-between items-center border-b pb-2 mb-3">
                   <div className="flex items-center gap-3">

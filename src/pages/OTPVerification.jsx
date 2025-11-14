@@ -128,7 +128,7 @@ const OTPVerification = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-md shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-md shadow-sm border border-gray-200">
         <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
           Verify OTP
         </h1>

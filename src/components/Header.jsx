@@ -407,7 +407,7 @@ export default function Header() {
                         <div className="relative w-full">
                             <form
                                 onSubmit={handleSearchSubmit}
-                                className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden relative"
+                                className="flex items-center w-full bg-white rounded-full shadow-sm border border-gray-200 overflow-hidden relative"
                             >
                                 <input
                                     type="text"
@@ -614,7 +614,7 @@ export default function Header() {
                     <div className="relative flex-1 mx-4 sm:mx-6 md:mx-8 lg:mx-12 max-w-2xl" ref={dropdownRef}>
                         <form
                             onSubmit={handleSearchSubmit}
-                            className="flex items-center w-full bg-white rounded-full shadow-md overflow-hidden"
+                            className="flex items-center w-full bg-white rounded-full shadow-sm border border-gray-200 overflow-hidden"
                         >
                             <input
                                 type="text"
@@ -689,9 +689,45 @@ export default function Header() {
                     <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
                             <button
-                                onClick={() => {
+                                onClick={async () => {
                                     console.log("Live Stream clicked");
-                                    navigate("/live");
+                                    try {
+                                        const token = localStorage.getItem('token');
+                                        if (!token) {
+                                            navigate("/login");
+                                            return;
+                                        }
+                                        
+                                        const response = await Api.livestream.getLiveNow(token);
+                                        
+                                        if (response.data?.success) {
+                                            let streams = [];
+                                            
+                                            if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
+                                                streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
+                                            } else if (response.data?.data?.livestream) {
+                                                const livestream = response.data.data.livestream;
+                                                if (livestream && livestream.status === 'live') {
+                                                    streams = [livestream];
+                                                }
+                                            }
+                                            
+                                            if (streams.length > 0) {
+                                                // Navigate to the first live stream
+                                                navigate(`/live/${streams[0]._id}`);
+                                            } else {
+                                                // No live streams available, navigate to list page
+                                                navigate("/live");
+                                            }
+                                        } else {
+                                            // Fallback to list page if API fails
+                                            navigate("/live");
+                                        }
+                                    } catch (error) {
+                                        console.error("Error fetching live streams:", error);
+                                        // Fallback to list page on error
+                                        navigate("/live");
+                                    }
                                 }}
                                 title="Live Stream"
                                 className="p-2 text-white hover:text-amber-500"

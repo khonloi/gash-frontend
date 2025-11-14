@@ -16,6 +16,10 @@ import rehypeRaw from "rehype-raw";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductFeedback from "../components/ProductFeedback";
 import ProductButton from "../components/ProductButton";
+import ProductCard from "../components/ProductCard";
+import ProductCardSkeleton from "../components/ProductCardSkeleton";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {
   DETAIL_STORAGE_KEY,
   API_RETRY_COUNT,
@@ -24,6 +28,19 @@ import {
 } from "../constants/constants";
 
 const THUMBNAILS_PER_PAGE = 4;
+
+// Fetch with retry helper
+const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await apiCall();
+      return response.data;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
+    }
+  }
+};
 
 // Custom hooks
 const useLocalStorage = (key, defaultValue) => {
@@ -95,6 +112,9 @@ const ProductDetail = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [forYouProducts, setForYouProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
 
   // Local storage
   const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
@@ -600,6 +620,75 @@ const ProductDetail = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   }, []);
 
+  // Shuffle helpers for For You section
+  const getRandomItems = useCallback((arr, count, excludeIds = []) => {
+    if (!Array.isArray(arr) || arr.length <= count) return arr;
+    const filtered = excludeIds.length > 0 ? arr.filter(item => !excludeIds.includes(item._id || item)) : arr;
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }, []);
+
+  // Fetch all products for For You section
+  const fetchAllProducts = useCallback(async () => {
+    setProductsLoading(true);
+    try {
+      const response = await fetchWithRetry(() => Api.newProducts.getAll());
+      const productsData = response?.data || response || [];
+
+      if (!Array.isArray(productsData) || productsData.length === 0) {
+        setAllProducts([]);
+        setForYouProducts([]);
+        return;
+      }
+
+      // Filter active products with variants
+      const activeProducts = productsData.filter(
+        (product) => product.productStatus === "active" &&
+          product.productVariantIds?.length > 0
+      );
+
+      setAllProducts(activeProducts);
+      
+      // Exclude current product from For You section
+      const excludeIds = id ? [id] : [];
+      const forYou = getRandomItems(activeProducts, 5, excludeIds);
+      setForYouProducts(forYou);
+    } catch (err) {
+      console.error("Error fetching products for For You section:", err);
+      setAllProducts([]);
+      setForYouProducts([]);
+    } finally {
+      setProductsLoading(false);
+    }
+  }, [id, getRandomItems]);
+
+  // Fetch products on mount
+  useEffect(() => {
+    fetchAllProducts();
+  }, [fetchAllProducts]);
+
+  // Product click handlers for For You section
+  const handleProductClick = useCallback(
+    (productId) => {
+      if (!productId) {
+        showToast("Invalid product selected", "error", TOAST_TIMEOUT);
+        return;
+      }
+      navigate(`/product/${productId}`);
+    },
+    [navigate, showToast]
+  );
+
+  const handleKeyDown = useCallback(
+    (e, productId) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleProductClick(productId);
+      }
+    },
+    [handleProductClick]
+  );
+
   // Check if a color-size combination is valid
   const isValidCombination = useCallback(
     (color, size) => {
@@ -666,23 +755,23 @@ const ProductDetail = () => {
       </nav>
 
       {/* Main Product Section Skeleton */}
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-sm border border-gray-200">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 w-full">
           {/* Image Gallery Skeleton */}
-          <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex gap-2 sm:gap-3">
-            {/* Thumbnail Navigation Skeleton */}
-            <div className="flex flex-col items-center justify-start gap-2">
-              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 rounded-full animate-pulse"></div>
-              <div className="w-[72px] flex flex-col gap-2">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-[60px] h-[60px] bg-gray-200 rounded animate-pulse"></div>
-                ))}
-              </div>
-              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 rounded-full animate-pulse"></div>
-            </div>
+          <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex flex-col gap-2 sm:gap-3">
             {/* Main Image Skeleton */}
             <div className="flex justify-center items-start w-full">
               <div className="w-full h-[400px] bg-gray-200 rounded-xl animate-pulse"></div>
+            </div>
+            {/* Horizontal Thumbnail Navigation Skeleton */}
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-200 rounded-full animate-pulse flex-shrink-0"></div>
+              <div className="flex gap-2 overflow-x-auto">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="w-[60px] h-[60px] bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
+                ))}
+              </div>
+              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-200 rounded-full animate-pulse flex-shrink-0"></div>
             </div>
           </div>
 
@@ -739,7 +828,7 @@ const ProductDetail = () => {
       </section>
 
       {/* Description Section Skeleton */}
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-sm border border-gray-200">
         <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
         <div className="space-y-3">
           <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
@@ -751,7 +840,7 @@ const ProductDetail = () => {
       </section>
 
       {/* Feedback Section Skeleton */}
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
         <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
@@ -782,7 +871,7 @@ const ProductDetail = () => {
   if (error && !product) {
     return (
       <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
         <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
           <span className="text-lg" aria-hidden="true">⚠</span>
           {error}
@@ -854,23 +943,47 @@ const ProductDetail = () => {
         </ol>
       </nav>
 
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-sm border border-gray-200">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 w-full">
-        <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex gap-2 sm:gap-3">
-          <div className="flex flex-col items-center justify-start gap-2">
+        <div className="flex-1 sm:flex-[3] max-w-full sm:max-w-[480px] flex flex-col gap-2 sm:gap-3">
+          {/* Main Image */}
+          <div className="flex justify-center items-start w-full">
+            <img
+              src={selectedImage || "/placeholder-image.png"}
+              alt={`${product.productName || "Product"}`}
+              onClick={handleOpenLightbox}
+              onError={(e) => {
+                e.target.src = "/placeholder-image.png";
+                e.target.alt = `Not available for ${product.productName || "product"}`;
+              }}
+              loading="lazy"
+              role="button"
+              tabIndex={0}
+              className="w-full max-h-[400px] object-contain bg-gray-50 rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
+              aria-label={`Open lightbox for ${product.productName || "Product"} image`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleOpenLightbox();
+                  e.preventDefault();
+                }
+              }}
+            />
+          </div>
+          {/* Horizontal Thumbnail Slider */}
+          <div className="flex items-center justify-center gap-2 relative">
             <button
-              className="bg-white border-2 border-gray-300 rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+              className="bg-white border-2 border-gray-300 rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed flex-shrink-0"
               onClick={handlePrevThumbnail}
               disabled={thumbnailIndex === 0}
               aria-label="Previous thumbnails"
             >
-              <i className="lni lni-chevron-up text-xs sm:text-sm text-gray-900"></i>
+              <ChevronLeftIcon fontSize="small" className="text-gray-900" />
             </button>
-            <div className="w-[72px] flex flex-col gap-2 overflow-hidden">
+            <div className="flex gap-2 overflow-x-auto overflow-y-hidden scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] max-w-full">
               {visibleThumbnails.map((thumbnail, index) => (
                 <div
                   key={thumbnail._id || index}
-                  className={`border-2 p-1 cursor-pointer rounded transition-colors ${
+                  className={`border-2 p-1 cursor-pointer rounded transition-colors flex-shrink-0 ${
                     selectedImage === thumbnail.imageUrl
                       ? "border-amber-400"
                       : "border-gray-300 hover:border-amber-400"
@@ -896,37 +1009,15 @@ const ProductDetail = () => {
               ))}
             </div>
             <button
-              className="bg-white border-2 border-gray-300 rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+              className="bg-white border-2 border-gray-300 rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed flex-shrink-0"
               onClick={handleNextThumbnail}
               disabled={
                 thumbnailIndex >= allThumbnails.length - THUMBNAILS_PER_PAGE
               }
               aria-label="Next thumbnails"
             >
-              <i className="lni lni-chevron-down text-xs sm:text-sm text-gray-900"></i>
+              <ChevronRightIcon fontSize="small" className="text-gray-900" />
             </button>
-          </div>
-          <div className="flex justify-center items-start w-full">
-            <img
-              src={selectedImage || "/placeholder-image.png"}
-              alt={`${product.productName || "Product"}`}
-              onClick={handleOpenLightbox}
-              onError={(e) => {
-                e.target.src = "/placeholder-image.png";
-                e.target.alt = `Not available for ${product.productName || "product"}`;
-              }}
-              loading="lazy"
-              role="button"
-              tabIndex={0}
-              className="w-full max-h-[400px] object-contain bg-gray-50 rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
-              aria-label={`Open lightbox for ${product.productName || "Product"} image`}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleOpenLightbox();
-                  e.preventDefault();
-                }
-              }}
-            />
           </div>
         </div>
 
@@ -1068,7 +1159,7 @@ const ProductDetail = () => {
       {isLightboxOpen && (
         <div className="fixed top-0 left-0 w-full h-full z-[1000] flex items-center justify-center" role="dialog" aria-label="Image lightbox">
           <div className="absolute top-0 left-0 w-full h-full bg-black/80 cursor-pointer" onClick={handleCloseLightbox}></div>
-          <div className="relative max-w-[90%] max-h-[90%] bg-white rounded-xl p-4 sm:p-5 flex items-center justify-center shadow-md">
+          <div className="relative max-w-[90%] max-h-[90%] bg-white rounded-xl p-4 sm:p-5 flex items-center justify-center shadow-sm border border-gray-200">
             <button
               className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
               onClick={handleCloseLightbox}
@@ -1128,7 +1219,7 @@ const ProductDetail = () => {
       )}
 
       {product?.description && (
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-md">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-sm border border-gray-200">
           <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900">Product Description</h2>
           <div className="leading-relaxed text-base text-gray-700 [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-semibold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_h4]:mt-4 [&_h4]:mb-2 [&_h4]:font-semibold [&_h5]:mt-4 [&_h5]:mb-2 [&_h5]:font-semibold [&_h6]:mt-4 [&_h6]:mb-2 [&_h6]:font-semibold [&_p]:my-2 [&_ul]:my-2 [&_ul]:pl-8 [&_ol]:my-2 [&_ol]:pl-8 [&_li]:mb-1 [&_a]:text-blue-600 [&_a]:no-underline [&_a:hover]:underline [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-gray-100 [&_pre]:p-4 [&_pre]:rounded [&_pre]:overflow-x-auto [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:my-4 [&_blockquote]:pl-4 [&_blockquote]:pr-4 [&_blockquote]:bg-gray-50 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_br]:block [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded [&_img]:my-2">
             <ReactMarkdown 
@@ -1141,8 +1232,33 @@ const ProductDetail = () => {
         </section>
       )}
 
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-md">
+      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
         <ProductFeedback productId={id} />
+      </section>
+
+      {/* For You Section */}
+      <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
+        <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+          role="grid"
+          aria-label={productsLoading ? "Loading products" : `${forYouProducts.length} personalized products`}
+        >
+          {productsLoading ? (
+            [...Array(5)].map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))
+          ) : (
+            forYouProducts.map((product) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                handleProductClick={handleProductClick}
+                handleKeyDown={handleKeyDown}
+              />
+            ))
+          )}
+        </div>
       </section>
     </div>
   );

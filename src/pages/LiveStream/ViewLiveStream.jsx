@@ -363,7 +363,7 @@ const LiveStreamDetail = () => {
                 const token = localStorage.getItem('token');
                 if (!token) {
                     showToast('Please login to view livestream', 'error');
-                    navigate('/live');
+                    navigate('/');
                     return;
                 }
 
@@ -387,12 +387,12 @@ const LiveStreamDetail = () => {
                     showToast('Joined livestream!', 'success');
                 } else {
                     showToast('Livestream not found', 'error');
-                    navigate('/live');
+                    navigate('/');
                 }
             } catch (error) {
                 console.error('Error loading stream:', error);
                 showToast('Error loading livestream', 'error');
-                navigate('/live');
+                navigate('/');
             } finally {
                 setIsLoading(false);
             }
@@ -465,7 +465,7 @@ const LiveStreamDetail = () => {
 
     const goBack = () => {
         leaveLivestream();
-        navigate('/live');
+        navigate('/');
     };
 
     useEffect(() => {
@@ -525,7 +525,7 @@ const LiveStreamDetail = () => {
                         onClick={goBack}
                         className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
                     >
-                        Back to Live Streams
+                        Back to Home
                     </button>
                 </div>
             </div>
@@ -548,7 +548,7 @@ const LiveStreamDetail = () => {
                         onClick={goBack}
                         className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
                     >
-                        Back to Live Streams
+                        Back to Home
                     </button>
                 </div>
             </div>

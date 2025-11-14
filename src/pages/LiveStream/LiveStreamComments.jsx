@@ -129,7 +129,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                         <span className="text-white font-semibold text-xs truncate">{senderName}</span>
                         {/* Host Badge */}
                         {senderData?._id === hostId && (
-                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-red-600 to-pink-600 text-white text-[9px] font-bold rounded border border-red-400/50 shadow-md">
+                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-red-600 to-pink-600 text-white text-[9px] font-bold rounded border border-red-400/50 shadow-sm border border-gray-200">
                                 HOST
                             </span>
                         )}

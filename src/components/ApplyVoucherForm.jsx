@@ -23,7 +23,7 @@ export default function ApplyVoucherForm() {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-5 mt-8">
+    <div className="bg-white shadow-sm border border-gray-200 rounded-xl p-5 mt-8">
       <h3 className="text-lg font-semibold mb-3">Nhập mã giảm giá</h3>
       <div className="flex gap-2">
         <input

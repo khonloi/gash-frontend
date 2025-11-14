@@ -73,14 +73,14 @@ const FavoriteProductCard = ({ product, favoriteId, handleProductClick, handleKe
 
   return (
     <article
-      className="flex flex-col h-[22em] w-[14em] border border-gray-300 rounded-2xl overflow-hidden hover:shadow-md focus:shadow-md focus:outline-none transition-shadow duration-200 relative"
+      className="flex flex-col h-[22em] w-[14em] border border-gray-300 rounded-2xl overflow-hidden hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none transition-shadow duration-200 relative"
       role="gridcell"
       aria-label={`View ${product.productName || "product"} details`}
     >
       {/* Remove button - positioned absolutely */}
       <button
         onClick={handleRemoveClick}
-        className="absolute top-2 right-2 z-10 bg-white border border-gray-300 rounded-full p-1.5 shadow-md hover:bg-red-50 hover:border-red-500 transition-colors focus:outline focus:outline-2 focus:outline-red-600 focus:outline-offset-2"
+        className="absolute top-2 right-2 z-10 bg-white border border-gray-300 rounded-full p-1.5 shadow-sm border border-gray-200 hover:bg-red-50 hover:border-red-500 transition-colors focus:outline focus:outline-2 focus:outline-red-600 focus:outline-offset-2"
         aria-label={`Remove ${product.productName || "product"} from favorites`}
         title="Remove from favorites"
       >

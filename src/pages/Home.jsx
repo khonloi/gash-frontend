@@ -291,7 +291,7 @@ const Home = () => {
 
         {/* Category Section */}
         {!error && (
-          <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
+          <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Categories</h2>
             {loading ? (
               <>
@@ -344,7 +344,7 @@ const Home = () => {
                       return (
                         <div
                           key={category}
-                          className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
+                          className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none"
                           tabIndex={0}
                           role="listitem"
                           aria-label={`View products in ${category}`}
@@ -379,7 +379,7 @@ const Home = () => {
                   {/* Navigation buttons for mobile */}
                   {categoryScrollPosition > 0 && (
                     <button
-                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
                       onClick={handleCategoryPrev}
                       aria-label="Previous categories"
                     >
@@ -388,7 +388,7 @@ const Home = () => {
                   )}
                   {canScrollNext && (
                     <button
-                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-md cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
                       onClick={handleCategoryNext}
                       aria-label="Next categories"
                     >
@@ -409,7 +409,7 @@ const Home = () => {
                     return (
                       <div
                         key={category}
-                        className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md focus:shadow-md focus:outline-none"
+                        className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none"
                         tabIndex={0}
                         role="listitem"
                         aria-label={`View products in ${category}`}
@@ -448,7 +448,7 @@ const Home = () => {
 
         {/* For You Section */}
         {!error && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
+          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
@@ -475,7 +475,7 @@ const Home = () => {
 
         {/* Recommendations Section */}
         {!error && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
+          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommendations</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"

@@ -412,7 +412,7 @@ const Checkout = () => {
 
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
         {/* Order Summary */}
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-md">
+        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
           <h2 className="text-xl sm:text-2xl font-normal mb-4 text-gray-900">Order Summary</h2>
 
           <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -512,7 +512,7 @@ const Checkout = () => {
 
         {/* Checkout Form */}
         {itemsToDisplay.length > 0 && (
-          <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 border-2 border-gray-300 relative shadow-md">
+          <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 border-2 border-gray-300 relative shadow-sm border border-gray-200">
             {loading && (
               <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-xl">
                 <div className="text-center">

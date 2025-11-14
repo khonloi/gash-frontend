@@ -381,7 +381,7 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Personal Information */}
                     <div className="space-y-3">
-                      <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Personal Information</h3>
+                      <h3 className="text-lg font-medium text-gray-900 ">Personal Information</h3>
 
                       <div className="space-y-2">
                         <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
@@ -436,7 +436,7 @@ const Profile = () => {
 
                     {/* Additional Information */}
                     <div className="space-y-3">
-                      <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Additional Information</h3>
+                      <h3 className="text-lg font-medium text-gray-900 ">Additional Information</h3>
 
                       <div className="space-y-2">
                         <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">

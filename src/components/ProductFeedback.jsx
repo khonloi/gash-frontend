@@ -247,7 +247,7 @@ const ProductFeedback = ({ productId }) => {
                                 if (!feedback || !feedback._id) return null;
 
                                 return (
-                                    <div key={feedback._id} className="bg-white border-2 border-gray-300 rounded-xl p-3 hover:shadow-md transition-shadow duration-200">
+                                    <div key={feedback._id} className="bg-white border-2 border-gray-300 rounded-xl p-3 hover:shadow-sm border border-gray-200 transition-shadow duration-200">
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">

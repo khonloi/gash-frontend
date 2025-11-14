@@ -83,7 +83,7 @@ export default function Notifications() {
               {/* Preferences */}
               <div className="grid gap-4">
                 {/* Email */}
-                <div className="group flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition-all duration-200">
+                <div className="group flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-sm border border-gray-200 transition-all duration-200">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-500 text-white rounded-xl shadow-sm">
                       <Mail className="w-5 h-5" />
@@ -112,7 +112,7 @@ export default function Notifications() {
                 </div>
 
                 {/* Web */}
-                <div className="group flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition-all duration-200">
+                <div className="group flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-sm border border-gray-200 transition-all duration-200">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-gradient-to-tr from-indigo-500 to-purple-500 text-white rounded-xl shadow-sm">
                       <Globe className="w-5 h-5" />
