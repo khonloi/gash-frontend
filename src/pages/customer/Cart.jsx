@@ -473,22 +473,32 @@ const Cart = () => {
   // Cart Item Skeleton Component
   const CartItemSkeleton = () => (
     <article
-      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4"
+      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
       aria-label="Loading cart item"
     >
       <div className="flex items-stretch gap-6 flex-1">
+        {/* Checkbox skeleton */}
         <div className="w-5 h-5 bg-gray-200 rounded animate-pulse flex-shrink-0 self-center" />
-        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+        {/* Image skeleton */}
+        <div className="w-20 sm:w-24 aspect-square bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+        {/* Product info skeleton */}
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-          <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4" />
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+          {/* Product name */}
+          <div className="h-5 sm:h-6 bg-gray-200 rounded animate-pulse w-3/4" />
+          {/* Color and Size */}
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+          {/* Price */}
           <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3" />
+          {/* Total */}
           <div className="h-5 bg-gray-200 rounded animate-pulse w-1/4" />
         </div>
       </div>
+      {/* Action buttons skeleton */}
       <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
+        {/* Quantity input skeleton */}
         <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
-        <div className="w-20 h-10 bg-gray-200 rounded-lg animate-pulse" />
+        {/* Remove button skeleton */}
+        <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
       </div>
     </article>
   );

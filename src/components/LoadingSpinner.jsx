@@ -32,7 +32,7 @@ const LoadingSpinner = ({
     if (fullScreen) {
         return (
             <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-                <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center gap-4">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 flex flex-col items-center gap-4">
                     <div className={spinnerClasses}></div>
                     {text && (
                         <p className="text-gray-600 font-medium">{text}</p>
@@ -69,10 +69,10 @@ export const LoadingForm = ({
     };
 
     return (
-        <div className={`bg-gray-50 border border-gray-200 rounded-lg ${height} ${className}`}>
+        <div className={`bg-gray-50 border-2 border-gray-300 rounded-xl ${height} ${className}`}>
             <div className="flex items-center justify-center h-full">
                 <div className="flex flex-col items-center gap-2">
-                    <div className={`animate-spin rounded-full border-b-2 border-blue-500 ${sizeClasses[size]}`}></div>
+                    <div className={`animate-spin rounded-full border-b-2 border-amber-400 ${sizeClasses[size]}`}></div>
                     {showText && (
                         <p className="text-sm text-gray-600 font-medium">{text}</p>
                     )}
@@ -91,24 +91,52 @@ export const LoadingCard = ({
     return <LoadingForm text={text} height={height} className={className} size="lg" />;
 };
 
-// Loading skeleton for list items
+// Loading skeleton for order items
 export const LoadingSkeleton = ({ count = 3, className = "" }) => {
     return (
         <div className={`space-y-4 ${className}`}>
             {[...Array(count)].map((_, index) => (
-                <div key={index} className="animate-pulse">
-                    <div className="bg-gray-200 rounded-lg p-4">
-                        <div className="flex items-center space-x-4">
-                            <div className="bg-gray-300 rounded-md w-16 h-16"></div>
-                            <div className="flex-1 space-y-2">
-                                <div className="bg-gray-300 rounded h-4 w-3/4"></div>
-                                <div className="bg-gray-300 rounded h-3 w-1/2"></div>
-                                <div className="bg-gray-300 rounded h-3 w-1/4"></div>
+                <article
+                    key={index}
+                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm animate-pulse"
+                    aria-label="Loading order"
+                >
+                    <div className="flex items-stretch gap-6 flex-1">
+                        {/* Product Image skeleton */}
+                        <div className="w-20 sm:w-24 aspect-square bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+                        
+                        {/* Order Details skeleton */}
+                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                            {/* Product name with badge */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <div className="h-5 sm:h-6 bg-gray-200 rounded animate-pulse w-3/4" />
+                                <div className="h-5 bg-gray-200 rounded animate-pulse w-16" />
                             </div>
-                            <div className="bg-gray-300 rounded h-6 w-20"></div>
+                            
+                            {/* Order ID and Date */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <div className="h-4 bg-gray-200 rounded animate-pulse w-32" />
+                                <div className="h-4 bg-gray-200 rounded animate-pulse w-1" />
+                                <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
+                            </div>
+                            
+                            {/* Status badges */}
+                            <div className="flex items-center gap-3 flex-wrap mt-1">
+                                <div className="h-5 bg-gray-200 rounded animate-pulse w-20" />
+                                <div className="h-5 bg-gray-200 rounded animate-pulse w-16" />
+                            </div>
+                            
+                            {/* Total price */}
+                            <div className="h-5 bg-gray-200 rounded animate-pulse w-28 mt-1" />
                         </div>
                     </div>
-                </div>
+                    
+                    {/* Action Buttons skeleton */}
+                    <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
+                        <div className="w-24 h-9 bg-gray-200 rounded-md animate-pulse" />
+                        <div className="w-28 h-9 bg-gray-200 rounded-md animate-pulse" />
+                    </div>
+                </article>
             ))}
         </div>
     );

@@ -778,11 +778,11 @@ const ProductDetail = () => {
           {/* Product Info Skeleton */}
           <div className="flex-1 sm:flex-[3] px-0 sm:px-3 space-y-4 sm:space-y-5">
             {/* Product Name Skeleton */}
-            <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="h-7 sm:h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
             {/* Price Skeleton */}
-            <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+            <div className="h-8 bg-gray-200 rounded w-40 animate-pulse"></div>
             {/* Stock Status Skeleton */}
-            <div className="h-6 bg-gray-200 rounded w-24 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
             
             {/* Color Selection Skeleton */}
             <div className="space-y-3 sm:space-y-4">
@@ -816,7 +816,7 @@ const ProductDetail = () => {
           {/* Action Buttons Sidebar Skeleton */}
           <div className="flex-1 min-w-[200px] max-w-full sm:max-w-[260px] p-4 sm:p-5 border-2 border-gray-300 rounded-xl bg-gray-50 flex flex-col gap-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-10 bg-gray-200 rounded animate-pulse"></div>
+              <div key={i} className="h-10 bg-gray-200 rounded-md animate-pulse"></div>
             ))}
             <div className="mt-3 space-y-2">
               {[...Array(3)].map((_, i) => (
@@ -829,7 +829,7 @@ const ProductDetail = () => {
 
       {/* Description Section Skeleton */}
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-sm border border-gray-200">
-        <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
+        <div className="h-6 sm:h-7 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
         <div className="space-y-3">
           <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
           <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
@@ -841,10 +841,10 @@ const ProductDetail = () => {
 
       {/* Feedback Section Skeleton */}
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
-        <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
+        <div className="h-6 sm:h-7 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="border-2 border-gray-200 rounded-xl p-4">
+            <div key={i} className="border-2 border-gray-300 rounded-xl p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
                 <div className="flex-1">

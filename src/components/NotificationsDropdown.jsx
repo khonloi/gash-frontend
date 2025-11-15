@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { Bell, Trash2, Settings, X } from "lucide-react";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
+import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../utils/orderEmailNotification";
 
 export default function NotificationsDropdown({ user }) {
   const [notifications, setNotifications] = useState([]);
@@ -63,6 +64,21 @@ export default function NotificationsDropdown({ user }) {
         }
         return [data, ...prev];
       });
+
+      // Send email notification if it's an order notification
+      if (data.type === 'order' && user?.email) {
+        const orderId = extractOrderIdFromMessage(data.message);
+        sendOrderNotificationEmail({
+          userEmail: user.email,
+          userName: user.name || user.username,
+          title: data.title,
+          message: data.message,
+          orderId: orderId,
+        }).catch(err => {
+          // Don't show error to user - email is optional
+          console.error('❌ Failed to send order notification email:', err);
+        });
+      }
     };
 
     // Listen for badge updates to refresh notification list
