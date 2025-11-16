@@ -130,6 +130,15 @@ const ProductDetail = () => {
     setThumbnailIndex(0);
   }, [id, images, variants]);
 
+  // Check if product is inactive or discontinued
+  const isProductInactive = useMemo(() => {
+    return product?.productStatus === 'inactive';
+  }, [product]);
+
+  const isProductDiscontinued = useMemo(() => {
+    return product?.productStatus === 'discontinued';
+  }, [product]);
+
   // Pre-index variants (only active variants)
   const variantIndex = useMemo(() => {
     const index = { byColor: {}, bySize: {}, byColorSize: {} };
@@ -255,23 +264,22 @@ const ProductDetail = () => {
         setSelectedVariant(null);
         console.warn("Product has no variants");
       } else {
-        const activeVariants = productVariants.filter(v =>
-          !v.variantStatus || v.variantStatus === 'active'
-        );
+        // Show ALL variants (all colors and sizes) regardless of product or variant status
+        // Individual variant status will be checked when rendering to grey out inactive/discontinued options
 
-        // Extract colors, filter out deleted colors (isDeleted: false)
+        // Extract colors from ALL variants, filter out deleted colors (isDeleted: false)
         const uniqueColors = [
           ...new Set(
-            activeVariants
+            productVariants
               .filter((v) => v.productColorId && !v.productColorId.isDeleted)
               .map((v) => v.productColorId?.color_name)
               .filter(Boolean)
           ),
         ].sort();
-        // Extract sizes, filter out deleted sizes (isDeleted: false)
+        // Extract sizes from ALL variants, filter out deleted sizes (isDeleted: false)
         const uniqueSizes = [
           ...new Set(
-            activeVariants
+            productVariants
               .filter((v) => v.productSizeId && !v.productSizeId.isDeleted)
               .map((v) => v.productSizeId?.size_name)
               .filter(Boolean)
@@ -689,40 +697,140 @@ const ProductDetail = () => {
     [handleProductClick]
   );
 
-  // Check if a color-size combination is valid
+  // Check if a color-size combination is valid (active and in stock)
   const isValidCombination = useCallback(
     (color, size) => {
-      const variant = variantIndex.byColorSize[`${color}-${size}`];
-      return variant && variant.variantStatus !== "discontinued" && variant.stockQuantity > 0;
+      const variant = variants.find(v => {
+        const variantColor = v.productColorId && !v.productColorId.isDeleted
+          ? v.productColorId.color_name
+          : null;
+        const variantSize = v.productSizeId && !v.productSizeId.isDeleted
+          ? v.productSizeId.size_name
+          : null;
+        return variantColor === color && variantSize === size;
+      });
+      return variant && 
+             variant.variantStatus !== "discontinued" && 
+             variant.variantStatus !== "inactive" &&
+             (!variant.variantStatus || variant.variantStatus === 'active') &&
+             variant.stockQuantity > 0;
     },
-    [variantIndex]
+    [variants]
   );
 
-  // Check if a color has any in-stock variants
+  // Check if a color has any in-stock variants (from all variants, not just active)
   const isColorInStock = useCallback(
     (color) => {
-      const colorVariants = variantIndex.byColor[color] || [];
+      const colorVariants = variants.filter(v => {
+        const variantColor = v.productColorId && !v.productColorId.isDeleted
+          ? v.productColorId.color_name
+          : null;
+        return variantColor === color;
+      });
       return colorVariants.some(
-        (v) => v.variantStatus !== "discontinued" && v.stockQuantity > 0
+        (v) => v.variantStatus !== "discontinued" && 
+               v.variantStatus !== "inactive" &&
+               (!v.variantStatus || v.variantStatus === 'active') &&
+               v.stockQuantity > 0
       );
     },
-    [variantIndex]
+    [variants]
   );
 
-  // Check if a size is in stock
+  // Check if a color has any inactive/discontinued variants (for greying out)
+  const isColorInactiveOrDiscontinued = useCallback(
+    (color) => {
+      const colorVariants = variants.filter(v => {
+        const variantColor = v.productColorId && !v.productColorId.isDeleted
+          ? v.productColorId.color_name
+          : null;
+        return variantColor === color;
+      });
+      // Check if ALL variants with this color are inactive or discontinued
+      if (colorVariants.length === 0) return true;
+      return colorVariants.every(
+        (v) => v.variantStatus === "inactive" || v.variantStatus === "discontinued"
+      );
+    },
+    [variants]
+  );
+
+  // Check if a size is in stock (from all variants, not just active)
   const isSizeInStock = useCallback(
     (size) => {
       if (selectedColor) {
-        const variant = variantIndex.byColorSize[`${selectedColor}-${size}`];
-        return variant && variant.variantStatus !== "discontinued" && variant.stockQuantity > 0;
+        // Check specific color-size combination
+        const variant = variants.find(v => {
+          const variantColor = v.productColorId && !v.productColorId.isDeleted
+            ? v.productColorId.color_name
+            : null;
+          const variantSize = v.productSizeId && !v.productSizeId.isDeleted
+            ? v.productSizeId.size_name
+            : null;
+          return variantColor === selectedColor && variantSize === size;
+        });
+        return variant && 
+               variant.variantStatus !== "discontinued" && 
+               variant.variantStatus !== "inactive" &&
+               (!variant.variantStatus || variant.variantStatus === 'active') &&
+               variant.stockQuantity > 0;
       }
-      const sizeVariants = variantIndex.bySize[size] || [];
-      return sizeVariants.some(v => v.variantStatus !== "discontinued" && v.stockQuantity > 0);
+      // Check all variants with this size
+      const sizeVariants = variants.filter(v => {
+        const variantSize = v.productSizeId && !v.productSizeId.isDeleted
+          ? v.productSizeId.size_name
+          : null;
+        return variantSize === size;
+      });
+      return sizeVariants.some(
+        v => v.variantStatus !== "discontinued" && 
+             v.variantStatus !== "inactive" &&
+             (!v.variantStatus || v.variantStatus === 'active') &&
+             v.stockQuantity > 0
+      );
     },
-    [selectedColor, variantIndex]
+    [selectedColor, variants]
+  );
+
+  // Check if a size is inactive or discontinued (for greying out)
+  const isSizeInactiveOrDiscontinued = useCallback(
+    (size) => {
+      if (selectedColor) {
+        // Check specific color-size combination
+        const variant = variants.find(v => {
+          const variantColor = v.productColorId && !v.productColorId.isDeleted
+            ? v.productColorId.color_name
+            : null;
+          const variantSize = v.productSizeId && !v.productSizeId.isDeleted
+            ? v.productSizeId.size_name
+            : null;
+          return variantColor === selectedColor && variantSize === size;
+        });
+        return variant && (variant.variantStatus === "inactive" || variant.variantStatus === "discontinued");
+      }
+      // Check all variants with this size
+      const sizeVariants = variants.filter(v => {
+        const variantSize = v.productSizeId && !v.productSizeId.isDeleted
+          ? v.productSizeId.size_name
+          : null;
+        return variantSize === size;
+      });
+      if (sizeVariants.length === 0) return true;
+      // Check if ALL variants with this size are inactive or discontinued
+      return sizeVariants.every(
+        v => v.variantStatus === "inactive" || v.variantStatus === "discontinued"
+      );
+    },
+    [selectedColor, variants]
   );
 
   const colorStockInfo = useMemo(() => {
+    if (isProductDiscontinued) {
+      return { inStock: false, message: "Discontinued" };
+    }
+    if (isProductInactive) {
+      return { inStock: false, message: "Out of Stock" };
+    }
     if (!selectedColor) {
       return { inStock: false, message: "Select a color to check stock" };
     }
@@ -738,7 +846,7 @@ const ProductDetail = () => {
       };
     }
     return { inStock: true, message: "In Stock" };
-  }, [selectedColor, selectedSize, selectedVariant, isColorInStock]);
+  }, [selectedColor, selectedSize, selectedVariant, isColorInStock, isProductInactive, isProductDiscontinued]);
 
   // Product Detail Skeleton Component
   const ProductDetailSkeleton = () => (
@@ -876,7 +984,7 @@ const ProductDetail = () => {
           <span className="text-lg" aria-hidden="true">⚠</span>
           {error}
           <button
-            className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
             onClick={handleRetry}
             disabled={loading}
             type="button"
@@ -908,7 +1016,7 @@ const ProductDetail = () => {
           <li>
             <button
               onClick={() => navigate("/")}
-              className="hover:text-blue-600 transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+              className="hover:text-blue-600 transition-colors focus:outline-none rounded"
               aria-label="Go to home"
             >
               Home
@@ -923,7 +1031,7 @@ const ProductDetail = () => {
                 {categoryLink ? (
                   <button
                     onClick={() => navigate(categoryLink)}
-                    className="hover:text-blue-600 transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+                    className="hover:text-blue-600 transition-colors focus:outline-none rounded"
                     aria-label={`Go to ${categoryName} category`}
                   >
                     {categoryName}
@@ -972,7 +1080,7 @@ const ProductDetail = () => {
           {/* Horizontal Thumbnail Slider */}
           <div className="flex items-center justify-center gap-2 relative">
             <button
-              className="bg-white border-2 border-gray-300 rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed flex-shrink-0"
+              className="bg-white border-2 border-gray-300 rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed flex-shrink-0"
               onClick={handlePrevThumbnail}
               disabled={thumbnailIndex === 0}
               aria-label="Previous thumbnails"
@@ -1009,7 +1117,7 @@ const ProductDetail = () => {
               ))}
             </div>
             <button
-              className="bg-white border-2 border-gray-300 rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed flex-shrink-0"
+              className="bg-white border-2 border-gray-300 rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed flex-shrink-0"
               onClick={handleNextThumbnail}
               disabled={
                 thumbnailIndex >= allThumbnails.length - THUMBNAILS_PER_PAGE
@@ -1030,7 +1138,11 @@ const ProductDetail = () => {
               ? formatPrice(selectedVariant.variantPrice)
               : lowestPriceVariant
                 ? `From ${formatPrice(lowestPriceVariant.variantPrice)}`
-                : "No variants available"}
+                : isProductDiscontinued
+                  ? "Discontinued"
+                  : isProductInactive
+                    ? "Out of Stock"
+                    : "No variants available"}
           </div>
           <div>
             <span
@@ -1048,22 +1160,33 @@ const ProductDetail = () => {
               <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4">
                 <legend className="text-sm sm:text-base font-semibold">Color:</legend>
                 <div className="flex flex-wrap gap-2">
-                  {availableColors.map((color) => (
-                    <button
-                      key={color}
-                      className={`px-3 py-1.5 border-2 rounded-md bg-white cursor-pointer text-sm transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 ${
-                        selectedColor === color
-                          ? "border-amber-400 bg-amber-50 font-semibold"
-                          : "border-gray-300 hover:bg-gray-50 hover:border-blue-600"
-                      } ${!isColorInStock(color) ? "opacity-50" : ""}`}
-                      onClick={() => handleColorClick(color)}
-                      type="button"
-                      aria-label={`Select ${color} color`}
-                      aria-pressed={selectedColor === color}
-                    >
-                      {color}
-                    </button>
-                  ))}
+                  {availableColors.map((color) => {
+                    // Disable if product is inactive/discontinued OR if all variants with this color are inactive/discontinued
+                    const isDisabled = isProductInactive || 
+                                     isProductDiscontinued || 
+                                     isColorInactiveOrDiscontinued(color) ||
+                                     !isColorInStock(color);
+                    return (
+                      <button
+                        key={color}
+                        className={`px-3 py-1.5 border-2 rounded-md bg-white text-sm transition-colors focus:outline-none ${
+                          isDisabled
+                            ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
+                            : selectedColor === color
+                              ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
+                              : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
+                        }`}
+                        onClick={() => !isDisabled && handleColorClick(color)}
+                        disabled={isDisabled}
+                        type="button"
+                        aria-label={`Select ${color} color`}
+                        aria-pressed={selectedColor === color}
+                        aria-disabled={isDisabled}
+                      >
+                        {color}
+                      </button>
+                    );
+                  })}
                 </div>
               </fieldset>
             )}
@@ -1071,23 +1194,34 @@ const ProductDetail = () => {
               <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4">
                 <legend className="text-sm sm:text-base font-semibold">Size:</legend>
                 <div className="flex flex-wrap gap-2">
-                  {availableSizes.map((size) => (
-                    <button
-                      key={size}
-                      className={`px-3 py-1.5 border-2 rounded-md bg-white cursor-pointer text-sm transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 ${
-                        selectedSize === size
-                          ? "border-amber-400 bg-amber-50 font-semibold"
-                          : "border-gray-300 hover:bg-gray-50 hover:border-blue-600"
-                      } ${!isSizeInStock(size) ? "opacity-50 cursor-not-allowed" : ""}`}
-                      onClick={() => isSizeInStock(size) && handleSizeClick(size)}
-                      disabled={!isSizeInStock(size) || (selectedColor && !isValidCombination(selectedColor, size))}
-                      type="button"
-                      aria-label={`Select ${size} size`}
-                      aria-pressed={selectedSize === size}
-                    >
-                      {size}
-                    </button>
-                  ))}
+                  {availableSizes.map((size) => {
+                    // Disable if product is inactive/discontinued OR if the specific size (or color-size combo) is inactive/discontinued
+                    const isDisabled = isProductInactive || 
+                                     isProductDiscontinued || 
+                                     isSizeInactiveOrDiscontinued(size) ||
+                                     !isSizeInStock(size) || 
+                                     (selectedColor && !isValidCombination(selectedColor, size));
+                    return (
+                      <button
+                        key={size}
+                        className={`px-3 py-1.5 border-2 rounded-md bg-white text-sm transition-colors focus:outline-none ${
+                          isDisabled
+                            ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
+                            : selectedSize === size
+                              ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
+                              : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
+                        }`}
+                        onClick={() => !isDisabled && handleSizeClick(size)}
+                        disabled={isDisabled}
+                        type="button"
+                        aria-label={`Select ${size} size`}
+                        aria-pressed={selectedSize === size}
+                        aria-disabled={isDisabled}
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
                 </div>
               </fieldset>
             )}
@@ -1095,11 +1229,11 @@ const ProductDetail = () => {
               <legend className="text-sm sm:text-base font-semibold">Quantity:</legend>
               <input
                 type="number"
-                className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 value={quantity}
                 onChange={handleQuantityChange}
                 min="1"
-                disabled={!selectedVariant || !isInStock}
+                disabled={!selectedVariant || !isInStock || isProductInactive || isProductDiscontinued}
                 aria-label="Select quantity"
               />
             </fieldset>
@@ -1125,7 +1259,7 @@ const ProductDetail = () => {
           <ProductButton
             variant="primary"
             onClick={handleAddToCart}
-            disabled={!selectedVariant || !isInStock || isAddingToCart}
+            disabled={!selectedVariant || !isInStock || isAddingToCart || isProductInactive || isProductDiscontinued}
             type="button"
             aria-label="Add to cart"
           >
@@ -1134,7 +1268,7 @@ const ProductDetail = () => {
           <ProductButton
             variant="default"
             onClick={handleBuyNow}
-            disabled={!selectedVariant || !isInStock}
+            disabled={!selectedVariant || !isInStock || isProductInactive || isProductDiscontinued}
             type="button"
             aria-label="Buy now"
           >
@@ -1161,21 +1295,21 @@ const ProductDetail = () => {
           <div className="absolute top-0 left-0 w-full h-full bg-black/80 cursor-pointer" onClick={handleCloseLightbox}></div>
           <div className="relative max-w-[90%] max-h-[90%] bg-white rounded-xl p-4 sm:p-5 flex items-center justify-center shadow-sm border border-gray-200">
             <button
-              className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+              className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
               onClick={handleCloseLightbox}
               aria-label="Close lightbox"
             >
               <i className="lni lni-close text-sm sm:text-base text-gray-900"></i>
             </button>
             <button
-              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
               onClick={handlePrevImage}
               aria-label="Previous image"
             >
               <i className="lni lni-chevron-left text-base sm:text-lg text-gray-900"></i>
             </button>
             <button
-              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
               onClick={handleNextImage}
               aria-label="Next image"
             >
@@ -1195,7 +1329,7 @@ const ProductDetail = () => {
             </div>
             <div className="absolute bottom-2 sm:bottom-3 flex items-center gap-2 sm:gap-3">
               <button
-                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 3}
                 aria-label="Zoom in"
@@ -1203,7 +1337,7 @@ const ProductDetail = () => {
                 <i className="lni lni-zoom-in text-sm sm:text-base text-gray-900"></i>
               </button>
               <button
-                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 1}
                 aria-label="Zoom out"

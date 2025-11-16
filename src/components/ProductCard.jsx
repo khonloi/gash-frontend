@@ -67,19 +67,19 @@ const ProductCard = ({ product, handleProductClick, handleKeyDown }) => {
 
   return (
     <article
-      className="flex flex-col h-[19em] w-[12em] sm:h-[22em] sm:w-[14em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none cursor-pointer transition-shadow duration-200"
+      className="flex flex-col h-[19em] w-[12em] sm:h-[22em] sm:w-[14em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-lg focus:shadow-lg focus:outline-none cursor-pointer transition-all duration-300 ease-in-out bg-white"
       onClick={() => handleProductClick(product._id)}
       onKeyDown={(e) => handleKeyDown(e, product._id)}
       role="gridcell"
       tabIndex={0}
       aria-label={`View ${product.productName || "product"} details`}
     >
-      <div className="h-1/2 overflow-hidden bg-gray-50">
+      <div className="h-1/2 overflow-hidden bg-gray-50 transition-transform duration-300 ease-in-out hover:scale-105">
         <img
           src={imageUrl}
           alt={product.productName || "Product image"}
           loading="lazy"
-          className="w-full h-full object-cover rounded-t-xl"
+          className="w-full h-full object-cover rounded-t-xl transition-transform duration-300 ease-in-out"
           onError={(e) => {
             e.target.src = "/placeholder-image.png";
             e.target.alt = `Image not available for ${product.productName || "product"}`;

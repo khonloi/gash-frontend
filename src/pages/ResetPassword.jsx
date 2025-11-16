@@ -117,7 +117,7 @@ const ResetPassword = () => {
                 onChange={handleChange}
                 ref={id === 'newPassword' ? passwordRef : null}
                 required={required}
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 aria-required={required}
               />
             </fieldset>
@@ -139,7 +139,7 @@ const ResetPassword = () => {
           Remember your password?{' '}
           <Link 
             to="/login" 
-            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
           >
             Sign In
           </Link>

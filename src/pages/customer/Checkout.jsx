@@ -258,6 +258,15 @@ const Checkout = () => {
     setPaymentMethod(e.target.value);
   };
 
+  // === Helper function to check if item is inactive ===
+  const isItemInactive = useCallback((item, variantData, productData) => {
+    const stockQuantity = variantData?.stockQuantity ?? 0;
+    const isVariantDiscontinued = variantData?.variantStatus === "discontinued";
+    const isProductDiscontinued = productData?.productStatus === "discontinued";
+    const isOutOfStock = stockQuantity <= 0;
+    return isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+  }, []);
+
   // === Handle place order ===
   const handlePlaceOrder = useCallback(async (e) => {
     e.preventDefault();
@@ -275,6 +284,55 @@ const Checkout = () => {
 
     if (itemsToOrder.length === 0) {
       showToast('Your cart is empty', 'error');
+      setLoading(false);
+      return;
+    }
+
+    // Check for inactive/discontinued/out of stock items
+    const inactiveItems = [];
+    if (isBuyNow) {
+      const variantData = buyNowState.variant;
+      const productData = buyNowState.product;
+      if (isItemInactive(buyNowState, variantData, productData)) {
+        const stockQuantity = variantData?.stockQuantity ?? 0;
+        const isVariantDiscontinued = variantData?.variantStatus === "discontinued";
+        const isProductDiscontinued = productData?.productStatus === "discontinued";
+        const isOutOfStock = stockQuantity <= 0;
+        
+        let message = '';
+        if (isProductDiscontinued || isVariantDiscontinued) {
+          message = `${productData?.productName || 'Product'} is discontinued and cannot be purchased.`;
+        } else if (isOutOfStock) {
+          message = `${productData?.productName || 'Product'} is out of stock and cannot be purchased.`;
+        }
+        inactiveItems.push(message);
+      }
+    } else {
+      selectedItems.forEach((item) => {
+        const variantData = item.variantId || item.variant;
+        const productData = item.variantId?.productId || item.product;
+        if (isItemInactive(item, variantData, productData)) {
+          const stockQuantity = variantData?.stockQuantity ?? 0;
+          const isVariantDiscontinued = variantData?.variantStatus === "discontinued";
+          const isProductDiscontinued = productData?.productStatus === "discontinued";
+          const isOutOfStock = stockQuantity <= 0;
+          
+          let message = '';
+          if (isProductDiscontinued || isVariantDiscontinued) {
+            message = `${productData?.productName || 'Product'} is discontinued and cannot be purchased.`;
+          } else if (isOutOfStock) {
+            message = `${productData?.productName || 'Product'} is out of stock and cannot be purchased.`;
+          }
+          inactiveItems.push(message);
+        }
+      });
+    }
+
+    if (inactiveItems.length > 0) {
+      const errorMessage = inactiveItems.length === 1 
+        ? inactiveItems[0]
+        : `Some items cannot be purchased. ${inactiveItems.slice(0, 2).join(' ')}${inactiveItems.length > 2 ? ` and ${inactiveItems.length - 2} more.` : ''}`;
+      showToast(errorMessage, 'error');
       setLoading(false);
       return;
     }
@@ -387,7 +445,7 @@ const Checkout = () => {
   }, [
     cartItems, user, formData, totalPrice, paymentMethod, buyNowState, showToast,
     appliedVoucher, discount, selectedItems, fetchCartItems, validateName,
-    validateAddress, validatePhone
+    validateAddress, validatePhone, isItemInactive
   ]);
 
   // === Blur validation ===
@@ -489,7 +547,7 @@ const Checkout = () => {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value)}
                   placeholder="Enter voucher code"
-                  className="flex-1 p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading}
                 />
                 <ProductButton
@@ -565,7 +623,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your recipient name"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -582,7 +640,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your delivery address"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -599,7 +657,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your phone number"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>

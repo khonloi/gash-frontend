@@ -392,6 +392,18 @@ const Cart = () => {
       }, 0);
   }, [cartItems]);
 
+  // Check if any selected items are inactive
+  const hasInactiveSelectedItems = useMemo(() => {
+    return cartItems.some((item) => {
+      if (!item.checked) return false;
+      const stockQuantity = item.variantId?.stockQuantity ?? 0;
+      const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+      const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+      const isOutOfStock = stockQuantity <= 0;
+      return isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+    });
+  }, [cartItems]);
+
   // Handle quantity change
   const handleQuantityChange = useCallback(
     (cartId, value) => {
@@ -568,11 +580,21 @@ const Cart = () => {
                   : parseInt(item.productQuantity, 10) || 1;
                 const maxQuantity = item.variantId?.stockQuantity || Infinity;
                 const isUpdating = updatingQuantities.has(item._id);
+                const stockQuantity = item.variantId?.stockQuantity ?? 0;
+                const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+                const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+                const isOutOfStock = stockQuantity <= 0;
+                const isInactive = isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+                const inactiveMessage = isProductDiscontinued || isVariantDiscontinued 
+                  ? "Discontinued" 
+                  : isOutOfStock 
+                    ? "Out of Stock" 
+                    : "";
 
               return (
                 <article
                   key={item._id}
-                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200"
+                    className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200 ${isInactive ? "opacity-60 grayscale" : ""}`}
                   tabIndex={0}
                     aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
                 >
@@ -581,8 +603,9 @@ const Cart = () => {
                     type="checkbox"
                     checked={item.checked || false}
                     onChange={() => toggleChecked(item._id)}
-                        className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center"
+                        className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label={`Select ${item.variantId?.productId?.productName || "product"} for checkout`}
+                        disabled={isInactive}
                   />
                   <img
                         src={item.variantId?.variantImage || "/placeholder-image.png"}
@@ -603,6 +626,14 @@ const Cart = () => {
                         <p className="text-sm text-gray-600 m-0">
                       Price: {formatPrice(item.productPrice)}
                     </p>
+                        <p className="text-sm text-gray-600 m-0">
+                          Stock: {stockQuantity}
+                    </p>
+                        {isInactive && (
+                          <p className="text-sm font-semibold text-red-600 m-0">
+                            {inactiveMessage}
+                          </p>
+                        )}
                         <p className="text-base font-semibold text-red-600 m-0">
                           Total: {formatPrice((item.productPrice || 0) * quantity)}
                     </p>
@@ -626,9 +657,9 @@ const Cart = () => {
                               setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
                             }
                           }}
-                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
-                          disabled={isUpdating || actionInProgress}
+                          disabled={isUpdating || actionInProgress || isInactive}
                         />
                       </div>
                       <ProductButton
@@ -665,7 +696,8 @@ const Cart = () => {
                 disabled={
                   cartItems.filter((i) => i.checked).length === 0 ||
                   loading ||
-                  actionInProgress
+                  actionInProgress ||
+                  hasInactiveSelectedItems
                 }
                 aria-label="Proceed to checkout"
                 className="w-full"
