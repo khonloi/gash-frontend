@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import ProductButton from '../components/ProductButton';
+import { startRegistration } from '@simplewebauthn/browser';
 
 const Register = () => {
   const location = useLocation();
@@ -140,6 +141,73 @@ const Register = () => {
         console.log('📝 Signup data being sent:', signupData);
         await signup(signupData);
         showToast('Account created successfully!', 'success', 2000);
+        
+        // Optionally set up biometric authentication
+        const setupPasskey = window.confirm('Would you like to set up biometric authentication (Touch ID, Face ID, or Windows Hello) for easier login?');
+        if (setupPasskey) {
+          try {
+            const token = localStorage.getItem('token');
+            if (token) {
+              // Get registration options
+              const regResponse = await Api.passkeys.generateRegistrationOptions(token);
+              const { options, challenge } = regResponse.data; // Get both options and challenge
+              
+              console.log('Registration options received:', options);
+              console.log('Challenge:', challenge);
+
+              // Start registration - pass the options object directly
+              const registrationResponse = await startRegistration(options);
+              console.log('Registration response from browser:', registrationResponse);
+
+              // Detect device type
+              const deviceType = navigator.userAgent.includes('Mobile') ? 'mobile' : 
+                                navigator.userAgent.includes('Tablet') ? 'tablet' : 'desktop';
+
+              // Convert ArrayBuffers to base64url strings for JSON transmission
+              const arrayBufferToBase64 = (buffer) => {
+                if (buffer instanceof ArrayBuffer) {
+                  const bytes = new Uint8Array(buffer);
+                  let binary = '';
+                  for (let i = 0; i < bytes.length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                  }
+                  return btoa(binary)
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=/g, '');
+                }
+                return buffer; // Already a string
+              };
+              
+              const verifyData = {
+                id: registrationResponse.id,
+                rawId: arrayBufferToBase64(registrationResponse.rawId),
+                response: {
+                  clientDataJSON: arrayBufferToBase64(registrationResponse.response.clientDataJSON),
+                  attestationObject: arrayBufferToBase64(registrationResponse.response.attestationObject),
+                  transports: registrationResponse.response.transports,
+                },
+                type: registrationResponse.type,
+                challenge: challenge, // Use the challenge from the server response
+                deviceType,
+              };
+              console.log('Sending verification data:', {
+                id: verifyData.id,
+                hasResponse: !!verifyData.response,
+                challenge: verifyData.challenge,
+                deviceType: verifyData.deviceType
+              });
+              
+              await Api.passkeys.verifyRegistration(verifyData, token);
+
+              showToast('Biometric authentication set up successfully!', 'success', 2000);
+            }
+          } catch (err) {
+            console.error('Passkey setup error:', err);
+            showToast('Biometric setup failed, but your account was created successfully.', 'info', 3000);
+          }
+        }
+        
         navigate('/');
       } catch (err) {
         console.error('❌ Register error details:', {
