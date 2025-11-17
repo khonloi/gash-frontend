@@ -10,7 +10,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { login, googleLogin } = React.useContext(AuthContext);
+  const { login, googleLogin, passkeyLogin } = React.useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const usernameRef = useRef(null);
@@ -88,6 +88,32 @@ const Login = () => {
     showToast(LOGIN_ERROR_MESSAGES.GOOGLE_FAILED, "error", ERROR_TIMEOUT);
   }, [showToast]);
 
+  const handlePasskeyLogin = useCallback(async () => {
+    const trimmedUsername = formData.username.trim();
+    
+    if (!trimmedUsername) {
+      showToast('Please enter your username to use passkey login.', "error", ERROR_TIMEOUT);
+      usernameRef.current?.focus();
+      return;
+    }
+
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 30) {
+      showToast('Username must be between 3 and 30 characters.', "error", ERROR_TIMEOUT);
+      usernameRef.current?.focus();
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await passkeyLogin(trimmedUsername);
+      navigate(from, { replace: true });
+    } catch (err) {
+      // Error message is already shown in passkeyLogin
+    } finally {
+      setIsLoading(false);
+    }
+  }, [formData.username, passkeyLogin, navigate, from, showToast]);
+
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -118,7 +144,7 @@ const Login = () => {
               onChange={handleInputChange}
               ref={usernameRef}
               required
-              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               aria-required="true"
               placeholder="Enter your username"
             />
@@ -135,7 +161,7 @@ const Login = () => {
               value={formData.password}
               onChange={handleInputChange}
               required
-              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               aria-required="true"
               placeholder="Enter your password"
             />
@@ -144,7 +170,7 @@ const Login = () => {
           <div className="text-right">
             <Link 
               to="/forgot-password" 
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
             >
               Forgot Password?
             </Link>
@@ -164,7 +190,7 @@ const Login = () => {
           </ProductButton>
         </form>
 
-        <div className="mt-4 sm:mt-5">
+        <div className="mt-4 sm:mt-5 space-y-3">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
@@ -173,13 +199,39 @@ const Login = () => {
             width="100%"
             aria-label="Sign in with Google"
           />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or</span>
+            </div>
+          </div>
+
+          <ProductButton
+            type="button"
+            variant="secondary"
+            size="lg"
+            disabled={isLoading}
+            onClick={handlePasskeyLogin}
+            className="w-full"
+            aria-label="Sign in with Biometrics"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Sign in with Biometrics
+            </span>
+          </ProductButton>
         </div>
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           New to GASH?{" "}
           <Link 
             to="/signup" 
-            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
           >
             Create your GASH account
           </Link>

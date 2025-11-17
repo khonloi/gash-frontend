@@ -4,7 +4,7 @@ import React from "react";
 const ProductCardSkeleton = () => {
   return (
     <article
-      className="flex flex-col h-[22em] w-[14em] border border-gray-300 rounded-2xl overflow-hidden"
+      className="flex flex-col h-[19em] w-[12em] sm:h-[22em] sm:w-[14em] border-2 border-gray-300 rounded-xl overflow-hidden"
       aria-label="Loading product"
       role="gridcell"
     >
@@ -37,4 +37,3 @@ const ProductCardSkeleton = () => {
 };
 
 export default ProductCardSkeleton;
-

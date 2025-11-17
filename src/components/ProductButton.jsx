@@ -57,7 +57,7 @@ const ProductButton = ({
   const variantConfig = variantClasses[variant] || variantClasses.default;
   const sizeClass = sizeClasses[size] || sizeClasses.md;
 
-  const baseClasses = "focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2";
+  const baseClasses = "focus:outline-none";
 
   // Combine styles - use disabled style when disabled
   const buttonStyle = disabled && variantConfig.disabledStyle

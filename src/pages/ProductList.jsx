@@ -108,6 +108,15 @@ const ProductList = () => {
   const [selectedSize, setSelectedSize] = useState(
     sanitizeParam(searchParams.get("size")) || storedFilters.size || DEFAULT_FILTERS.size
   );
+  const [minPrice, setMinPrice] = useState(
+    searchParams.get("minPrice") || storedFilters.minPrice || DEFAULT_FILTERS.minPrice
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    searchParams.get("maxPrice") || storedFilters.maxPrice || DEFAULT_FILTERS.maxPrice
+  );
+  const [sortBy, setSortBy] = useState(
+    sanitizeParam(searchParams.get("sortBy")) || storedFilters.sortBy || DEFAULT_FILTERS.sortBy
+  );
 
   const navigate = useNavigate();
 
@@ -115,6 +124,8 @@ const ProductList = () => {
   const debouncedCategory = useDebounce(selectedCategory, SEARCH_DEBOUNCE_DELAY);
   const debouncedColor = useDebounce(selectedColor, SEARCH_DEBOUNCE_DELAY);
   const debouncedSize = useDebounce(selectedSize, SEARCH_DEBOUNCE_DELAY);
+  const debouncedMinPrice = useDebounce(minPrice, SEARCH_DEBOUNCE_DELAY);
+  const debouncedMaxPrice = useDebounce(maxPrice, SEARCH_DEBOUNCE_DELAY);
 
   // Data fetching - use refs to prevent unnecessary re-renders
   const hasFetchedProductsRef = useRef(false);
@@ -203,6 +214,20 @@ const ProductList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Calculate price range from products
+  const priceRange = useMemo(() => {
+    if (!products.length) return { min: 0, max: 0 };
+    const activeProducts = products.filter(
+      (product) => product.productStatus === "active" && product.productVariantIds?.length > 0
+    );
+    const prices = activeProducts.map(getMinPrice).filter(price => price > 0);
+    if (prices.length === 0) return { min: 0, max: 0 };
+    return {
+      min: Math.min(...prices),
+      max: Math.max(...prices)
+    };
+  }, [products]);
+
   // Sync filters with URL and localStorage - only when debounced values change
   const prevFiltersRef = useRef(null);
   useEffect(() => {
@@ -210,6 +235,9 @@ const ProductList = () => {
       category: debouncedCategory,
       color: debouncedColor,
       size: debouncedSize,
+      minPrice: debouncedMinPrice,
+      maxPrice: debouncedMaxPrice,
+      sortBy: sortBy,
     };
     
     // Only update if filters actually changed (skip initial render if no change)
@@ -221,7 +249,10 @@ const ProductList = () => {
     const hasChanged = 
       prevFiltersRef.current.category !== currentFilters.category ||
       prevFiltersRef.current.color !== currentFilters.color ||
-      prevFiltersRef.current.size !== currentFilters.size;
+      prevFiltersRef.current.size !== currentFilters.size ||
+      prevFiltersRef.current.minPrice !== currentFilters.minPrice ||
+      prevFiltersRef.current.maxPrice !== currentFilters.maxPrice ||
+      prevFiltersRef.current.sortBy !== currentFilters.sortBy;
     
     if (hasChanged) {
       prevFiltersRef.current = currentFilters;
@@ -236,9 +267,18 @@ const ProductList = () => {
       if (currentFilters.size !== DEFAULT_FILTERS.size) {
         newSearchParams.set("size", currentFilters.size);
       }
+      if (currentFilters.minPrice && currentFilters.minPrice !== DEFAULT_FILTERS.minPrice) {
+        newSearchParams.set("minPrice", currentFilters.minPrice);
+      }
+      if (currentFilters.maxPrice && currentFilters.maxPrice !== DEFAULT_FILTERS.maxPrice) {
+        newSearchParams.set("maxPrice", currentFilters.maxPrice);
+      }
+      if (currentFilters.sortBy && currentFilters.sortBy !== DEFAULT_FILTERS.sortBy) {
+        newSearchParams.set("sortBy", currentFilters.sortBy);
+      }
       navigate(`?${newSearchParams.toString()}`, { replace: true });
     }
-  }, [debouncedCategory, debouncedColor, debouncedSize, setStoredFilters, navigate]);
+  }, [debouncedCategory, debouncedColor, debouncedSize, debouncedMinPrice, debouncedMaxPrice, sortBy, setStoredFilters, navigate]);
 
   // Focus error notification
   const errorRef = useRef(null);
@@ -251,7 +291,7 @@ const ProductList = () => {
   // Note: variantIndex removed as it's not used in current filtering logic
   // Variants are accessed directly from product.productVariantIds in filterProducts
 
-  // Optimized product filtering
+  // Optimized product filtering and sorting
   const activeProducts = useMemo(() => {
     if (!products.length) return [];
 
@@ -291,8 +331,47 @@ const ProductList = () => {
       });
     }
 
-    return active.sort((a, b) => (a.productName || "").localeCompare(b.productName || ""));
-  }, [products, debouncedCategory, debouncedColor, debouncedSize, variants.length]);
+    // Apply price range filter
+    if (debouncedMinPrice || debouncedMaxPrice) {
+      active = active.filter((product) => {
+        const productMinPrice = getMinPrice(product);
+        if (productMinPrice === 0) return false;
+        
+        const min = debouncedMinPrice ? parseFloat(debouncedMinPrice) : 0;
+        const max = debouncedMaxPrice ? parseFloat(debouncedMaxPrice) : Infinity;
+        
+        // Validate that min is not greater than max
+        if (min > max) return false;
+        
+        return productMinPrice >= min && productMinPrice <= max;
+      });
+    }
+
+    // Apply sorting
+    const sorted = [...active].sort((a, b) => {
+      switch (sortBy) {
+        case "price-low":
+          return getMinPrice(a) - getMinPrice(b);
+        case "price-high":
+          return getMinPrice(b) - getMinPrice(a);
+        case "new":
+          const dateA = new Date(a.createdAt || 0).getTime();
+          const dateB = new Date(b.createdAt || 0).getTime();
+          return dateB - dateA; // Newest first
+        case "popularity":
+          // Since there's no popularity field, we'll use createdAt as a proxy (newer = more popular)
+          // Or we could sort by name as fallback
+          const popDateA = new Date(a.createdAt || 0).getTime();
+          const popDateB = new Date(b.createdAt || 0).getTime();
+          return popDateB - popDateA;
+        case "name":
+        default:
+          return (a.productName || "").localeCompare(b.productName || "");
+      }
+    });
+
+    return sorted;
+  }, [products, debouncedCategory, debouncedColor, debouncedSize, debouncedMinPrice, debouncedMaxPrice, sortBy, variants.length]);
 
   // Event handlers
   const handleFilterChange = useCallback((filterType, value) => {
@@ -305,6 +384,15 @@ const ProductList = () => {
         break;
       case "size":
         setSelectedSize(value);
+        break;
+      case "minPrice":
+        setMinPrice(value);
+        break;
+      case "maxPrice":
+        setMaxPrice(value);
+        break;
+      case "sortBy":
+        setSortBy(value);
         break;
       default:
         console.warn(`Unknown filter type: ${filterType}`);
@@ -343,6 +431,9 @@ const ProductList = () => {
     setSelectedCategory(DEFAULT_FILTERS.category);
     setSelectedColor(DEFAULT_FILTERS.color);
     setSelectedSize(DEFAULT_FILTERS.size);
+    setMinPrice(DEFAULT_FILTERS.minPrice);
+    setMaxPrice(DEFAULT_FILTERS.maxPrice);
+    setSortBy(DEFAULT_FILTERS.sortBy);
   }, []);
 
   // Helpers
@@ -377,14 +468,17 @@ const ProductList = () => {
   const hasActiveFilters =
     selectedCategory !== DEFAULT_FILTERS.category ||
     selectedColor !== DEFAULT_FILTERS.color ||
-    selectedSize !== DEFAULT_FILTERS.size;
+    selectedSize !== DEFAULT_FILTERS.size ||
+    minPrice !== DEFAULT_FILTERS.minPrice ||
+    maxPrice !== DEFAULT_FILTERS.maxPrice ||
+    sortBy !== DEFAULT_FILTERS.sortBy;
 
   // Update filtering state
   useEffect(() => {
     setIsFiltering(true);
     const timer = setTimeout(() => setIsFiltering(false), SEARCH_DEBOUNCE_DELAY);
     return () => clearTimeout(timer);
-  }, [debouncedCategory, debouncedColor, debouncedSize]);
+  }, [debouncedCategory, debouncedColor, debouncedSize, debouncedMinPrice, debouncedMaxPrice, sortBy]);
 
   return (
     <div className="flex flex-col md:flex-row w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
@@ -425,13 +519,69 @@ const ProductList = () => {
             selectedValue={selectedSize}
             filterType="size"
           />
+
+          {/* Price Range Filter */}
+          <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
+            <legend className="text-md font-semibold">Price Range</legend>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-2">Min Price (VND)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={minPrice}
+                  onChange={(e) => handleFilterChange("minPrice", e.target.value)}
+                  placeholder={priceRange.min > 0 ? priceRange.min.toString() : ""}
+                  className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Max Price (VND)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={maxPrice}
+                  onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                  placeholder={priceRange.max > 0 ? priceRange.max.toString() : ""}
+                  className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
+                />
+              </div>
+              {priceRange.max > 0 && (
+                <p className="text-xs text-gray-500">
+                  Range: {formatPrice(priceRange.min)} - {formatPrice(priceRange.max)}
+                </p>
+              )}
+            </div>
+          </fieldset>
         </div>
       </aside>
 
       <main className="flex-1 px-0 md:px-4 min-w-0" role="main">
         <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
           <header className="mb-4">
-            <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Product Listings</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
+              <h1 className="text-xl sm:text-2xl font-normal m-0">Product Listings</h1>
+              <div className="flex items-center gap-2">
+                <label htmlFor="sortBy" className="text-sm font-medium text-gray-700">
+                  Sort by:
+                </label>
+                <select
+                  id="sortBy"
+                  value={sortBy}
+                  onChange={(e) => handleFilterChange("sortBy", e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                  aria-label="Sort products"
+                >
+                  <option value="name">Name (A-Z)</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="new">Newest First</option>
+                  <option value="popularity">Popularity</option>
+                </select>
+              </div>
+            </div>
             <p className="text-sm text-gray-600 mb-4">
               Explore our range of products below. Select a product to view detailed information,
               pricing, and available variations.

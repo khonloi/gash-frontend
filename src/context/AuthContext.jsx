@@ -222,6 +222,46 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const passkeyLogin = async (username) => {
+    try {
+      const { startAuthentication } = await import('@simplewebauthn/browser');
+      
+      // Step 1: Get authentication options from server
+      const response = await axiosClient.post('/passkeys/auth/generate', { username });
+      const { options } = response.data;
+
+      // Step 2: Start authentication with browser
+      const authenticationResponse = await startAuthentication(options);
+
+      // Step 3: Verify authentication with server
+      const verifyResponse = await axiosClient.post('/passkeys/auth/verify', {
+        username,
+        ...authenticationResponse,
+        challenge: options.challenge,
+      });
+
+      const { token, account } = verifyResponse.data;
+      const loginTime = Date.now().toString();
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(account));
+      localStorage.setItem('loginTime', loginTime);
+      setUser(account);
+
+      showToast('Passkey login successful!', 'success');
+
+      setTimeout(() => {
+        handleForcedLogout('Your session has expired. You will be logged out.');
+      }, 24 * 60 * 60 * 1000);
+
+      navigate('/');
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Passkey login failed. Please try again.';
+      showToast(msg, 'error');
+      throw error;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -236,6 +276,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         googleLogin,
+        passkeyLogin,
         requestSignupOTP,
         verifyOTP,
         signup,

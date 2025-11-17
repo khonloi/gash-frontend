@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import Api from "../../common/SummaryAPI";
 import { useToast } from "../../hooks/useToast";
+import { startRegistration } from "@simplewebauthn/browser";
 
 // Import modal
 import EditProfileModal from "../../components/EditProfileModal";
@@ -26,6 +27,9 @@ const Profile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [passkeys, setPasskeys] = useState([]);
+  const [isSettingUpPasskey, setIsSettingUpPasskey] = useState(false);
+  const [requireAuthForCheckout, setRequireAuthForCheckout] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -82,6 +86,7 @@ const Profile = () => {
         dob: response.data.dob || "",
         image: response.data.image || "",
       });
+      setRequireAuthForCheckout(response.data.requireAuthForCheckout || false);
     } catch (err) {
       console.error("Fetch profile error:", err.response || err.message);
       let errorMessage = "Failed to fetch profile";
@@ -103,9 +108,131 @@ const Profile = () => {
     }
   }, [user, showToast]);
 
+  const fetchPasskeys = useCallback(async () => {
+    if (!user || !user._id) return;
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const response = await Api.passkeys.getUserPasskeys(token);
+        setPasskeys(response.data.passkeys || []);
+      }
+    } catch (err) {
+      console.error('Fetch passkeys error:', err);
+    }
+  }, [user]);
+
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  useEffect(() => {
+    fetchPasskeys();
+  }, [fetchPasskeys]);
+
+  const handleSetupPasskey = useCallback(async () => {
+    setIsSettingUpPasskey(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showToast('Please log in again', 'error', 3000);
+        return;
+      }
+
+      // Get registration options
+      const regResponse = await Api.passkeys.generateRegistrationOptions(token);
+      const { options, challenge } = regResponse.data; // Get both options and challenge
+
+      console.log('Registration options received:', options);
+      console.log('Challenge:', challenge);
+
+      // Start registration - pass the options object directly
+      const registrationResponse = await startRegistration(options);
+      console.log('Registration response from browser:', registrationResponse);
+
+      // Detect device type
+      const deviceType = navigator.userAgent.includes('Mobile') ? 'mobile' :
+        navigator.userAgent.includes('Tablet') ? 'tablet' : 'desktop';
+
+      // SimpleWebAuthn browser v13 returns response with base64url strings already
+      // But we need to ensure proper format for transmission
+      // The response from startRegistration is already in the correct format
+      const verifyData = {
+        id: registrationResponse.id,
+        rawId: registrationResponse.rawId,
+        response: registrationResponse.response,
+        type: registrationResponse.type,
+        challenge: challenge, // Server needs this to verify
+        deviceType,
+      };
+
+      console.log('Sending verification data:', {
+        id: verifyData.id,
+        hasRawId: !!verifyData.rawId,
+        hasResponse: !!verifyData.response,
+        hasClientDataJSON: !!verifyData.response?.clientDataJSON,
+        hasAttestationObject: !!verifyData.response?.attestationObject,
+        challenge: verifyData.challenge,
+        deviceType: verifyData.deviceType
+      });
+
+      await Api.passkeys.verifyRegistration(verifyData, token);
+
+      showToast('Biometric authentication set up successfully!', 'success', 2000);
+      fetchPasskeys();
+    } catch (err) {
+      console.error('Passkey setup error:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to set up biometric authentication';
+      showToast(errorMsg, 'error', 3000);
+    } finally {
+      setIsSettingUpPasskey(false);
+    }
+  }, [showToast, fetchPasskeys]);
+
+  const handleDeletePasskey = useCallback(async (passkeyId) => {
+    if (!window.confirm('Are you sure you want to delete this passkey?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showToast('Please log in again', 'error', 3000);
+        return;
+      }
+
+      await Api.passkeys.deletePasskey(passkeyId, token);
+      showToast('Biometric authentication removed successfully!', 'success', 2000);
+      fetchPasskeys();
+    } catch (err) {
+      console.error('Delete passkey error:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to remove biometric authentication';
+      showToast(errorMsg, 'error', 3000);
+    }
+  }, [showToast, fetchPasskeys]);
+
+  const handleToggleCheckoutAuth = useCallback(async (checked) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showToast('Please log in again', 'error', 3000);
+        return;
+      }
+
+      await Api.auth.updateCheckoutAuthSetting(checked, token);
+      setRequireAuthForCheckout(checked);
+      showToast(
+        checked
+          ? 'Checkout authentication enabled. You will need to authenticate before placing orders.'
+          : 'Checkout authentication disabled.',
+        'success',
+        3000
+      );
+    } catch (err) {
+      console.error('Update checkout auth setting error:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to update setting';
+      showToast(errorMsg, 'error', 3000);
+    }
+  }, [showToast]);
 
   useEffect(() => {
     if (editMode) {
@@ -362,7 +489,7 @@ const Profile = () => {
             </div>
           </div>
         ) : (
-          <>
+          <React.Fragment>
             {/* Header Section */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4 mb-4 lg:mb-6 pt-2 lg:pt-3 pb-2 lg:pb-3">
               <div className="flex-1 min-w-0">
@@ -393,7 +520,7 @@ const Profile = () => {
 
                   {/* Action Buttons */}
                   {!isDeleted ? (
-                    <div className="p-4 sm:p-6 space-y-3 flex-grow flex flex-col justify-end">
+                    <div className="p-6 space-y-3 flex-grow flex flex-col justify-end">
                       <ProductButton
                         variant="primary"
                         size="lg"
@@ -411,6 +538,19 @@ const Profile = () => {
                         Change Password
                       </ProductButton>
                       <ProductButton
+                        variant="secondary"
+                        size="lg"
+                        onClick={handleSetupPasskey}
+                        disabled={isSettingUpPasskey || passkeys.length > 0}
+                        className="w-full"
+                      >
+                        {isSettingUpPasskey
+                          ? 'Setting up...'
+                          : passkeys.length > 0
+                            ? 'Biometrics Already Set Up'
+                            : 'Set Up Biometrics'}
+                      </ProductButton>
+                      <ProductButton
                         variant="danger"
                         size="lg"
                         onClick={() => setShowDeleteConfirm(true)}
@@ -420,8 +560,8 @@ const Profile = () => {
                       </ProductButton>
                     </div>
                   ) : (
-                    <div className="p-4 sm:p-6 flex-grow flex flex-col justify-end">
-                      <div className="backdrop-blur-xl rounded-xl border p-4 mb-4" style={{ borderColor: '#A86523', boxShadow: '0 25px 70px rgba(168, 101, 35, 0.3), 0 15px 40px rgba(233, 163, 25, 0.25), 0 5px 15px rgba(168, 101, 35, 0.2)' }}>
+                    <div className="p-6 flex-grow flex flex-col justify-end">
+                      <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
                         <div className="flex items-center justify-center mb-2">
                           <svg className="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -555,7 +695,7 @@ const Profile = () => {
                             </div>
                           )}
 
-                          <div className="flex items-center p-3 bg-gray-50 rounded-lg border" style={{ borderColor: '#A86523' }}>
+                          <div className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
                             <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
                               <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -568,12 +708,72 @@ const Profile = () => {
                           </div>
                         </div>
                       </div>
+
+                      {/* Security Settings */}
+                      <div className="mt-6 space-y-3">
+                        <h3 className="text-lg font-medium text-gray-900">Security Settings</h3>
+
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">Require Authentication for Checkout</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Enable to require password, Google login, or biometric authentication before placing orders
+                            </p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer ml-4">
+                            <input
+                              type="checkbox"
+                              checked={requireAuthForCheckout}
+                              onChange={(e) => handleToggleCheckoutAuth(e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Passkeys Section */}
+                      <div className="mt-6 space-y-3">
+                        <h3 className="text-lg font-medium text-gray-900">Biometric Authentication</h3>
+                        {passkeys.length > 0 ? (
+                          <div className="space-y-2">
+                            {passkeys.map((passkey) => (
+                              <div key={passkey.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-200">
+                                <div className="flex items-center">
+                                  <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                    <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-900 capitalize">{passkey.deviceType || 'Unknown Device'}</p>
+                                    <p className="text-xs text-gray-500">
+                                      Added {new Date(passkey.createdAt).toLocaleDateString('vi-VN')}
+                                    </p>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleDeletePasskey(passkey.id)}
+                                  className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                  aria-label="Remove biometric authentication"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-4 bg-gray-50 rounded-md border border-gray-200 text-center">
+                            <p className="text-sm text-gray-600">No biometric authentication set up yet. Click "Set Up Biometrics" to use Touch ID, Face ID, or Windows Hello.</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </>
+          </React.Fragment>
         )}
       </div>
 

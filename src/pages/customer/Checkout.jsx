@@ -1,5 +1,6 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect } from 'react';
 import OrderSuccessModal from '../../components/OrderSuccessModal';
+import CheckoutAuthModal from '../../components/CheckoutAuthModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../hooks/useToast';
@@ -106,6 +107,10 @@ const Checkout = () => {
   const [voucherCode, setVoucherCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [requireAuthForCheckout, setRequireAuthForCheckout] = useState(false);
+  const [passkeys, setPasskeys] = useState([]);
 
   // === Fetch cart items (only if not Buy Now and no selectedItems) ===
   const fetchCartItems = useCallback(async () => {
@@ -126,6 +131,25 @@ const Checkout = () => {
     }
   }, [user, showToast]);
 
+  // Fetch user profile to get requireAuthForCheckout setting and passkeys
+  const fetchUserSettings = useCallback(async () => {
+    if (!user?._id) return;
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      // Fetch profile to get requireAuthForCheckout setting
+      const profileResponse = await Api.accounts.getProfile(user._id);
+      setRequireAuthForCheckout(profileResponse.data.requireAuthForCheckout || false);
+
+      // Fetch passkeys
+      const passkeysResponse = await Api.passkeys.getUserPasskeys(token);
+      setPasskeys(passkeysResponse.data.passkeys || []);
+    } catch (err) {
+      console.error('Fetch user settings error:', err);
+    }
+  }, [user]);
+
   // === Auth & Data Restore Logic ===
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -140,11 +164,16 @@ const Checkout = () => {
     // If token exists but user not loaded → wait (AuthContext may still be loading)
     // Do NOT redirect
 
+    // Fetch user settings
+    if (user?._id && token) {
+      fetchUserSettings();
+    }
+
     // Fetch cart only if needed
     if (!buyNowState && selectedItems.length === 0 && user?._id && token) {
       fetchCartItems();
     }
-  }, [user, navigate, buyNowState, selectedItems.length, fetchCartItems, showToast, location.pathname]);
+  }, [user, navigate, buyNowState, selectedItems.length, fetchCartItems, showToast, location.pathname, fetchUserSettings]);
 
   // Format price helper
   const formatPrice = useCallback((price) => {
@@ -258,9 +287,79 @@ const Checkout = () => {
     setPaymentMethod(e.target.value);
   };
 
-  // === Handle place order ===
-  const handlePlaceOrder = useCallback(async (e) => {
-    e.preventDefault();
+  // === Helper function to check if item is inactive ===
+  const isItemInactive = useCallback((item, variantData, productData) => {
+    const stockQuantity = variantData?.stockQuantity ?? 0;
+    const isVariantDiscontinued = variantData?.variantStatus === "discontinued";
+    const isProductDiscontinued = productData?.productStatus === "discontinued";
+    const isOutOfStock = stockQuantity <= 0;
+    return isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+  }, []);
+
+  // === Check items validity (similar to voucher check) ===
+  const checkItemsValidity = useCallback(() => {
+    if (!buyNowState && selectedItems.length === 0) return;
+
+    const inactiveItems = [];
+
+    if (buyNowState) {
+      const variantData = buyNowState.variant;
+      const productData = buyNowState.product;
+      if (isItemInactive(buyNowState, variantData, productData)) {
+        const stockQuantity = variantData?.stockQuantity ?? 0;
+        const isVariantDiscontinued = variantData?.variantStatus === "discontinued";
+        const isProductDiscontinued = productData?.productStatus === "discontinued";
+        const isOutOfStock = stockQuantity <= 0;
+        
+        let message = '';
+        if (isProductDiscontinued || isVariantDiscontinued) {
+          message = `${productData?.productName || 'Product'} is discontinued and cannot be purchased.`;
+        } else if (isOutOfStock) {
+          message = `${productData?.productName || 'Product'} is out of stock and cannot be purchased.`;
+        }
+        inactiveItems.push(message);
+      }
+    } else {
+      selectedItems.forEach((item) => {
+        const variantData = item.variantId || item.variant;
+        const productData = item.variantId?.productId || item.product;
+        if (isItemInactive(item, variantData, productData)) {
+          const stockQuantity = variantData?.stockQuantity ?? 0;
+          const isVariantDiscontinued = variantData?.variantStatus === "discontinued";
+          const isProductDiscontinued = productData?.productStatus === "discontinued";
+          const isOutOfStock = stockQuantity <= 0;
+          
+          let message = '';
+          if (isProductDiscontinued || isVariantDiscontinued) {
+            message = `${productData?.productName || 'Product'} is discontinued and cannot be purchased.`;
+          } else if (isOutOfStock) {
+            message = `${productData?.productName || 'Product'} is out of stock and cannot be purchased.`;
+          }
+          inactiveItems.push(message);
+        }
+      });
+    }
+
+    if (inactiveItems.length > 0) {
+      const errorMessage = inactiveItems.length === 1 
+        ? inactiveItems[0]
+        : `Some items cannot be purchased. ${inactiveItems.slice(0, 2).join(' ')}${inactiveItems.length > 2 ? ` and ${inactiveItems.length - 2} more.` : ''}`;
+      showToast(errorMessage, 'error');
+      return false;
+    }
+
+    return true;
+  }, [buyNowState, selectedItems, isItemInactive, showToast]);
+
+  // === Check items when loaded ===
+  useEffect(() => {
+    if (buyNowState || selectedItems.length > 0) {
+      checkItemsValidity();
+    }
+  }, [buyNowState, selectedItems, checkItemsValidity]);
+
+  // Internal order placement function (called after authentication if required)
+  const handlePlaceOrderInternal = useCallback(async () => {
     setLoading(true);
 
     const isBuyNow = !!buyNowState;
@@ -275,6 +374,12 @@ const Checkout = () => {
 
     if (itemsToOrder.length === 0) {
       showToast('Your cart is empty', 'error');
+      setLoading(false);
+      return;
+    }
+
+    // Check for inactive/discontinued/out of stock items
+    if (!checkItemsValidity()) {
       setLoading(false);
       return;
     }
@@ -340,6 +445,9 @@ const Checkout = () => {
 
         // Clear persistent data
         clearCheckoutData();
+        
+        // Reset authentication state
+        setIsAuthenticated(false);
 
         setSuccessInfo({
           status: 'success',
@@ -387,8 +495,30 @@ const Checkout = () => {
   }, [
     cartItems, user, formData, totalPrice, paymentMethod, buyNowState, showToast,
     appliedVoucher, discount, selectedItems, fetchCartItems, validateName,
-    validateAddress, validatePhone
+    validateAddress, validatePhone, checkItemsValidity
   ]);
+
+  // Handle authentication success
+  const handleAuthSuccess = useCallback(() => {
+    setIsAuthenticated(true);
+    setShowAuthModal(false);
+    // Proceed with order placement
+    handlePlaceOrderInternal();
+  }, [handlePlaceOrderInternal]);
+
+  // === Handle place order (with authentication check) ===
+  const handlePlaceOrder = useCallback(async (e) => {
+    e.preventDefault();
+
+    // Check if authentication is required
+    if (requireAuthForCheckout && !isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    // If already authenticated or not required, proceed
+    handlePlaceOrderInternal();
+  }, [requireAuthForCheckout, isAuthenticated, handlePlaceOrderInternal]);
 
   // === Blur validation ===
   const handleFieldBlur = (e) => {
@@ -420,6 +550,17 @@ const Checkout = () => {
           }}
         />
       )}
+
+      <CheckoutAuthModal
+        open={showAuthModal}
+        onClose={() => {
+          setShowAuthModal(false);
+          setIsAuthenticated(false);
+        }}
+        onAuthenticated={handleAuthSuccess}
+        user={user}
+        passkeys={passkeys}
+      />
 
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
         {/* Order Summary */}
@@ -489,7 +630,7 @@ const Checkout = () => {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value)}
                   placeholder="Enter voucher code"
-                  className="flex-1 p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading}
                 />
                 <ProductButton
@@ -565,7 +706,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your recipient name"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -582,7 +723,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your delivery address"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>
@@ -599,7 +740,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     onBlur={handleFieldBlur}
                     placeholder="Your phone number"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading}
                   />
                 </div>

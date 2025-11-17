@@ -616,7 +616,7 @@ const handleSubmitCancel = async () => {
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 rounded"
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors focus:outline-none rounded"
                 >
                     ×
                 </button>
@@ -868,7 +868,7 @@ const handleSubmitCancel = async () => {
                     <h3 className="text-lg font-medium text-gray-900">Cancel Order #{orderId}</h3>
                     <button
                         onClick={() => setShowConfirmModal(false)}
-                        className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-md focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                        className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-md focus:outline-none"
                         aria-label="Close cancel modal"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -911,7 +911,7 @@ const handleSubmitCancel = async () => {
                             value={cancelFormData.customReason}
                             onChange={(e) => setCancelFormData({ ...cancelFormData, customReason: e.target.value })}
                             placeholder="Enter custom reason"
-                            className="w-full px-3 py-2 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+                            className="w-full px-3 py-2 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
                             rows={3}
                         />
                     )}

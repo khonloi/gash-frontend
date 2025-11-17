@@ -6,7 +6,10 @@ export const DETAIL_STORAGE_KEY = "productDetailState";
 export const DEFAULT_FILTERS = {
   category: "All Categories",
   color: "All Colors",
-  size: "All Sizes"
+  size: "All Sizes",
+  minPrice: "",
+  maxPrice: "",
+  sortBy: "name"
 };
 export const API_RETRY_COUNT = 3;
 export const API_RETRY_DELAY = 1000;
