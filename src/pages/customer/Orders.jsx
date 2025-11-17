@@ -110,11 +110,25 @@ const Orders = () => {
           const existingIndex = prevOrders.findIndex((o) => o._id === updatedOrder._id);
           
           if (existingIndex !== -1) {
-            // Update existing order
+            // Update existing order while preserving populated orderDetails
+            const existingOrder = prevOrders[existingIndex];
             const updated = [...prevOrders];
+            
+            // Check if updated order has properly populated orderDetails
+            const hasPopulatedDetails = updatedOrder.orderDetails?.some(
+              (detail) => detail?.variant_id?.productId?.productName
+            );
+            
+            // Preserve existing orderDetails if updated order doesn't have populated ones
+            const preservedOrderDetails = hasPopulatedDetails 
+              ? updatedOrder.orderDetails 
+              : existingOrder.orderDetails;
+            
             updated[existingIndex] = {
-              ...updated[existingIndex],
+              ...existingOrder,
               ...updatedOrder,
+              // Preserve populated orderDetails structure
+              orderDetails: preservedOrderDetails || updatedOrder.orderDetails || existingOrder.orderDetails,
             };
             // Re-sort by orderDate
             return updated.sort(
@@ -134,10 +148,24 @@ const Orders = () => {
           const existingIndex = prevFiltered.findIndex((o) => o._id === updatedOrder._id);
           
           if (existingIndex !== -1) {
+            const existingOrder = prevFiltered[existingIndex];
             const updated = [...prevFiltered];
+            
+            // Check if updated order has properly populated orderDetails
+            const hasPopulatedDetails = updatedOrder.orderDetails?.some(
+              (detail) => detail?.variant_id?.productId?.productName
+            );
+            
+            // Preserve existing orderDetails if updated order doesn't have populated ones
+            const preservedOrderDetails = hasPopulatedDetails 
+              ? updatedOrder.orderDetails 
+              : existingOrder.orderDetails;
+            
             updated[existingIndex] = {
-              ...updated[existingIndex],
+              ...existingOrder,
               ...updatedOrder,
+              // Preserve populated orderDetails structure
+              orderDetails: preservedOrderDetails || updatedOrder.orderDetails || existingOrder.orderDetails,
             };
             return updated.sort(
               (a, b) => new Date(b.orderDate) - new Date(a.orderDate)

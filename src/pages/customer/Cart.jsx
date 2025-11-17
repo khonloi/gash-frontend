@@ -54,6 +54,7 @@ const Cart = () => {
   const [updatingQuantities, setUpdatingQuantities] = useState(new Set());
   const [error, setError] = useState(null);
   const [quantityValues, setQuantityValues] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
   // Track last saved quantities to compare against (not optimistic updates)
   const lastSavedQuantities = useRef({});
 
@@ -381,20 +382,44 @@ const Cart = () => {
     }).format(price);
   }, []);
 
+  // Filter cart items based on search query
+  const filteredCartItems = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return cartItems;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return cartItems.filter((item) => {
+      // Search by product name
+      const productName = item.variantId?.productId?.productName?.toLowerCase() || "";
+      if (productName.includes(query)) return true;
+
+      // Search by color
+      const colorName = item.variantId?.productColorId?.color_name?.toLowerCase() || "";
+      if (colorName.includes(query)) return true;
+
+      // Search by size
+      const sizeName = item.variantId?.productSizeId?.size_name?.toLowerCase() || "";
+      if (sizeName.includes(query)) return true;
+
+      return false;
+    });
+  }, [cartItems, searchQuery]);
+
   // Calculate total for selected items
   const totalPrice = useMemo(() => {
-    return cartItems
+    return filteredCartItems
       .filter((item) => item.checked)
       .reduce((total, item) => {
         const price = item.productPrice || 0;
         const quantity = parseInt(item.productQuantity, 10) || 0;
         return total + price * quantity;
       }, 0);
-  }, [cartItems]);
+  }, [filteredCartItems]);
 
   // Check if any selected items are inactive
   const hasInactiveSelectedItems = useMemo(() => {
-    return cartItems.some((item) => {
+    return filteredCartItems.some((item) => {
       if (!item.checked) return false;
       const stockQuantity = item.variantId?.stockQuantity ?? 0;
       const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
@@ -402,7 +427,7 @@ const Cart = () => {
       const isOutOfStock = stockQuantity <= 0;
       return isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
     });
-  }, [cartItems]);
+  }, [filteredCartItems]);
 
   // Handle quantity change
   const handleQuantityChange = useCallback(
@@ -522,6 +547,56 @@ const Cart = () => {
           Shopping Cart
         </h2>
 
+        {/* Search Bar */}
+        {!loading && cartItems.length > 0 && (
+          <div className="mb-4 sm:mb-5 md:mb-6">
+            <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+              <legend className="text-sm sm:text-base font-semibold">Search</legend>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search by product name, color, or size..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      aria-label="Search cart items"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                {searchQuery && (
+                  <div className="flex items-end">
+                    <ProductButton
+                      variant="default"
+                      size="md"
+                      onClick={() => setSearchQuery("")}
+                      aria-label="Clear search"
+                    >
+                      Clear
+                    </ProductButton>
+                  </div>
+                )}
+              </div>
+            </fieldset>
+          </div>
+        )}
+
       {error && (
         <div
             ref={errorRef}
@@ -546,7 +621,7 @@ const Cart = () => {
         </div>
       )}
 
-      {!loading && cartItems.length === 0 && !error ? (
+      {!loading && cartItems.length === 0 && !error && !searchQuery ? (
           <div
             className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
             role="status"
@@ -572,8 +647,23 @@ const Cart = () => {
                     <CartItemSkeleton key={`skeleton-${index}`} />
                   ))}
                 </>
+              ) : filteredCartItems.length === 0 && searchQuery ? (
+                <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[200px] flex flex-col items-center justify-center gap-4" role="status">
+                  <p className="text-gray-500 italic text-lg">No items match your search</p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Try adjusting your search criteria
+                  </p>
+                  <ProductButton
+                    variant="default"
+                    size="sm"
+                    onClick={() => setSearchQuery("")}
+                    className="text-blue-600"
+                  >
+                    Clear Search
+                  </ProductButton>
+                </div>
               ) : (
-                cartItems.map((item) => {
+                filteredCartItems.map((item) => {
                 const quantityValue = quantityValues[item._id];
                 const quantity = quantityValue !== undefined && quantityValue !== ""
                   ? (typeof quantityValue === "number" ? quantityValue : parseInt(quantityValue, 10))
@@ -678,7 +768,7 @@ const Cart = () => {
               )}
           </section>
 
-            {!loading && cartItems.length > 0 && (
+            {!loading && filteredCartItems.length > 0 && (
               <aside
                 className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 sm:p-5 flex-shrink-0 sm:w-64 w-full"
                 aria-label="Cart summary"
@@ -690,11 +780,11 @@ const Cart = () => {
                 variant="primary"
                 size="lg"
                 onClick={() => {
-                  const selectedItems = cartItems.filter((i) => i.checked);
+                  const selectedItems = filteredCartItems.filter((i) => i.checked);
                   navigate("/checkout", { state: { selectedItems } });
                 }}
                 disabled={
-                  cartItems.filter((i) => i.checked).length === 0 ||
+                  filteredCartItems.filter((i) => i.checked).length === 0 ||
                   loading ||
                   actionInProgress ||
                   hasInactiveSelectedItems
