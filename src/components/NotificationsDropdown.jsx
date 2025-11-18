@@ -100,6 +100,60 @@ export default function NotificationsDropdown({ user }) {
       fetchNotifications();
     };
 
+    // Listen for deleted notifications to remove them immediately
+    const handleNotificationDeleted = (data) => {
+      console.log("🗑️ Notification deleted event received:", data);
+      const { notificationId, userId } = data;
+      
+      if (!notificationId) {
+        console.warn("⚠️ notificationDeleted event received without notificationId:", data);
+        return;
+      }
+      
+      // If userId is provided and doesn't match current user, ignore (for global notifications this might be null)
+      if (userId && user?._id && userId.toString() !== user._id.toString()) {
+        console.log(`⚠️ Deletion event for different user (${userId} vs ${user._id}), ignoring`);
+        return;
+      }
+      
+      // Remove the notification from the list immediately
+      setNotifications((prev) => {
+        const filtered = prev.filter((n) => {
+          const nId = n._id?.toString() || n._id;
+          const deletedId = notificationId?.toString() || notificationId;
+          const shouldKeep = nId !== deletedId;
+          if (!shouldKeep) {
+            console.log("🗑️ Removing notification from list:", { nId, deletedId });
+          }
+          return shouldKeep;
+        });
+        
+        if (filtered.length !== prev.length) {
+          console.log(`✅ Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
+        } else {
+          console.warn(`⚠️ Notification with ID ${notificationId} not found in current list, refreshing...`);
+          // Fallback: refresh the list if notification not found (might be a race condition)
+          setTimeout(() => {
+            const fetchNotifications = async () => {
+              try {
+                const res = await fetch(
+                  `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
+                );
+                if (!res.ok) throw new Error("Failed to fetch notifications");
+                const notificationData = await res.json();
+                setNotifications(notificationData);
+              } catch (err) {
+                console.error("❌ Lỗi khi refresh thông báo:", err);
+              }
+            };
+            fetchNotifications();
+          }, 500);
+        }
+        
+        return filtered;
+      });
+    };
+
     // Log lỗi
     const handleConnectError = (err) => {
       console.error("❌ Notification Socket connection error:", err.message);
@@ -114,6 +168,7 @@ export default function NotificationsDropdown({ user }) {
     socket.on("connect", handleConnect);
     socket.on("newNotification", handleNewNotification);
     socket.on("notificationBadgeUpdate", handleBadgeUpdate);
+    socket.on("notificationDeleted", handleNotificationDeleted);
     socket.on("connect_error", handleConnectError);
     socket.on("disconnect", handleDisconnect);
 
@@ -123,11 +178,19 @@ export default function NotificationsDropdown({ user }) {
       console.log(`🔔 Emitted userConnected immediately for user: ${user._id}`);
     }
 
-    // Cleanup
+    // Re-join rooms on reconnect
+    const handleReconnect = () => {
+      console.log("🔄 Socket reconnected, rejoining notification rooms");
+      socket.emit("userConnected", user._id);
+    };
+    socket.on("reconnect", handleReconnect);
+    
     return () => {
       socket.off("connect", handleConnect);
       socket.off("newNotification", handleNewNotification);
       socket.off("notificationBadgeUpdate", handleBadgeUpdate);
+      socket.off("notificationDeleted", handleNotificationDeleted);
+      socket.off("reconnect", handleReconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("disconnect", handleDisconnect);
       // Don't disconnect here - keep socket alive for component lifecycle
