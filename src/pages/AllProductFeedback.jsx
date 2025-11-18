@@ -66,8 +66,9 @@ const AllProductFeedback = () => {
         }
       }
 
+      // Include deleted feedbacks (they will show deletion message)
       const validFeedbacks = feedbacksData
-        .filter(feedback => !feedback.feedback?.is_deleted)
+        .filter(feedback => feedback && feedback.feedback) // Only filter out null/undefined feedbacks
         .sort((a, b) => {
           if (a.customer?.is_current_user && !b.customer?.is_current_user) return -1;
           if (!a.customer?.is_current_user && b.customer?.is_current_user) return 1;
@@ -130,15 +131,12 @@ const AllProductFeedback = () => {
     .filter(f => f.variant?.size)
     .map(f => f.variant.size))].sort();
 
-  // Filter feedbacks based on selected filters
+  // Filter feedbacks based on selected filters (include deleted feedbacks)
   const filteredFeedbacks = feedbacks.filter(feedback => {
-    if (!feedback.feedback?.is_deleted) {
-      const matchesRating = ratingFilter ? feedback.feedback?.rating === parseInt(ratingFilter) : true;
-      const matchesColor = colorFilter ? feedback.variant?.color === colorFilter : true;
-      const matchesSize = sizeFilter ? feedback.variant?.size === sizeFilter : true;
-      return matchesRating && matchesColor && matchesSize;
-    }
-    return false;
+    const matchesRating = ratingFilter ? feedback.feedback?.rating === parseInt(ratingFilter) : true;
+    const matchesColor = colorFilter ? feedback.variant?.color === colorFilter : true;
+    const matchesSize = sizeFilter ? feedback.variant?.size === sizeFilter : true;
+    return matchesRating && matchesColor && matchesSize;
   });
 
   // Reset feedbacksToShow when filters change
@@ -170,7 +168,7 @@ const AllProductFeedback = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Product ID</h2>
           <Link
             to="/products"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline-none"
           >
             Back to Products
           </Link>
@@ -194,7 +192,7 @@ const AllProductFeedback = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
           <Link
             to="/products"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium border-2 border-blue-700 focus:outline-none"
           >
             Back to Products
           </Link>
@@ -213,7 +211,7 @@ const AllProductFeedback = () => {
             </h2>
             <Link
               to={`/product/${id}`}
-              className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors font-medium border-2 border-gray-700 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2"
+              className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors font-medium border-2 border-gray-700 focus:outline-none"
             >
               <i className="lni lni-arrow-left mr-2"></i>
               Back to Product
@@ -227,7 +225,7 @@ const AllProductFeedback = () => {
               <select
                 value={ratingFilter}
                 onChange={(e) => setRatingFilter(e.target.value)}
-                className="w-full p-2 border-2 border-gray-300 rounded-xl focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 focus:border-blue-600 transition-colors hover:bg-gray-50"
+                className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
               >
                 <option value="">All Ratings</option>
                 {[1, 2, 3, 4, 5].map(rating => (
@@ -240,7 +238,7 @@ const AllProductFeedback = () => {
               <select
                 value={colorFilter}
                 onChange={(e) => setColorFilter(e.target.value)}
-                className="w-full p-2 border-2 border-gray-300 rounded-xl focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 focus:border-blue-600 transition-colors hover:bg-gray-50"
+                className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
               >
                 <option value="">All Colors</option>
                 {uniqueColors.map(color => (
@@ -253,7 +251,7 @@ const AllProductFeedback = () => {
               <select
                 value={sizeFilter}
                 onChange={(e) => setSizeFilter(e.target.value)}
-                className="w-full p-2 border-2 border-gray-300 rounded-xl focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 focus:border-blue-600 transition-colors hover:bg-gray-50"
+                className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
               >
                 <option value="">All Sizes</option>
                 {uniqueSizes.map(size => (
@@ -354,12 +352,12 @@ const AllProductFeedback = () => {
                   .map((feedback) => (
                     <div
                       key={feedback._id}
-                      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 hover:shadow-sm border border-gray-200 transition-shadow duration-200"
+                      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">
                           <div className="relative">
-                            <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                               {feedback.customer?.image ? (
                                 <img
                                   src={feedback.customer.image}
@@ -372,7 +370,7 @@ const AllProductFeedback = () => {
                                 />
                               ) : null}
                               <div
-                                className={`w-full h-full flex items-center justify-center text-white font-bold text-xl ${feedback.customer?.image ? 'hidden' : 'flex'}`}
+                                className={`w-full h-full flex items-center justify-center text-white font-bold text-lg ${feedback.customer?.image ? 'hidden' : 'flex'}`}
                               >
                                 {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
                               </div>
@@ -385,7 +383,7 @@ const AllProductFeedback = () => {
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <div className="font-semibold text-gray-900 text-lg">
+                              <div className="font-semibold text-gray-900 text-base">
                                 {feedback.customer?.username || "Anonymous"}
                               </div>
                               {feedback.customer?.is_current_user && (
@@ -418,7 +416,7 @@ const AllProductFeedback = () => {
                               {[...Array(5)].map((_, i) => (
                                 <svg
                                   key={i}
-                                  className={`w-6 h-6 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                  className={`w-5 h-5 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                                   fill="currentColor"
                                   viewBox="0 0 20 20"
                                 >
@@ -432,7 +430,11 @@ const AllProductFeedback = () => {
                       {feedback.feedback?.has_content && (
                         <div className="mb-4">
                           <p 
-                            className="text-gray-800 text-base sm:text-lg leading-relaxed bg-gray-50 p-4 rounded-xl border-l-4 border-yellow-400 break-words whitespace-pre-wrap max-w-full"
+                            className={`text-base leading-relaxed p-4 rounded-xl border-l-4 break-words whitespace-pre-wrap max-w-full ${
+                              feedback.feedback?.is_deleted 
+                                ? 'text-gray-500 italic bg-gray-100 border-gray-400' 
+                                : 'text-gray-700 bg-gray-50 border-yellow-400'
+                            }`}
                             style={{ 
                               wordBreak: 'break-word',
                               overflowWrap: 'anywhere',

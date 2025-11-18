@@ -12,7 +12,7 @@ export default function IconButton({
     <button
       onClick={onClick}
       title={title}
-      className={`p-2 text-white hover:text-amber-500 ${className}`}
+      className={`p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out ${className}`}
     >
       {children}
 

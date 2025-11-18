@@ -12,6 +12,7 @@ import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ProductButton from "../../components/ProductButton";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -54,6 +55,9 @@ const Cart = () => {
   const [updatingQuantities, setUpdatingQuantities] = useState(new Set());
   const [error, setError] = useState(null);
   const [quantityValues, setQuantityValues] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   // Track last saved quantities to compare against (not optimistic updates)
   const lastSavedQuantities = useRef({});
 
@@ -322,11 +326,20 @@ const Cart = () => {
     updateQuantities();
   }, [debouncedQuantities, user, showToast]);
 
-  // Remove item from cart
-  const handleRemoveItem = useCallback(
-    async (cartId) => {
-      if (!user?._id) return;
+  // Show confirmation modal for removing item
+  const handleRemoveItemClick = useCallback((cartId) => {
+    const item = cartItems.find((item) => item._id === cartId);
+    setItemToDelete({ cartId, item });
+    setShowDeleteConfirm(true);
+  }, [cartItems]);
 
+  // Remove item from cart (after confirmation)
+  const handleRemoveItem = useCallback(
+    async () => {
+      if (!user?._id || !itemToDelete) return;
+
+      const { cartId } = itemToDelete;
+      setShowDeleteConfirm(false);
       setActionInProgress(true);
       setError(null);
       const previousItems = [...cartItems];
@@ -367,9 +380,10 @@ const Cart = () => {
         showToast(errorMessage, "error", TOAST_TIMEOUT);
       } finally {
         setActionInProgress(false);
+        setItemToDelete(null);
       }
     },
-    [cartItems, user, showToast]
+    [cartItems, user, showToast, itemToDelete]
   );
 
   // Format price helper
@@ -381,16 +395,52 @@ const Cart = () => {
     }).format(price);
   }, []);
 
+  // Filter cart items based on search query
+  const filteredCartItems = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return cartItems;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return cartItems.filter((item) => {
+      // Search by product name
+      const productName = item.variantId?.productId?.productName?.toLowerCase() || "";
+      if (productName.includes(query)) return true;
+
+      // Search by color
+      const colorName = item.variantId?.productColorId?.color_name?.toLowerCase() || "";
+      if (colorName.includes(query)) return true;
+
+      // Search by size
+      const sizeName = item.variantId?.productSizeId?.size_name?.toLowerCase() || "";
+      if (sizeName.includes(query)) return true;
+
+      return false;
+    });
+  }, [cartItems, searchQuery]);
+
   // Calculate total for selected items
   const totalPrice = useMemo(() => {
-    return cartItems
+    return filteredCartItems
       .filter((item) => item.checked)
       .reduce((total, item) => {
         const price = item.productPrice || 0;
         const quantity = parseInt(item.productQuantity, 10) || 0;
         return total + price * quantity;
       }, 0);
-  }, [cartItems]);
+  }, [filteredCartItems]);
+
+  // Check if any selected items are inactive
+  const hasInactiveSelectedItems = useMemo(() => {
+    return filteredCartItems.some((item) => {
+      if (!item.checked) return false;
+      const stockQuantity = item.variantId?.stockQuantity ?? 0;
+      const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+      const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+      const isOutOfStock = stockQuantity <= 0;
+      return isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+    });
+  }, [filteredCartItems]);
 
   // Handle quantity change
   const handleQuantityChange = useCallback(
@@ -473,22 +523,32 @@ const Cart = () => {
   // Cart Item Skeleton Component
   const CartItemSkeleton = () => (
     <article
-      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4"
+      className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
       aria-label="Loading cart item"
     >
       <div className="flex items-stretch gap-6 flex-1">
+        {/* Checkbox skeleton */}
         <div className="w-5 h-5 bg-gray-200 rounded animate-pulse flex-shrink-0 self-center" />
-        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+        {/* Image skeleton */}
+        <div className="w-20 sm:w-24 aspect-square bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+        {/* Product info skeleton */}
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-          <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4" />
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+          {/* Product name */}
+          <div className="h-5 sm:h-6 bg-gray-200 rounded animate-pulse w-3/4" />
+          {/* Color and Size */}
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+          {/* Price */}
           <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3" />
+          {/* Total */}
           <div className="h-5 bg-gray-200 rounded animate-pulse w-1/4" />
         </div>
       </div>
+      {/* Action buttons skeleton */}
       <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
+        {/* Quantity input skeleton */}
         <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
-        <div className="w-20 h-10 bg-gray-200 rounded-lg animate-pulse" />
+        {/* Remove button skeleton */}
+        <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
       </div>
     </article>
   );
@@ -499,6 +559,56 @@ const Cart = () => {
         <h2 className="text-xl sm:text-2xl font-normal mb-4 sm:mb-5 md:mb-6 m-0">
           Shopping Cart
         </h2>
+
+        {/* Search Bar */}
+        {!loading && cartItems.length > 0 && (
+          <div className="mb-4 sm:mb-5 md:mb-6">
+            <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
+              <legend className="text-sm sm:text-base font-semibold m-0">Search</legend>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search by product name, color, or size..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      aria-label="Search cart items"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                {searchQuery && (
+                  <div className="flex items-end">
+                    <ProductButton
+                      variant="default"
+                      size="md"
+                      onClick={() => setSearchQuery("")}
+                      aria-label="Clear search"
+                    >
+                      Clear
+                    </ProductButton>
+                  </div>
+                )}
+              </div>
+            </fieldset>
+          </div>
+        )}
 
       {error && (
         <div
@@ -524,9 +634,9 @@ const Cart = () => {
         </div>
       )}
 
-      {!loading && cartItems.length === 0 && !error ? (
+      {!loading && cartItems.length === 0 && !error && !searchQuery ? (
           <div
-            className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
+            className="text-center text-xs sm:text-sm text-gray-500 p-4 sm:p-6 md:p-8 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
             role="status"
           >
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 m-0">
@@ -550,19 +660,44 @@ const Cart = () => {
                     <CartItemSkeleton key={`skeleton-${index}`} />
                   ))}
                 </>
+              ) : filteredCartItems.length === 0 && searchQuery ? (
+                <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[200px] flex flex-col items-center justify-center gap-4" role="status">
+                  <p className="text-gray-500 italic text-lg">No items match your search</p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Try adjusting your search criteria
+                  </p>
+                  <ProductButton
+                    variant="default"
+                    size="sm"
+                    onClick={() => setSearchQuery("")}
+                    className="text-blue-600"
+                  >
+                    Clear Search
+                  </ProductButton>
+                </div>
               ) : (
-                cartItems.map((item) => {
+                filteredCartItems.map((item) => {
                 const quantityValue = quantityValues[item._id];
                 const quantity = quantityValue !== undefined && quantityValue !== ""
                   ? (typeof quantityValue === "number" ? quantityValue : parseInt(quantityValue, 10))
                   : parseInt(item.productQuantity, 10) || 1;
                 const maxQuantity = item.variantId?.stockQuantity || Infinity;
                 const isUpdating = updatingQuantities.has(item._id);
+                const stockQuantity = item.variantId?.stockQuantity ?? 0;
+                const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+                const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+                const isOutOfStock = stockQuantity <= 0;
+                const isInactive = isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+                const inactiveMessage = isProductDiscontinued || isVariantDiscontinued 
+                  ? "Discontinued" 
+                  : isOutOfStock 
+                    ? "Out of Stock" 
+                    : "";
 
               return (
                 <article
                   key={item._id}
-                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200"
+                    className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200 ${isInactive ? "opacity-60 grayscale" : ""}`}
                   tabIndex={0}
                     aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
                 >
@@ -571,8 +706,9 @@ const Cart = () => {
                     type="checkbox"
                     checked={item.checked || false}
                     onChange={() => toggleChecked(item._id)}
-                        className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center"
+                        className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label={`Select ${item.variantId?.productId?.productName || "product"} for checkout`}
+                        disabled={isInactive}
                   />
                   <img
                         src={item.variantId?.variantImage || "/placeholder-image.png"}
@@ -593,6 +729,14 @@ const Cart = () => {
                         <p className="text-sm text-gray-600 m-0">
                       Price: {formatPrice(item.productPrice)}
                     </p>
+                        <p className="text-sm text-gray-600 m-0">
+                          Stock: {stockQuantity}
+                    </p>
+                        {isInactive && (
+                          <p className="text-sm font-semibold text-red-600 m-0">
+                            {inactiveMessage}
+                          </p>
+                        )}
                         <p className="text-base font-semibold text-red-600 m-0">
                           Total: {formatPrice((item.productPrice || 0) * quantity)}
                     </p>
@@ -616,15 +760,15 @@ const Cart = () => {
                               setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
                             }
                           }}
-                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
-                          disabled={isUpdating || actionInProgress}
+                          disabled={isUpdating || actionInProgress || isInactive}
                         />
                       </div>
                       <ProductButton
                         variant="danger"
                         size="sm"
-                        onClick={() => handleRemoveItem(item._id)}
+                        onClick={() => handleRemoveItemClick(item._id)}
                         aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
                         disabled={isUpdating || actionInProgress}
                       >
@@ -637,7 +781,7 @@ const Cart = () => {
               )}
           </section>
 
-            {!loading && cartItems.length > 0 && (
+            {!loading && filteredCartItems.length > 0 && (
               <aside
                 className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 sm:p-5 flex-shrink-0 sm:w-64 w-full"
                 aria-label="Cart summary"
@@ -649,13 +793,14 @@ const Cart = () => {
                 variant="primary"
                 size="lg"
                 onClick={() => {
-                  const selectedItems = cartItems.filter((i) => i.checked);
+                  const selectedItems = filteredCartItems.filter((i) => i.checked);
                   navigate("/checkout", { state: { selectedItems } });
                 }}
                 disabled={
-                  cartItems.filter((i) => i.checked).length === 0 ||
+                  filteredCartItems.filter((i) => i.checked).length === 0 ||
                   loading ||
-                  actionInProgress
+                  actionInProgress ||
+                  hasInactiveSelectedItems
                 }
                 aria-label="Proceed to checkout"
                 className="w-full"
@@ -667,6 +812,25 @@ const Cart = () => {
         </main>
       )}
       </section>
+
+      {/* Confirmation Modal for Removing Item */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Remove Item from Cart"
+        message={
+          itemToDelete?.item
+            ? `Are you sure you want to remove "${itemToDelete.item.variantId?.productId?.productName || "this product"}" from your cart?`
+            : "Are you sure you want to remove this item from your cart?"
+        }
+        confirmText="Remove"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleRemoveItem}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setItemToDelete(null);
+        }}
+      />
     </div>
   );
 };

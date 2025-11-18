@@ -103,24 +103,6 @@ const Home = () => {
     return shuffled.slice(0, count);
   };
 
-  // Helper function to get main image URL from product
-  const getMainImageUrl = (product) => {
-    if (!product.productImageIds || product.productImageIds.length === 0) {
-      return "/placeholder-image.png";
-    }
-    const mainImage = product.productImageIds.find(img => img.isMain);
-    return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-  };
-
-  // Helper function to get a random product from a category
-  const getRandomProductForCategory = (categoryName) => {
-    const categoryProducts = products.filter(
-      (product) => product.categoryId?.cat_name === categoryName
-    );
-    if (categoryProducts.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * categoryProducts.length);
-    return categoryProducts[randomIndex];
-  };
 
   // State for randomized sections
   const [forYouProducts, setForYouProducts] = useState([]);
@@ -303,8 +285,7 @@ const Home = () => {
                         key={index}
                         className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col"
                       >
-                        <div className="w-[9em] h-[9em] bg-gray-200 animate-pulse" />
-                        <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                        <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
                           <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
                         </div>
                       </div>
@@ -318,8 +299,7 @@ const Home = () => {
                       key={index}
                       className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col"
                     >
-                      <div className="w-[9em] h-[9em] bg-gray-200 animate-pulse" />
-                      <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                      <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
                         <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
                       </div>
                     </div>
@@ -338,13 +318,10 @@ const Home = () => {
                     aria-label={`${randomCategories.length} categories`}
                   >
                     {randomCategories.map((category) => {
-                      const categoryProduct = getRandomProductForCategory(category);
-                      const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
-                      
                       return (
                         <div
                           key={category}
-                          className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none"
+                          className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
                           tabIndex={0}
                           role="listitem"
                           aria-label={`View products in ${category}`}
@@ -353,21 +330,8 @@ const Home = () => {
                             if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
                           }}
                         >
-                          {/* Square image thumbnail */}
-                          <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
-                            <img
-                              src={categoryImageUrl}
-                              alt={`${category} category`}
-                              loading="lazy"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.src = "/placeholder-image.png";
-                                e.target.alt = `Image not available for ${category}`;
-                              }}
-                            />
-                          </div>
                           {/* Category name */}
-                          <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
+                          <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
                             <span className="font-semibold text-sm text-center line-clamp-2">
                               {category}
                             </span>
@@ -379,7 +343,7 @@ const Home = () => {
                   {/* Navigation buttons for mobile */}
                   {categoryScrollPosition > 0 && (
                     <button
-                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
                       onClick={handleCategoryPrev}
                       aria-label="Previous categories"
                     >
@@ -388,7 +352,7 @@ const Home = () => {
                   )}
                   {canScrollNext && (
                     <button
-                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 transition-colors"
+                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
                       onClick={handleCategoryNext}
                       aria-label="Next categories"
                     >
@@ -403,13 +367,10 @@ const Home = () => {
                   aria-label={`${randomCategories.length} categories`}
                 >
                   {randomCategories.map((category) => {
-                    const categoryProduct = getRandomProductForCategory(category);
-                    const categoryImageUrl = categoryProduct ? getMainImageUrl(categoryProduct) : "/placeholder-image.png";
-                    
                     return (
                       <div
                         key={category}
-                        className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-sm border border-gray-200 focus:shadow-sm border border-gray-200 focus:outline-none"
+                        className="w-[9em] border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
                         tabIndex={0}
                         role="listitem"
                         aria-label={`View products in ${category}`}
@@ -418,22 +379,9 @@ const Home = () => {
                           if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
                         }}
                       >
-                        {/* Square image thumbnail */}
-                        <div className="w-[9em] h-[9em] overflow-hidden bg-gray-50">
-                          <img
-                            src={categoryImageUrl}
-                            alt={`${category} category`}
-                            loading="lazy"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.src = "/placeholder-image.png";
-                              e.target.alt = `Image not available for ${category}`;
-                            }}
-                          />
-                        </div>
                         {/* Category name */}
-                        <div className="flex items-center justify-center bg-white px-2 py-2 min-h-[3em]">
-                          <span className="font-semibold text-sm text-center line-clamp-2">
+                        <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
+                          <span className="font-semibold text-base text-center line-clamp-2">
                             {category}
                           </span>
                         </div>

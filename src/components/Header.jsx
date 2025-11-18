@@ -510,7 +510,7 @@ export default function Header() {
                                     setMobileSearchOpen(true);
                                 }}
                                 title="Search"
-                                className="p-2 text-white hover:text-amber-500"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
                                 <SearchIcon />
                             </button>
@@ -529,7 +529,7 @@ export default function Header() {
                                         }
                                     }}
                                     title="My Account"
-                                    className="p-2 text-white hover:text-amber-500"
+                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                                 >
                                     <PermIdentityOutlinedIcon />
                                 </button>
@@ -626,7 +626,7 @@ export default function Header() {
                                 placeholder="Search products..."
                                 className="flex-1 pl-3 sm:pl-4 md:pl-5 pr-10 sm:pr-12 py-1.5 sm:py-2 text-sm sm:text-base text-gray-900 focus:outline-none"
                             />
-                            <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500">
+                            <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500 transition-colors duration-200 ease-in-out">
                                 <SearchIcon fontSize="small" />
                             </button>
                         </form>
@@ -730,7 +730,7 @@ export default function Header() {
                                     }
                                 }}
                                 title="Live Stream"
-                                className="p-2 text-white hover:text-amber-500"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
                                 <TvOutlinedIcon />
                                 {livestreamCount > 0 && (
@@ -760,7 +760,7 @@ export default function Header() {
                                     user ? navigate("/cart") : navigate("/login");
                                 }}
                                 title="Cart"
-                                className="p-2 text-white hover:text-amber-500"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
                                 <ShoppingBagOutlinedIcon />
                                 {cartItemCount > 0 && (
@@ -787,7 +787,7 @@ export default function Header() {
                                         navigate("/login");
                                     }}
                                     title="Notifications"
-                                    className="p-2 text-white hover:text-amber-500"
+                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                                 >
                                     <NotificationsNoneOutlinedIcon />
                                 </button>
@@ -799,7 +799,7 @@ export default function Header() {
                         }}>
                             <button
                                 title="My Account"
-                                className="p-2 text-white hover:text-amber-500"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
                                 <PermIdentityOutlinedIcon />
                             </button>
@@ -835,13 +835,13 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("My Vouchers clicked");
-                                            alert("My Vouchers");
+                                            console.log("My Feedback clicked");
+                                            navigate("/feedback");
                                             setShowUserMenu(false);
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
-                                        My Vouchers
+                                        My Feedback
                                     </button>
                                     <button
                                         onClick={(e) => {

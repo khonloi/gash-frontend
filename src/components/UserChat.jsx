@@ -39,7 +39,7 @@ export default function UserChat({ userId }) {
     });
 
     socket.current.on("chat_history", ({ conversation: convo, messages: history }) => {
-      setConversation(convo);
+      setConversation(convo || null);
       setMessages(history || []);
       if (convo && convo.id) {
         socket.current.emit("join_room", convo.id);
@@ -188,9 +188,17 @@ export default function UserChat({ userId }) {
                   >
                     {msg.type === "image" ? (
                       <img
-                        src={msg.imageUrl}
+                        src={
+                          (msg.imageUrl || msg.attachments)?.startsWith('http')
+                            ? (msg.imageUrl || msg.attachments)
+                            : `${SOCKET_URL}${(msg.imageUrl || msg.attachments)?.startsWith('/') ? '' : '/'}${msg.imageUrl || msg.attachments}`
+                        }
                         alt="uploaded"
                         className="rounded-lg max-w-[200px] cursor-pointer hover:opacity-90"
+                        onError={(e) => {
+                          console.error("Image load error:", msg.imageUrl || msg.attachments);
+                          e.target.style.display = "none";
+                        }}
                       />
                     ) : (
                       <p className="text-sm">{msg.messageText}</p>

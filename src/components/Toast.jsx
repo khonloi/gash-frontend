@@ -39,7 +39,7 @@ export const ToastProvider = ({ children }) => {
       // 4. Remove entering state after animation completes
       setTimeout(() => {
         setToast((prev) => ({ ...prev, isEntering: false }));
-      }, 350);
+      }, 300);
 
       // 5. Start a fresh auto-close timer
       closeTimerRef.current = setTimeout(() => {

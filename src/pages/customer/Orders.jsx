@@ -110,11 +110,25 @@ const Orders = () => {
           const existingIndex = prevOrders.findIndex((o) => o._id === updatedOrder._id);
           
           if (existingIndex !== -1) {
-            // Update existing order
+            // Update existing order while preserving populated orderDetails
+            const existingOrder = prevOrders[existingIndex];
             const updated = [...prevOrders];
+            
+            // Check if updated order has properly populated orderDetails
+            const hasPopulatedDetails = updatedOrder.orderDetails?.some(
+              (detail) => detail?.variant_id?.productId?.productName
+            );
+            
+            // Preserve existing orderDetails if updated order doesn't have populated ones
+            const preservedOrderDetails = hasPopulatedDetails 
+              ? updatedOrder.orderDetails 
+              : existingOrder.orderDetails;
+            
             updated[existingIndex] = {
-              ...updated[existingIndex],
+              ...existingOrder,
               ...updatedOrder,
+              // Preserve populated orderDetails structure
+              orderDetails: preservedOrderDetails || updatedOrder.orderDetails || existingOrder.orderDetails,
             };
             // Re-sort by orderDate
             return updated.sort(
@@ -134,10 +148,24 @@ const Orders = () => {
           const existingIndex = prevFiltered.findIndex((o) => o._id === updatedOrder._id);
           
           if (existingIndex !== -1) {
+            const existingOrder = prevFiltered[existingIndex];
             const updated = [...prevFiltered];
+            
+            // Check if updated order has properly populated orderDetails
+            const hasPopulatedDetails = updatedOrder.orderDetails?.some(
+              (detail) => detail?.variant_id?.productId?.productName
+            );
+            
+            // Preserve existing orderDetails if updated order doesn't have populated ones
+            const preservedOrderDetails = hasPopulatedDetails 
+              ? updatedOrder.orderDetails 
+              : existingOrder.orderDetails;
+            
             updated[existingIndex] = {
-              ...updated[existingIndex],
+              ...existingOrder,
               ...updatedOrder,
+              // Preserve populated orderDetails structure
+              orderDetails: preservedOrderDetails || updatedOrder.orderDetails || existingOrder.orderDetails,
             };
             return updated.sort(
               (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
@@ -348,7 +376,7 @@ const Orders = () => {
 
         <div className="mb-6 space-y-4">
           <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-            <legend className="text-sm sm:text-base font-semibold">Search</legend>
+            <legend className="text-sm sm:text-base font-semibold m-0">Search</legend>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1">
                 <fieldset className="flex flex-col">
@@ -359,7 +387,7 @@ const Orders = () => {
                       placeholder="Search by product name, order ID, or status..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline focus:outline-2 focus:outline-blue-600 focus:outline-offset-2 disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg
