@@ -61,8 +61,8 @@ const Feedback = () => {
               });
 
               // Include feedback if it has content OR rating (checking both direct values and flags)
-              // AND it's not deleted
-              if ((hasContent || hasRating || hasContentFlag || hasRatingFlag) && !isDeleted) {
+              // Include deleted feedbacks so they can be shown with deletion message
+              if (hasContent || hasRating || hasContentFlag || hasRatingFlag) {
                 // Note: getUserOrdersService returns variant_id (not variant) with populated productId
                 // But getOrder returns variant, so we need to handle both
                 const variantId = detail.variant_id?._id || detail.variant?._id || detail.variant_id || detail.variant || null;
@@ -142,16 +142,15 @@ const Feedback = () => {
           const feedback = detail.feedback || detail.feedbackId || null;
           const feedbackObj = typeof feedback === 'object' ? feedback : null;
           
-          // Check if feedback exists and is valid
+          // Check if feedback exists and is valid (include deleted feedbacks)
           let hasValidFeedback = false;
           if (feedbackObj) {
             const hasContent = feedbackObj.content && feedbackObj.content.trim() !== '';
             const hasRating = feedbackObj.rating && feedbackObj.rating > 0;
             const hasContentFlag = feedbackObj.has_content === true;
             const hasRatingFlag = feedbackObj.has_rating === true;
-            const isDeleted = feedbackObj.is_deleted === true;
             
-            hasValidFeedback = (hasContent || hasRating || hasContentFlag || hasRatingFlag) && !isDeleted;
+            hasValidFeedback = (hasContent || hasRating || hasContentFlag || hasRatingFlag);
           }
 
           // If no valid feedback exists, this item is eligible
@@ -630,7 +629,11 @@ const Feedback = () => {
                           )}
 
                           {/* Feedback Content */}
-                          {feedback?.content && feedback.content.trim() !== '' ? (
+                          {feedback?.is_deleted ? (
+                            <p className="text-sm text-gray-500 italic m-0 line-clamp-3">
+                              This feedback has been deleted by staff/admin
+                            </p>
+                          ) : feedback?.content && feedback.content.trim() !== '' ? (
                             <p className="text-sm text-gray-700 m-0 line-clamp-3">
                               {feedback.content}
                             </p>

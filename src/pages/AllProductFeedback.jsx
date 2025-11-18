@@ -66,8 +66,9 @@ const AllProductFeedback = () => {
         }
       }
 
+      // Include deleted feedbacks (they will show deletion message)
       const validFeedbacks = feedbacksData
-        .filter(feedback => !feedback.feedback?.is_deleted)
+        .filter(feedback => feedback && feedback.feedback) // Only filter out null/undefined feedbacks
         .sort((a, b) => {
           if (a.customer?.is_current_user && !b.customer?.is_current_user) return -1;
           if (!a.customer?.is_current_user && b.customer?.is_current_user) return 1;
@@ -130,15 +131,12 @@ const AllProductFeedback = () => {
     .filter(f => f.variant?.size)
     .map(f => f.variant.size))].sort();
 
-  // Filter feedbacks based on selected filters
+  // Filter feedbacks based on selected filters (include deleted feedbacks)
   const filteredFeedbacks = feedbacks.filter(feedback => {
-    if (!feedback.feedback?.is_deleted) {
-      const matchesRating = ratingFilter ? feedback.feedback?.rating === parseInt(ratingFilter) : true;
-      const matchesColor = colorFilter ? feedback.variant?.color === colorFilter : true;
-      const matchesSize = sizeFilter ? feedback.variant?.size === sizeFilter : true;
-      return matchesRating && matchesColor && matchesSize;
-    }
-    return false;
+    const matchesRating = ratingFilter ? feedback.feedback?.rating === parseInt(ratingFilter) : true;
+    const matchesColor = colorFilter ? feedback.variant?.color === colorFilter : true;
+    const matchesSize = sizeFilter ? feedback.variant?.size === sizeFilter : true;
+    return matchesRating && matchesColor && matchesSize;
   });
 
   // Reset feedbacksToShow when filters change
@@ -432,7 +430,11 @@ const AllProductFeedback = () => {
                       {feedback.feedback?.has_content && (
                         <div className="mb-4">
                           <p 
-                            className="text-gray-700 text-base leading-relaxed bg-gray-50 p-4 rounded-xl border-l-4 border-yellow-400 break-words whitespace-pre-wrap max-w-full"
+                            className={`text-base leading-relaxed p-4 rounded-xl border-l-4 break-words whitespace-pre-wrap max-w-full ${
+                              feedback.feedback?.is_deleted 
+                                ? 'text-gray-500 italic bg-gray-100 border-gray-400' 
+                                : 'text-gray-700 bg-gray-50 border-yellow-400'
+                            }`}
                             style={{ 
                               wordBreak: 'break-word',
                               overflowWrap: 'anywhere',
