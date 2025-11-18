@@ -376,7 +376,7 @@ const Orders = () => {
 
         <div className="mb-6 space-y-4">
           <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-            <legend className="text-sm sm:text-base font-semibold">Search</legend>
+            <legend className="text-sm sm:text-base font-semibold m-0">Search</legend>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1">
                 <fieldset className="flex flex-col">

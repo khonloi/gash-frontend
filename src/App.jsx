@@ -19,6 +19,7 @@ import Checkout from "./pages/customer/Checkout";
 import Orders from "./pages/customer/Orders";
 import OrderDetails from "./components/OrderDetails";
 import ProductFavorite from "./pages/customer/ProductFavorite";
+import Feedback from "./pages/customer/Feedback";
 import Search from "./pages/Search";
 import OTPVerification from "./pages/OTPVerification";
 import ForgotPassword from "./pages/customer/ForgotPassword";
@@ -85,6 +86,7 @@ const App = () => {
                 <Route path="/orders/:id" element={<OrderDetails />} />
                 <Route path="/bills/:orderId" element={<Bill />} />
                 <Route path="/favorites" element={<ProductFavorite />} />
+                <Route path="/feedback" element={<Feedback />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/news" element={<BlogPost />} />
                 <Route path="/contact" element={<Contact />} />

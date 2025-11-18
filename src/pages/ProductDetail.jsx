@@ -1158,7 +1158,7 @@ const ProductDetail = () => {
           <div className="space-y-3 sm:space-y-4">
             {availableColors.length > 0 && (
               <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-                <legend className="text-sm sm:text-base font-semibold">Color:</legend>
+                <legend className="text-sm sm:text-base font-semibold m-0">Color:</legend>
                 <div className="flex flex-wrap gap-2">
                   {availableColors.map((color) => {
                     // Disable if product is inactive/discontinued OR if all variants with this color are inactive/discontinued
@@ -1192,7 +1192,7 @@ const ProductDetail = () => {
             )}
             {availableSizes.length > 0 && (
               <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-                <legend className="text-sm sm:text-base font-semibold">Size:</legend>
+                <legend className="text-sm sm:text-base font-semibold m-0">Size:</legend>
                 <div className="flex flex-wrap gap-2">
                   {availableSizes.map((size) => {
                     // Disable if product is inactive/discontinued OR if the specific size (or color-size combo) is inactive/discontinued
@@ -1226,7 +1226,7 @@ const ProductDetail = () => {
               </fieldset>
             )}
             <fieldset className="mb-4 sm:mb-5 flex flex-col">
-              <legend className="text-sm sm:text-base font-semibold">Quantity:</legend>
+              <legend className="text-sm sm:text-base font-semibold m-0">Quantity:</legend>
               <input
                 type="number"
                 className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
