@@ -41,13 +41,16 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     );
   };
 
-  // Check if feedback exists
+  // Check if feedback exists (include deleted feedbacks so they can be displayed)
   const hasFeedback = feedback?.feedback && (
     (feedback.feedback.content && feedback.feedback.content.trim() !== '') ||
     (feedback.feedback.rating && feedback.feedback.rating > 0) ||
     feedback.feedback.has_content === true ||
     feedback.feedback.has_rating === true
-  ) && feedback.feedback.is_deleted !== true;
+  );
+  
+  // Check if feedback is deleted by staff/admin
+  const isDeletedByStaff = feedback?.feedback?.is_deleted === true;
 
   // Create feedback
   const handleCreateFeedback = useCallback(async (variantId, comment, rating) => {
@@ -301,7 +304,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
             <div className="bg-gray-50 p-4 sm:p-5 rounded-xl mb-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm sm:text-base font-semibold text-gray-900">Your Feedback</h4>
-                {hasFeedback && !editingFeedback && (
+                {hasFeedback && !editingFeedback && !isDeletedByStaff && (
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setEditingFeedback({
@@ -366,7 +369,11 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                   )}
 
                   {/* Content */}
-                  {feedbackData?.content && feedbackData.content.trim() !== '' ? (
+                  {isDeletedByStaff ? (
+                    <p className="text-gray-500 text-sm italic whitespace-pre-wrap">
+                      {feedbackData?.content || 'This feedback has been deleted by staff/admin'}
+                    </p>
+                  ) : feedbackData?.content && feedbackData.content.trim() !== '' ? (
                     <p className="text-gray-700 text-sm whitespace-pre-wrap">
                       {feedbackData.content}
                     </p>

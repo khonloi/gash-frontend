@@ -636,7 +636,7 @@ const Cart = () => {
 
       {!loading && cartItems.length === 0 && !error && !searchQuery ? (
           <div
-            className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
+            className="text-center text-xs sm:text-sm text-gray-500 p-4 sm:p-6 md:p-8 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
             role="status"
           >
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 m-0">
