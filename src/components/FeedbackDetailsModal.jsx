@@ -11,8 +11,10 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
   const navigate = useNavigate();
 
   const [editingFeedback, setEditingFeedback] = useState(null);
+  const [creatingFeedback, setCreatingFeedback] = useState(null);
   const [loadingStates, setLoadingStates] = useState({
     editing: false,
+    creating: false,
     deleting: false,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -38,6 +40,83 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       </div>
     );
   };
+
+  // Check if feedback exists
+  const hasFeedback = feedback?.feedback && (
+    (feedback.feedback.content && feedback.feedback.content.trim() !== '') ||
+    (feedback.feedback.rating && feedback.feedback.rating > 0) ||
+    feedback.feedback.has_content === true ||
+    feedback.feedback.has_rating === true
+  ) && feedback.feedback.is_deleted !== true;
+
+  // Create feedback
+  const handleCreateFeedback = useCallback(async (variantId, comment, rating) => {
+    setLoadingStates(prev => ({ ...prev, creating: true }));
+
+    const timeoutId = setTimeout(() => {
+      setLoadingStates(prev => ({ ...prev, creating: false }));
+    }, 10000);
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!orderId) {
+        throw new Error("Order ID is missing");
+      }
+      if (!variantId) {
+        throw new Error("Variant ID is missing");
+      }
+      if (!token) {
+        throw new Error("Authentication token is missing");
+      }
+      if (!rating) {
+        throw new Error("Rating is required");
+      }
+      if (rating < 1 || rating > 5) {
+        throw new Error("Rating must be between 1 and 5");
+      }
+      if (comment && comment.length > 500) {
+        throw new Error("Comment cannot exceed 500 characters");
+      }
+
+      const feedbackData = {
+        rating: parseInt(rating),
+        content: comment ? comment.trim() : null
+      };
+
+      const actualVariantId = variantId.startsWith('item_') ? null : variantId;
+
+      await Api.feedback.addFeedback(
+        orderId,
+        actualVariantId,
+        feedbackData,
+        token
+      );
+
+      showToast("Feedback created successfully!", "success");
+      setCreatingFeedback(false);
+      onUpdate?.();
+    } catch (err) {
+      let errorMessage = "Failed to create feedback";
+
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 500) {
+        errorMessage = "Server error - please try again later";
+      } else if (err.response?.status === 400) {
+        errorMessage = "Invalid request - please check your input";
+      } else if (err.response?.status === 404) {
+        errorMessage = "Order or product not found";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      showToast(errorMessage, "error");
+    } finally {
+      clearTimeout(timeoutId);
+      setLoadingStates(prev => ({ ...prev, creating: false }));
+    }
+  }, [orderId, showToast, onUpdate]);
 
   // Edit feedback
   const handleEditFeedback = useCallback(async (variantId, comment, rating) => {
@@ -141,7 +220,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     }
   }, [orderId, feedback.variantId, showToast, onUpdate, onClose]);
 
-  const { feedback: feedbackData, productName, productImage, color, size, quantity, unitPrice, totalPrice, orderDate } = feedback;
+  const { feedback: feedbackData, productName, productImage, color, size, quantity, unitPrice, totalPrice, orderDate } = feedback || {};
+
+  // Initialize creating feedback state if no feedback exists
+  React.useEffect(() => {
+    if (!hasFeedback && creatingFeedback === null) {
+      setCreatingFeedback({ rating: 5, comment: "" });
+    }
+  }, [hasFeedback, creatingFeedback]);
 
   return (
     <>
@@ -163,7 +249,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl sm:text-2xl font-normal text-gray-900">
-                Feedback Details
+                {hasFeedback ? "Feedback Details" : "Create Feedback"}
               </h2>
             </div>
 
@@ -215,12 +301,12 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
             <div className="bg-gray-50 p-4 sm:p-5 rounded-xl mb-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm sm:text-base font-semibold text-gray-900">Your Feedback</h4>
-                {!editingFeedback && (
+                {hasFeedback && !editingFeedback && (
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setEditingFeedback({
-                        rating: feedbackData.rating || 5,
-                        comment: feedbackData.content || ""
+                        rating: feedbackData?.rating || 5,
+                        comment: feedbackData?.content || ""
                       })}
                       disabled={loadingStates.deleting}
                       className={`p-1 rounded transition ${
@@ -267,10 +353,10 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                 )}
               </div>
 
-              {editingFeedback === null ? (
+              {hasFeedback && editingFeedback === null && !creatingFeedback ? (
                 <div className="space-y-3">
                   {/* Rating */}
-                  {(feedbackData.has_rating || feedbackData.rating) && feedbackData.rating && feedbackData.rating > 0 && (
+                  {(feedbackData?.has_rating || feedbackData?.rating) && feedbackData?.rating && feedbackData.rating > 0 && (
                     <div className="flex items-center gap-2">
                       {renderStars(feedbackData.rating)}
                       <span className="text-sm text-gray-600">
@@ -280,7 +366,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                   )}
 
                   {/* Content */}
-                  {feedbackData.content && feedbackData.content.trim() !== '' ? (
+                  {feedbackData?.content && feedbackData.content.trim() !== '' ? (
                     <p className="text-gray-700 text-sm whitespace-pre-wrap">
                       {feedbackData.content}
                     </p>
@@ -296,16 +382,26 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                         key={r}
                         type="button"
                         onClick={() => {
-                          setEditingFeedback({
-                            rating: r,
-                            comment: editingFeedback?.comment || feedbackData.content || ""
-                          });
+                          if (hasFeedback) {
+                            setEditingFeedback({
+                              rating: r,
+                              comment: editingFeedback?.comment || feedbackData?.content || ""
+                            });
+                          } else {
+                            setCreatingFeedback({
+                              rating: r,
+                              comment: creatingFeedback?.comment || ""
+                            });
+                          }
                         }}
                         className="focus:outline-none"
                       >
                         <svg
                           className={`w-6 h-6 transition-transform ${
-                            (editingFeedback?.rating || feedbackData.rating || 0) >= r
+                            (hasFeedback 
+                              ? (editingFeedback?.rating || feedbackData?.rating || 0)
+                              : (creatingFeedback?.rating || 0)
+                            ) >= r
                               ? "fill-yellow-400 text-yellow-400 scale-110"
                               : "text-gray-300"
                           }`}
@@ -320,13 +416,24 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
 
                   <textarea
                     placeholder="Share your thoughts about this product... (Optional)"
-                    value={editingFeedback?.comment || feedbackData.content || ""}
+                    value={hasFeedback 
+                      ? (editingFeedback?.comment || feedbackData?.content || "")
+                      : (creatingFeedback?.comment || "")
+                    }
                     onChange={(e) => {
-                      setEditingFeedback({
-                        ...editingFeedback,
-                        rating: editingFeedback?.rating || feedbackData.rating || 5,
-                        comment: e.target.value,
-                      });
+                      if (hasFeedback) {
+                        setEditingFeedback({
+                          ...editingFeedback,
+                          rating: editingFeedback?.rating || feedbackData?.rating || 5,
+                          comment: e.target.value,
+                        });
+                      } else {
+                        setCreatingFeedback({
+                          ...creatingFeedback,
+                          rating: creatingFeedback?.rating || 5,
+                          comment: e.target.value,
+                        });
+                      }
                     }}
                     className="w-full border-2 border-gray-300 rounded-xl p-3 mb-4 resize-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition outline-none"
                     rows={4}
@@ -338,7 +445,11 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                       variant="secondary"
                       size="md"
                       onClick={() => {
-                        setEditingFeedback(null);
+                        if (hasFeedback) {
+                          setEditingFeedback(null);
+                        } else {
+                          setCreatingFeedback({ rating: 5, comment: "" });
+                        }
                       }}
                     >
                       Cancel
@@ -349,17 +460,33 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                       variant="primary"
                       size="md"
                       onClick={() => {
-                        const rating = editingFeedback?.rating || feedbackData.rating || 5;
-                        const comment = editingFeedback?.comment || feedbackData.content || "";
-                        handleEditFeedback(
-                          feedback.variantId || `item_${feedback.orderDetail?._id || 0}`,
-                          comment,
-                          rating
-                        );
+                        const rating = hasFeedback
+                          ? (editingFeedback?.rating || feedbackData?.rating || 5)
+                          : (creatingFeedback?.rating || 5);
+                        const comment = hasFeedback
+                          ? (editingFeedback?.comment || feedbackData?.content || "")
+                          : (creatingFeedback?.comment || "");
+                        
+                        if (hasFeedback) {
+                          handleEditFeedback(
+                            feedback.variantId || `item_${feedback.orderDetail?._id || 0}`,
+                            comment,
+                            rating
+                          );
+                        } else {
+                          handleCreateFeedback(
+                            feedback?.variantId || `item_${feedback?.orderDetail?._id || 0}`,
+                            comment,
+                            rating
+                          );
+                        }
                       }}
-                      disabled={loadingStates.editing}
+                      disabled={hasFeedback ? loadingStates.editing : loadingStates.creating}
                     >
-                      {loadingStates.editing ? "Updating..." : "Update Feedback"}
+                      {hasFeedback 
+                        ? (loadingStates.editing ? "Updating..." : "Update Feedback")
+                        : (loadingStates.creating ? "Creating..." : "Create Feedback")
+                      }
                     </ProductButton>
                   </div>
                 </div>
@@ -391,16 +518,18 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={showDeleteConfirm}
-        title="Delete Feedback"
-        message="Are you sure you want to delete this feedback? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="danger"
-        onConfirm={handleDeleteFeedback}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
+      {hasFeedback && (
+        <ConfirmationModal
+          isOpen={showDeleteConfirm}
+          title="Delete Feedback"
+          message="Are you sure you want to delete this feedback? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+          onConfirm={handleDeleteFeedback}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </>
   );
 };
