@@ -835,13 +835,13 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("My Vouchers clicked");
-                                            alert("My Vouchers");
+                                            console.log("My Feedback clicked");
+                                            navigate("/feedback");
                                             setShowUserMenu(false);
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
-                                        My Vouchers
+                                        My Feedback
                                     </button>
                                     <button
                                         onClick={(e) => {

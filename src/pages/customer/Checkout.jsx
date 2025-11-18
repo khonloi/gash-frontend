@@ -623,7 +623,7 @@ const Checkout = () => {
           {/* Voucher Section */}
           <div className="mt-6 pt-6 border-t border-gray-300">
             <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-              <legend className="text-sm sm:text-base font-semibold">Voucher Code</legend>
+              <legend className="text-sm sm:text-base font-semibold m-0">Voucher Code</legend>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -692,7 +692,7 @@ const Checkout = () => {
             <form onSubmit={handlePlaceOrder} className="space-y-6">
               {/* Shipping Information */}
               <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-4">
-                <legend className="text-sm sm:text-base font-semibold">Shipping Information</legend>
+                <legend className="text-sm sm:text-base font-semibold m-0">Shipping Information</legend>
 
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -748,7 +748,7 @@ const Checkout = () => {
 
               {/* Payment Method */}
               <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-3">
-                <legend className="text-sm sm:text-base font-semibold">Payment Method</legend>
+                <legend className="text-sm sm:text-base font-semibold m-0">Payment Method</legend>
                 <div className="space-y-3">
                   <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <input

@@ -6,6 +6,7 @@ import Api from "../../common/SummaryAPI";
 import FavoriteProductCard from "../../components/FavoriteProductCard";
 import ProductCardSkeleton from "../../components/ProductCardSkeleton";
 import ProductButton from "../../components/ProductButton";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -32,6 +33,8 @@ const ProductFavorite = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [favoriteToDelete, setFavoriteToDelete] = useState(null);
   const { showToast } = useToast();
 
   // Data fetching
@@ -72,17 +75,33 @@ const ProductFavorite = () => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  // Remove from favorites
-  const handleDeleteFavorite = useCallback(async (favoriteId) => {
-    if (!user) {
-      navigate("/login");
+  // Show confirmation modal for removing favorite
+  const handleDeleteFavoriteClick = useCallback((favoriteId) => {
+    const favorite = favorites.find((fav) => fav._id === favoriteId);
+    setFavoriteToDelete({ favoriteId, favorite });
+    setShowDeleteConfirm(true);
+  }, [favorites]);
+
+  // Remove from favorites (after confirmation)
+  const handleDeleteFavorite = useCallback(async () => {
+    if (!user || !favoriteToDelete) {
+      setShowDeleteConfirm(false);
+      setFavoriteToDelete(null);
+      if (!user) {
+        navigate("/login");
+      }
       return;
     }
+
+    const { favoriteId } = favoriteToDelete;
+    setShowDeleteConfirm(false);
+    
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         showToast("Authentication token missing", "error", 3000);
         navigate("/login");
+        setFavoriteToDelete(null);
         return;
       }
       await fetchWithRetry(() => Api.favorites.remove(favoriteId, token));
@@ -92,8 +111,10 @@ const ProductFavorite = () => {
       const errorMessage = err.response?.data?.message || err.message || "Failed to remove from favorites";
       setError(errorMessage);
       showToast(errorMessage, "error", 3000);
+    } finally {
+      setFavoriteToDelete(null);
     }
-  }, [user, navigate, showToast]);
+  }, [user, navigate, showToast, favoriteToDelete]);
 
   // Navigation
   const handleProductClick = useCallback((id) => {
@@ -152,7 +173,7 @@ const ProductFavorite = () => {
         {!loading && favorites.length > 0 && (
           <div className="mb-4 sm:mb-5 md:mb-6">
             <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-              <legend className="text-sm sm:text-base font-semibold">Search</legend>
+              <legend className="text-sm sm:text-base font-semibold m-0">Search</legend>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -275,13 +296,32 @@ const ProductFavorite = () => {
                   favoriteId={favorite._id}
                   handleProductClick={handleProductClick}
                   handleKeyDown={handleKeyDown}
-                  handleRemove={handleDeleteFavorite}
+                  handleRemove={handleDeleteFavoriteClick}
                 />
               );
             })
           )}
         </div>
       </section>
+
+      {/* Confirmation Modal for Removing Favorite */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Remove from Favorites"
+        message={
+          favoriteToDelete?.favorite?.pro_id
+            ? `Are you sure you want to remove "${favoriteToDelete.favorite.pro_id.productName || "this product"}" from your favorites?`
+            : "Are you sure you want to remove this product from your favorites?"
+        }
+        confirmText="Remove"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteFavorite}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setFavoriteToDelete(null);
+        }}
+      />
     </div>
   );
 };

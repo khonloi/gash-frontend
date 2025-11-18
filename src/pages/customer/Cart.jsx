@@ -12,6 +12,7 @@ import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ProductButton from "../../components/ProductButton";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -55,6 +56,8 @@ const Cart = () => {
   const [error, setError] = useState(null);
   const [quantityValues, setQuantityValues] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   // Track last saved quantities to compare against (not optimistic updates)
   const lastSavedQuantities = useRef({});
 
@@ -323,11 +326,20 @@ const Cart = () => {
     updateQuantities();
   }, [debouncedQuantities, user, showToast]);
 
-  // Remove item from cart
-  const handleRemoveItem = useCallback(
-    async (cartId) => {
-      if (!user?._id) return;
+  // Show confirmation modal for removing item
+  const handleRemoveItemClick = useCallback((cartId) => {
+    const item = cartItems.find((item) => item._id === cartId);
+    setItemToDelete({ cartId, item });
+    setShowDeleteConfirm(true);
+  }, [cartItems]);
 
+  // Remove item from cart (after confirmation)
+  const handleRemoveItem = useCallback(
+    async () => {
+      if (!user?._id || !itemToDelete) return;
+
+      const { cartId } = itemToDelete;
+      setShowDeleteConfirm(false);
       setActionInProgress(true);
       setError(null);
       const previousItems = [...cartItems];
@@ -368,9 +380,10 @@ const Cart = () => {
         showToast(errorMessage, "error", TOAST_TIMEOUT);
       } finally {
         setActionInProgress(false);
+        setItemToDelete(null);
       }
     },
-    [cartItems, user, showToast]
+    [cartItems, user, showToast, itemToDelete]
   );
 
   // Format price helper
@@ -551,7 +564,7 @@ const Cart = () => {
         {!loading && cartItems.length > 0 && (
           <div className="mb-4 sm:mb-5 md:mb-6">
             <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-              <legend className="text-sm sm:text-base font-semibold">Search</legend>
+              <legend className="text-sm sm:text-base font-semibold m-0">Search</legend>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -755,7 +768,7 @@ const Cart = () => {
                       <ProductButton
                         variant="danger"
                         size="sm"
-                        onClick={() => handleRemoveItem(item._id)}
+                        onClick={() => handleRemoveItemClick(item._id)}
                         aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
                         disabled={isUpdating || actionInProgress}
                       >
@@ -799,6 +812,25 @@ const Cart = () => {
         </main>
       )}
       </section>
+
+      {/* Confirmation Modal for Removing Item */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Remove Item from Cart"
+        message={
+          itemToDelete?.item
+            ? `Are you sure you want to remove "${itemToDelete.item.variantId?.productId?.productName || "this product"}" from your cart?`
+            : "Are you sure you want to remove this item from your cart?"
+        }
+        confirmText="Remove"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleRemoveItem}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setItemToDelete(null);
+        }}
+      />
     </div>
   );
 };
