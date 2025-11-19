@@ -27,7 +27,7 @@ const Contact = () => {
 
       // Validation
       if (!name.trim()) {
-        setError("Please enter your name.");
+        setError("Please fill in all required fields");
         return;
       }
       if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -39,7 +39,12 @@ const Contact = () => {
         return;
       }
       if (!message.trim()) {
-        setError("Please enter your message.");
+        setError("Please fill in all required fields");
+        return;
+      }
+      const trimmedMessage = message.trim();
+      if (trimmedMessage.length < 5 || trimmedMessage.length > 500) {
+        setError("Message must be between 5 and 500 characters");
         return;
       }
 

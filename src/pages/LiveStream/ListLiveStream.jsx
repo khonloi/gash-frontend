@@ -98,7 +98,7 @@ const LiveStream = () => {
             if (cached) {
                 setLiveStreams(cached.data);
             } else {
-                showToast(`Network Error: ${error.message}`, 'error');
+                showToast(`Failed to load livestreams. ${error.message || 'Please try again later.'}`, 'error');
             }
         } finally {
             setIsLoading(false);

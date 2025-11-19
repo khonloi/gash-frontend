@@ -32,8 +32,8 @@ const ForgotPassword = () => {
   }, []);
 
   const validateEmail = useCallback(() => {
-    if (!email.trim()) return 'Email is required';
-    if (!/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email address';
+    if (!email.trim()) return 'Please fill in all required fields';
+    if (!/^\S+@\S+\.\S+$/.test(email)) return 'Invalid email address';
     return '';
   }, [email]);
 
@@ -80,6 +80,8 @@ const ForgotPassword = () => {
         let errorMsg = '';
         if (err.status === 422) {
           errorMsg = 'Failed to send OTP: Invalid email configuration. Please check your email and try again.';
+        } else if (err.response?.status === 404 || err.response?.data?.message?.includes('No account found')) {
+          errorMsg = 'No account found with this email';
         } else if (err.response?.data?.message) {
           errorMsg = err.response.data.message;
         } else {

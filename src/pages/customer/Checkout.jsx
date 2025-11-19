@@ -124,7 +124,17 @@ const Checkout = () => {
       const response = await Api.newCart.getByAccount(user._id, token);
       setCartItems(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      showToast(err.message || 'Failed to load cart items', 'error');
+      let errorMessage = 'Failed to load cart items';
+      
+      if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      } else if (!err.response) {
+        errorMessage = 'Failed to load cart items. Please try again later.';
+      }
+      
+      showToast(errorMessage, 'error');
       console.error('Fetch cart items error:', err);
     } finally {
       setLoading(false);
@@ -248,27 +258,24 @@ const Checkout = () => {
   // === Validation ===
   const validateName = useCallback((name) => {
     const trimmed = name.trim();
-    if (!trimmed) return 'Recipient name is required';
-    if (trimmed.length < 5) return 'Recipient name must be at least 5 characters';
-    if (trimmed.length > 50) return 'Recipient name cannot exceed 50 characters';
-    if (!/^[\p{L}\s]+$/u.test(trimmed)) return 'Recipient name can only contain letters and spaces';
+    if (!trimmed) return 'Please fill in all required fields';
+    if (trimmed.length < 2 || trimmed.length > 100) return 'Recipient name must be between 2 and 100 characters';
+    if (!/^[\p{L}\s]+$/u.test(trimmed)) return 'Recipient name must contain only letters and spaces';
     return null;
   }, []);
 
   const validateAddress = useCallback((address) => {
     const trimmed = address.trim();
-    if (!trimmed) return 'Address is required';
-    if (trimmed.length < 5) return 'Address must be at least 5 characters';
-    if (trimmed.length > 150) return 'Address cannot exceed 150 characters';
+    if (!trimmed) return 'Please fill in all required fields';
+    if (trimmed.length < 5 || trimmed.length > 150) return 'Address must be between 5 and 150 characters.';
+    if (!/^[\p{L}\p{N}\s,/\-]+$/u.test(trimmed)) return 'Address must only contain letters, numbers, commas and slashes';
     return null;
   }, []);
 
   const validatePhone = useCallback((phone) => {
     const trimmed = phone.trim();
-    if (!trimmed) return 'Phone number is required';
-    if (!/^\d+$/.test(trimmed)) return 'Phone number must contain only digits';
-    if (trimmed.length < 7) return 'Phone number must be at least 7 digits';
-    if (trimmed.length > 20) return 'Phone number must not exceed 20 digits';
+    if (!trimmed) return 'Please fill in all required fields';
+    if (!/^\d{10}$/.test(trimmed)) return 'Phone number must be 10 digits';
     return null;
   }, []);
 
@@ -456,7 +463,7 @@ const Checkout = () => {
           amount: Math.max(totalPrice - discount, 0),
           paymentMethod: 'COD',
         });
-        showToast('Order placed successfully!', 'success');
+        showToast('Order created successfully', 'success');
         setLoading(false);
       } else if (paymentMethod === "VNPAY") {
         const orderId = checkoutRes?.data?.data?.order?._id || checkoutRes?.data?.data?.order?.id || checkoutRes?.data?.data?.orderId;
@@ -487,7 +494,16 @@ const Checkout = () => {
         }
       }
     } catch (err) {
-      const errorMessage = err.message || 'Failed to place order';
+      let errorMessage = 'Failed to place order';
+      
+      if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      } else if (!err.response) {
+        errorMessage = 'Failed to place order. Please try again later.';
+      }
+      
       showToast(errorMessage, 'error');
       console.error('Place order error:', err);
       setLoading(false);
