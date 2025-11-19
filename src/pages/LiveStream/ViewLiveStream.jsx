@@ -177,7 +177,7 @@ const LiveStreamDetail = () => {
                 console.log('❌ Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
-                
+
                 // Clear remote participants
                 setRemoteParticipants([]);
 
@@ -249,7 +249,7 @@ const LiveStreamDetail = () => {
             // Handle participant connected - subscribe to their tracks
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
                 console.log('👤 Participant connected:', participant.identity);
-                
+
                 // Add participant to remote participants list
                 setRemoteParticipants(prev => {
                     // Check if participant already exists (avoid duplicates)
@@ -258,7 +258,7 @@ const LiveStreamDetail = () => {
                     }
                     return [...prev, participant];
                 });
-                
+
                 // Subscribe to all their tracks
                 participant.trackPublications.forEach((publication) => {
                     if (!publication.isSubscribed) {
@@ -481,7 +481,7 @@ const LiveStreamDetail = () => {
                     hasJoinedRef.current = false;
                 }
             }
-            
+
             if (room) {
                 room.disconnect().catch(console.error);
             }
@@ -867,7 +867,7 @@ const LiveStreamDetail = () => {
                             </button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
-                            <LiveStreamProducts liveId={selectedStream?._id || id} />
+                            <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />
                         </div>
                     </div>
                 )}

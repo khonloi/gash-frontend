@@ -6,6 +6,8 @@ import Api from '../../common/SummaryAPI';
 const LiveStreamProducts = ({ liveId }) => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [productPriceCache, setProductPriceCache] = useState({}); // Cache for product prices
+    const productPriceCacheRef = useRef({}); // Ref cache for synchronous access
     const socketRef = useRef(null);
 
     // Helper: Get product name
@@ -37,11 +39,39 @@ const LiveStreamProducts = ({ liveId }) => {
     // Helper: Get minimum price from product variants
     const getMinPrice = (product) => {
         if (!product) return 0;
-        const variants = product.productVariantIds || product.variants || [];
+
+        // Try multiple paths to get variants
+        let variants = product.productVariantIds || product.variants || product.productVariants || [];
+
+        // If variants is not an array, try to extract it
+        if (!Array.isArray(variants) && typeof variants === 'object') {
+            if (Array.isArray(variants.data)) {
+                variants = variants.data;
+            } else if (Array.isArray(variants.variants)) {
+                variants = variants.variants;
+            } else {
+                variants = [];
+            }
+        }
+
         if (variants.length === 0) return 0;
+
+        // Extract prices from variants, handling different data structures
         const prices = variants
-            .filter(v => v && v.variantStatus !== 'discontinued' && v.variantPrice > 0)
-            .map(v => v.variantPrice);
+            .filter(v => {
+                if (!v) return false;
+                // Check variant status
+                const status = v.variantStatus || v.status;
+                if (status === 'discontinued') return false;
+
+                // Get price from different possible fields
+                const price = v.variantPrice || v.price || v.variant_price || 0;
+                return price > 0;
+            })
+            .map(v => {
+                return v.variantPrice || v.price || v.variant_price || 0;
+            });
+
         return prices.length > 0 ? Math.min(...prices) : 0;
     };
 
@@ -66,6 +96,36 @@ const LiveStreamProducts = ({ liveId }) => {
         });
     };
 
+    // Fetch product details to get price if not available
+    const fetchProductPrice = useCallback(async (productId) => {
+        // Check cache first (from ref for synchronous access)
+        if (productPriceCacheRef.current[productId]) {
+            return productPriceCacheRef.current[productId];
+        }
+
+        try {
+            const response = await Api.newProducts.getById(productId);
+            if (response.data?.success && response.data.data) {
+                const product = response.data.data;
+                // Try to get price from variants
+                let price = getMinPrice(product);
+                // If no price from variants, try direct price field
+                if (price === 0) {
+                    price = product.price || product.productPrice || product.minPrice || 0;
+                }
+                // Cache the price in both state and ref
+                if (price > 0) {
+                    productPriceCacheRef.current[productId] = price;
+                    setProductPriceCache(prev => ({ ...prev, [productId]: price }));
+                }
+                return price;
+            }
+        } catch (error) {
+            console.error('Error fetching product price:', error);
+        }
+        return 0;
+    }, []);
+
     // Load live products
     const loadProducts = useCallback(async () => {
         if (!liveId) return;
@@ -78,18 +138,75 @@ const LiveStreamProducts = ({ liveId }) => {
             if (response.data?.success) {
                 const productsData = response.data.data || [];
                 // Sort products: pinned first, then by added date
-                setProducts(sortProducts(productsData));
+                const sortedProducts = sortProducts(productsData);
+                setProducts(sortedProducts);
+
+                // Immediately fetch prices for products that don't have price
+                // Use Promise.allSettled to fetch all prices in parallel without blocking
+                const pricePromises = sortedProducts.map(async (lp) => {
+                    const product = lp.product || lp.productId || {};
+                    const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id);
+
+                    if (productId) {
+                        // Check if product already has price
+                        const hasPrice = getMinPrice(product) > 0 || product.price || product.productPrice || product.minPrice;
+                        // Check cache
+                        const cachedPrice = productPriceCacheRef.current[productId];
+
+                        if (!hasPrice && !cachedPrice) {
+                            // Fetch product details to get price
+                            const price = await fetchProductPrice(productId);
+                            return { productId, price };
+                        }
+                    }
+                    return { productId: null, price: 0 };
+                });
+
+                // Wait for all prices to be fetched, then update state once
+                Promise.allSettled(pricePromises).then(results => {
+                    const priceUpdates = results
+                        .filter(result => result.status === 'fulfilled' && result.value.price > 0)
+                        .map(result => result.value);
+
+                    if (priceUpdates.length > 0) {
+                        // Update all products with prices in a single state update
+                        setProducts(prev => prev.map(p => {
+                            const pId = typeof p.productId === 'string' ? p.productId : (p.productId?._id || p.product?._id);
+                            const update = priceUpdates.find(update => pId === update.productId);
+
+                            if (update) {
+                                // Create a completely new object to ensure React detects the change
+                                const updatedProduct = JSON.parse(JSON.stringify(p));
+                                if (updatedProduct.product) {
+                                    updatedProduct.product = { ...updatedProduct.product, price: update.price };
+                                } else if (updatedProduct.productId && typeof updatedProduct.productId === 'object') {
+                                    updatedProduct.productId = { ...updatedProduct.productId, price: update.price };
+                                }
+                                return updatedProduct;
+                            }
+                            return p;
+                        }));
+                    }
+                }).catch(error => {
+                    console.error('Error fetching product prices:', error);
+                });
+            } else {
+                // Reset products if API call fails
+                setProducts([]);
             }
         } catch (error) {
             console.error('Error loading live products:', error);
+            // Reset products on error
+            setProducts([]);
         } finally {
             setIsLoading(false);
         }
-    }, [liveId]);
+    }, [liveId, fetchProductPrice]);
 
     useEffect(() => {
         loadProducts();
     }, [loadProducts]);
+
 
     // Setup WebSocket for real-time products updates
     useEffect(() => {
@@ -97,6 +214,9 @@ const LiveStreamProducts = ({ liveId }) => {
 
         const socket = io(SOCKET_URL, { transports: ['websocket'] });
         socketRef.current = socket;
+
+        // Store fetchProductPrice in a ref to avoid dependency issues
+        const fetchPrice = fetchProductPrice;
 
         socket.on('connect', () => {
             socket.emit('joinLiveProductRoom', liveId);
@@ -110,7 +230,42 @@ const LiveStreamProducts = ({ liveId }) => {
                     const exists = prev.some(p => p._id === data.liveProduct._id);
                     if (exists) return prev;
                     // Add new product and sort (pinned first, then by added date)
-                    return sortProducts([...prev, data.liveProduct]);
+                    const updatedProducts = sortProducts([...prev, data.liveProduct]);
+
+                    // Fetch price for the new product if it doesn't have one
+                    const newProduct = data.liveProduct;
+                    const product = newProduct.product || newProduct.productId || {};
+                    const productId = typeof newProduct.productId === 'string' ? newProduct.productId : (product._id || newProduct.productId?._id);
+
+                    if (productId) {
+                        const hasPrice = getMinPrice(product) > 0 || product.price || product.productPrice || product.minPrice;
+                        const cachedPrice = productPriceCacheRef.current[productId];
+
+                        if (!hasPrice && !cachedPrice) {
+                            // Fetch price asynchronously
+                            fetchPrice(productId).then(price => {
+                                if (price > 0) {
+                                    setProducts(prevProducts => prevProducts.map(p => {
+                                        const pId = typeof p.productId === 'string' ? p.productId : (p.productId?._id || p.product?._id);
+                                        if (pId === productId) {
+                                            const updatedProduct = JSON.parse(JSON.stringify(p));
+                                            if (updatedProduct.product) {
+                                                updatedProduct.product = { ...updatedProduct.product, price };
+                                            } else if (updatedProduct.productId && typeof updatedProduct.productId === 'object') {
+                                                updatedProduct.productId = { ...updatedProduct.productId, price };
+                                            }
+                                            return updatedProduct;
+                                        }
+                                        return p;
+                                    }));
+                                }
+                            }).catch(error => {
+                                console.error('Error fetching price for new product:', error);
+                            });
+                        }
+                    }
+
+                    return updatedProducts;
                 });
             }
         });
@@ -164,7 +319,7 @@ const LiveStreamProducts = ({ liveId }) => {
             socket.off('product:unpinned');
             socket.close();
         };
-    }, [liveId]);
+    }, [liveId, fetchProductPrice]);
 
     // Navigate to product detail in new tab
     const handleProductClick = (productId) => {
@@ -206,7 +361,18 @@ const LiveStreamProducts = ({ liveId }) => {
                 // productId can be string ID (WebSocket) or object with _id (API)
                 const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id || lp.productId || '');
                 const productImageUrl = getMainImageUrl(product);
-                const minPrice = getMinPrice(product);
+
+                // Try to get price from multiple sources
+                let minPrice = getMinPrice(product);
+                // If no price from variants, try direct price field
+                if (minPrice === 0) {
+                    minPrice = product.price || product.productPrice || product.minPrice || 0;
+                }
+                // If still no price, check cache (both state and ref for immediate access)
+                if (minPrice === 0 && productId) {
+                    minPrice = productPriceCache[productId] || productPriceCacheRef.current[productId] || 0;
+                }
+
                 const orderNumber = index + 1;
 
                 return (
@@ -256,9 +422,15 @@ const LiveStreamProducts = ({ liveId }) => {
 
                         {/* Product Info */}
                         <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight">{productName}</h4>
-                            {minPrice > 0 && (
+                            {/* Always show product name */}
+                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight">
+                                {productName || 'Unnamed Product'}
+                            </h4>
+                            {/* Always show price below name */}
+                            {minPrice > 0 ? (
                                 <p className="text-xs font-bold text-red-400 mt-0.5">{formatPrice(minPrice)}</p>
+                            ) : (
+                                <p className="text-[10px] text-gray-500 mt-0.5">Price not available</p>
                             )}
                             {lp.isPinned && (
                                 <p className="text-[9px] text-yellow-400 font-bold mt-0.5">PINNED</p>
