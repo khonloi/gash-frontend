@@ -301,7 +301,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
         // Listen for new comments (real-time)
         socket.on('comment:added', (data) => {
-            if (data?.comment && data?.liveId === liveId) {
+            // Normalize liveId comparison (handle both string and ObjectId)
+            const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
+            const currentLiveId = liveId?.toString?.() || liveId;
+            if (data?.comment && dataLiveId === currentLiveId) {
                 const newComment = data.comment;
                 // Normalize: socket uses 'sender', API uses 'senderId'
                 if (newComment.sender && !newComment.senderId) {
@@ -343,7 +346,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
         // Listen for comment deletion (if user sends comment that gets deleted)
         socket.on('comment:deleted', (data) => {
-            if (data?.commentId && data?.liveId === liveId) {
+            // Normalize liveId comparison (handle both string and ObjectId)
+            const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
+            const currentLiveId = liveId?.toString?.() || liveId;
+            if (data?.commentId && dataLiveId === currentLiveId) {
                 setComments(prev => prev.filter(c => c._id !== data.commentId));
                 console.log('🗑️ Comment deleted via WebSocket');
             }
@@ -351,7 +357,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
         // Listen for comment pin/unpin (real-time updates)
         socket.on('comment:pinned', (data) => {
-            if (data?.comment && data?.liveId === liveId) {
+            // Normalize liveId comparison (handle both string and ObjectId)
+            const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
+            const currentLiveId = liveId?.toString?.() || liveId;
+            if (data?.comment && dataLiveId === currentLiveId) {
                 setComments(prev => {
                     const updated = prev.map(c =>
                         c._id === data.comment._id
@@ -368,7 +377,10 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
         });
 
         socket.on('comment:unpinned', (data) => {
-            if (data?.commentId && data?.liveId === liveId) {
+            // Normalize liveId comparison (handle both string and ObjectId)
+            const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
+            const currentLiveId = liveId?.toString?.() || liveId;
+            if (data?.commentId && dataLiveId === currentLiveId) {
                 setComments(prev => {
                     const updated = prev.map(c =>
                         c._id === data.commentId
@@ -485,7 +497,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                             Pinned
                         </span>
                     </div>
-                    
+
                     {/* Pinned Comment Content */}
                     <div className="p-3 max-h-40 overflow-y-auto scrollbar-livestream">
                         {comments
