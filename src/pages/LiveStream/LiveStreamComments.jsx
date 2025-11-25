@@ -205,8 +205,13 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 // Backend returns: { success: true, data: comments, count, totalCount, ... }
                 // data is the array of comments directly
                 const comments = response.data.data || [];
+                // Ensure isPinned is explicitly set for all comments (default to false if not provided)
+                const commentsWithPin = comments.map(c => ({
+                    ...c,
+                    isPinned: c.isPinned ?? false
+                }));
                 // Sort: pinned first, then oldest to newest
-                const sortedComments = comments.sort((a, b) => {
+                const sortedComments = commentsWithPin.sort((a, b) => {
                     if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
                     return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                 });
@@ -320,10 +325,20 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                     const exists = prev.some(c => c._id === newComment._id);
                     if (exists) {
                         console.log('⚠️ Duplicate comment ignored:', newComment._id);
-                        return prev;
+                        // Update existing comment to preserve isPinned if it was already set
+                        return prev.map(c =>
+                            c._id === newComment._id
+                                ? { ...c, ...newComment, isPinned: c.isPinned || newComment.isPinned }
+                                : c
+                        );
                     }
+                    // Ensure isPinned is explicitly set (default to false if not provided)
+                    const commentWithPin = {
+                        ...newComment,
+                        isPinned: newComment.isPinned ?? false
+                    };
                     // Add new comment and maintain sort (pinned first, then oldest to newest)
-                    const updated = [...prev, newComment].sort((a, b) => {
+                    const updated = [...prev, commentWithPin].sort((a, b) => {
                         if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
                         return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                     });
@@ -454,7 +469,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
         }
 
         previousCommentsLengthRef.current = currentLength;
-    }, [comments.length, isVisible]);
+    }, [comments, isVisible]);
 
     if (!isVisible) return null;
 
