@@ -127,7 +127,6 @@ const LiveStreamProducts = ({ liveId }) => {
     };
 
     // Fetch product details to get price if not available
-    // eslint-disable-next-line no-unused-vars
     const fetchProductPrice = useCallback(async (productId) => {
         // Check cache first (from ref for synchronous access)
         if (productPriceCacheRef.current[productId]) {
@@ -240,6 +239,30 @@ const LiveStreamProducts = ({ liveId }) => {
     useEffect(() => {
         loadProducts();
     }, [loadProducts]);
+
+    // Auto-fetch prices for products without price info
+    useEffect(() => {
+        if (products.length === 0) return;
+
+        products.forEach((lp) => {
+            const product = lp.product || lp.productId || {};
+            const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id || lp.productId || '');
+
+            // Check if price is already available
+            let minPrice = getMinPrice(product);
+            if (minPrice === 0) {
+                minPrice = product.price || product.productPrice || product.minPrice || 0;
+            }
+            if (minPrice === 0 && productId) {
+                minPrice = productPriceCache[productId] || productPriceCacheRef.current[productId] || 0;
+            }
+
+            // If still no price and productId exists, fetch it
+            if (minPrice === 0 && productId && !productPriceCacheRef.current[productId]) {
+                fetchProductPrice(productId);
+            }
+        });
+    }, [products, productPriceCache, fetchProductPrice]);
 
 
     // Setup WebSocket for real-time products updates
