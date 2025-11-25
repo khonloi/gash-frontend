@@ -20,20 +20,50 @@ const LiveStreamProducts = ({ liveId }) => {
         return 'Unnamed';
     };
 
-    // Helper: Get main product image URL
+    // Helper: Get main product image URL with fallback to variant images
     const getMainImageUrl = (product) => {
         if (!product) return null;
 
-        // Handle WebSocket format: product.image (direct URL string)
+        // PRIORITY 1: Handle API format - productImageIds array with isMain flag
+        const images = product.productImageIds || product.images || [];
+        if (images.length > 0) {
+            // Try to find main image first (isMain === true)
+            const mainImage = images.find(img => img && img.isMain === true && img.imageUrl);
+            if (mainImage?.imageUrl) {
+                return mainImage.imageUrl;
+            }
+            // Otherwise, use first available image
+            const firstImage = images.find(img => img && img.imageUrl);
+            if (firstImage?.imageUrl) {
+                return firstImage.imageUrl;
+            }
+        }
+
+        // PRIORITY 2: Handle WebSocket format - product.image (direct URL string)
         if (product.image && typeof product.image === 'string') {
             return product.image;
         }
 
-        // Handle API format: productImageIds array
-        const images = product.productImageIds || product.images || [];
-        if (images.length === 0) return null;
-        const mainImage = images.find(img => img.isMain === true);
-        return mainImage?.imageUrl || images[0]?.imageUrl || null;
+        // PRIORITY 3: Fallback to variant images if no product images available
+        const variants = product.productVariantIds || product.variants || [];
+        if (Array.isArray(variants) && variants.length > 0) {
+            for (const variant of variants) {
+                if (variant?.variantImage && typeof variant.variantImage === 'string') {
+                    return variant.variantImage;
+                }
+            }
+        }
+
+        // PRIORITY 4: Check nested product object for variants
+        if (product.product?.productVariantIds && Array.isArray(product.product.productVariantIds)) {
+            for (const variant of product.product.productVariantIds) {
+                if (variant?.variantImage && typeof variant.variantImage === 'string') {
+                    return variant.variantImage;
+                }
+            }
+        }
+
+        return null;
     };
 
     // Helper: Get minimum price from product variants
@@ -97,6 +127,7 @@ const LiveStreamProducts = ({ liveId }) => {
     };
 
     // Fetch product details to get price if not available
+    // eslint-disable-next-line no-unused-vars
     const fetchProductPrice = useCallback(async (productId) => {
         // Check cache first (from ref for synchronous access)
         if (productPriceCacheRef.current[productId]) {
@@ -204,7 +235,7 @@ const LiveStreamProducts = ({ liveId }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [liveId, fetchProductPrice]);
+    }, [liveId]);
 
     useEffect(() => {
         loadProducts();
@@ -218,9 +249,6 @@ const LiveStreamProducts = ({ liveId }) => {
         const socket = io(SOCKET_URL, { transports: ['websocket'] });
         socketRef.current = socket;
 
-        // Store fetchProductPrice in a ref to avoid dependency issues
-        const fetchPrice = fetchProductPrice;
-
         socket.on('connect', () => {
             socket.emit('joinLiveProductRoom', liveId);
         });
@@ -228,6 +256,15 @@ const LiveStreamProducts = ({ liveId }) => {
         // Handle product added
         socket.on('product:added', (data) => {
             if (data?.liveId === liveId && data?.liveProduct) {
+                const hasImages = (data.liveProduct.productId?.productImageIds?.length > 0) ||
+                    (data.liveProduct.product?.image);
+
+                // If socket data doesn't have images, reload from API to get full data
+                if (!hasImages) {
+                    loadProducts();
+                    return;
+                }
+
                 setProducts(prev => {
                     // Check if product already exists
                     const exists = prev.some(p => p._id === data.liveProduct._id);
@@ -305,7 +342,7 @@ const LiveStreamProducts = ({ liveId }) => {
             socket.off('product:unpinned');
             socket.close();
         };
-    }, [liveId, fetchProductPrice]);
+    }, [liveId, loadProducts]);
 
     // Navigate to product detail in new tab
     const handleProductClick = (productId) => {
@@ -409,7 +446,7 @@ const LiveStreamProducts = ({ liveId }) => {
                         {/* Product Info */}
                         <div className="min-w-0 flex-1">
                             {/* Always show product name */}
-                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight">
+                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight" title={productName || 'Unnamed Product'}>
                                 {productName || 'Unnamed Product'}
                             </h4>
                             {/* Always show price below name */}
