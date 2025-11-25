@@ -115,7 +115,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
 
     return (
         <div className={`group relative p-3 rounded-lg transition-all duration-300 backdrop-blur-sm border ${comment.isPinned
-            ? 'bg-gradient-to-r from-yellow-900/40 via-yellow-800/30 to-yellow-900/40 border-yellow-500/60 shadow-lg shadow-yellow-500/20'
+            ? 'bg-gradient-to-r from-yellow-900/40 via-yellow-800/30 to-yellow-900/40 border-yellow-500/60 hover:border-yellow-400/80 shadow-lg shadow-yellow-500/20'
             : 'bg-gradient-to-r from-gray-800/40 via-gray-700/40 to-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 hover:border-gray-600/60'
             }`}>
             <div className="flex items-start gap-2.5">
@@ -126,19 +126,29 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                         className="w-9 h-9 rounded-lg object-cover border-2 border-white/10 shadow-lg"
                         onError={(e) => { e.target.src = '/default-avatar.png'; }}
                     />
+                    {comment.isPinned && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border border-gray-900 flex items-center justify-center shadow-lg">
+                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" />
+                            </svg>
+                        </div>
+                    )}
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
                         <span className="text-white font-semibold text-xs truncate">{senderName}</span>
                         {/* Host Badge */}
                         {senderData?._id === hostId && (
-                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-red-600 to-pink-600 text-white text-[9px] font-bold rounded border border-red-400/50 shadow-sm border border-gray-200">
+                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-red-600 to-pink-600 text-white text-[9px] font-bold rounded border border-red-400/50 shadow-sm">
                                 HOST
                             </span>
                         )}
                         <span className="text-gray-400 text-[10px]">{formatTimeAgo(comment.createdAt)}</span>
                     </div>
                     <p className="text-gray-200 text-xs break-words leading-relaxed">{comment.commentText || comment.content}</p>
+                    {comment.isPinned && (
+                        <p className="text-[9px] text-yellow-400 font-bold mt-0.5">PINNED</p>
+                    )}
                 </div>
 
                 {(canDelete || canPin) && (onHideComment || onPinComment) && (
@@ -216,6 +226,17 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                     return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                 });
                 setComments(sortedComments);
+
+                // Auto-scroll to bottom after loading comments
+                setTimeout(() => {
+                    if (commentsContainerRef.current) {
+                        const container = commentsContainerRef.current;
+                        container.scrollTo({
+                            top: container.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 100);
             } else {
                 setError('Failed to load comments');
             }
@@ -243,6 +264,16 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 // Comment will be added automatically via WebSocket in real-time
                 // No need to fetch again - WebSocket handles it
                 console.log('✅ Comment sent, waiting for WebSocket update...');
+                // Auto-scroll to bottom after sending comment
+                setTimeout(() => {
+                    if (commentsContainerRef.current) {
+                        const container = commentsContainerRef.current;
+                        container.scrollTo({
+                            top: container.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 300);
             } else {
                 const errorMsg = response.data?.message || 'Unable to send comment';
                 if (errorMsg.includes('at most 100') || errorMsg.includes('100 characters')) {
@@ -350,12 +381,13 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 setTimeout(() => {
                     if (commentsContainerRef.current) {
                         const container = commentsContainerRef.current;
+                        // Always scroll to bottom for new comments
                         container.scrollTo({
                             top: container.scrollHeight,
                             behavior: 'smooth'
                         });
                     }
-                }, 100);
+                }, 200);
             }
         });
 
@@ -447,19 +479,20 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
         }
     }, [isVisible, liveId, fetchComments]);
 
-    // Auto-scroll when new comments arrive (only when not pinned)
+    // Auto-scroll when new comments arrive
     useEffect(() => {
-        const currentLength = comments.filter(c => !c.isPinned).length;
-        const previousLength = previousCommentsLengthRef.current;
+        const currentTotalLength = comments.length;
+        const previousTotalLength = previousCommentsLengthRef.current;
 
-        // Only auto-scroll if:
+        // Auto-scroll if:
         // 1. Comments length increased (new comment added)
         // 2. Comments container is visible
-        // 3. Not initial load (previousLength > 0)
-        if (previousLength > 0 && currentLength > previousLength && isVisible && commentsContainerRef.current) {
+        // 3. Not initial load (previousTotalLength > 0)
+        if (previousTotalLength > 0 && currentTotalLength > previousTotalLength && isVisible && commentsContainerRef.current) {
             setTimeout(() => {
                 const container = commentsContainerRef.current;
                 if (container) {
+                    // Always scroll to bottom for new comments
                     container.scrollTo({
                         top: container.scrollHeight,
                         behavior: 'smooth'
@@ -468,14 +501,14 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             }, 150);
         }
 
-        previousCommentsLengthRef.current = currentLength;
+        previousCommentsLengthRef.current = currentTotalLength;
     }, [comments, isVisible]);
 
     if (!isVisible) return null;
 
     return (
         <div className="fixed right-0 top-0 h-full w-[352px] bg-black/95 backdrop-blur-xl border-l border-gray-800/50 flex flex-col z-[45] shadow-2xl pointer-events-auto">
-            <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+            <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
                         <Chat className="w-4 h-4 text-white" />
@@ -505,14 +538,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             {/* Pinned Comments Section - Sticky below reactions */}
             {comments.some(c => c.isPinned) && (
                 <div className="bg-yellow-900/30 border-b border-yellow-500/40">
-                    {/* Pinned Header */}
-                    <div className="flex items-center gap-2 px-3 py-2 border-b border-yellow-500/20">
-                        <PushPin className="w-4 h-4 text-yellow-400" />
-                        <span className="text-yellow-300 text-xs font-semibold">
-                            Pinned
-                        </span>
-                    </div>
-
                     {/* Pinned Comment Content */}
                     <div className="p-3 max-h-40 overflow-y-auto scrollbar-livestream">
                         {comments
