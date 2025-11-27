@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { Bell, Trash2, Settings, X } from "lucide-react";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
 import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../utils/orderEmailNotification";
+import Api from "../common/SummaryAPI";
+
+const MAX_ORDER_CACHE = 20;
 
 export default function NotificationsDropdown({ user }) {
   const [notifications, setNotifications] = useState([]);
@@ -13,6 +16,85 @@ export default function NotificationsDropdown({ user }) {
 
   // 🧩 Socket.IO: kết nối realtime
   const socketRef = useRef(null);
+  const orderCacheRef = useRef(new Map());
+
+  const hasDetailedOrderInfo = useCallback((order) => {
+    return Boolean(
+      order?.orderDetails?.some(
+        (detail) => detail?.variant_id?.productId?.productName
+      )
+    );
+  }, []);
+
+  const pruneCacheIfNeeded = useCallback(() => {
+    const cache = orderCacheRef.current;
+    if (cache.size <= MAX_ORDER_CACHE) return;
+    const firstKey = cache.keys().next().value;
+    if (firstKey) {
+      cache.delete(firstKey);
+    }
+  }, []);
+
+  const mergeOrderIntoCache = useCallback((suffixKey, orderData) => {
+    if (!suffixKey || !orderData) return;
+    const normalizedKey = suffixKey.toLowerCase();
+    orderCacheRef.current.set(normalizedKey, orderData);
+    pruneCacheIfNeeded();
+  }, [pruneCacheIfNeeded]);
+
+  const fetchOrderDataBySuffix = useCallback(
+    async (orderIdSuffix) => {
+      if (!orderIdSuffix || !user?._id) return null;
+      const normalizedSuffix = orderIdSuffix.toString().toLowerCase();
+      const cache = orderCacheRef.current;
+      const cachedOrder = cache.get(normalizedSuffix);
+      if (cachedOrder && hasDetailedOrderInfo(cachedOrder)) {
+        return cachedOrder;
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return cachedOrder || null;
+      }
+
+      try {
+        let orderIdToFetch = cachedOrder?._id;
+
+        if (!orderIdToFetch) {
+          const response = await Api.order.getOrders(user._id, token);
+          const ordersList = response.data?.data || [];
+          const matchedOrder = ordersList.find(
+            (orderItem) =>
+              orderItem?._id?.slice(-8).toLowerCase() === normalizedSuffix
+          );
+          if (!matchedOrder) {
+            return cachedOrder || null;
+          }
+          orderIdToFetch = matchedOrder._id;
+          mergeOrderIntoCache(normalizedSuffix, matchedOrder);
+          if (hasDetailedOrderInfo(matchedOrder)) {
+            return matchedOrder;
+          }
+        }
+
+        if (!orderIdToFetch) {
+          return cachedOrder || null;
+        }
+
+        const detailedResponse = await Api.order.getOrder(orderIdToFetch, token);
+        const detailedOrder = detailedResponse.data?.data;
+        if (detailedOrder) {
+          mergeOrderIntoCache(normalizedSuffix, detailedOrder);
+          return detailedOrder;
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch order data for email:", err);
+      }
+
+      return cachedOrder || null;
+    },
+    [user, hasDetailedOrderInfo, mergeOrderIntoCache]
+  );
 
   useEffect(() => {
     if (!user?._id) {
@@ -67,17 +149,25 @@ export default function NotificationsDropdown({ user }) {
 
       // Send email notification if it's an order notification
       if (data.type === 'order' && user?.email) {
-        const orderId = extractOrderIdFromMessage(data.message);
-        sendOrderNotificationEmail({
-          userEmail: user.email,
-          userName: user.name || user.username,
-          title: data.title,
-          message: data.message,
-          orderId: orderId,
-        }).catch(err => {
-          // Don't show error to user - email is optional
-          console.error('❌ Failed to send order notification email:', err);
-        });
+        const orderIdSuffix = extractOrderIdFromMessage(data.message);
+        (async () => {
+          try {
+            const orderInfo = orderIdSuffix
+              ? await fetchOrderDataBySuffix(orderIdSuffix)
+              : null;
+            await sendOrderNotificationEmail({
+              userEmail: user.email,
+              userName: user.name || user.username,
+              title: data.title,
+              message: data.message,
+              orderId: orderInfo?._id || orderIdSuffix,
+              orderInfo,
+            });
+          } catch (err) {
+            // Don't show error to user - email is optional
+            console.error('❌ Failed to send order notification email:', err);
+          }
+        })();
       }
     };
 
@@ -154,6 +244,15 @@ export default function NotificationsDropdown({ user }) {
       });
     };
 
+    // Listen to order updates to hydrate cache for mailing details
+    const handleOrderUpdated = (payload) => {
+      const updatedOrder = payload?.order || payload;
+      const orderId = updatedOrder?._id;
+      if (!orderId) return;
+      const suffixKey = orderId.slice(-8).toLowerCase();
+      mergeOrderIntoCache(suffixKey, updatedOrder);
+    };
+
     // Log lỗi
     const handleConnectError = (err) => {
       console.error("❌ Notification Socket connection error:", err.message);
@@ -169,6 +268,7 @@ export default function NotificationsDropdown({ user }) {
     socket.on("newNotification", handleNewNotification);
     socket.on("notificationBadgeUpdate", handleBadgeUpdate);
     socket.on("notificationDeleted", handleNotificationDeleted);
+    socket.on("orderUpdated", handleOrderUpdated);
     socket.on("connect_error", handleConnectError);
     socket.on("disconnect", handleDisconnect);
 
@@ -190,12 +290,13 @@ export default function NotificationsDropdown({ user }) {
       socket.off("newNotification", handleNewNotification);
       socket.off("notificationBadgeUpdate", handleBadgeUpdate);
       socket.off("notificationDeleted", handleNotificationDeleted);
+      socket.off("orderUpdated", handleOrderUpdated);
       socket.off("reconnect", handleReconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("disconnect", handleDisconnect);
       // Don't disconnect here - keep socket alive for component lifecycle
     };
-  }, [user]);
+  }, [user, fetchOrderDataBySuffix, mergeOrderIntoCache]);
 
   // 🧠 Lấy danh sách thông báo từ backend
   useEffect(() => {
