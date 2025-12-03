@@ -9,11 +9,14 @@ import LiveStreamReactions from './LiveStreamReactions';
 // ============= CommentInput Component (Inline) =============
 const CommentInput = ({ onSendComment, isSending }) => {
     const [commentText, setCommentText] = useState('');
-    const maxLength = 500;
+    const maxLength = 100;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!commentText.trim() || isSending) return;
+        if (commentText.trim().length > 100) {
+            return;
+        }
 
         await onSendComment(commentText.trim());
         setCommentText('');
@@ -236,11 +239,25 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 // No need to fetch again - WebSocket handles it
                 console.log('✅ Comment sent, waiting for WebSocket update...');
             } else {
-                setError(response.data?.message || 'Unable to send comment');
+                const errorMsg = response.data?.message || 'Unable to send comment';
+                if (errorMsg.includes('at most 100') || errorMsg.includes('100 characters')) {
+                    setError('Comment must be at most 100 characters');
+                } else if (errorMsg.includes('required') || errorMsg.includes('fill in')) {
+                    setError('Please fill in all required fields');
+                } else {
+                    setError(errorMsg);
+                }
             }
         } catch (error) {
             console.error('Error sending comment:', error);
-            setError('Error sending comment');
+            const errorMsg = error?.response?.data?.message || error?.message || 'Error sending comment';
+            if (errorMsg.includes('at most 100') || errorMsg.includes('100 characters')) {
+                setError('Comment must be at most 100 characters');
+            } else if (errorMsg.includes('required') || errorMsg.includes('fill in')) {
+                setError('Please fill in all required fields');
+            } else {
+                setError(errorMsg);
+            }
         } finally {
             setIsSending(false);
         }

@@ -78,8 +78,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
       }
-      if (comment && comment.length > 500) {
-        throw new Error("Comment cannot exceed 500 characters");
+      if (comment && comment.trim()) {
+        const trimmedComment = comment.trim();
+        if (trimmedComment.length < 10) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
+        if (trimmedComment.length > 10000) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
       }
 
       const feedbackData = {
@@ -147,8 +153,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
       }
-      if (comment && comment.length > 500) {
-        throw new Error("Comment cannot exceed 500 characters");
+      if (comment && comment.trim()) {
+        const trimmedComment = comment.trim();
+        if (trimmedComment.length < 10) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
+        if (trimmedComment.length > 10000) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
       }
 
       const feedbackData = {

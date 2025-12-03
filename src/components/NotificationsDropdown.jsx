@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { Bell, Trash2, Settings, X } from "lucide-react";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
 import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../utils/orderEmailNotification";
+import Api from "../common/SummaryAPI";
+
+const MAX_ORDER_CACHE = 20;
 
 export default function NotificationsDropdown({ user }) {
   const [notifications, setNotifications] = useState([]);
@@ -13,6 +16,85 @@ export default function NotificationsDropdown({ user }) {
 
   // 🧩 Socket.IO: kết nối realtime
   const socketRef = useRef(null);
+  const orderCacheRef = useRef(new Map());
+
+  const hasDetailedOrderInfo = useCallback((order) => {
+    return Boolean(
+      order?.orderDetails?.some(
+        (detail) => detail?.variant_id?.productId?.productName
+      )
+    );
+  }, []);
+
+  const pruneCacheIfNeeded = useCallback(() => {
+    const cache = orderCacheRef.current;
+    if (cache.size <= MAX_ORDER_CACHE) return;
+    const firstKey = cache.keys().next().value;
+    if (firstKey) {
+      cache.delete(firstKey);
+    }
+  }, []);
+
+  const mergeOrderIntoCache = useCallback((suffixKey, orderData) => {
+    if (!suffixKey || !orderData) return;
+    const normalizedKey = suffixKey.toLowerCase();
+    orderCacheRef.current.set(normalizedKey, orderData);
+    pruneCacheIfNeeded();
+  }, [pruneCacheIfNeeded]);
+
+  const fetchOrderDataBySuffix = useCallback(
+    async (orderIdSuffix) => {
+      if (!orderIdSuffix || !user?._id) return null;
+      const normalizedSuffix = orderIdSuffix.toString().toLowerCase();
+      const cache = orderCacheRef.current;
+      const cachedOrder = cache.get(normalizedSuffix);
+      if (cachedOrder && hasDetailedOrderInfo(cachedOrder)) {
+        return cachedOrder;
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return cachedOrder || null;
+      }
+
+      try {
+        let orderIdToFetch = cachedOrder?._id;
+
+        if (!orderIdToFetch) {
+          const response = await Api.order.getOrders(user._id, token);
+          const ordersList = response.data?.data || [];
+          const matchedOrder = ordersList.find(
+            (orderItem) =>
+              orderItem?._id?.slice(-8).toLowerCase() === normalizedSuffix
+          );
+          if (!matchedOrder) {
+            return cachedOrder || null;
+          }
+          orderIdToFetch = matchedOrder._id;
+          mergeOrderIntoCache(normalizedSuffix, matchedOrder);
+          if (hasDetailedOrderInfo(matchedOrder)) {
+            return matchedOrder;
+          }
+        }
+
+        if (!orderIdToFetch) {
+          return cachedOrder || null;
+        }
+
+        const detailedResponse = await Api.order.getOrder(orderIdToFetch, token);
+        const detailedOrder = detailedResponse.data?.data;
+        if (detailedOrder) {
+          mergeOrderIntoCache(normalizedSuffix, detailedOrder);
+          return detailedOrder;
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch order data for email:", err);
+      }
+
+      return cachedOrder || null;
+    },
+    [user, hasDetailedOrderInfo, mergeOrderIntoCache]
+  );
 
   useEffect(() => {
     if (!user?._id) {
@@ -67,17 +149,25 @@ export default function NotificationsDropdown({ user }) {
 
       // Send email notification if it's an order notification
       if (data.type === 'order' && user?.email) {
-        const orderId = extractOrderIdFromMessage(data.message);
-        sendOrderNotificationEmail({
-          userEmail: user.email,
-          userName: user.name || user.username,
-          title: data.title,
-          message: data.message,
-          orderId: orderId,
-        }).catch(err => {
-          // Don't show error to user - email is optional
-          console.error('❌ Failed to send order notification email:', err);
-        });
+        const orderIdSuffix = extractOrderIdFromMessage(data.message);
+        (async () => {
+          try {
+            const orderInfo = orderIdSuffix
+              ? await fetchOrderDataBySuffix(orderIdSuffix)
+              : null;
+            await sendOrderNotificationEmail({
+              userEmail: user.email,
+              userName: user.name || user.username,
+              title: data.title,
+              message: data.message,
+              orderId: orderInfo?._id || orderIdSuffix,
+              orderInfo,
+            });
+          } catch (err) {
+            // Don't show error to user - email is optional
+            console.error('❌ Failed to send order notification email:', err);
+          }
+        })();
       }
     };
 
@@ -100,6 +190,69 @@ export default function NotificationsDropdown({ user }) {
       fetchNotifications();
     };
 
+    // Listen for deleted notifications to remove them immediately
+    const handleNotificationDeleted = (data) => {
+      console.log("🗑️ Notification deleted event received:", data);
+      const { notificationId, userId } = data;
+      
+      if (!notificationId) {
+        console.warn("⚠️ notificationDeleted event received without notificationId:", data);
+        return;
+      }
+      
+      // If userId is provided and doesn't match current user, ignore (for global notifications this might be null)
+      if (userId && user?._id && userId.toString() !== user._id.toString()) {
+        console.log(`⚠️ Deletion event for different user (${userId} vs ${user._id}), ignoring`);
+        return;
+      }
+      
+      // Remove the notification from the list immediately
+      setNotifications((prev) => {
+        const filtered = prev.filter((n) => {
+          const nId = n._id?.toString() || n._id;
+          const deletedId = notificationId?.toString() || notificationId;
+          const shouldKeep = nId !== deletedId;
+          if (!shouldKeep) {
+            console.log("🗑️ Removing notification from list:", { nId, deletedId });
+          }
+          return shouldKeep;
+        });
+        
+        if (filtered.length !== prev.length) {
+          console.log(`✅ Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
+        } else {
+          console.warn(`⚠️ Notification with ID ${notificationId} not found in current list, refreshing...`);
+          // Fallback: refresh the list if notification not found (might be a race condition)
+          setTimeout(() => {
+            const fetchNotifications = async () => {
+              try {
+                const res = await fetch(
+                  `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
+                );
+                if (!res.ok) throw new Error("Failed to fetch notifications");
+                const notificationData = await res.json();
+                setNotifications(notificationData);
+              } catch (err) {
+                console.error("❌ Lỗi khi refresh thông báo:", err);
+              }
+            };
+            fetchNotifications();
+          }, 500);
+        }
+        
+        return filtered;
+      });
+    };
+
+    // Listen to order updates to hydrate cache for mailing details
+    const handleOrderUpdated = (payload) => {
+      const updatedOrder = payload?.order || payload;
+      const orderId = updatedOrder?._id;
+      if (!orderId) return;
+      const suffixKey = orderId.slice(-8).toLowerCase();
+      mergeOrderIntoCache(suffixKey, updatedOrder);
+    };
+
     // Log lỗi
     const handleConnectError = (err) => {
       console.error("❌ Notification Socket connection error:", err.message);
@@ -114,6 +267,8 @@ export default function NotificationsDropdown({ user }) {
     socket.on("connect", handleConnect);
     socket.on("newNotification", handleNewNotification);
     socket.on("notificationBadgeUpdate", handleBadgeUpdate);
+    socket.on("notificationDeleted", handleNotificationDeleted);
+    socket.on("orderUpdated", handleOrderUpdated);
     socket.on("connect_error", handleConnectError);
     socket.on("disconnect", handleDisconnect);
 
@@ -123,16 +278,25 @@ export default function NotificationsDropdown({ user }) {
       console.log(`🔔 Emitted userConnected immediately for user: ${user._id}`);
     }
 
-    // Cleanup
+    // Re-join rooms on reconnect
+    const handleReconnect = () => {
+      console.log("🔄 Socket reconnected, rejoining notification rooms");
+      socket.emit("userConnected", user._id);
+    };
+    socket.on("reconnect", handleReconnect);
+    
     return () => {
       socket.off("connect", handleConnect);
       socket.off("newNotification", handleNewNotification);
       socket.off("notificationBadgeUpdate", handleBadgeUpdate);
+      socket.off("notificationDeleted", handleNotificationDeleted);
+      socket.off("orderUpdated", handleOrderUpdated);
+      socket.off("reconnect", handleReconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("disconnect", handleDisconnect);
       // Don't disconnect here - keep socket alive for component lifecycle
     };
-  }, [user]);
+  }, [user, fetchOrderDataBySuffix, mergeOrderIntoCache]);
 
   // 🧠 Lấy danh sách thông báo từ backend
   useEffect(() => {
