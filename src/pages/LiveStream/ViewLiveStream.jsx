@@ -23,7 +23,7 @@ const LiveStreamDetail = () => {
 
     const [selectedStream, setSelectedStream] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isFullscreen, setIsFullscreen] = useState(false);
+    // const [isFullscreen, setIsFullscreen] = useState(false); // Removed - no longer needed after removing toggle buttons
     const [showComments, setShowComments] = useState(true);
     const [showProducts, setShowProducts] = useState(true);
     const [showInfo, setShowInfo] = useState(true);
@@ -177,7 +177,7 @@ const LiveStreamDetail = () => {
                 console.log('❌ Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
-                
+
                 // Clear remote participants
                 setRemoteParticipants([]);
 
@@ -249,7 +249,7 @@ const LiveStreamDetail = () => {
             // Handle participant connected - subscribe to their tracks
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
                 console.log('👤 Participant connected:', participant.identity);
-                
+
                 // Add participant to remote participants list
                 setRemoteParticipants(prev => {
                     // Check if participant already exists (avoid duplicates)
@@ -258,7 +258,7 @@ const LiveStreamDetail = () => {
                     }
                     return [...prev, participant];
                 });
-                
+
                 // Subscribe to all their tracks
                 participant.trackPublications.forEach((publication) => {
                     if (!publication.isSubscribed) {
@@ -353,6 +353,7 @@ const LiveStreamDetail = () => {
             }
             throw error;
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showToast]);
 
     // Load stream details
@@ -451,15 +452,15 @@ const LiveStreamDetail = () => {
         }
     };
 
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            containerRef.current?.requestFullscreen();
-            setIsFullscreen(true);
-        } else {
-            document.exitFullscreen();
-            setIsFullscreen(false);
-        }
-    };
+    // const toggleFullscreen = () => {
+    //     if (!document.fullscreenElement) {
+    //         containerRef.current?.requestFullscreen();
+    //         setIsFullscreen(true);
+    //     } else {
+    //         document.exitFullscreen();
+    //         setIsFullscreen(false);
+    //     }
+    // };
 
     // Mute functionality removed
 
@@ -481,7 +482,7 @@ const LiveStreamDetail = () => {
                     hasJoinedRef.current = false;
                 }
             }
-            
+
             if (room) {
                 room.disconnect().catch(console.error);
             }
@@ -702,49 +703,12 @@ const LiveStreamDetail = () => {
                         </div>
                     )}
 
-                    {/* Controls */}
-                    <div
-                        className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-auto z-10"
-                        onClick={(e) => e.stopPropagation()}
-                        onMouseDown={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowInfo(!showInfo)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showInfo ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border-blue-500/50' : ''
-                                    }`}
-                            >
-                                <Info className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowProducts(!showProducts)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showProducts ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border-green-500/50' : ''
-                                    }`}
-                            >
-                                <ShoppingBag className="w-5 h-5" />
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setShowComments(!showComments)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
-                                    }`}
-                            >
-                                <Chat className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Info Panel - Left side of Video */}
                 {showInfo && selectedStream && (
                     <div className="fixed left-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto border-r border-gray-800/50">
-                        <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+                        <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
                                     <Info className="w-4 h-4 text-white" />
@@ -826,7 +790,7 @@ const LiveStreamDetail = () => {
                                             </div>
                                         </div>
                                     )}
-                                    {selectedStream.endTime && (
+                                    {selectedStream.endTime && selectedStream.status !== 'live' && (
                                         <div className="flex items-start gap-2">
                                             <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
                                             <div>
@@ -847,7 +811,7 @@ const LiveStreamDetail = () => {
                 {showProducts && (selectedStream?._id || id) && (
                     <div className={`fixed top-0 h-full w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-[352px]' : 'right-0'
                         } border-l border-gray-800/50`}>
-                        <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+                        <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
                                     <ShoppingBag className="w-4 h-4 text-white" />
@@ -867,7 +831,7 @@ const LiveStreamDetail = () => {
                             </button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
-                            <LiveStreamProducts liveId={selectedStream?._id || id} />
+                            <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />
                         </div>
                     </div>
                 )}

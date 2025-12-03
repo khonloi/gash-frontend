@@ -6,6 +6,8 @@ import Api from '../../common/SummaryAPI';
 const LiveStreamProducts = ({ liveId }) => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [productPriceCache, setProductPriceCache] = useState({}); // Cache for product prices
+    const productPriceCacheRef = useRef({}); // Ref cache for synchronous access
     const socketRef = useRef(null);
 
     // Helper: Get product name
@@ -18,30 +20,88 @@ const LiveStreamProducts = ({ liveId }) => {
         return 'Unnamed';
     };
 
-    // Helper: Get main product image URL
+    // Helper: Get main product image URL with fallback to variant images
     const getMainImageUrl = (product) => {
         if (!product) return null;
 
-        // Handle WebSocket format: product.image (direct URL string)
+        // PRIORITY 1: Handle API format - productImageIds array with isMain flag
+        const images = product.productImageIds || product.images || [];
+        if (images.length > 0) {
+            // Try to find main image first (isMain === true)
+            const mainImage = images.find(img => img && img.isMain === true && img.imageUrl);
+            if (mainImage?.imageUrl) {
+                return mainImage.imageUrl;
+            }
+            // Otherwise, use first available image
+            const firstImage = images.find(img => img && img.imageUrl);
+            if (firstImage?.imageUrl) {
+                return firstImage.imageUrl;
+            }
+        }
+
+        // PRIORITY 2: Handle WebSocket format - product.image (direct URL string)
         if (product.image && typeof product.image === 'string') {
             return product.image;
         }
 
-        // Handle API format: productImageIds array
-        const images = product.productImageIds || product.images || [];
-        if (images.length === 0) return null;
-        const mainImage = images.find(img => img.isMain === true);
-        return mainImage?.imageUrl || images[0]?.imageUrl || null;
+        // PRIORITY 3: Fallback to variant images if no product images available
+        const variants = product.productVariantIds || product.variants || [];
+        if (Array.isArray(variants) && variants.length > 0) {
+            for (const variant of variants) {
+                if (variant?.variantImage && typeof variant.variantImage === 'string') {
+                    return variant.variantImage;
+                }
+            }
+        }
+
+        // PRIORITY 4: Check nested product object for variants
+        if (product.product?.productVariantIds && Array.isArray(product.product.productVariantIds)) {
+            for (const variant of product.product.productVariantIds) {
+                if (variant?.variantImage && typeof variant.variantImage === 'string') {
+                    return variant.variantImage;
+                }
+            }
+        }
+
+        return null;
     };
 
     // Helper: Get minimum price from product variants
     const getMinPrice = (product) => {
         if (!product) return 0;
-        const variants = product.productVariantIds || product.variants || [];
+
+        // Try multiple paths to get variants
+        let variants = product.productVariantIds || product.variants || product.productVariants || [];
+
+        // If variants is not an array, try to extract it
+        if (!Array.isArray(variants) && typeof variants === 'object') {
+            if (Array.isArray(variants.data)) {
+                variants = variants.data;
+            } else if (Array.isArray(variants.variants)) {
+                variants = variants.variants;
+            } else {
+                variants = [];
+            }
+        }
+
         if (variants.length === 0) return 0;
+
+        // Extract prices from variants, handling different data structures
         const prices = variants
-            .filter(v => v && v.variantStatus !== 'discontinued' && v.variantPrice > 0)
-            .map(v => v.variantPrice);
+            .filter(v => {
+                if (!v) return false;
+                // Check variant status
+                const status = v.variantStatus || v.status;
+                if (status === 'discontinued') return false;
+
+                // Get price from different possible fields
+                const price = v.variantPrice || v.price || v.variant_price || 0;
+                return price > 0;
+            })
+            .map(v => {
+                return v.variantPrice || v.price || v.variant_price || 0;
+            });
+
         return prices.length > 0 ? Math.min(...prices) : 0;
     };
 
@@ -66,6 +126,36 @@ const LiveStreamProducts = ({ liveId }) => {
         });
     };
 
+    // Fetch product details to get price if not available
+    const fetchProductPrice = useCallback(async (productId) => {
+        // Check cache first (from ref for synchronous access)
+        if (productPriceCacheRef.current[productId]) {
+            return productPriceCacheRef.current[productId];
+        }
+
+        try {
+            const response = await Api.newProducts.getById(productId);
+            if (response.data?.success && response.data.data) {
+                const product = response.data.data;
+                // Try to get price from variants
+                let price = getMinPrice(product);
+                // If no price from variants, try direct price field
+                if (price === 0) {
+                    price = product.price || product.productPrice || product.minPrice || 0;
+                }
+                // Cache the price in both state and ref
+                if (price > 0) {
+                    productPriceCacheRef.current[productId] = price;
+                    setProductPriceCache(prev => ({ ...prev, [productId]: price }));
+                }
+                return price;
+            }
+        } catch (error) {
+            console.error('Error fetching product price:', error);
+        }
+        return 0;
+    }, []);
+
     // Load live products
     const loadProducts = useCallback(async () => {
         if (!liveId) return;
@@ -74,14 +164,73 @@ const LiveStreamProducts = ({ liveId }) => {
             const token = localStorage.getItem('token');
             const response = await Api.livestream.getLiveProducts(liveId, token);
 
-            // Frontend API doesn't use .then(), so response is axios response
-            if (response.data?.success) {
-                const productsData = response.data.data || [];
+            // Handle different response structures
+            // API might return axios response (response.data) or direct data
+            let productsData = [];
+            if (response?.data?.success && Array.isArray(response.data.data)) {
+                productsData = response.data.data;
+            } else if (response?.success && Array.isArray(response.data)) {
+                productsData = response.data;
+            } else if (Array.isArray(response?.data)) {
+                productsData = response.data;
+            } else if (Array.isArray(response)) {
+                productsData = response;
+            }
+
+            if (productsData.length > 0 || (response && (response.success !== false || response.data?.success !== false))) {
+
+                // Debug: Log raw data to check isPinned values
+                if (import.meta.env.DEV) {
+                    console.log('📦 Raw products data:', productsData.map(p => ({
+                        _id: p._id,
+                        isPinned: p.isPinned,
+                        isPinnedType: typeof p.isPinned,
+                        productName: p.productId?.productName || p.product?.productName
+                    })));
+                }
+
+                // Ensure isPinned is explicitly set for all products (default to false if not provided)
+                // Convert to boolean explicitly to handle null, undefined, string "true"/"false", etc.
+                const productsWithPin = productsData.map(p => {
+                    // More robust boolean conversion - check multiple formats
+                    let isPinnedValue = false;
+                    const pinValue = p.isPinned;
+
+                    // Explicit true cases
+                    if (pinValue === true || pinValue === 1 || pinValue === 'true' || pinValue === '1' || pinValue === 'True' || pinValue === 'TRUE') {
+                        isPinnedValue = true;
+                    }
+                    // Explicit false cases (though default is already false)
+                    else if (pinValue === false || pinValue === 0 || pinValue === 'false' || pinValue === '0' || pinValue === 'False' || pinValue === 'FALSE') {
+                        isPinnedValue = false;
+                    }
+                    // For null, undefined, or any other value, default to false
+                    else {
+                        isPinnedValue = false;
+                    }
+
+                    return {
+                        ...p,
+                        isPinned: isPinnedValue
+                    };
+                });
+
+                // Debug: Log converted data
+                if (import.meta.env.DEV) {
+                    console.log('📌 Converted products with isPinned:', productsWithPin.map(p => ({
+                        _id: p._id,
+                        isPinned: p.isPinned,
+                        productName: p.productId?.productName || p.product?.productName
+                    })));
+                }
+
                 // Sort products: pinned first, then by added date
-                setProducts(sortProducts(productsData));
+                setProducts(sortProducts(productsWithPin));
             }
         } catch (error) {
             console.error('Error loading live products:', error);
+            // Reset products on error
+            setProducts([]);
         } finally {
             setIsLoading(false);
         }
@@ -90,6 +239,31 @@ const LiveStreamProducts = ({ liveId }) => {
     useEffect(() => {
         loadProducts();
     }, [loadProducts]);
+
+    // Auto-fetch prices for products without price info
+    useEffect(() => {
+        if (products.length === 0) return;
+
+        products.forEach((lp) => {
+            const product = lp.product || lp.productId || {};
+            const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id || lp.productId || '');
+
+            // Check if price is already available
+            let minPrice = getMinPrice(product);
+            if (minPrice === 0) {
+                minPrice = product.price || product.productPrice || product.minPrice || 0;
+            }
+            if (minPrice === 0 && productId) {
+                minPrice = productPriceCache[productId] || productPriceCacheRef.current[productId] || 0;
+            }
+
+            // If still no price and productId exists, fetch it
+            if (minPrice === 0 && productId && !productPriceCacheRef.current[productId]) {
+                fetchProductPrice(productId);
+            }
+        });
+    }, [products, productPriceCache, fetchProductPrice]);
+
 
     // Setup WebSocket for real-time products updates
     useEffect(() => {
@@ -105,12 +279,38 @@ const LiveStreamProducts = ({ liveId }) => {
         // Handle product added
         socket.on('product:added', (data) => {
             if (data?.liveId === liveId && data?.liveProduct) {
+                const hasImages = (data.liveProduct.productId?.productImageIds?.length > 0) ||
+                    (data.liveProduct.product?.image);
+
+                // If socket data doesn't have images, reload from API to get full data
+                if (!hasImages) {
+                    loadProducts();
+                    return;
+                }
+
                 setProducts(prev => {
                     // Check if product already exists
                     const exists = prev.some(p => p._id === data.liveProduct._id);
-                    if (exists) return prev;
+                    if (exists) {
+                        // Update existing product, preserve isPinned if it was already set
+                        return prev.map(p =>
+                            p._id === data.liveProduct._id
+                                ? {
+                                    ...p,
+                                    ...data.liveProduct,
+                                    isPinned: Boolean(p.isPinned === true || p.isPinned === 'true' || p.isPinned === 1) || Boolean(data.liveProduct.isPinned === true || data.liveProduct.isPinned === 'true' || data.liveProduct.isPinned === 1)
+                                }
+                                : p
+                        );
+                    }
+                    // Ensure isPinned is explicitly set (default to false if not provided)
+                    // Convert to boolean explicitly to handle null, undefined, string "true"/"false", etc.
+                    const productWithPin = {
+                        ...data.liveProduct,
+                        isPinned: Boolean(data.liveProduct.isPinned === true || data.liveProduct.isPinned === 'true' || data.liveProduct.isPinned === 1)
+                    };
                     // Add new product and sort (pinned first, then by added date)
-                    return sortProducts([...prev, data.liveProduct]);
+                    return sortProducts([...prev, productWithPin]);
                 });
             }
         });
@@ -132,10 +332,11 @@ const LiveStreamProducts = ({ liveId }) => {
                 // Backend emits full liveProduct object, not just ID
                 const productIdToPin = data.liveProduct._id || data.liveProductId;
                 setProducts(prev => {
+                    // Only update the pinned product, preserve isPinned status of others
                     const updated = prev.map(p =>
                         p._id === productIdToPin
                             ? { ...p, isPinned: true }
-                            : { ...p, isPinned: false }
+                            : p
                     );
                     // Re-sort after pinning
                     return sortProducts(updated);
@@ -164,7 +365,7 @@ const LiveStreamProducts = ({ liveId }) => {
             socket.off('product:unpinned');
             socket.close();
         };
-    }, [liveId]);
+    }, [liveId, loadProducts]);
 
     // Navigate to product detail in new tab
     const handleProductClick = (productId) => {
@@ -206,7 +407,18 @@ const LiveStreamProducts = ({ liveId }) => {
                 // productId can be string ID (WebSocket) or object with _id (API)
                 const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id || lp.productId || '');
                 const productImageUrl = getMainImageUrl(product);
-                const minPrice = getMinPrice(product);
+
+                // Try to get price from multiple sources
+                let minPrice = getMinPrice(product);
+                // If no price from variants, try direct price field
+                if (minPrice === 0) {
+                    minPrice = product.price || product.productPrice || product.minPrice || 0;
+                }
+                // If still no price, check cache (both state and ref for immediate access)
+                if (minPrice === 0 && productId) {
+                    minPrice = productPriceCache[productId] || productPriceCacheRef.current[productId] || 0;
+                }
+
                 const orderNumber = index + 1;
 
                 return (
@@ -256,9 +468,15 @@ const LiveStreamProducts = ({ liveId }) => {
 
                         {/* Product Info */}
                         <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight">{productName}</h4>
-                            {minPrice > 0 && (
+                            {/* Always show product name */}
+                            <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight" title={productName || 'Unnamed Product'}>
+                                {productName || 'Unnamed Product'}
+                            </h4>
+                            {/* Always show price below name */}
+                            {minPrice > 0 ? (
                                 <p className="text-xs font-bold text-red-400 mt-0.5">{formatPrice(minPrice)}</p>
+                            ) : (
+                                <p className="text-[10px] text-gray-500 mt-0.5">Price not available</p>
                             )}
                             {lp.isPinned && (
                                 <p className="text-[9px] text-yellow-400 font-bold mt-0.5">PINNED</p>
