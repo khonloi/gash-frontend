@@ -154,8 +154,8 @@ const Register = () => {
         await signup(signupData);
         showToast('Register successfully', 'success', 2000);
         
-        // Optionally set up biometric authentication
-        const setupPasskey = window.confirm('Would you like to set up biometric authentication (Touch ID, Face ID, or Windows Hello) for easier login?');
+        // Optionally set up passkey authentication
+        const setupPasskey = window.confirm('Would you like to set up passkey authentication (Touch ID, Face ID, or Windows Hello) for easier login?');
         if (setupPasskey) {
           try {
             const token = localStorage.getItem('token');
@@ -212,11 +212,11 @@ const Register = () => {
               
               await Api.passkeys.verifyRegistration(verifyData, token);
 
-              showToast('Biometric authentication set up successfully!', 'success', 2000);
+              showToast('Passkey authentication set up successfully!', 'success', 2000);
             }
           } catch (err) {
             console.error('Passkey setup error:', err);
-            showToast('Biometric setup failed, but your account was created successfully.', 'info', 3000);
+            showToast('Passkey setup failed, but your account was created successfully.', 'info', 3000);
           }
         }
         

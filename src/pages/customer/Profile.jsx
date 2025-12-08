@@ -180,11 +180,11 @@ const Profile = () => {
 
       await Api.passkeys.verifyRegistration(verifyData, token);
 
-      showToast('Biometric authentication set up successfully!', 'success', 2000);
+      showToast('Passkey authentication set up successfully!', 'success', 2000);
       fetchPasskeys();
     } catch (err) {
       console.error('Passkey setup error:', err);
-      const errorMsg = err.response?.data?.message || 'Failed to set up biometric authentication';
+      const errorMsg = err.response?.data?.message || 'Failed to set up passkey authentication';
       showToast(errorMsg, 'error', 3000);
     } finally {
       setIsSettingUpPasskey(false);
@@ -204,11 +204,11 @@ const Profile = () => {
       }
 
       await Api.passkeys.deletePasskey(passkeyId, token);
-      showToast('Biometric authentication removed successfully!', 'success', 2000);
+      showToast('Passkey authentication removed successfully!', 'success', 2000);
       fetchPasskeys();
     } catch (err) {
       console.error('Delete passkey error:', err);
-      const errorMsg = err.response?.data?.message || 'Failed to remove biometric authentication';
+      const errorMsg = err.response?.data?.message || 'Failed to remove passkey authentication';
       showToast(errorMsg, 'error', 3000);
     }
   }, [showToast, fetchPasskeys]);
@@ -567,8 +567,8 @@ const Profile = () => {
                         {isSettingUpPasskey
                           ? 'Setting up...'
                           : passkeys.length > 0
-                            ? 'Biometrics Already Set Up'
-                            : 'Set Up Biometrics'}
+                            ? 'Passkeys Already Set Up'
+                            : 'Set Up Passkeys'}
                       </ProductButton>
                       <ProductButton
                         variant="danger"
@@ -737,7 +737,7 @@ const Profile = () => {
                           <div className="flex-1">
                             <p className="text-sm font-medium text-gray-900">Require Authentication for Checkout</p>
                             <p className="text-xs text-gray-500 mt-1">
-                              Enable to require password, Google login, or biometric authentication before placing orders
+                              Enable to require password, Google login, or passkey authentication before placing orders
                             </p>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer ml-4">
@@ -754,7 +754,7 @@ const Profile = () => {
 
                       {/* Passkeys Section */}
                       <div className="mt-6 space-y-3">
-                        <h3 className="text-lg font-medium text-gray-900">Biometric Authentication</h3>
+                        <h3 className="text-lg font-medium text-gray-900">Passkey Authentication</h3>
                         {passkeys.length > 0 ? (
                           <div className="space-y-2">
                             {passkeys.map((passkey) => (
@@ -775,7 +775,7 @@ const Profile = () => {
                                 <button
                                   onClick={() => handleDeletePasskey(passkey.id)}
                                   className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                  aria-label="Remove biometric authentication"
+                                  aria-label="Remove passkey authentication"
                                 >
                                   Remove
                                 </button>
@@ -784,7 +784,7 @@ const Profile = () => {
                           </div>
                         ) : (
                           <div className="p-4 bg-gray-50 rounded-md border border-gray-200 text-center">
-                            <p className="text-sm text-gray-600">No biometric authentication set up yet. Click "Set Up Biometrics" to use Touch ID, Face ID, or Windows Hello.</p>
+                            <p className="text-sm text-gray-600">No passkey authentication set up yet. Click "Set Up Passkey" to use Touch ID, Face ID, or Windows Hello.</p>
                           </div>
                         )}
                       </div>
