@@ -832,7 +832,7 @@ export default function Header() {
                                     >
                                         My Orders
                                     </button>
-                                    <button
+                                    {/* <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             console.log("My Feedback clicked");
@@ -842,7 +842,7 @@ export default function Header() {
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
                                         My Feedback
-                                    </button>
+                                    </button> */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();

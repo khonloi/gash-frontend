@@ -103,12 +103,12 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
       };
 
       await Api.passkeys.verifyAuthentication(verifyData);
-      showToast('Biometric authentication successful', 'success', 2000);
+      showToast('Passkey authentication successful', 'success', 2000);
       onAuthenticated();
       onClose();
     } catch (err) {
       console.error('Passkey authentication error:', err);
-      const errorMsg = err.response?.data?.message || 'Biometric authentication failed';
+      const errorMsg = err.response?.data?.message || 'Passkey authentication failed';
       showToast(errorMsg, 'error', 3000);
     } finally {
       setIsAuthenticating(false);
@@ -174,7 +174,7 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
             </div>
           )}
 
-          {/* Passkey/Biometric Authentication */}
+          {/* Passkey/Passkey Authentication */}
           {hasPasskeys && (
             <ProductButton
               variant="secondary"
@@ -183,7 +183,7 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
               disabled={isAuthenticating}
               className="w-full"
             >
-              {isAuthenticating && authMethod === 'passkey' ? 'Authenticating...' : 'Authenticate with Biometrics'}
+              {isAuthenticating && authMethod === 'passkey' ? 'Authenticating...' : 'Authenticate with Passkeys'}
             </ProductButton>
           )}
 
