@@ -179,16 +179,6 @@ const LiveStreamProducts = ({ liveId }) => {
 
             if (productsData.length > 0 || (response && (response.success !== false || response.data?.success !== false))) {
 
-                // Debug: Log raw data to check isPinned values
-                if (import.meta.env.DEV) {
-                    console.log('📦 Raw products data:', productsData.map(p => ({
-                        _id: p._id,
-                        isPinned: p.isPinned,
-                        isPinnedType: typeof p.isPinned,
-                        productName: p.productId?.productName || p.product?.productName
-                    })));
-                }
-
                 // Ensure isPinned is explicitly set for all products (default to false if not provided)
                 // Convert to boolean explicitly to handle null, undefined, string "true"/"false", etc.
                 const productsWithPin = productsData.map(p => {
@@ -214,15 +204,6 @@ const LiveStreamProducts = ({ liveId }) => {
                         isPinned: isPinnedValue
                     };
                 });
-
-                // Debug: Log converted data
-                if (import.meta.env.DEV) {
-                    console.log('📌 Converted products with isPinned:', productsWithPin.map(p => ({
-                        _id: p._id,
-                        isPinned: p.isPinned,
-                        productName: p.productId?.productName || p.product?.productName
-                    })));
-                }
 
                 // Sort products: pinned first, then by added date
                 setProducts(sortProducts(productsWithPin));

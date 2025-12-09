@@ -57,7 +57,10 @@ const LiveStreamDetail = () => {
     };
 
     // Connect to LiveKit - moved before useEffect
-    const connectToLiveKit = useCallback(async (roomName, viewerToken) => {
+    // This function is safe to call from multiple users simultaneously
+    // Each user gets their own unique token and room connection
+    const connectToLiveKit = useCallback(async (roomName, viewerToken, serverUrl = null) => {
+        // Prevent multiple simultaneous connection attempts from the same user
         if (isReconnectingRef.current) return;
         if (streamEndedRef.current) return;
 
@@ -71,12 +74,31 @@ const LiveStreamDetail = () => {
             return;
         }
 
-        if (!LIVEKIT_CONFIG.serverUrl || LIVEKIT_CONFIG.serverUrl.includes('your-livekit-server.com')) {
+        // Use serverUrl from API response, fallback to config, then to env
+        // Validate serverUrl from API first - if invalid/empty, use fallback
+        let livekitServerUrl = serverUrl;
+
+        // Check if serverUrl from API is valid
+        if (!livekitServerUrl ||
+            typeof livekitServerUrl !== 'string' ||
+            livekitServerUrl.trim() === '' ||
+            livekitServerUrl.includes('your-livekit-server.com')) {
+            // Fallback to config or env
+            livekitServerUrl = LIVEKIT_CONFIG.serverUrl || import.meta.env.VITE_LIVEKIT_SERVER_URL;
+        }
+
+        // Final validation
+        if (!livekitServerUrl ||
+            typeof livekitServerUrl !== 'string' ||
+            livekitServerUrl.trim() === '' ||
+            livekitServerUrl.includes('your-livekit-server.com')) {
+            console.error('LiveKit server URL not configured:', { serverUrl, config: LIVEKIT_CONFIG.serverUrl, env: import.meta.env.VITE_LIVEKIT_SERVER_URL });
             showToast('LiveKit server not configured', 'error');
             return;
         }
 
-        if (!LIVEKIT_CONFIG.serverUrl.startsWith('wss://') && !LIVEKIT_CONFIG.serverUrl.startsWith('ws://')) {
+        if (!livekitServerUrl.startsWith('wss://') && !livekitServerUrl.startsWith('ws://')) {
+            console.error('Invalid LiveKit server URL format:', livekitServerUrl);
             showToast('Invalid LiveKit server URL', 'error');
             return;
         }
@@ -85,7 +107,6 @@ const LiveStreamDetail = () => {
 
         try {
             isReconnectingRef.current = true;
-            console.log('🔗 Connecting to LiveKit room:', roomName);
             setConnectionState('connecting');
 
             const existingRoom = roomRef.current;
@@ -116,7 +137,6 @@ const LiveStreamDetail = () => {
             const newRoom = new Room(roomOptions);
 
             newRoom.on(RoomEvent.Connected, () => {
-                console.log('✅ Connected to LiveKit room');
                 setConnectionState('connected');
 
                 // Initialize remote participants list (exclude local participant)
@@ -128,7 +148,8 @@ const LiveStreamDetail = () => {
                     videoRef.current.muted = false;
                 }
 
-                // Subscribe to all remote tracks (video and audio)
+                // Subscribe to all remote tracks (video and audio) from all participants
+                // This ensures all users can see the host's video stream
                 newRoom.remoteParticipants.forEach((participant) => {
                     participant.trackPublications.forEach((publication) => {
                         // Subscribe to the track if not already subscribed
@@ -137,12 +158,17 @@ const LiveStreamDetail = () => {
                         }
 
                         // If track is available, attach it immediately
+                        // Only attach video/audio tracks (host publishes these, viewers don't)
                         if (publication.track) {
                             if (publication.track.kind === 'video' && videoRef.current) {
+                                // Attach video track from host
                                 publication.track.attach(videoRef.current);
                                 videoRef.current.muted = false; // Ensure not muted
-                                videoRef.current.play().catch(() => { });
+                                videoRef.current.play().catch((err) => {
+                                    console.error('Video play error:', err);
+                                });
                             } else if (publication.track.kind === 'audio' && videoRef.current) {
+                                // Attach audio track from host
                                 publication.track.attach(videoRef.current);
 
                                 // CRITICAL: Enable audio track
@@ -154,12 +180,6 @@ const LiveStreamDetail = () => {
                                 if (videoRef.current) {
                                     videoRef.current.muted = false;
                                 }
-
-                                console.log('✅ Audio track attached on connect', {
-                                    trackId: publication.track.id,
-                                    enabled: publication.track.enabled,
-                                    muted: videoRef.current?.muted
-                                });
                             }
                         }
                     });
@@ -174,7 +194,6 @@ const LiveStreamDetail = () => {
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
-                console.log('❌ Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
 
@@ -188,7 +207,6 @@ const LiveStreamDetail = () => {
                         if (token) {
                             await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
                             hasJoinedRef.current = false;
-                            console.log('✅ Left livestream via API');
                         }
                     } catch (error) {
                         console.error('Error leaving livestream:', error);
@@ -211,7 +229,9 @@ const LiveStreamDetail = () => {
                             if (videoRef.current) {
                                 // Ensure video is not muted when playing
                                 videoRef.current.muted = false;
-                                videoRef.current.play().catch(err => {
+                                videoRef.current.play().then(() => {
+                                    console.log('✅ Livestream connected and playing successfully');
+                                }).catch(err => {
                                     if (err.name !== 'AbortError') {
                                         console.error('Video play failed:', err);
                                     }
@@ -243,14 +263,15 @@ const LiveStreamDetail = () => {
                             }, 500);
                         }
                     }
+                } else {
+                    console.error('videoRef.current is null, cannot attach track');
                 }
             });
 
             // Handle participant connected - subscribe to their tracks
+            // This handles new participants joining (including host if they join later)
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
-                console.log('👤 Participant connected:', participant.identity);
-
-                // Add participant to remote participants list
+                // Add participant to remote participants list (for viewer count)
                 setRemoteParticipants(prev => {
                     // Check if participant already exists (avoid duplicates)
                     if (prev.find(p => p.identity === participant.identity)) {
@@ -259,19 +280,31 @@ const LiveStreamDetail = () => {
                     return [...prev, participant];
                 });
 
-                // Subscribe to all their tracks
+                // Subscribe to all their tracks (host publishes video/audio, viewers don't)
                 participant.trackPublications.forEach((publication) => {
                     if (!publication.isSubscribed) {
                         publication.setSubscribed(true);
                     }
 
-                    // If audio track is already available, attach and enable it
-                    if (publication.track && publication.track.kind === 'audio' && videoRef.current) {
-                        publication.track.attach(videoRef.current);
-                        if (publication.track instanceof MediaStreamTrack) {
-                            publication.track.enabled = true;
+                    // If tracks are already available, attach them
+                    if (publication.track) {
+                        if (publication.track.kind === 'video' && videoRef.current) {
+                            // Attach video track from host
+                            publication.track.attach(videoRef.current);
+                            videoRef.current.muted = false;
+                            videoRef.current.play().catch((err) => {
+                                if (err.name !== 'AbortError') {
+                                    console.error('Video play failed:', err);
+                                }
+                            });
+                        } else if (publication.track.kind === 'audio' && videoRef.current) {
+                            // Attach audio track from host
+                            publication.track.attach(videoRef.current);
+                            if (publication.track instanceof MediaStreamTrack) {
+                                publication.track.enabled = true;
+                            }
+                            videoRef.current.muted = false;
                         }
-                        videoRef.current.muted = false;
                     }
                 });
             });
@@ -288,7 +321,6 @@ const LiveStreamDetail = () => {
 
             // Handle participant disconnected - remove from list
             newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
-                console.log('👤 Participant disconnected:', participant.identity);
                 setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
             });
 
@@ -300,7 +332,7 @@ const LiveStreamDetail = () => {
                 originalConsoleError.apply(console, args);
             };
 
-            const connectPromise = newRoom.connect(LIVEKIT_CONFIG.serverUrl, viewerToken);
+            const connectPromise = newRoom.connect(livekitServerUrl, viewerToken);
             const timeoutPromise = new Promise((_, reject) => {
                 const timeoutId = setTimeout(() => {
                     reject(new Error(`Connection timeout after 45 seconds`));
@@ -383,8 +415,9 @@ const LiveStreamDetail = () => {
                     setSelectedStream(streamData);
                     hasJoinedRef.current = true; // Mark as joined
 
-                    // Connect to LiveKit
-                    await connectToLiveKit(streamData.roomName, streamData.viewerToken);
+                    // Connect to LiveKit - use serverUrl from API response
+                    // Backend always returns serverUrl, so this should work for both local and production
+                    await connectToLiveKit(streamData.roomName, streamData.viewerToken, streamData.serverUrl);
                     showToast('Joined livestream!', 'success');
                 } else {
                     showToast('Livestream not found', 'error');
