@@ -59,6 +59,7 @@ const LiveStreamDetail = () => {
     const streamEndedRef = useRef(false);
     const socketRef = useRef(null);
     const hasJoinedRef = useRef(false);
+    const streamDataRef = useRef(null); // Store stream data for connection
 
     // Helper: Format date/time to dd/mm/yyyy HH:mm
     const formatDateTime = (dateString) => {
@@ -489,28 +490,10 @@ const LiveStreamDetail = () => {
                         return;
                     }
 
+                    // Store stream data for connection
+                    streamDataRef.current = streamData;
                     setSelectedStream(streamData);
                     hasJoinedRef.current = true; // Mark as joined
-
-                    // CRITICAL: Ensure video element is mounted before connecting
-                    // This is especially important for users joining later
-                    // Wait for video element to be available in DOM
-                    let retries = 0;
-                    while (!videoRef.current && retries < 10) {
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                        retries++;
-                    }
-
-                    if (!videoRef.current) {
-                        console.error('Video element not found after waiting');
-                        showToast('Video player not ready', 'error');
-                        return;
-                    }
-
-                    // Connect to LiveKit - use serverUrl from API response
-                    // Backend always returns serverUrl, so this should work for both local and production
-                    await connectToLiveKit(streamData.roomName, streamData.viewerToken, streamData.serverUrl);
-                    showToast('Joined livestream!', 'success');
                 } else {
                     showToast('Livestream not found', 'error');
                     navigate('/');
@@ -526,7 +509,52 @@ const LiveStreamDetail = () => {
 
         loadStream();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, connectToLiveKit]);
+    }, [id]);
+
+    // Connect to LiveKit when both stream data and video element are ready
+    useEffect(() => {
+        const connectWhenReady = async () => {
+            // Wait for both selectedStream and videoRef to be available
+            if (!selectedStream || !streamDataRef.current || streamDataRef.current.status !== 'live') {
+                return;
+            }
+
+            // Wait for video element to be mounted in DOM
+            let retries = 0;
+            const maxRetries = 20; // Increased retries for slower devices
+            while (!videoRef.current && retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            if (!videoRef.current) {
+                console.error('Video element not found after waiting');
+                showToast('Video player not ready', 'error');
+                return;
+            }
+
+            // Check if already connected
+            if (roomRef.current && roomRef.current.state === 'connected') {
+                return;
+            }
+
+            // Connect to LiveKit - use serverUrl from API response
+            try {
+                await connectToLiveKit(
+                    streamDataRef.current.roomName,
+                    streamDataRef.current.viewerToken,
+                    streamDataRef.current.serverUrl
+                );
+                showToast('Joined livestream!', 'success');
+            } catch (error) {
+                console.error('Error connecting to LiveKit:', error);
+                // Error toast is already shown in connectToLiveKit
+            }
+        };
+
+        connectWhenReady();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedStream, connectToLiveKit]);
 
     // Note: Reactions and Floating Reactions are now handled inside LiveStreamReactions component
 
