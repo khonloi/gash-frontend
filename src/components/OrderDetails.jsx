@@ -6,6 +6,7 @@ import FeedbackForm from "./FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
 import ImageModal from "./ImageModal";
 import ProductButton from "./ProductButton";
+import ConfirmationModal from "./ConfirmationModal";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
@@ -18,10 +19,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [loadingStates, setLoadingStates] = useState({
         submitting: {},
-        editing: {}
+        editing: {},
+        deleting: {}
     });
     const [showViewFeedbackModal, setShowViewFeedbackModal] = useState(false);
     const [showEditFeedbackModal, setShowEditFeedbackModal] = useState(false);
+    const [showDeleteFeedbackConfirm, setShowDeleteFeedbackConfirm] = useState(false);
     const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState('');
 
@@ -272,6 +275,48 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         setSelectedProductName(productName);
         setShowEditFeedbackModal(true);
     };
+
+    // Delete feedback
+    const handleDeleteFeedback = useCallback(async () => {
+        setShowDeleteFeedbackConfirm(false);
+        setLoadingStates(prev => ({
+            ...prev,
+            deleting: { ...prev.deleting, [selectedVariantId]: true }
+        }));
+
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!orderId) {
+                throw new Error("Order ID is missing");
+            }
+            if (!selectedVariantId) {
+                throw new Error("Variant ID is missing");
+            }
+            if (!token) {
+                throw new Error("Authentication token is missing");
+            }
+
+            const actualVariantId = selectedVariantId.startsWith('item_') ? null : selectedVariantId;
+
+            await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
+
+            showToast("Feedback deleted successfully!", "success");
+            
+            // Refresh order data to get updated feedback
+            await fetchOrderDetails();
+            
+            setShowEditFeedbackModal(false);
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || "Failed to delete feedback";
+            showToast(errorMessage, "error");
+        } finally {
+            setLoadingStates(prev => ({
+                ...prev,
+                deleting: { ...prev.deleting, [selectedVariantId]: false }
+            }));
+        }
+    }, [orderId, selectedVariantId, showToast, fetchOrderDetails]);
 
     const getStatusBadge = (status, type = "order") => {
         const base =
@@ -763,37 +808,19 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             {/* Edit Feedback Modal */}
             {showEditFeedbackModal && (
-                <div
-                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4"
-                    onClick={() => setShowEditFeedbackModal(false)}
-                >
-                    <div
-                        className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-6 relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setShowEditFeedbackModal(false)}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
-                        >
-                            ×
-                        </button>
-                        <h3 className="text-xl font-semibold mb-4">
-                            {existingFeedbacks[selectedVariantId] ? 'Edit' : 'Add'} Feedback for {selectedProductName}
-                        </h3>
-                        <FeedbackForm
-                            variantId={selectedVariantId}
-                            onSubmit={existingFeedbacks[selectedVariantId] ? handleEditFeedback : handleFeedback}
-                            initialRating={existingFeedbacks[selectedVariantId]?.rating || ''}
-                            initialComment={existingFeedbacks[selectedVariantId]?.content || ''}
-                            submitText={existingFeedbacks[selectedVariantId] ? 'Update Feedback' : 'Submit Feedback'}
-                            showForm={true}
-                            onCancel={() => setShowEditFeedbackModal(false)}
-                            isSubmitting={existingFeedbacks[selectedVariantId]
-                                ? loadingStates.editing?.[selectedVariantId]
-                                : loadingStates.submitting?.[selectedVariantId]}
-                        />
-                    </div>
-                </div>
+                <FeedbackForm
+                    variantId={selectedVariantId}
+                    onSubmit={existingFeedbacks[selectedVariantId] ? handleEditFeedback : handleFeedback}
+                    initialRating={existingFeedbacks[selectedVariantId]?.rating || ''}
+                    initialComment={existingFeedbacks[selectedVariantId]?.content || ''}
+                    submitText={existingFeedbacks[selectedVariantId] ? 'Update Feedback' : 'Submit Feedback'}
+                    showForm={true}
+                    onCancel={() => setShowEditFeedbackModal(false)}
+                    onDelete={handleDeleteFeedback}
+                    isDeleting={loadingStates.deleting?.[selectedVariantId] || false}
+                    showDeleteButton={!!existingFeedbacks[selectedVariantId]}
+                    productName={selectedProductName}
+                />
             )}
 
             {/* Confirmation Modal */}

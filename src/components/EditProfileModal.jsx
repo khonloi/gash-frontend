@@ -149,11 +149,10 @@ const EditProfileModal = ({
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.18 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white rounded-2xl shadow-2xl border-2 w-full max-w-lg max-h-[90vh] flex flex-col"
-        style={{ borderColor: '#A86523' }}
+        className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-lg max-h-[90vh] flex flex-col"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b shrink-0" style={{ borderColor: '#A86523' }}>
+        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b border-gray-200 shrink-0">
           <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
             Edit Profile
           </h2>
@@ -284,7 +283,7 @@ const EditProfileModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t shrink-0" style={{ borderColor: '#A86523' }}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t border-gray-200 shrink-0">
           <ProductButton
             type="button"
             variant="secondary"
