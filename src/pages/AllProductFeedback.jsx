@@ -61,7 +61,13 @@ const AllProductFeedback = () => {
       }
 
       const validFeedbacks = feedbacksData
-        .filter(f => f && f.feedback)
+        .filter(f => {
+            if (!f || !f.feedback) return false;
+            // Filter out feedbacks with no rating and no content
+            const hasRating = f.feedback?.rating !== null && f.feedback?.rating !== undefined && f.feedback.rating >= 1 && f.feedback.rating <= 5;
+            const hasContent = f.feedback?.content && f.feedback.content.trim() !== '';
+            return hasRating || hasContent;
+        })
         .sort((a, b) => {
           if (a.customer?.is_current_user && !b.customer?.is_current_user) return -1;
           if (!a.customer?.is_current_user && b.customer?.is_current_user) return 1;
