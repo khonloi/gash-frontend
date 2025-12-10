@@ -119,8 +119,8 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 max-w-md w-full mx-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 max-w-md w-full">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">Authenticate to Place Order</h3>
         <p className="text-sm text-gray-600 mb-6">
           Please authenticate to confirm your order. Choose your preferred method:

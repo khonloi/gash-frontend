@@ -44,14 +44,17 @@ const ConfirmationModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-[70] p-4"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
     >
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-md mx-4">
+      <div 
+        className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 max-w-md w-full"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 id="modal-title" className="text-lg font-semibold text-gray-900 mb-4">
           {title}
         </h3>

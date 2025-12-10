@@ -8,8 +8,8 @@ export default function OrderSuccessModal({ open, info, onClose }) {
     if (!open || !info) return null;
     
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 text-center max-w-md w-full">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 text-center max-w-md w-full">
                 <div className="mb-4 flex justify-center">
                     <CheckCircle size={64} className="text-green-600" />
                 </div>
