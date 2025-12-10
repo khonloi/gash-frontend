@@ -87,7 +87,7 @@ const Orders = () => {
 
     // Connect and authenticate
     socket.on("connect", () => {
-      console.log("✅ Orders Socket connected:", socket.id);
+      console.log("Orders Socket connected:", socket.id);
       // Emit user connection
       socket.emit("userConnected", user._id);
       // Also try authentication if token available
@@ -194,7 +194,7 @@ const Orders = () => {
     });
 
     socket.on("connect_error", (err) => {
-      console.error("❌ Orders Socket connection error:", err.message);
+      console.error("Orders Socket connection error:", err.message);
     });
 
     socket.on("disconnect", (reason) => {

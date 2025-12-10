@@ -34,7 +34,7 @@ export default function UserChat({ userId }) {
     socket.current = io(SOCKET_URL, { transports: ["websocket"] });
 
     socket.current.on("connect", () => {
-      console.log("✅ User connected:", userId);
+      console.log("User connected:", userId);
       socket.current.emit("start_chat", { userId, messageText: "" });
     });
 
@@ -116,7 +116,7 @@ export default function UserChat({ userId }) {
         alert("Upload thất bại!");
       }
     } catch (err) {
-      console.error("❌ Upload error:", err);
+      console.error("Upload error:", err);
       alert("Lỗi khi upload ảnh");
     }
   };

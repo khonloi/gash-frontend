@@ -116,7 +116,7 @@ const LiveStreamDetail = () => {
             const newRoom = new Room(roomOptions);
 
             newRoom.on(RoomEvent.Connected, () => {
-                console.log('✅ Connected to LiveKit room');
+                console.log('Connected to LiveKit room');
                 setConnectionState('connected');
 
                 // Initialize remote participants list (exclude local participant)
@@ -155,7 +155,7 @@ const LiveStreamDetail = () => {
                                     videoRef.current.muted = false;
                                 }
 
-                                console.log('✅ Audio track attached on connect', {
+                                console.log('Audio track attached on connect', {
                                     trackId: publication.track.id,
                                     enabled: publication.track.enabled,
                                     muted: videoRef.current?.muted
@@ -174,7 +174,7 @@ const LiveStreamDetail = () => {
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
-                console.log('❌ Disconnected from LiveKit:', reason);
+                console.log('Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
 
@@ -188,7 +188,7 @@ const LiveStreamDetail = () => {
                         if (token) {
                             await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
                             hasJoinedRef.current = false;
-                            console.log('✅ Left livestream via API');
+                            console.log('Left livestream via API');
                         }
                     } catch (error) {
                         console.error('Error leaving livestream:', error);

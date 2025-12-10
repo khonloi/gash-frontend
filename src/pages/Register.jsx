@@ -222,7 +222,7 @@ const Register = () => {
         
         navigate('/');
       } catch (err) {
-        console.error('❌ Register error details:', {
+        console.error('Register error details:', {
           message: err.message,
           status: err.response?.status,
           data: err.response?.data,

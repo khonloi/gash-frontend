@@ -177,7 +177,7 @@ export default function Header() {
 
         // Join user's room for targeted updates
         socket.on("connect", () => {
-            console.log("✅ Header Socket connected:", socket.id);
+            console.log("Header Socket connected:", socket.id);
             socket.emit("userConnected", user._id);
             socket.emit("joinRoom", user._id);
         });
@@ -223,7 +223,7 @@ export default function Header() {
         });
 
         socket.on("connect_error", (err) => {
-            console.error("❌ Header Socket connection error:", err.message);
+            console.error("Header Socket connection error:", err.message);
         });
 
         socket.on("disconnect", (reason) => {
