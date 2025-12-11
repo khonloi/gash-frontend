@@ -30,6 +30,7 @@ const Profile = () => {
   const [passkeys, setPasskeys] = useState([]);
   const [isSettingUpPasskey, setIsSettingUpPasskey] = useState(false);
   const [requireAuthForCheckout, setRequireAuthForCheckout] = useState(false);
+  const [passkeyToDelete, setPasskeyToDelete] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -192,26 +193,31 @@ const Profile = () => {
   }, [showToast, fetchPasskeys]);
 
   const handleDeletePasskey = useCallback(async (passkeyId) => {
-    if (!window.confirm('Are you sure you want to delete this passkey?')) {
-      return;
-    }
+    setPasskeyToDelete(passkeyId);
+  }, []);
+
+  const confirmDeletePasskey = useCallback(async () => {
+    if (!passkeyToDelete) return;
 
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         showToast('Please log in again', 'error', 3000);
+        setPasskeyToDelete(null);
         return;
       }
 
-      await Api.passkeys.deletePasskey(passkeyId, token);
+      await Api.passkeys.deletePasskey(passkeyToDelete, token);
       showToast('Passkey authentication removed successfully!', 'success', 2000);
       fetchPasskeys();
+      setPasskeyToDelete(null);
     } catch (err) {
       console.error('Delete passkey error:', err);
       const errorMsg = err.response?.data?.message || 'Failed to remove passkey authentication';
       showToast(errorMsg, 'error', 3000);
+      setPasskeyToDelete(null);
     }
-  }, [showToast, fetchPasskeys]);
+  }, [passkeyToDelete, showToast, fetchPasskeys]);
 
   const handleToggleCheckoutAuth = useCallback(async (checked) => {
     try {
@@ -838,6 +844,34 @@ const Profile = () => {
                 onClick={handleDeleteConfirm}
               >
                 Delete Account
+              </ProductButton>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Delete Passkey Confirmation */}
+      {passkeyToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Passkey Removal</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to remove this passkey? You will need to set it up again if you want to use passkey authentication in the future.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <ProductButton
+                variant="secondary"
+                size="md"
+                onClick={() => setPasskeyToDelete(null)}
+              >
+                Cancel
+              </ProductButton>
+              <ProductButton
+                variant="danger"
+                size="md"
+                onClick={confirmDeletePasskey}
+              >
+                Remove Passkey
               </ProductButton>
             </div>
           </div>
