@@ -221,14 +221,14 @@ export async function sendOrderNotificationEmail({
     );
 
     if (response.status === 200) {
-      console.log('✅ Order notification email sent successfully to', userEmail);
+      console.log('Order notification email sent successfully to', userEmail);
     } else {
       console.warn('⚠️ Unexpected EmailJS response status:', response.status);
     }
 
     return { success: true, response };
   } catch (error) {
-    console.error('❌ Error sending order notification email:', error.text || error.message);
+    console.error('Error sending order notification email:', error.text || error.message);
     
     // Log helpful error messages for common issues
     if (error.status === 422) {

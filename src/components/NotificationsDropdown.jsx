@@ -8,6 +8,10 @@ import Api from "../common/SummaryAPI";
 
 const MAX_ORDER_CACHE = 20;
 
+// Shared across all component instances to prevent duplicate emails
+// when multiple NotificationsDropdown components are mounted (e.g., mobile + desktop)
+const emailedNotificationsSet = new Set();
+
 export default function NotificationsDropdown({ user }) {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -88,7 +92,7 @@ export default function NotificationsDropdown({ user }) {
           return detailedOrder;
         }
       } catch (err) {
-        console.error("❌ Failed to fetch order data for email:", err);
+        console.error("Failed to fetch order data for email:", err);
       }
 
       return cachedOrder || null;
@@ -106,7 +110,7 @@ export default function NotificationsDropdown({ user }) {
       return;
     }
 
-    // ✅ Lấy URL backend chính xác
+    // Lấy URL backend chính xác
     const baseURL =
       import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
 
@@ -127,7 +131,7 @@ export default function NotificationsDropdown({ user }) {
 
     // Khi user kết nối, gửi userId lên server
     const handleConnect = () => {
-      console.log("✅ Notification Socket connected:", socket.id);
+      console.log("Notification Socket connected:", socket.id);
       // Emit user connection to join notification room
       socket.emit("userConnected", user._id);
       console.log(`🔔 Emitted userConnected for user: ${user._id}`);
@@ -148,7 +152,15 @@ export default function NotificationsDropdown({ user }) {
       });
 
       // Send email notification if it's an order notification
-      if (data.type === 'order' && user?.email) {
+      // Check if we've already sent an email for this notification to prevent duplicates
+      // Use module-level Set to share state across all component instances
+      const notificationId = data._id?.toString() || data._id;
+      const hasSentEmail = emailedNotificationsSet.has(notificationId);
+      
+      if (data.type === 'order' && user?.email && !hasSentEmail) {
+        // Mark this notification as having triggered an email (shared across all instances)
+        emailedNotificationsSet.add(notificationId);
+        
         const orderIdSuffix = extractOrderIdFromMessage(data.message);
         (async () => {
           try {
@@ -163,11 +175,16 @@ export default function NotificationsDropdown({ user }) {
               orderId: orderInfo?._id || orderIdSuffix,
               orderInfo,
             });
+            console.log(`📧 Email sent for notification ${notificationId}`);
           } catch (err) {
+            // On error, remove from set so we can retry if notification comes again
+            emailedNotificationsSet.delete(notificationId);
             // Don't show error to user - email is optional
-            console.error('❌ Failed to send order notification email:', err);
+            console.error('Failed to send order notification email:', err);
           }
         })();
+      } else if (hasSentEmail) {
+        console.log(`⚠️ Email already sent for notification ${notificationId} (by another instance), skipping duplicate`);
       }
     };
 
@@ -184,7 +201,7 @@ export default function NotificationsDropdown({ user }) {
           const notificationData = await res.json();
           setNotifications(notificationData);
         } catch (err) {
-          console.error("❌ Lỗi khi refresh thông báo:", err);
+          console.error("Lỗi khi refresh thông báo:", err);
         }
       };
       fetchNotifications();
@@ -219,7 +236,7 @@ export default function NotificationsDropdown({ user }) {
         });
         
         if (filtered.length !== prev.length) {
-          console.log(`✅ Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
+          console.log(`Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
         } else {
           console.warn(`⚠️ Notification with ID ${notificationId} not found in current list, refreshing...`);
           // Fallback: refresh the list if notification not found (might be a race condition)
@@ -233,7 +250,7 @@ export default function NotificationsDropdown({ user }) {
                 const notificationData = await res.json();
                 setNotifications(notificationData);
               } catch (err) {
-                console.error("❌ Lỗi khi refresh thông báo:", err);
+                console.error("Lỗi khi refresh thông báo:", err);
               }
             };
             fetchNotifications();
@@ -255,7 +272,7 @@ export default function NotificationsDropdown({ user }) {
 
     // Log lỗi
     const handleConnectError = (err) => {
-      console.error("❌ Notification Socket connection error:", err.message);
+      console.error("Notification Socket connection error:", err.message);
     };
 
     // Ngắt kết nối
@@ -310,7 +327,7 @@ export default function NotificationsDropdown({ user }) {
         const data = await res.json();
         setNotifications(data);
       } catch (err) {
-        console.error("❌ Lỗi khi lấy thông báo:", err);
+        console.error("Lỗi khi lấy thông báo:", err);
       }
     };
 
@@ -333,7 +350,7 @@ export default function NotificationsDropdown({ user }) {
   // 🔢 Số lượng chưa đọc
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // ✅ Đánh dấu đã đọc
+  // Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
       await fetch(
@@ -344,11 +361,11 @@ export default function NotificationsDropdown({ user }) {
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
     } catch (err) {
-      console.error("❌ Lỗi khi đánh dấu đã đọc:", err);
+      console.error("Lỗi khi đánh dấu đã đọc:", err);
     }
   };
 
-  // ❌ Xóa 1 thông báo (cho user)
+  // Xóa 1 thông báo (cho user)
   const deleteNotification = async (id) => {
     try {
       await fetch(
@@ -357,7 +374,7 @@ export default function NotificationsDropdown({ user }) {
       );
       setNotifications((prev) => prev.filter((n) => n._id !== id));
     } catch (err) {
-      console.error("❌ Lỗi khi xóa thông báo:", err);
+      console.error("Lỗi khi xóa thông báo:", err);
     }
   };
 
@@ -370,7 +387,7 @@ export default function NotificationsDropdown({ user }) {
       );
       setNotifications([]);
     } catch (err) {
-      console.error("❌ Lỗi khi clear all:", err);
+      console.error("Lỗi khi clear all:", err);
     }
   };
 

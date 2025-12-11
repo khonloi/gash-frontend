@@ -42,9 +42,9 @@ const Feedback = () => {
             const feedbackObj = typeof feedback === 'object' ? feedback : null;
             
             if (feedbackObj) {
-              // More lenient check - if feedback object exists, check for actual content/rating
+              // Check for actual content/rating
               const hasContent = feedbackObj.content && feedbackObj.content.trim() !== '';
-              const hasRating = feedbackObj.rating && feedbackObj.rating > 0;
+              const hasRating = feedbackObj.rating !== null && feedbackObj.rating !== undefined && feedbackObj.rating >= 1 && feedbackObj.rating <= 5;
               // Also check has_* flags if they exist
               const hasContentFlag = feedbackObj.has_content === true;
               const hasRatingFlag = feedbackObj.has_rating === true;
@@ -60,9 +60,10 @@ const Feedback = () => {
                 detail: detail
               });
 
-              // Include feedback if it has content OR rating (checking both direct values and flags)
-              // Include deleted feedbacks so they can be shown with deletion message
-              if (hasContent || hasRating || hasContentFlag || hasRatingFlag) {
+              // Include feedback ONLY if it has content OR rating (checking both direct values and flags)
+              // Filter out feedbacks with no rating and no content
+              // Include deleted feedbacks so they can be shown with deletion message (but only if they have rating or content)
+              if ((hasContent || hasRating || hasContentFlag || hasRatingFlag)) {
                 // Note: getUserOrdersService returns variant_id (not variant) with populated productId
                 // But getOrder returns variant, so we need to handle both
                 const variantId = detail.variant_id?._id || detail.variant?._id || detail.variant_id || detail.variant || null;
@@ -142,14 +143,15 @@ const Feedback = () => {
           const feedback = detail.feedback || detail.feedbackId || null;
           const feedbackObj = typeof feedback === 'object' ? feedback : null;
           
-          // Check if feedback exists and is valid (include deleted feedbacks)
+          // Check if feedback exists and is valid (must have rating or content)
           let hasValidFeedback = false;
           if (feedbackObj) {
             const hasContent = feedbackObj.content && feedbackObj.content.trim() !== '';
-            const hasRating = feedbackObj.rating && feedbackObj.rating > 0;
+            const hasRating = feedbackObj.rating !== null && feedbackObj.rating !== undefined && feedbackObj.rating >= 1 && feedbackObj.rating <= 5;
             const hasContentFlag = feedbackObj.has_content === true;
             const hasRatingFlag = feedbackObj.has_rating === true;
             
+            // Only consider valid if it has rating OR content
             hasValidFeedback = (hasContent || hasRating || hasContentFlag || hasRatingFlag);
           }
 

@@ -43,7 +43,13 @@ const ProductFeedback = ({ productId }) => {
 
             // Include deleted feedbacks (they will show deletion message) and sort: current user first, then by date (newest first)
             const validFeedbacks = feedbacksData
-                .filter(feedback => feedback && feedback.feedback) // Only filter out null/undefined feedbacks
+                .filter(feedback => {
+                    if (!feedback || !feedback.feedback) return false;
+                    // Filter out feedbacks with no rating and no content
+                    const hasRating = feedback.feedback?.rating !== null && feedback.feedback?.rating !== undefined && feedback.feedback.rating >= 1 && feedback.feedback.rating <= 5;
+                    const hasContent = feedback.feedback?.content && feedback.feedback.content.trim() !== '';
+                    return hasRating || hasContent;
+                })
                 .sort((a, b) => {
                     // If one is current user and other is not, current user comes first
                     if (a.customer?.is_current_user && !b.customer?.is_current_user) {

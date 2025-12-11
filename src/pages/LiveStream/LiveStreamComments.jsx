@@ -263,7 +263,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             if (response.data?.success) {
                 // Comment will be added automatically via WebSocket in real-time
                 // No need to fetch again - WebSocket handles it
-                console.log('✅ Comment sent, waiting for WebSocket update...');
+                console.log('Comment sent, waiting for WebSocket update...');
                 // Auto-scroll to bottom after sending comment
                 setTimeout(() => {
                     if (commentsContainerRef.current) {
@@ -311,7 +311,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
             if (response.data?.success) {
                 // Comment will be deleted automatically via WebSocket in real-time
-                console.log('✅ Comment deleted, waiting for WebSocket update...');
+                console.log('Comment deleted, waiting for WebSocket update...');
             } else {
                 setError(response.data?.message || 'Unable to delete comment');
             }
