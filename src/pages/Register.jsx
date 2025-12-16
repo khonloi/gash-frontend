@@ -138,7 +138,7 @@ const Register = () => {
           // if (!imageUrl) {
           //   throw new Error('Upload completed but server did not return URL');
           // }
-          // showToast('Image uploaded successfully!', 'success', 2000);
+          // showToast('Image uploaded successfully', 'success', 2000);
         }
 
         // Filter out fields that backend doesn't expect

@@ -106,7 +106,7 @@ const ProductFavorite = () => {
       }
       await fetchWithRetry(() => Api.favorites.remove(favoriteId, token));
       setFavorites((prev) => prev.filter((fav) => fav._id !== favoriteId));
-      showToast("Product removed from favorites!", "success", 3000);
+      showToast("Product removed from favorites successfully", "success", 3000);
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || "Failed to remove from favorites";
       setError(errorMessage);

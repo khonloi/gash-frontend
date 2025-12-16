@@ -13,7 +13,7 @@ export default function OrderSuccessModal({ open, info, onClose }) {
                 <div className="mb-4 flex justify-center">
                     <CheckCircle size={64} className="text-green-600" />
                 </div>
-                <h2 className="text-green-600 font-bold text-2xl sm:text-3xl mb-2">Order Successfully!</h2>
+                <h2 className="text-green-600 font-bold text-2xl sm:text-3xl mb-2">Order Successfully</h2>
                 <p className="text-gray-700 mb-5">Thank you for your order. It will be shipped to you promptly!</p>
                 
                 <div className="text-left bg-gray-50 rounded-xl p-4 sm:p-5 mb-6 border border-gray-200">

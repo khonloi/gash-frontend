@@ -102,7 +102,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
         token
       );
 
-      showToast("Feedback created successfully!", "success");
+      showToast("Feedback created successfully", "success");
       setCreatingFeedback(false);
       onUpdate?.();
     } catch (err) {
@@ -177,7 +177,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
         token
       );
 
-      showToast("Feedback updated successfully!", "success");
+      showToast("Feedback updated successfully", "success");
       setEditingFeedback(null);
       onUpdate?.();
     } catch (err) {
@@ -224,7 +224,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
 
       await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
 
-      showToast("Feedback deleted successfully!", "success");
+      showToast("Feedback deleted successfully", "success");
       onUpdate?.();
       onClose();
     } catch (err) {
