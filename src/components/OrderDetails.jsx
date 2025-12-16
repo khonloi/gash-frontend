@@ -32,6 +32,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState('');
 
+    // VNPay countdown timer state
+    const [timeLeft, setTimeLeft] = useState(null);
+    const [isVNPayExpired, setIsVNPayExpired] = useState(false);
+
     const socketRef = useRef(null);
 
     // 🧭 Fetch order with all details
@@ -83,10 +87,39 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     }, [orderId, fetchOrderDetails]);
 
     useEffect(() => {
-        if (order?.orderDetails?.length > 0) {
-            extractFeedbacksFromOrder();
+        if (order?.payment_method === 'VNPAY' && order?.pay_status === 'unpaid' && order?.vnpay_expiry_time) {
+            const expiryTime = new Date(order.vnpay_expiry_time);
+            const now = new Date();
+
+            if (expiryTime > now) {
+                // Calculate initial time left in seconds
+                const initialTimeLeft = Math.floor((expiryTime - now) / 1000);
+                setTimeLeft(initialTimeLeft);
+                setIsVNPayExpired(false);
+
+                // Start countdown timer
+                const timer = setInterval(() => {
+                    setTimeLeft(prev => {
+                        if (prev <= 1) {
+                            setIsVNPayExpired(true);
+                            clearInterval(timer);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+
+                return () => clearInterval(timer);
+            } else {
+                // Already expired
+                setTimeLeft(0);
+                setIsVNPayExpired(true);
+            }
+        } else {
+            setTimeLeft(null);
+            setIsVNPayExpired(false);
         }
-    }, [order?.orderDetails, extractFeedbacksFromOrder]);
+    }, [order]);
 
     // Setup Socket.IO for real-time order updates
     useEffect(() => {
@@ -613,6 +646,45 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 </div>
                             )}
                         </div>
+
+                        {/* VNPay Payment Countdown */}
+                        {order?.payment_method === 'VNPAY' && order?.pay_status === 'unpaid' && order?.order_status !== 'cancelled' && (
+                            <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <h3 className="text-lg font-semibold text-gray-900">VNPay Payment</h3>
+                                        {timeLeft !== null && !isVNPayExpired && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-gray-600">Time remaining:</span>
+                                                <span className={`text-lg font-mono font-bold ${
+                                                    timeLeft < 300 ? 'text-red-600' : timeLeft < 600 ? 'text-orange-600' : 'text-green-600'
+                                                }`}>
+                                                    {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {isVNPayExpired && (
+                                            <div className="text-red-600 font-medium">
+                                                Payment time expired. Order will be cancelled automatically.
+                                            </div>
+                                        )}
+                                    </div>
+                                    {!isVNPayExpired && order?.vnpay_payment_url && (
+                                        <ProductButton
+                                            variant="primary"
+                                            size="md"
+                                            onClick={() => window.open(order.vnpay_payment_url, '_blank')}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                            Continue VNPay Payment
+                                        </ProductButton>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Customer & Payment Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
