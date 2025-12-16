@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Home, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Home, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProductButton from './ProductButton';
 
@@ -7,14 +7,22 @@ export default function OrderSuccessModal({ open, info, onClose }) {
     const navigate = useNavigate();
     if (!open || !info) return null;
     
+    const isSuccess = info.status === 'success';
+    
     return (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-[9999] p-4">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 text-center max-w-md w-full">
                 <div className="mb-4 flex justify-center">
-                    <CheckCircle size={64} className="text-green-600" />
+                    {isSuccess ? (
+                        <CheckCircle size={64} className="text-green-600" />
+                    ) : (
+                        <XCircle size={64} className="text-red-600" />
+                    )}
                 </div>
-                <h2 className="text-green-600 font-bold text-2xl sm:text-3xl mb-2">Order Successfully</h2>
-                <p className="text-gray-700 mb-5">Thank you for your order. It will be shipped to you promptly!</p>
+                <h2 className={`font-bold text-2xl sm:text-3xl mb-2 ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+                    {isSuccess ? 'Payment Successful' : 'Payment Failed'}
+                </h2>
+                <p className="text-gray-700 mb-5">{info.message}</p>
                 
                 <div className="text-left bg-gray-50 rounded-xl p-4 sm:p-5 mb-6 border border-gray-200">
                     <h3 className="text-base font-semibold mb-3 text-gray-900">Transaction Information</h3>
