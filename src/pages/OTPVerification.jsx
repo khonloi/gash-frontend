@@ -53,11 +53,11 @@ const OTPVerification = () => {
       try {
         if (type === 'register') {
           await verifyOTP(email, otp, formData, 'register');
-          showToast('OTP verified successfully!', 'success', 2000);
+          showToast('OTP verified successfully', 'success', 2000);
           navigate('/register', { state: { email, formData } });
         } else if (type === 'forgot-password') {
           await verifyOTP(email, otp, null, 'forgot-password');
-          showToast('OTP verified successfully!', 'success', 2000);
+          showToast('OTP verified successfully', 'success', 2000);
           navigate('/reset-password', { state: { email, otp } });
         }
       } catch (err) {

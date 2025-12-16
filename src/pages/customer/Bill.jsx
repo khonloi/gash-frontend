@@ -35,7 +35,7 @@ const Bill = () => {
             }
 
             setBillData(orderData);
-            showToast('Bill exported successfully!', 'success');
+            showToast('Bill exported successfully', 'success');
         } catch (err) {
             setError(err.response?.data?.message || 'Unable to load invoice');
             showToast('Unable to load invoice', 'error');
@@ -262,7 +262,7 @@ const Bill = () => {
             const fileName = `bill-${billData?.order?.orderId || orderId}-${new Date().toISOString().split('T')[0]}.pdf`;
             pdf.save(fileName);
 
-            showToast('PDF exported successfully!', 'success');
+            showToast('PDF exported successfully', 'success');
         } catch (error) {
             console.error('PDF export error:', error);
             showToast('Failed to export PDF', 'error');

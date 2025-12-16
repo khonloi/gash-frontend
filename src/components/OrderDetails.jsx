@@ -1,5 +1,8 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { io } from "socket.io-client";
+import { SOCKET_URL } from "../common/axiosClient";
 import Api from "../common/SummaryAPI";
 import { useToast } from "../hooks/useToast";
 import FeedbackForm from "./FeedbackForm";
@@ -11,6 +14,7 @@ import ConfirmationModal from "./ConfirmationModal";
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const { user } = useContext(AuthContext);
 
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -27,6 +31,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [showDeleteFeedbackConfirm, setShowDeleteFeedbackConfirm] = useState(false);
     const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState('');
+
+    const socketRef = useRef(null);
 
     // 🧭 Fetch order with all details
     const fetchOrderDetails = useCallback(async () => {
@@ -81,6 +87,74 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             extractFeedbacksFromOrder();
         }
     }, [order?.orderDetails, extractFeedbacksFromOrder]);
+
+    // Setup Socket.IO for real-time order updates
+    useEffect(() => {
+        if (!user?._id || !orderId) return;
+
+        // Initialize socket if not already created
+        if (!socketRef.current) {
+          const token = localStorage.getItem("token");
+          socketRef.current = io(SOCKET_URL, {
+            transports: ["websocket", "polling"],
+            auth: { token },
+            withCredentials: true,
+          });
+        }
+
+        const socket = socketRef.current;
+
+        // Connect and authenticate
+        socket.on("connect", () => {
+          console.log("OrderDetails Socket connected:", socket.id);
+          // Emit user connection
+          socket.emit("userConnected", user._id);
+          // Also try authentication if token available
+          const token = localStorage.getItem("token");
+          if (token) {
+            socket.emit("authenticate", token);
+          }
+        });
+
+        // Listen for order updates
+        socket.on("orderUpdated", (payload) => {
+          const updatedOrder = payload.order || payload;
+          const orderUserId = payload.userId || updatedOrder.acc_id?._id || updatedOrder.acc_id;
+
+          // Only update if this order belongs to the current user and matches the current orderId
+          if (orderUserId && orderUserId.toString() === user._id.toString() && updatedOrder._id === orderId) {
+            console.log("📦 Order updated via Socket.IO in OrderDetails:", updatedOrder._id);
+
+            // Update the order state while preserving populated orderDetails structure
+            setOrder((prevOrder) => {
+              if (!prevOrder) return updatedOrder;
+
+              // Check if updated order has properly populated orderDetails
+              const hasPopulatedDetails = updatedOrder.orderDetails?.some(
+                (detail) => detail?.variant_id?.productId?.productName
+              );
+
+              // Preserve existing orderDetails if updated order doesn't have populated ones
+              const preservedOrderDetails = hasPopulatedDetails
+                ? updatedOrder.orderDetails
+                : prevOrder.orderDetails;
+
+              return {
+                ...prevOrder,
+                ...updatedOrder,
+                // Preserve populated orderDetails structure
+                orderDetails: preservedOrderDetails || updatedOrder.orderDetails || prevOrder.orderDetails,
+              };
+            });
+          }
+        });
+
+        // Cleanup on unmount
+        return () => {
+          socket.off("connect");
+          socket.off("orderUpdated");
+        };
+    }, [user?._id, orderId]);
 
     const formatPrice = (p) =>
         p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -145,7 +219,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             );
 
             // Show success message after API call succeeds
-            showToast("Feedback created successfully!", "success");
+            showToast("Feedback created successfully", "success");
 
             // Refresh order data to get updated feedback
             await fetchOrderDetails();
@@ -232,7 +306,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             );
 
             // Show success notification after API call succeeds
-            showToast("Feedback updated successfully!", "success");
+            showToast("Feedback updated successfully", "success");
 
             // Refresh order data to get updated feedback
             await fetchOrderDetails();
@@ -301,7 +375,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
 
-            showToast("Feedback deleted successfully!", "success");
+            showToast("Feedback deleted successfully", "success");
             
             // Refresh order data to get updated feedback
             await fetchOrderDetails();
@@ -454,7 +528,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 : cancelFormData.cancelReason;
             console.log("Sending cancel request with reason:", reason); // Debug log
             await Api.order.cancel(orderId, reason, token);
-            showToast("Order cancelled successfully!", "success");
+            showToast("Order cancelled successfully", "success");
             fetchOrderDetails();
             setShowConfirmModal(false);
         } catch (err) {

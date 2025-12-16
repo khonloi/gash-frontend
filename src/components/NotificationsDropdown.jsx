@@ -440,7 +440,14 @@ export default function NotificationsDropdown({ user }) {
               {notifications.map((n) => (
                 <li
                   key={n._id}
-                  onClick={() => markAsRead(n._id)}
+                  onClick={() => {
+                    markAsRead(n._id);
+                    // Navigate to livestream if it's a livestream notification
+                    if (n.type === 'livestream' && n.livestreamId) {
+                      setShowNotifications(false);
+                      navigate(`/live/${n.livestreamId}`);
+                    }
+                  }}
                   className={`group flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
                     !n.isRead ? "bg-amber-50/50" : "bg-white"
                   }`}
