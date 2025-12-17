@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Google login successful!', 'success');
+      showToast('Google logged in successfully', 'success');
 
       setTimeout(() => {
         handleForcedLogout('Your session has expired. You will be logged out.');
@@ -248,7 +248,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Passkey login successful!', 'success');
+      showToast('Passkey logged in successfully', 'success');
 
       setTimeout(() => {
         handleForcedLogout('Your session has expired. You will be logged out.');

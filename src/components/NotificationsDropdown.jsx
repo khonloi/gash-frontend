@@ -462,7 +462,7 @@ export default function NotificationsDropdown({ user }) {
                     <p className="text-gray-900 text-sm sm:text-base leading-snug mb-1">
                       <strong className="font-semibold">{n.title}</strong>
                     </p>
-                    <p className="text-gray-600 text-xs sm:text-sm mb-2">
+                    <p className="text-gray-600 text-xs sm:text-sm mb-2 whitespace-pre-wrap">
                       {n.message}
                     </p>
 

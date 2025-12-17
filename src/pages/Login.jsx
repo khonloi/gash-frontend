@@ -47,7 +47,7 @@ const Login = () => {
       setIsLoading(true);
       try {
         await login(trimmedUsername, trimmedPassword);
-        showToast('Login successful!', 'success', ERROR_TIMEOUT);
+        showToast('Logged in successfully', 'success', ERROR_TIMEOUT);
         navigate(from, { replace: true });
       } catch (err) {
         const errorMessage =
@@ -73,7 +73,7 @@ const Login = () => {
       setIsLoading(true);
       try {
         await googleLogin(credentialResponse.credential);
-        showToast('Login successful!', 'success', ERROR_TIMEOUT);
+        showToast('Logged in successfully', 'success', ERROR_TIMEOUT);
         navigate(from, { replace: true });
       } catch (err) {
         showToast(LOGIN_ERROR_MESSAGES.GOOGLE_FAILED, "error", ERROR_TIMEOUT);
