@@ -515,7 +515,7 @@ export default function Header() {
                                 <SearchIcon />
                             </button>
                             <Link to="/" className="flex items-center justify-center">
-                                <img src={gashLogo} alt="Gash Logo" className="h-6 sm:h-7" />
+                                <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
                             </Link>
                             <div className="relative" ref={userMenuRef}>
                                 <button
@@ -609,7 +609,7 @@ export default function Header() {
                 {/* ==== DESKTOP HEADER ==== */}
                 <div className="hidden sm:flex w-full items-center justify-between">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={gashLogo} alt="Gash Logo" className="h-6 md:h-7" />
+                        <img src={gashLogo} alt="GASH Logo" className="h-6 md:h-7" />
                     </Link>
                     <div className="relative flex-1 mx-4 sm:mx-6 md:mx-8 lg:mx-12 max-w-2xl" ref={dropdownRef}>
                         <form
