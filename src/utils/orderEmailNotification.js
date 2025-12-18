@@ -15,9 +15,14 @@
 import emailjs from '@emailjs/browser';
 
 // Feature flag to enable/disable order email notifications
-// Set to 'true' or '1' to enable, anything else to disable
-const isEnabled = import.meta.env.VITE_ENABLE_ORDER_EMAIL_NOTIFICATIONS === 'true' || 
-                  import.meta.env.VITE_ENABLE_ORDER_EMAIL_NOTIFICATIONS === '1';
+// Default ON unless explicitly set to 'false' or '0'
+const rawOrderEmailFlag = import.meta.env.VITE_ENABLE_ORDER_EMAIL_NOTIFICATIONS;
+const isEnabled =
+  rawOrderEmailFlag === undefined ||
+  rawOrderEmailFlag === null ||
+  rawOrderEmailFlag === ''
+    ? true
+    : rawOrderEmailFlag === 'true' || rawOrderEmailFlag === '1';
 
 // Initialize EmailJS with Public API Key (shared with OTP emails)
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -30,6 +35,117 @@ if (publicKey && publicKey !== 'your_emailjs_public_key_here') {
   emailjs.init(publicKey);
 }
 
+const currencyFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+});
+
+const formatCurrency = (value) => {
+  if (value === undefined || value === null) return '';
+  const numericValue = typeof value === 'string' ? Number(value) : value;
+  if (!Number.isFinite(numericValue)) return '';
+  try {
+    return currencyFormatter.format(numericValue);
+  } catch {
+    return numericValue.toString();
+  }
+};
+
+const buildOrderItemsPayload = (orderInfo) => {
+  if (!orderInfo?.orderDetails || !Array.isArray(orderInfo.orderDetails)) {
+    return {
+      items: [],
+      text: '',
+      html: '',
+      json: '[]',
+    };
+  }
+
+  const items = orderInfo.orderDetails
+    .map((detail) => {
+      const variant = detail?.variant_id || {};
+      const productName =
+        variant?.productId?.productName ||
+        variant?.productName ||
+        detail?.productName;
+      if (!productName) return null;
+
+      const color =
+        variant?.productColorId?.color_name ||
+        variant?.color ||
+        detail?.color ||
+        '';
+      const size =
+        variant?.productSizeId?.size_name ||
+        variant?.size ||
+        detail?.size ||
+        '';
+      const quantity =
+        detail?.Quantity ??
+        detail?.quantity ??
+        detail?.qty ??
+        1;
+      const unitPrice =
+        detail?.UnitPrice ??
+        detail?.unitPrice ??
+        detail?.price ??
+        null;
+      const totalPrice =
+        detail?.totalPrice ??
+        (unitPrice !== null && Number.isFinite(Number(unitPrice))
+          ? Number(unitPrice) * Number(quantity || 1)
+          : null);
+
+      return {
+        name: productName,
+        color: color || '',
+        size: size || '',
+        quantity,
+        unitPrice: Number.isFinite(Number(unitPrice)) ? Number(unitPrice) : null,
+        totalPrice: Number.isFinite(Number(totalPrice))
+          ? Number(totalPrice)
+          : null,
+      };
+    })
+    .filter(Boolean);
+
+  const text = items
+    .map((item) => {
+      const variantParts = [];
+      if (item.size) variantParts.push(`Size: ${item.size}`);
+      if (item.color) variantParts.push(`Color: ${item.color}`);
+      const variantText = variantParts.length ? ` (${variantParts.join(' · ')})` : '';
+      const priceText = item.totalPrice !== null ? ` - ${formatCurrency(item.totalPrice)}` : '';
+      return `• ${item.name}${variantText} x${item.quantity}${priceText}`;
+    })
+    .join('\n');
+
+  const html = items.length
+    ? `<ul>${items
+        .map((item) => {
+          const variantParts = [];
+          if (item.size) variantParts.push(`Size: ${item.size}`);
+          if (item.color) variantParts.push(`Color: ${item.color}`);
+          const variantText = variantParts.length
+            ? `<small>${variantParts.join(' · ')}</small>`
+            : '';
+          const priceText =
+            item.totalPrice !== null
+              ? `<span style="float:right;">${formatCurrency(item.totalPrice)}</span>`
+              : '';
+          return `<li><strong>${item.name}</strong> ${variantText} × ${item.quantity} ${priceText}</li>`;
+        })
+        .join('')}</ul>`
+    : '';
+
+  return {
+    items,
+    text,
+    html,
+    json: JSON.stringify(items),
+  };
+};
+
 /**
  * Send order notification email via EmailJS
  * @param {Object} params - Email parameters
@@ -38,9 +154,17 @@ if (publicKey && publicKey !== 'your_emailjs_public_key_here') {
  * @param {String} params.title - Email subject/title
  * @param {String} params.message - Email message content
  * @param {String} params.orderId - Order ID for reference (optional)
+ * @param {Object} params.orderInfo - Detailed order information (optional)
  * @returns {Promise<Object>} EmailJS response
  */
-export async function sendOrderNotificationEmail({ userEmail, userName, title, message, orderId }) {
+export async function sendOrderNotificationEmail({
+  userEmail,
+  userName,
+  title,
+  message,
+  orderId,
+  orderInfo = null,
+}) {
   // Check if feature is enabled
   if (!isEnabled) {
     // Silently skip - feature is disabled
@@ -64,13 +188,28 @@ export async function sendOrderNotificationEmail({ userEmail, userName, title, m
     return { success: false, message: 'User email missing' };
   }
 
+  const detailsPayload = orderInfo ? buildOrderItemsPayload(orderInfo) : null;
+
   // Prepare template parameters (matching EmailJS template variables)
   const templateParams = {
     to_email: userEmail,
     to_name: userName || userEmail.split('@')[0], // Use provided name or extract from email
     subject: title,
     message: message,
-    order_id: orderId || '', // Order ID (formatted as #XXXXXXXX if provided)
+    order_id: orderId || orderInfo?._id || '', // Order ID (formatted as #XXXXXXXX if provided)
+    order_status: orderInfo?.order_status || orderInfo?.status || '',
+    order_payment_status: orderInfo?.pay_status || orderInfo?.payment_status || '',
+    order_shipping_address: orderInfo?.addressReceive || orderInfo?.shippingAddress || '',
+    order_recipient_name: orderInfo?.name || orderInfo?.recipientName || '',
+    order_total_price: formatCurrency(orderInfo?.totalPrice),
+    order_discount_amount: formatCurrency(orderInfo?.discountAmount),
+    order_final_price: formatCurrency(orderInfo?.finalPrice),
+    order_updated_at: orderInfo?.updatedAt
+      ? new Date(orderInfo.updatedAt).toLocaleString('vi-VN')
+      : '',
+    order_details_text: detailsPayload?.text || '',
+    order_details_html: detailsPayload?.html || '',
+    order_details_json: detailsPayload?.json || '[]',
   };
 
   try {
@@ -82,14 +221,14 @@ export async function sendOrderNotificationEmail({ userEmail, userName, title, m
     );
 
     if (response.status === 200) {
-      console.log('✅ Order notification email sent successfully to', userEmail);
+      console.log('Order notification email sent successfully to', userEmail);
     } else {
       console.warn('⚠️ Unexpected EmailJS response status:', response.status);
     }
 
     return { success: true, response };
   } catch (error) {
-    console.error('❌ Error sending order notification email:', error.text || error.message);
+    console.error('Error sending order notification email:', error.text || error.message);
     
     // Log helpful error messages for common issues
     if (error.status === 422) {

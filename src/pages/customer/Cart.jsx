@@ -131,8 +131,16 @@ const Cart = () => {
         lastSavedQuantities.current = savedQuantities;
       } catch (err) {
         console.error("Fetch cart error:", err);
-        const errorMessage =
-          err.response?.data?.message || err.message || "Failed to load cart items";
+        let errorMessage = "Failed to load cart items";
+        
+        if (err?.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        } else if (err?.message) {
+          errorMessage = err.message;
+        } else if (!err.response) {
+          errorMessage = "Failed to load cart items. Please try again later.";
+        }
+        
         setError(errorMessage);
         showToast(errorMessage, "error", TOAST_TIMEOUT);
       } finally {

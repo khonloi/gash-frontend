@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Google login successful!', 'success');
+      showToast('Google logged in successfully', 'success');
 
       setTimeout(() => {
         handleForcedLogout('Your session has expired. You will be logged out.');
@@ -159,7 +159,7 @@ export const AuthProvider = ({ children }) => {
             ? '/auth/register/request-otp'
             : '/auth/forgot-password/request-otp';
         const response = await axiosClient.post(endpoint, { email });
-        showToast('OTP resent successfully!', 'info');
+        showToast('OTP resent successfully', 'info');
         return response;
       }
 
@@ -170,7 +170,7 @@ export const AuthProvider = ({ children }) => {
         response = await axiosClient.post('/auth/forgot-password/verify-otp', { email, otp });
       }
 
-      showToast('OTP verified successfully!', 'success');
+      showToast('OTP verified successfully', 'success');
       return response;
     } catch (error) {
       const msg = error.response?.data?.message || 'Invalid or expired OTP.';
@@ -193,7 +193,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Account created successfully!', 'success');
+      showToast('Account created successfully', 'success');
 
       setTimeout(() => {
         handleForcedLogout('Your session has expired. You will be logged out.');
@@ -214,7 +214,7 @@ export const AuthProvider = ({ children }) => {
         email,
         newPassword,
       });
-      showToast('Password reset successfully!', 'success');
+      showToast('Password reset successfully', 'success');
     } catch (error) {
       const msg = error.response?.data?.message || 'Failed to reset password.';
       showToast(msg, 'error');
@@ -248,7 +248,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('loginTime', loginTime);
       setUser(account);
 
-      showToast('Passkey login successful!', 'success');
+      showToast('Passkey logged in successfully', 'success');
 
       setTimeout(() => {
         handleForcedLogout('Your session has expired. You will be logged out.');

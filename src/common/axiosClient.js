@@ -40,7 +40,8 @@ axiosClient.interceptors.response.use(
     const message = status === 401 ? 'Unauthorized access - please log in' :
       status === 404 ? 'Resource not found' :
         status >= 500 ? 'Server error - please try again later' :
-          'Network error - please check your connection';
+          !error.response ? 'Failed to connect to server. Please check your connection.' :
+            'An error occurred. Please try again.';
     return Promise.reject({ ...error, message });
   }
 );

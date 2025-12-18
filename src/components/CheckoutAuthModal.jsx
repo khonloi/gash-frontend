@@ -103,12 +103,12 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
       };
 
       await Api.passkeys.verifyAuthentication(verifyData);
-      showToast('Biometric authentication successful', 'success', 2000);
+      showToast('Passkey authentication successful', 'success', 2000);
       onAuthenticated();
       onClose();
     } catch (err) {
       console.error('Passkey authentication error:', err);
-      const errorMsg = err.response?.data?.message || 'Biometric authentication failed';
+      const errorMsg = err.response?.data?.message || 'Passkey authentication failed';
       showToast(errorMsg, 'error', 3000);
     } finally {
       setIsAuthenticating(false);
@@ -119,8 +119,8 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 max-w-md w-full mx-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 max-w-md w-full">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">Authenticate to Place Order</h3>
         <p className="text-sm text-gray-600 mb-6">
           Please authenticate to confirm your order. Choose your preferred method:
@@ -174,7 +174,7 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
             </div>
           )}
 
-          {/* Passkey/Biometric Authentication */}
+          {/* Passkey/Passkey Authentication */}
           {hasPasskeys && (
             <ProductButton
               variant="secondary"
@@ -183,7 +183,7 @@ const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = []
               disabled={isAuthenticating}
               className="w-full"
             >
-              {isAuthenticating && authMethod === 'passkey' ? 'Authenticating...' : 'Authenticate with Biometrics'}
+              {isAuthenticating && authMethod === 'passkey' ? 'Authenticating...' : 'Authenticate with Passkeys'}
             </ProductButton>
           )}
 

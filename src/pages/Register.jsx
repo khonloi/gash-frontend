@@ -4,7 +4,6 @@ import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import ProductButton from '../components/ProductButton';
-import { startRegistration } from '@simplewebauthn/browser';
 
 const Register = () => {
   const location = useLocation();
@@ -40,8 +39,9 @@ const Register = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (!file.type.startsWith("image/")) {
-        showToast("Please select a valid image file.", "error", 3000);
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type.toLowerCase())) {
+        showToast("Profile Image must be a PNG or JPG image URL", "error", 3000);
         setInvalidFile(true);
         setSelectedFile(null);
         setPreviewUrl("");
@@ -82,14 +82,25 @@ const Register = () => {
       invalidFile
     });
 
-    if (username.length < 3 || username.length > 30) return 'Username must be between 3 and 30 characters';
-    if (name && name.length > 50) return 'Name cannot exceed 50 characters';
+    // Check required fields
+    if (!username) return 'Please fill in all required fields';
+    if (!name) return 'Please fill in all required fields';
+    if (!email) return 'Please fill in all required fields';
+    if (!phone) return 'Please fill in all required fields';
+    if (!address) return 'Please fill in all required fields';
+    if (!password) return 'Please fill in all required fields';
+    if (!repeatPassword) return 'Please fill in all required fields';
+
+    if (username.length < 5 || username.length > 30) return 'Username must be between 5 and 30 characters';
+    if (name.length < 1 || name.length > 50) return 'Fullname must be between 1 and 50 characters';
     if (!/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email address';
-    if (phone && !/^\d{10}$/.test(phone)) return 'Phone number must be exactly 10 digits';
-    if (address && address.length > 100) return 'Address cannot exceed 100 characters';
+    if (!/^\d{10}$/.test(phone)) return 'Phone must be exactly 10 digits';
+    if (address.length > 200) return 'Address must be at most 200 characters';
     
     // Password validation: at least 8 characters, at least 3 of 4 character types
-    if (password.length < 8) return 'Password must be at least 8 characters long';
+    if (password.length < 8) {
+      return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';
+    }
     
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
@@ -98,11 +109,11 @@ const Register = () => {
     const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
     
     if (characterTypesMet < 3) {
-      return 'Password must include at least three of: uppercase letter, lowercase letter, number, special character';
+      return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';
     }
     
-    if (password !== repeatPassword) return 'Passwords do not match';
-    if (invalidFile) return 'Please select a valid image file';
+    if (password !== repeatPassword) return 'Repeat password does not match';
+    if (invalidFile) return 'Profile Image must be a PNG or JPG image URL';
     return '';
   }, [formData, invalidFile]);
 
@@ -127,7 +138,7 @@ const Register = () => {
           // if (!imageUrl) {
           //   throw new Error('Upload completed but server did not return URL');
           // }
-          // showToast('Image uploaded successfully!', 'success', 2000);
+          // showToast('Image uploaded successfully', 'success', 2000);
         }
 
         // Filter out fields that backend doesn't expect
@@ -140,77 +151,11 @@ const Register = () => {
 
         console.log('📝 Signup data being sent:', signupData);
         await signup(signupData);
-        showToast('Account created successfully!', 'success', 2000);
-        
-        // Optionally set up biometric authentication
-        const setupPasskey = window.confirm('Would you like to set up biometric authentication (Touch ID, Face ID, or Windows Hello) for easier login?');
-        if (setupPasskey) {
-          try {
-            const token = localStorage.getItem('token');
-            if (token) {
-              // Get registration options
-              const regResponse = await Api.passkeys.generateRegistrationOptions(token);
-              const { options, challenge } = regResponse.data; // Get both options and challenge
-              
-              console.log('Registration options received:', options);
-              console.log('Challenge:', challenge);
-
-              // Start registration - pass the options object directly
-              const registrationResponse = await startRegistration(options);
-              console.log('Registration response from browser:', registrationResponse);
-
-              // Detect device type
-              const deviceType = navigator.userAgent.includes('Mobile') ? 'mobile' : 
-                                navigator.userAgent.includes('Tablet') ? 'tablet' : 'desktop';
-
-              // Convert ArrayBuffers to base64url strings for JSON transmission
-              const arrayBufferToBase64 = (buffer) => {
-                if (buffer instanceof ArrayBuffer) {
-                  const bytes = new Uint8Array(buffer);
-                  let binary = '';
-                  for (let i = 0; i < bytes.length; i++) {
-                    binary += String.fromCharCode(bytes[i]);
-                  }
-                  return btoa(binary)
-                    .replace(/\+/g, '-')
-                    .replace(/\//g, '_')
-                    .replace(/=/g, '');
-                }
-                return buffer; // Already a string
-              };
-              
-              const verifyData = {
-                id: registrationResponse.id,
-                rawId: arrayBufferToBase64(registrationResponse.rawId),
-                response: {
-                  clientDataJSON: arrayBufferToBase64(registrationResponse.response.clientDataJSON),
-                  attestationObject: arrayBufferToBase64(registrationResponse.response.attestationObject),
-                  transports: registrationResponse.response.transports,
-                },
-                type: registrationResponse.type,
-                challenge: challenge, // Use the challenge from the server response
-                deviceType,
-              };
-              console.log('Sending verification data:', {
-                id: verifyData.id,
-                hasResponse: !!verifyData.response,
-                challenge: verifyData.challenge,
-                deviceType: verifyData.deviceType
-              });
-              
-              await Api.passkeys.verifyRegistration(verifyData, token);
-
-              showToast('Biometric authentication set up successfully!', 'success', 2000);
-            }
-          } catch (err) {
-            console.error('Passkey setup error:', err);
-            showToast('Biometric setup failed, but your account was created successfully.', 'info', 3000);
-          }
-        }
+        showToast('Register successfully', 'success', 2000);
         
         navigate('/');
       } catch (err) {
-        console.error('❌ Register error details:', {
+        console.error('Register error details:', {
           message: err.message,
           status: err.response?.status,
           data: err.response?.data,
@@ -221,13 +166,13 @@ const Register = () => {
         if (err.response?.status === 400) {
           errorMessage = err.response.data.message || 'Invalid input data';
         } else if (err.response?.status === 409) {
-          errorMessage = 'Username or email already exists';
+          errorMessage = 'Username already exists';
         } else if (err.response?.data?.errors) {
           errorMessage = err.response.data.errors[0]?.msg || errorMessage;
         } else if (err.message === 'Upload completed but server did not return URL') {
           errorMessage = err.message;
-        } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
-          errorMessage = 'Network error. Please check if backend is running.';
+        } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error') || !err.response) {
+          errorMessage = 'Failed to register. Please try again later.';
         }
         showToast(errorMessage, 'error', 4000);
         usernameRef.current?.focus();
@@ -298,7 +243,7 @@ const Register = () => {
                   value={formData.address}
                   onChange={handleChange}
                   required
-                  maxLength={100}
+                  maxLength={200}
                   className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                   aria-required={true}
                 />
@@ -407,7 +352,7 @@ const Register = () => {
                   <input
                     id="signup-image-upload"
                     type="file"
-                    accept="image/*"
+                    accept="image/png,image/jpeg,image/jpg"
                     onChange={handleFileChange}
                     className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                     aria-required={false}

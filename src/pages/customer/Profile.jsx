@@ -30,6 +30,7 @@ const Profile = () => {
   const [passkeys, setPasskeys] = useState([]);
   const [isSettingUpPasskey, setIsSettingUpPasskey] = useState(false);
   const [requireAuthForCheckout, setRequireAuthForCheckout] = useState(false);
+  const [passkeyToDelete, setPasskeyToDelete] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -51,8 +52,9 @@ const Profile = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (!file.type.startsWith("image/")) {
-        showToast("Please select a valid image file.", "error", 3000);
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type.toLowerCase())) {
+        showToast("Profile picture must be a PNG or JPG image", "error", 3000);
         setInvalidFile(true);
         setSelectedFile(null);
         setPreviewUrl("");
@@ -98,6 +100,8 @@ const Profile = () => {
         errorMessage = "Profile not found";
       } else if (err.response?.status >= 500) {
         errorMessage = "Server error. Please try again later";
+      } else if (!err.response) {
+        errorMessage = "Failed to fetch profile. Please try again later.";
       } else if (err.message) {
         errorMessage = `Failed to fetch profile: ${err.message}`;
       }
@@ -177,11 +181,11 @@ const Profile = () => {
 
       await Api.passkeys.verifyRegistration(verifyData, token);
 
-      showToast('Biometric authentication set up successfully!', 'success', 2000);
+      showToast('Passkey authentication set up successfully', 'success', 2000);
       fetchPasskeys();
     } catch (err) {
       console.error('Passkey setup error:', err);
-      const errorMsg = err.response?.data?.message || 'Failed to set up biometric authentication';
+      const errorMsg = err.response?.data?.message || 'Failed to set up passkey authentication';
       showToast(errorMsg, 'error', 3000);
     } finally {
       setIsSettingUpPasskey(false);
@@ -189,26 +193,31 @@ const Profile = () => {
   }, [showToast, fetchPasskeys]);
 
   const handleDeletePasskey = useCallback(async (passkeyId) => {
-    if (!window.confirm('Are you sure you want to delete this passkey?')) {
-      return;
-    }
+    setPasskeyToDelete(passkeyId);
+  }, []);
+
+  const confirmDeletePasskey = useCallback(async () => {
+    if (!passkeyToDelete) return;
 
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         showToast('Please log in again', 'error', 3000);
+        setPasskeyToDelete(null);
         return;
       }
 
-      await Api.passkeys.deletePasskey(passkeyId, token);
-      showToast('Biometric authentication removed successfully!', 'success', 2000);
+      await Api.passkeys.deletePasskey(passkeyToDelete, token);
+      showToast('Passkey authentication removed successfully', 'success', 2000);
       fetchPasskeys();
+      setPasskeyToDelete(null);
     } catch (err) {
       console.error('Delete passkey error:', err);
-      const errorMsg = err.response?.data?.message || 'Failed to remove biometric authentication';
+      const errorMsg = err.response?.data?.message || 'Failed to remove passkey authentication';
       showToast(errorMsg, 'error', 3000);
+      setPasskeyToDelete(null);
     }
-  }, [showToast, fetchPasskeys]);
+  }, [passkeyToDelete, showToast, fetchPasskeys]);
 
   const handleToggleCheckoutAuth = useCallback(async (checked) => {
     try {
@@ -249,27 +258,44 @@ const Profile = () => {
     const newErrors = {};
     const { username, name, email, phone, address } = formData;
 
-    if (!username.trim()) newErrors.username = "Username cannot be blank";
-    if (!name.trim()) newErrors.name = "Full name cannot be blank";
-    if (!email.trim()) newErrors.email = "Email cannot be blank";
-    if (!phone.trim()) newErrors.phone = "Phone cannot be blank";
-    if (!address.trim()) newErrors.address = "Address cannot be blank";
+    if (!username.trim()) newErrors.username = "Please fill in all required fields";
+    if (!name.trim()) newErrors.name = "Please fill in all required fields";
+    if (!email.trim()) newErrors.email = "Please fill in all required fields";
+    if (!phone.trim()) newErrors.phone = "Please fill in all required fields";
+    if (!address.trim()) newErrors.address = "Please fill in all required fields";
 
     const hasImage = Boolean(formData.image?.trim() || selectedFile || profile?.image);
-    if (!hasImage) newErrors.image = "Image cannot be blank";
+    if (!hasImage) newErrors.image = "Please fill in all required fields";
 
-    if (username && (username.length < 3 || username.length > 30)) {
-      newErrors.username = "Username must be 3-30 characters";
+    if (username && (username.length < 5 || username.length > 30)) {
+      newErrors.username = "Username must be between 5 and 30 characters";
     }
-    if (name && name.length > 50) newErrors.name = "Name cannot exceed 50 characters";
-    if (name && !/^[\p{L}\p{N}\s]+$/u.test(name))
-      newErrors.name = "Name can only contain letters, numbers, and spaces";
+    if (name && name.length > 50) {
+      newErrors.name = "Name must be at most 50 characters";
+    }
+    if (name && !/^[\p{L}\s]+$/u.test(name))
+      newErrors.name = "Name must contain only letters and spaces";
     if (email && !/^\S+@\S+\.\S+$/.test(email))
       newErrors.email = "Valid email is required";
     if (phone && !/^\d{10}$/.test(phone))
       newErrors.phone = "Phone must be exactly 10 digits";
-    if (address && address.length > 100)
-      newErrors.address = "Address cannot exceed 100 characters";
+    if (address && address.length > 200)
+      newErrors.address = "Address must be at most 200 characters";
+
+    // Validate image format if provided
+    if (hasImage) {
+      if (selectedFile) {
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+        if (!validTypes.includes(selectedFile.type.toLowerCase())) {
+          newErrors.image = "Profile picture must be a PNG or JPG image";
+        }
+      } else if (formData.image?.trim()) {
+        const imageUrl = formData.image.trim().toLowerCase();
+        if (!imageUrl.match(/\.(png|jpg|jpeg)$/i) && !imageUrl.startsWith('data:image/')) {
+          newErrors.image = "Profile picture must be a PNG or JPG image";
+        }
+      }
+    }
 
     if (Object.keys(newErrors).length > 0) {
       Object.values(newErrors).forEach((msg) =>
@@ -296,7 +322,7 @@ const Profile = () => {
       const response = await Api.accounts.updateProfile(user._id, updateData);
       await fetchProfile();
       setEditMode(false);
-      showToast("Profile updated successfully!", "success", 2000);
+      showToast("Profile edited successfully", "success", 2000);
     } catch (err) {
       console.error("Update profile error:", err.response || err.message);
       const errorMessage =
@@ -322,7 +348,7 @@ const Profile = () => {
         .then(async (response) => {
           await fetchProfile();
           setEditMode(false);
-          showToast("Profile updated successfully!", "success", 2000);
+          showToast("Profile edited successfully", "success", 2000);
         })
         .catch((err) => {
           console.error("Update profile with image error:", err.response || err.message);
@@ -357,7 +383,7 @@ const Profile = () => {
           .then((response) => {
             const imageUrl = response.data?.url || response.data?.imageUrl;
             if (imageUrl) {
-              showToast("Image uploaded successfully!", "success", 2000);
+              showToast("Image uploaded successfully", "success", 2000);
               updateProfileWithImage(imageUrl);
             } else {
               showToast(
@@ -369,7 +395,7 @@ const Profile = () => {
             }
           })
           .catch((err) => {
-            console.error("❌ Upload failed details:", {
+            console.error("Upload failed details:", {
               message: err.message,
               status: err.response?.status,
               data: err.response?.data,
@@ -415,7 +441,7 @@ const Profile = () => {
       await Api.accounts.softDeleteAccount(user._id);
       setIsDeleted(true);
       logout();
-      showToast("Account soft deleted successfully!", "success", 2000);
+      showToast("Account soft deleted successfully", "success", 2000);
       navigate("/login");
     } catch {
       showToast("Failed to soft delete account", "error", 4000);
@@ -550,8 +576,8 @@ const Profile = () => {
                         {isSettingUpPasskey
                           ? 'Setting up...'
                           : passkeys.length > 0
-                            ? 'Biometrics Already Set Up'
-                            : 'Set Up Biometrics'}
+                            ? 'Passkeys Already Set Up'
+                            : 'Set Up Passkeys'}
                       </ProductButton>
                       <ProductButton
                         variant="danger"
@@ -720,7 +746,7 @@ const Profile = () => {
                           <div className="flex-1">
                             <p className="text-sm font-medium text-gray-900">Require Authentication for Checkout</p>
                             <p className="text-xs text-gray-500 mt-1">
-                              Enable to require password, Google login, or biometric authentication before placing orders
+                              Enable to require password, Google login, or passkey authentication before placing orders
                             </p>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer ml-4">
@@ -737,7 +763,7 @@ const Profile = () => {
 
                       {/* Passkeys Section */}
                       <div className="mt-6 space-y-3">
-                        <h3 className="text-lg font-medium text-gray-900">Biometric Authentication</h3>
+                        <h3 className="text-lg font-medium text-gray-900">Passkey Authentication</h3>
                         {passkeys.length > 0 ? (
                           <div className="space-y-2">
                             {passkeys.map((passkey) => (
@@ -758,7 +784,7 @@ const Profile = () => {
                                 <button
                                   onClick={() => handleDeletePasskey(passkey.id)}
                                   className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                  aria-label="Remove biometric authentication"
+                                  aria-label="Remove passkey authentication"
                                 >
                                   Remove
                                 </button>
@@ -767,7 +793,7 @@ const Profile = () => {
                           </div>
                         ) : (
                           <div className="p-4 bg-gray-50 rounded-md border border-gray-200 text-center">
-                            <p className="text-sm text-gray-600">No biometric authentication set up yet. Click "Set Up Biometrics" to use Touch ID, Face ID, or Windows Hello.</p>
+                            <p className="text-sm text-gray-600">No passkey authentication set up yet. Click "Set Up Passkey" to use Touch ID, Face ID, or Windows Hello.</p>
                           </div>
                         )}
                       </div>
@@ -822,6 +848,34 @@ const Profile = () => {
                 onClick={handleDeleteConfirm}
               >
                 Delete Account
+              </ProductButton>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Delete Passkey Confirmation */}
+      {passkeyToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Passkey Removal</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to remove this passkey? You will need to set it up again if you want to use passkey authentication in the future.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <ProductButton
+                variant="secondary"
+                size="md"
+                onClick={() => setPasskeyToDelete(null)}
+              >
+                Cancel
+              </ProductButton>
+              <ProductButton
+                variant="danger"
+                size="md"
+                onClick={confirmDeletePasskey}
+              >
+                Remove Passkey
               </ProductButton>
             </div>
           </div>

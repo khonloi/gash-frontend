@@ -38,7 +38,12 @@ const OTPVerification = () => {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+      if (!otp || otp.trim() === '') {
+        showToast('Please fill in all required fields', 'error', 3000);
+        otpRef.current?.focus();
+        return;
+      }
+      if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
         showToast('Please enter a valid 6-digit OTP', 'error', 3000);
         otpRef.current?.focus();
         return;
@@ -48,15 +53,16 @@ const OTPVerification = () => {
       try {
         if (type === 'register') {
           await verifyOTP(email, otp, formData, 'register');
-          showToast('OTP verified successfully!', 'success', 2000);
+          showToast('OTP verified successfully', 'success', 2000);
           navigate('/register', { state: { email, formData } });
         } else if (type === 'forgot-password') {
           await verifyOTP(email, otp, null, 'forgot-password');
-          showToast('OTP verified successfully!', 'success', 2000);
+          showToast('OTP verified successfully', 'success', 2000);
           navigate('/reset-password', { state: { email, otp } });
         }
       } catch (err) {
-        showToast(err.response?.data?.message || 'Invalid or expired OTP', 'error', 3000);
+        const errorMsg = err.response?.data?.message || 'Invalid or expired OTP';
+        showToast(errorMsg, 'error', 3000);
         otpRef.current?.focus();
       } finally {
         setIsLoading(false);

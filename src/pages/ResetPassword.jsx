@@ -34,7 +34,12 @@ const ResetPassword = () => {
     const newPassword = formData.newPassword.trim();
     const repeatPassword = formData.repeatPassword.trim();
     
-    if (newPassword.length < 8) return 'Password must be at least 8 characters long';
+    if (!newPassword) return 'Please fill in all required fields';
+    if (!repeatPassword) return 'Please fill in all required fields';
+    
+    if (newPassword.length < 8) {
+      return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';
+    }
     
     // Password validation: at least 3 of 4 character types
     const hasUpperCase = /[A-Z]/.test(newPassword);
@@ -44,10 +49,10 @@ const ResetPassword = () => {
     const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
     
     if (characterTypesMet < 3) {
-      return 'Password must include at least three of: uppercase letter, lowercase letter, number, special character';
+      return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';
     }
     
-    if (newPassword !== repeatPassword) return 'Passwords do not match';
+    if (newPassword !== repeatPassword) return 'Repeated password does not match';
     return '';
   }, [formData]);
 
@@ -66,7 +71,7 @@ const ResetPassword = () => {
           email: formData.email,
           newPassword: formData.newPassword,
         });
-        showToast('Password reset successfully. You can now log in.', 'success', 3000);
+        showToast('Password reset successfully', 'success', 3000);
         setTimeout(() => navigate('/login'), 2000);
       } catch (err) {
         let errorMessage = 'Failed to reset password. Please try again.';

@@ -78,8 +78,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
       }
-      if (comment && comment.length > 500) {
-        throw new Error("Comment cannot exceed 500 characters");
+      if (comment && comment.trim()) {
+        const trimmedComment = comment.trim();
+        if (trimmedComment.length < 10) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
+        if (trimmedComment.length > 10000) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
       }
 
       const feedbackData = {
@@ -96,7 +102,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
         token
       );
 
-      showToast("Feedback created successfully!", "success");
+      showToast("Feedback created successfully", "success");
       setCreatingFeedback(false);
       onUpdate?.();
     } catch (err) {
@@ -147,8 +153,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
       }
-      if (comment && comment.length > 500) {
-        throw new Error("Comment cannot exceed 500 characters");
+      if (comment && comment.trim()) {
+        const trimmedComment = comment.trim();
+        if (trimmedComment.length < 10) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
+        if (trimmedComment.length > 10000) {
+          throw new Error("Comment must be between 10 and 10.000 characters");
+        }
       }
 
       const feedbackData = {
@@ -165,7 +177,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
         token
       );
 
-      showToast("Feedback updated successfully!", "success");
+      showToast("Feedback updated successfully", "success");
       setEditingFeedback(null);
       onUpdate?.();
     } catch (err) {
@@ -212,7 +224,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
 
       await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
 
-      showToast("Feedback deleted successfully!", "success");
+      showToast("Feedback deleted successfully", "success");
       onUpdate?.();
       onClose();
     } catch (err) {
@@ -235,23 +247,27 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-3xl max-h-[85vh] overflow-y-auto relative"
+          className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-3xl max-h-[90vh] relative flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           <button
+            type="button"
             onClick={onClose}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors focus:outline-none rounded"
+            className="absolute top-3 right-3 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 z-10"
+            aria-label="Close modal"
           >
-            ×
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
 
-          <div className="p-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 md:p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl sm:text-2xl font-normal text-gray-900">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
                 {hasFeedback ? "Feedback Details" : "Create Feedback"}
               </h2>
             </div>
@@ -499,27 +515,27 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 justify-end">
-              <ProductButton
-                variant="secondary"
-                size="md"
-                onClick={onClose}
-              >
-                Close
-              </ProductButton>
-              <ProductButton
-                variant="primary"
-                size="md"
-                onClick={() => {
-                  onClose();
-                  navigate(`/orders`);
-                }}
-              >
-                View Order
-              </ProductButton>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t shrink-0 border-gray-200">
+            <ProductButton
+              variant="secondary"
+              size="md"
+              onClick={onClose}
+            >
+              Close
+            </ProductButton>
+            <ProductButton
+              variant="primary"
+              size="md"
+              onClick={() => {
+                onClose();
+                navigate(`/orders`);
+              }}
+            >
+              View Order
+            </ProductButton>
           </div>
         </div>
       </div>

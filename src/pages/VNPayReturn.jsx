@@ -25,11 +25,23 @@ export default function VNPayReturn() {
           });
         } else {
           setStatus('failed');
-          setSuccessInfo(null);
+          setSuccessInfo({
+            status: 'failed',
+            message: data.message || 'Payment failed. Please try again.',
+            orderId: data.data?.orderId || data.orderId || '',
+            amount: data.data?.amount || data.amount || '',
+            paymentMethod: 'VNPay',
+          });
         }
       } catch (err) {
         setStatus('failed');
-        setSuccessInfo(null);
+        setSuccessInfo({
+          status: 'failed',
+          message: 'Payment verification failed. Please check your order status.',
+          orderId: '',
+          amount: '',
+          paymentMethod: 'VNPay',
+        });
       }
     };
     fetchPaymentResult();
@@ -39,6 +51,8 @@ export default function VNPayReturn() {
   const handleCloseModal = () => {
     setSuccessInfo(null);
     setStatus('pending');
+    // Redirect to orders page after closing modal
+    navigate('/orders', { state: { forceFetch: true } });
   };
 
   return (

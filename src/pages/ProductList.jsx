@@ -385,12 +385,29 @@ const ProductList = () => {
       case "size":
         setSelectedSize(value);
         break;
-      case "minPrice":
-        setMinPrice(value);
+      case "minPrice": {
+        // Normalize numeric input: allow empty string to represent no filter
+        const parsed = value === '' ? '' : Number(value);
+        if (parsed === '' || (!isNaN(parsed) && parsed >= 0)) {
+          setMinPrice(parsed);
+          // If maxPrice is set and now less than minPrice, clamp maxPrice
+          if (typeof parsed === 'number' && typeof maxPrice === 'number' && maxPrice < parsed) {
+            setMaxPrice(parsed);
+          }
+        }
         break;
-      case "maxPrice":
-        setMaxPrice(value);
+      }
+      case "maxPrice": {
+        const parsed = value === '' ? '' : Number(value);
+        if (parsed === '' || (!isNaN(parsed) && parsed >= 0)) {
+          setMaxPrice(parsed);
+          // If minPrice is set and now greater than maxPrice, clamp minPrice
+          if (typeof parsed === 'number' && typeof minPrice === 'number' && minPrice > parsed) {
+            setMinPrice(parsed);
+          }
+        }
         break;
+      }
       case "sortBy":
         setSortBy(value);
         break;
