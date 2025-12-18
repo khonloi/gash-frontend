@@ -25,11 +25,7 @@ const EditProfileModal = ({
         const trimmedName = value.trim();
         if (trimmedName.length > 50) {
           return 'Name must be at most 50 characters';
-        if (trimmedName.length > 50) {
-          return 'Name must be at most 50 characters';
         }
-        if (!/^[\p{L}\s]+$/u.test(trimmedName)) {
-          return 'Name must contain only letters and spaces';
         if (!/^[\p{L}\s]+$/u.test(trimmedName)) {
           return 'Name must contain only letters and spaces';
         }
@@ -47,8 +43,6 @@ const EditProfileModal = ({
         const trimmedAddress = value.trim();
         if (trimmedAddress.length > 200) {
           return 'Address must be at most 200 characters';
-        if (trimmedAddress.length > 200) {
-          return 'Address must be at most 200 characters';
         }
         return null;
       }
@@ -59,20 +53,6 @@ const EditProfileModal = ({
       case 'image': {
         const hasImage = Boolean(currentFormData.image?.trim() || selectedFile || profile?.image);
         if (!hasImage) return 'Please fill in all required fields';
-        // Check if image is PNG or JPG when it's a URL
-        if (currentFormData.image?.trim() && !selectedFile) {
-          const imageUrl = currentFormData.image.trim().toLowerCase();
-          if (!imageUrl.match(/\.(png|jpg|jpeg)$/i) && !imageUrl.startsWith('data:image/')) {
-            return 'Profile picture must be a PNG or JPG image';
-          }
-        }
-        // Check file type when a file is selected
-        if (selectedFile) {
-          const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-          if (!validTypes.includes(selectedFile.type.toLowerCase())) {
-            return 'Profile picture must be a PNG or JPG image';
-          }
-        }
         // Check if image is PNG or JPG when it's a URL
         if (currentFormData.image?.trim() && !selectedFile) {
           const imageUrl = currentFormData.image.trim().toLowerCase();
@@ -170,10 +150,8 @@ const EditProfileModal = ({
         transition={{ duration: 0.18 }}
         onClick={(e) => e.stopPropagation()}
         className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-lg max-h-[90vh] flex flex-col"
-        className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-lg max-h-[90vh] flex flex-col"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b border-gray-200 shrink-0">
         <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b border-gray-200 shrink-0">
           <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
             Edit Profile
@@ -194,7 +172,6 @@ const EditProfileModal = ({
         {/* Modal Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {/* Profile Picture */}
-          {/* Profile Picture */}
           <div className="flex flex-col items-center mb-6">
             <div className={`w-24 h-24 rounded-full p-[2px] bg-gradient-to-tr from-[#E9A319] via-[#A86523] to-[#8B4E1A] ${validationErrors.image ? 'ring-2 ring-red-500' : ''}`}>
               <img
@@ -212,32 +189,16 @@ const EditProfileModal = ({
               onClick={() => fileInputRef.current?.click()}
             >
               Change Profile Picture
-              Change Profile Picture
             </button>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/png,image/jpeg,image/jpg"
               accept="image/png,image/jpeg,image/jpg"
               className="hidden"
               onChange={(e) => {
                 handleFileChange(e);
                 // Revalidate image after file change
                 if (e.target.files && e.target.files.length > 0) {
-                  const file = e.target.files[0];
-                  const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-                  if (validTypes.includes(file.type.toLowerCase())) {
-                    setValidationErrors(prevErrors => {
-                      const newErrors = { ...prevErrors };
-                      delete newErrors.image;
-                      return newErrors;
-                    });
-                  } else {
-                    setValidationErrors(prevErrors => ({
-                      ...prevErrors,
-                      image: 'Profile picture must be a PNG or JPG image'
-                    }));
-                  }
                   const file = e.target.files[0];
                   const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
                   if (validTypes.includes(file.type.toLowerCase())) {
