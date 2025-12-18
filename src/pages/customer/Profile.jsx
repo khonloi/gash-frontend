@@ -83,7 +83,7 @@ const Profile = () => {
         phone: response.data.phone || "",
         address: response.data.address || "",
         gender: response.data.gender || "",
-        dob: response.data.dob || "",
+        dob: response.data.dob ? new Date(response.data.dob).toISOString().split('T')[0] : "",
         image: response.data.image || "",
       });
       setRequireAuthForCheckout(response.data.requireAuthForCheckout || false);
@@ -294,7 +294,7 @@ const Profile = () => {
         image: formData.image,
       };
       const response = await Api.accounts.updateProfile(user._id, updateData);
-      setProfile(response.data.account);
+      await fetchProfile();
       setEditMode(false);
       showToast("Profile updated successfully!", "success", 2000);
     } catch (err) {
@@ -307,11 +307,10 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [formData, user, showToast]);
+  }, [formData, user, showToast, fetchProfile]);
 
   const updateProfileWithImage = useCallback(
     (imageUrl) => {
-      setLoading(true);
       const updateData = {
         ...formData,
         image: imageUrl,
@@ -320,8 +319,8 @@ const Profile = () => {
       };
       Api.accounts
         .updateProfile(user._id, updateData)
-        .then((response) => {
-          setProfile(response.data.account);
+        .then(async (response) => {
+          await fetchProfile();
           setEditMode(false);
           showToast("Profile updated successfully!", "success", 2000);
         })
@@ -336,7 +335,7 @@ const Profile = () => {
         })
         .finally(() => setLoading(false));
     },
-    [formData, user, showToast]
+    [formData, user, showToast, fetchProfile]
   );
 
   const handleSubmit = useCallback(
@@ -348,6 +347,8 @@ const Profile = () => {
         showToast("Invalid file selected. Please choose an image.", "error", 3000);
         return;
       }
+
+      setLoading(true);
 
       if (selectedFile) {
         // gọi API upload ảnh
@@ -364,6 +365,7 @@ const Profile = () => {
                 "error",
                 3000
               );
+              setLoading(false);
             }
           })
           .catch((err) => {
@@ -374,6 +376,7 @@ const Profile = () => {
               config: err.config
             });
             showToast(`Upload failed: ${err.response?.data?.message || err.message}`, "error", 5000);
+            setLoading(false);
           });
       } else {
         updateProfile();
@@ -788,6 +791,7 @@ const Profile = () => {
           handleCancel={handleCancel}
           selectedFile={selectedFile}
           profile={profile}
+          loading={loading}
         />
       )}
 
