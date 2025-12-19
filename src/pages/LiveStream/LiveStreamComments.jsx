@@ -518,12 +518,12 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                         <p className="text-white/70 text-[10px]">Live chat</p>
                     </div>
                 </div>
-                <button
+                {/* <button
                     onClick={onToggle}
                     className="text-white hover:bg-white/20 p-1.5 rounded-full transition-all duration-300 hover:scale-110 transform border border-white/10"
                 >
                     <Close className="w-4 h-4" />
-                </button>
+                </button> */}
             </div>
 
             {/* Reactions Section - Same row as header */}
