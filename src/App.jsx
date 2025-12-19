@@ -27,7 +27,6 @@ import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
-import VNPayReturn from "./pages/VNPayReturn";
 import Bill from "./pages/customer/Bill";
 import UserVoucherPage from "./pages/UserVoucherPage";
 import Notifications from "./pages/Notifications";
@@ -90,7 +89,6 @@ const App = () => {
                 <Route path="/search" element={<Search />} />
                 <Route path="/news" element={<BlogPost />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/vnpay-return" element={<VNPayReturn />} />
                 <Route path="/vouchers" element={<UserVoucherPage />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/live" element={<ListLiveStream />} />
