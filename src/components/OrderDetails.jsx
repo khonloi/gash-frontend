@@ -70,8 +70,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             if (detail.feedback) {
                 // Only include feedback if it has content or rating and is not deleted
                 // Check the has_* flags to determine if feedback exists
-                const hasContent = detail.feedback.has_content && detail.feedback.content && detail.feedback.content.trim() !== '';
-                const hasRating = detail.feedback.has_rating && detail.feedback.rating && detail.feedback.rating > 0;
+                const hasContent = detail.feedback.content && detail.feedback.content.trim() !== '';
+                const hasRating = detail.feedback.rating > 0; // rating is integer 1-5
 
                 if ((hasContent || hasRating) && !detail.feedback.is_deleted) {
                     feedbackMap[key] = detail.feedback;
@@ -188,6 +188,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
           socket.off("orderUpdated");
         };
     }, [user?._id, orderId]);
+
+    useEffect(() => {
+        extractFeedbacksFromOrder();
+    }, [order, extractFeedbacksFromOrder]);
 
     const formatPrice = (p) =>
         p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -366,7 +370,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             clearTimeout(timeoutId);
             setLoadingStates(prev => ({
                 ...prev,
-                editing: { ...prev.editing, [variantId]: false }
+                submitting: { ...prev.submitting, [variantId]: false }
             }));
         }
     };
