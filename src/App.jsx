@@ -32,6 +32,7 @@ import UserVoucherPage from "./pages/UserVoucherPage";
 import Notifications from "./pages/Notifications";
 import ListLiveStream from "./pages/LiveStream/ListLiveStream";
 import ViewLiveStream from "./pages/LiveStream/ViewLiveStream";
+import VNPayReturn from "./pages/VNPayReturn";
 
 // ==== Components ====
 import UserChat from "./components/UserChat";
@@ -94,6 +95,7 @@ const App = () => {
                 <Route path="/live" element={<ListLiveStream />} />
                 <Route path="/live/:id" element={<ViewLiveStream />} />
                 {/* <Route path="/live" element={<LiveStream />} /> */}
+                <Route path="/vnpay-return" element={<VNPayReturn />} />
               </Routes>
               <ChatIfLoggedIn />
             </Layout>

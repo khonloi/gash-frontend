@@ -213,6 +213,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         };
     }, [user?._id, orderId]);
 
+    useEffect(() => {
+        extractFeedbacksFromOrder();
+    }, [order, extractFeedbacksFromOrder]);
+
     const formatPrice = (p) =>
         p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
@@ -390,7 +394,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             clearTimeout(timeoutId);
             setLoadingStates(prev => ({
                 ...prev,
-                editing: { ...prev.editing, [variantId]: false }
+                submitting: { ...prev.submitting, [variantId]: false }
             }));
         }
     };
