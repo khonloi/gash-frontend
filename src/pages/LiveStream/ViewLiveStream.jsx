@@ -210,28 +210,38 @@ const LiveStreamDetail = () => {
                 // This ensures ALL users (up to 100) can see the host's video stream
                 // CRITICAL: Each user must subscribe independently to receive the stream data
                 // LiveKit supports multiple subscribers to the same track - each user gets their own stream
-                newRoom.remoteParticipants.forEach((participant) => {
-                    participant.trackPublications.forEach((publication) => {
-                        // CRITICAL: Force subscribe to tracks for THIS user
-                        // This ensures each user gets their own subscription to the stream
-                        // Even if 99 other users have already subscribed, this user needs their own subscription
-                        // LiveKit handles multiple subscriptions correctly - each user receives the data independently
-                        // IMPORTANT: Always set subscribed to true, even if already subscribed, to ensure this user's subscription is maintained
-                        // This is critical to prevent subscription from being dropped when other users join
-                        publication.setSubscribed(true);
-
-                        // CRITICAL: If track is already available (host already streaming), attach it immediately
-                        // This handles the case when user joins after host has already started streaming
-                        // Each user attaches to their own video element, so there's no conflict
-                        // Multiple users can attach the same track to different video elements
-                        // IMPORTANT: attach() is safe to call multiple times - LiveKit handles it correctly
-                        if (publication.track && videoRef.current) {
-                            attachTrackToVideo(publication.track, publication.track.kind);
+                try {
+                    newRoom.remoteParticipants.forEach((participant) => {
+                        if (!participant || !participant.trackPublications) {
+                            return;
                         }
-                        // If track is not available yet, TrackSubscribed event will handle it
-                        // TrackSubscribed fires for each user independently when their subscription is ready
+                        participant.trackPublications.forEach((publication) => {
+                            if (!publication) {
+                                return;
+                            }
+                            // CRITICAL: Force subscribe to tracks for THIS user
+                            // This ensures each user gets their own subscription to the stream
+                            // Even if 99 other users have already subscribed, this user needs their own subscription
+                            // LiveKit handles multiple subscriptions correctly - each user receives the data independently
+                            // IMPORTANT: Always set subscribed to true, even if already subscribed, to ensure this user's subscription is maintained
+                            // This is critical to prevent subscription from being dropped when other users join
+                            publication.setSubscribed(true);
+
+                            // CRITICAL: If track is already available (host already streaming), attach it immediately
+                            // This handles the case when user joins after host has already started streaming
+                            // Each user attaches to their own video element, so there's no conflict
+                            // Multiple users can attach the same track to different video elements
+                            // IMPORTANT: attach() is safe to call multiple times - LiveKit handles it correctly
+                            if (publication.track && videoRef.current) {
+                                attachTrackToVideo(publication.track, publication.track.kind);
+                            }
+                            // If track is not available yet, TrackSubscribed event will handle it
+                            // TrackSubscribed fires for each user independently when their subscription is ready
+                        });
                     });
-                });
+                } catch (err) {
+                    console.warn('Error subscribing to remote tracks on connect:', err);
+                }
 
                 // CRITICAL: Set up a listener to monitor track subscriptions
                 // This ensures subscriptions are maintained even when room state changes
@@ -239,14 +249,24 @@ const LiveStreamDetail = () => {
                     if (!newRoom || newRoom.state !== 'connected') {
                         return;
                     }
-                    newRoom.remoteParticipants.forEach((participant) => {
-                        participant.trackPublications.forEach((publication) => {
-                            // Always ensure subscription is maintained for THIS user
-                            if (!publication.isSubscribed && publication.track) {
-                                publication.setSubscribed(true);
+                    try {
+                        newRoom.remoteParticipants.forEach((participant) => {
+                            if (!participant || !participant.trackPublications) {
+                                return;
                             }
+                            participant.trackPublications.forEach((publication) => {
+                                if (!publication) {
+                                    return;
+                                }
+                                // Always ensure subscription is maintained for THIS user
+                                if (!publication.isSubscribed && publication.track) {
+                                    publication.setSubscribed(true);
+                                }
+                            });
                         });
-                    });
+                    } catch (err) {
+                        console.warn('Error maintaining subscriptions:', err);
+                    }
                 };
 
                 // Monitor subscriptions periodically
@@ -270,43 +290,78 @@ const LiveStreamDetail = () => {
                         return;
                     }
 
-                    // Check all remote participants' tracks
-                    newRoom.remoteParticipants.forEach((participant) => {
-                        participant.trackPublications.forEach((publication) => {
-                            // CRITICAL: Always ensure subscription is maintained for THIS user
-                            // This prevents subscription from being dropped when other users join
-                            if (!publication.isSubscribed) {
-                                publication.setSubscribed(true);
-                            }
+                    // PRODUCTION: Ensure video element is never muted
+                    if (videoRef.current.muted) {
+                        videoRef.current.muted = false;
+                    }
 
-                            // Only process if track exists and is subscribed
-                            if (!publication.track || !publication.isSubscribed) {
+                    // Check all remote participants' tracks
+                    try {
+                        newRoom.remoteParticipants.forEach((participant) => {
+                            if (!participant || !participant.trackPublications) {
                                 return;
                             }
+                            participant.trackPublications.forEach((publication) => {
+                                if (!publication) {
+                                    return;
+                                }
+                                // CRITICAL: Always ensure subscription is maintained for THIS user
+                                // This prevents subscription from being dropped when other users join
+                                if (!publication.isSubscribed) {
+                                    publication.setSubscribed(true);
+                                }
 
-                            // For video tracks, ensure they're attached and playing
-                            if (publication.track.kind === 'video' && videoRef.current) {
-                                // Check if video element has a source (track is attached)
-                                const hasVideoSource = videoRef.current.srcObject !== null ||
-                                    videoRef.current.src !== '';
+                                // Only process if track exists and is subscribed
+                                if (!publication.track || !publication.isSubscribed) {
+                                    return;
+                                }
 
-                                if (!hasVideoSource) {
-                                    // Track is not attached - re-attach it
-                                    publication.track.attach(videoRef.current);
-                                    videoRef.current.muted = false;
-                                    videoRef.current.play().catch(() => { });
-                                } else {
-                                    // Track is attached, just ensure it's playing and not muted
-                                    if (videoRef.current.paused) {
-                                        videoRef.current.play().catch(() => { });
-                                    }
-                                    if (videoRef.current.muted) {
-                                        videoRef.current.muted = false;
+                                // For video tracks, ensure they're attached and playing
+                                if (publication.track.kind === 'video' && videoRef.current) {
+                                    try {
+                                        // Check if video element has a source (track is attached)
+                                        const hasVideoSource = videoRef.current.srcObject !== null ||
+                                            videoRef.current.src !== '';
+
+                                        if (!hasVideoSource) {
+                                            // Track is not attached - re-attach it
+                                            publication.track.attach(videoRef.current);
+                                            videoRef.current.muted = false;
+                                            videoRef.current.play().catch(() => { });
+                                        } else {
+                                            // Track is attached, just ensure it's playing and not muted
+                                            if (videoRef.current.paused) {
+                                                videoRef.current.play().catch(() => { });
+                                            }
+                                            if (videoRef.current.muted) {
+                                                videoRef.current.muted = false;
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.warn('Error verifying video track:', err);
                                     }
                                 }
-                            }
+
+                                // PRODUCTION: For audio tracks, ensure they're attached and enabled
+                                if (publication.track.kind === 'audio' && videoRef.current) {
+                                    try {
+                                        // Ensure audio track is enabled
+                                        if (publication.track instanceof MediaStreamTrack) {
+                                            publication.track.enabled = true;
+                                        }
+                                        // Ensure video element (which contains audio) is not muted
+                                        if (videoRef.current.muted) {
+                                            videoRef.current.muted = false;
+                                        }
+                                    } catch (err) {
+                                        console.warn('Error verifying audio track:', err);
+                                    }
+                                }
+                            });
                         });
-                    });
+                    } catch (err) {
+                        console.warn('Error verifying tracks:', err);
+                    }
                 }, 3000); // Check every 3 seconds (less frequent to avoid overhead)
 
                 // Store interval ID for cleanup
@@ -362,8 +417,14 @@ const LiveStreamDetail = () => {
                 // LiveKit sends separate subscription events for each user, so all 100 users get the stream independently
                 // Multiple users can subscribe to the same track - LiveKit handles this correctly
 
+                // Validate track and publication exist
+                if (!track || !publication) {
+                    console.warn('Invalid track or publication in TrackSubscribed:', { track, publication });
+                    return;
+                }
+
                 // CRITICAL: Ensure subscription is maintained
-                if (publication && !publication.isSubscribed) {
+                if (!publication.isSubscribed) {
                     publication.setSubscribed(true);
                 }
 
@@ -374,6 +435,12 @@ const LiveStreamDetail = () => {
                         // This ensures the track is attached even if DOM is not ready yet
                         // Important for users joining quickly one after another
                         setTimeout(attachTrack, 100);
+                        return;
+                    }
+
+                    // Validate track exists before accessing properties
+                    if (!track) {
+                        console.warn('Track is undefined in attachTrack');
                         return;
                     }
 
@@ -432,10 +499,16 @@ const LiveStreamDetail = () => {
             // Handle participant connected - subscribe to their tracks
             // This handles new participants joining (including host if they join later)
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
+                // Validate participant exists
+                if (!participant || !participant.identity) {
+                    console.warn('Invalid participant received:', participant);
+                    return;
+                }
+
                 // Add participant to remote participants list (for viewer count)
                 setRemoteParticipants(prev => {
                     // Check if participant already exists (avoid duplicates)
-                    if (prev.find(p => p.identity === participant.identity)) {
+                    if (prev.find(p => p && p.identity === participant.identity)) {
                         return prev;
                     }
                     return [...prev, participant];
@@ -443,26 +516,39 @@ const LiveStreamDetail = () => {
 
                 // CRITICAL: When a new participant joins, ensure THIS user's existing subscriptions are maintained
                 // This prevents THIS user's tracks from being dropped when other users join
-                newRoom.remoteParticipants.forEach((existingParticipant) => {
-                    existingParticipant.trackPublications.forEach((existingPublication) => {
-                        if (existingPublication.isSubscribed && existingPublication.track) {
-                            // Re-assert subscription to ensure it's maintained
-                            existingPublication.setSubscribed(true);
-                            // Re-attach if needed to ensure track is still connected
-                            if (existingPublication.track.kind === 'video' && videoRef.current) {
-                                existingPublication.track.attach(videoRef.current);
-                                videoRef.current.muted = false;
-                                videoRef.current.play().catch(() => { });
-                            }
+                try {
+                    newRoom.remoteParticipants.forEach((existingParticipant) => {
+                        if (!existingParticipant || !existingParticipant.trackPublications) {
+                            return;
                         }
+                        existingParticipant.trackPublications.forEach((existingPublication) => {
+                            if (existingPublication && existingPublication.isSubscribed && existingPublication.track) {
+                                // Re-assert subscription to ensure it's maintained
+                                existingPublication.setSubscribed(true);
+                                // Re-attach if needed to ensure track is still connected
+                                if (existingPublication.track.kind === 'video' && videoRef.current) {
+                                    existingPublication.track.attach(videoRef.current);
+                                    videoRef.current.muted = false;
+                                    videoRef.current.play().catch(() => { });
+                                }
+                            }
+                        });
                     });
-                });
+                } catch (err) {
+                    console.warn('Error maintaining subscriptions on participant connect:', err);
+                }
 
                 // Subscribe to all their tracks (host publishes video/audio, viewers don't)
                 // CRITICAL: Force subscribe to ensure THIS user gets the tracks
                 // Each user (up to 100) must subscribe independently to receive the stream data
                 // LiveKit supports multiple subscribers - each user gets their own stream independently
+                if (!participant.trackPublications) {
+                    return;
+                }
                 participant.trackPublications.forEach((publication) => {
+                    if (!publication) {
+                        return;
+                    }
                     // CRITICAL: Always set subscribed to true to maintain THIS user's subscription
                     // Even if already subscribed, ensure subscription is maintained
                     // This prevents subscription from being dropped when other users join
@@ -507,18 +593,29 @@ const LiveStreamDetail = () => {
                 // TrackUnsubscribed fires when THIS user's subscription ends
                 // IMPORTANT: Do NOT detach if subscription was dropped due to other users joining
                 // Only detach if the publication is truly unsubscribed for THIS user
-                if (videoRef.current && publication) {
+
+                // Validate track and publication exist
+                if (!track || !publication) {
+                    console.warn('Invalid track or publication in TrackUnsubscribed:', { track, publication });
+                    return;
+                }
+
+                if (videoRef.current) {
                     // Double-check: Only detach if publication is confirmed unsubscribed
                     // Sometimes TrackUnsubscribed fires temporarily - we should verify
                     if (!publication.isSubscribed) {
                         // Wait a bit to see if subscription is restored
                         setTimeout(() => {
                             // Only detach if still unsubscribed after delay
-                            if (videoRef.current && publication && !publication.isSubscribed) {
-                                if (track.kind === 'video') {
-                                    track.detach(videoRef.current);
-                                } else if (track.kind === 'audio') {
-                                    track.detach(videoRef.current);
+                            if (videoRef.current && publication && !publication.isSubscribed && track) {
+                                try {
+                                    if (track.kind === 'video') {
+                                        track.detach(videoRef.current);
+                                    } else if (track.kind === 'audio') {
+                                        track.detach(videoRef.current);
+                                    }
+                                } catch (err) {
+                                    console.warn('Error detaching track:', err);
                                 }
                             }
                         }, 500);
@@ -528,7 +625,11 @@ const LiveStreamDetail = () => {
 
             // Handle participant disconnected - remove from list
             newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
-                setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
+                if (!participant || !participant.identity) {
+                    console.warn('Invalid participant disconnected:', participant);
+                    return;
+                }
+                setRemoteParticipants(prev => prev.filter(p => p && p.identity !== participant.identity));
             });
 
             console.error = (...args) => {
@@ -581,14 +682,34 @@ const LiveStreamDetail = () => {
             setConnectionState('error');
             isReconnectingRef.current = false;
 
-            if (error.message.includes('timeout')) {
+            // Log detailed error for debugging
+            console.error('Error connecting to LiveKit:', error);
+
+            // Safely extract error message
+            let errorMessage = 'Unknown error occurred';
+            try {
+                if (error && typeof error === 'object' && error.message) {
+                    errorMessage = error.message;
+                } else if (error) {
+                    errorMessage = String(error);
+                }
+            } catch (err) {
+                console.warn('Error extracting error message:', err);
+            }
+
+            // Provide user-friendly error messages
+            if (errorMessage.includes('timeout')) {
                 showToast('Connection timeout. Please check network', 'error');
-            } else if (error.message.includes('token')) {
+            } else if (errorMessage.includes('token')) {
                 showToast('Invalid or expired token', 'error');
-            } else if (error.message.includes('server')) {
+            } else if (errorMessage.includes('server')) {
                 showToast('Unable to connect to server', 'error');
+            } else if (errorMessage.includes('Cannot read properties') || errorMessage.includes('reading')) {
+                // Handle undefined property access errors
+                console.error('LiveKit connection error - undefined property access:', error);
+                showToast('Connection error. Please try again', 'error');
             } else {
-                showToast(`Connection error: ${error.message}`, 'error');
+                showToast(`Connection error: ${errorMessage}`, 'error');
             }
             throw error;
         }
