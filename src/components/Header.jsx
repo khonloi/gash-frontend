@@ -8,7 +8,7 @@ import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../cons
 
 // Material UI Icons
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
@@ -177,7 +177,7 @@ export default function Header() {
 
         // Join user's room for targeted updates
         socket.on("connect", () => {
-            console.log("✅ Header Socket connected:", socket.id);
+            console.log("Header Socket connected:", socket.id);
             socket.emit("userConnected", user._id);
             socket.emit("joinRoom", user._id);
         });
@@ -223,7 +223,7 @@ export default function Header() {
         });
 
         socket.on("connect_error", (err) => {
-            console.error("❌ Header Socket connection error:", err.message);
+            console.error("Header Socket connection error:", err.message);
         });
 
         socket.on("disconnect", (reason) => {
@@ -515,7 +515,7 @@ export default function Header() {
                                 <SearchIcon />
                             </button>
                             <Link to="/" className="flex items-center justify-center">
-                                <img src={gashLogo} alt="Gash Logo" className="h-6 sm:h-7" />
+                                <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
                             </Link>
                             <div className="relative" ref={userMenuRef}>
                                 <button
@@ -564,7 +564,7 @@ export default function Header() {
                                             }}
                                             className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
                                         >
-                                            <NotificationsNoneOutlinedIcon fontSize="small" />
+                                            <NotificationsOutlinedIcon fontSize="small" />
                                             Notifications
                                             {notificationCount > 0 && (
                                                 <span className={`${badgeClass} top-1 right-4`}>
@@ -609,7 +609,7 @@ export default function Header() {
                 {/* ==== DESKTOP HEADER ==== */}
                 <div className="hidden sm:flex w-full items-center justify-between">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={gashLogo} alt="Gash Logo" className="h-6 md:h-7" />
+                        <img src={gashLogo} alt="GASH Logo" className="h-6 md:h-7" />
                     </Link>
                     <div className="relative flex-1 mx-4 sm:mx-6 md:mx-8 lg:mx-12 max-w-2xl" ref={dropdownRef}>
                         <form
@@ -789,7 +789,7 @@ export default function Header() {
                                     title="Notifications"
                                     className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                                 >
-                                    <NotificationsNoneOutlinedIcon />
+                                    <NotificationsOutlinedIcon />
                                 </button>
                             </div>
                         )}
@@ -832,7 +832,7 @@ export default function Header() {
                                     >
                                         My Orders
                                     </button>
-                                    <button
+                                    {/* <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             console.log("My Feedback clicked");
@@ -842,7 +842,7 @@ export default function Header() {
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
                                         My Feedback
-                                    </button>
+                                    </button> */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();

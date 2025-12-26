@@ -7,10 +7,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
+import { useToast } from "../hooks/useToast";
+
+const MAX_MESSAGE_LENGTH = 500;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 // use shared SOCKET_URL (same as API base)
 
 export default function UserChat({ userId }) {
+  const { showToast } = useToast();
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -34,7 +39,7 @@ export default function UserChat({ userId }) {
     socket.current = io(SOCKET_URL, { transports: ["websocket"] });
 
     socket.current.on("connect", () => {
-      console.log("✅ User connected:", userId);
+      console.log("User connected:", userId);
       socket.current.emit("start_chat", { userId, messageText: "" });
     });
 
@@ -60,7 +65,7 @@ export default function UserChat({ userId }) {
         conversationRef.current &&
         conversationId.toString() === conversationRef.current.id.toString()
       ) {
-        alert("💬 Cuộc trò chuyện đã kết thúc.");
+        showToast("The conversation has ended", "info");
         setConversation(null);
         setMessages([]);
         setIsOpen(false);
@@ -75,17 +80,27 @@ export default function UserChat({ userId }) {
   }, [messages]);
 
   const startChat = () => {
-    if (!input.trim()) return;
-    socket.current.emit("start_chat", { userId, messageText: input });
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    if (trimmed.length > MAX_MESSAGE_LENGTH) {
+      showToast(`Message is too long (max ${MAX_MESSAGE_LENGTH} characters)`, "error");
+      return;
+    }
+    socket.current.emit("start_chat", { userId, messageText: trimmed });
     setInput("");
   };
 
   const sendMessage = () => {
-    if (!input.trim() || !conversation) return;
+    const trimmed = input.trim();
+    if (!trimmed || !conversation) return;
+    if (trimmed.length > MAX_MESSAGE_LENGTH) {
+      showToast(`Message is too long (max ${MAX_MESSAGE_LENGTH} characters)`, "error");
+      return;
+    }
     socket.current.emit("send_message", {
       conversationId: conversation.id,
       senderId: userId,
-      messageText: input,
+      messageText: trimmed,
       type: "text",
     });
     setInput("");
@@ -93,7 +108,20 @@ export default function UserChat({ userId }) {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file || !conversation) return;
+    if (!file) return;
+    if (!conversation) {
+      showToast("Conversation is not active. Start a chat first.", "error");
+      return;
+    }
+    // Validate file type and size
+    if (!file.type || !file.type.startsWith("image/")) {
+      showToast("Please upload a valid image file.", "error");
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      showToast("Image is too large. Maximum allowed size is 5 MB.", "error");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("image", file);
@@ -113,11 +141,11 @@ export default function UserChat({ userId }) {
           imageUrl: data.url,
         });
       } else {
-        alert("Upload thất bại!");
+        showToast("Upload thất bại!", "error");
       }
     } catch (err) {
-      console.error("❌ Upload error:", err);
-      alert("Lỗi khi upload ảnh");
+      console.error("Upload error:", err);
+      showToast("Lỗi khi upload ảnh", "error");
     }
   };
 
@@ -245,7 +273,7 @@ export default function UserChat({ userId }) {
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => setInput(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
                 disabled={conversation?.status === "closed"}
@@ -283,7 +311,9 @@ export default function UserChat({ userId }) {
                 <EmojiPicker
                   width="100%"
                   height="400px"
-                  onEmojiClick={(emoji) => setInput((prev) => prev + emoji.emoji)}
+                  onEmojiClick={(emoji) =>
+                    setInput((prev) => (prev + emoji.emoji).slice(0, MAX_MESSAGE_LENGTH))
+                  }
                 />
               </div>
             )}

@@ -70,7 +70,7 @@ const ForgotPassword = () => {
           templateParams
         );
         console.log('EmailJS Success:', emailjsResponse);
-        showToast('OTP sent successfully!', 'success', 3000);
+        showToast('OTP sent successfully', 'success', 3000);
 
         navigate('/otp-verification', {
           state: { email, type: 'forgot-password' },

@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import OrderDetailsModal from "../../components/OrderDetails";
+import OrderSuccessModal from "../../components/OrderSuccessModal";
 import LoadingSpinner, { LoadingSkeleton } from "../../components/LoadingSpinner";
 import ProductButton from "../../components/ProductButton";
 import { io } from "socket.io-client";
@@ -20,6 +21,8 @@ const Orders = () => {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [vnpayStatus, setVnpayStatus] = useState('pending');
+  const [vnpaySuccessInfo, setVnpaySuccessInfo] = useState(null);
   const socketRef = useRef(null);
 
   // Pagination state
@@ -69,6 +72,50 @@ const Orders = () => {
     }
   }, [isAuthLoading, user, fetchOrders]);
 
+  // Handle VNPay return if params are present
+  useEffect(() => {
+    const params = window.location.search;
+    if (params && params.includes('vnp_')) {
+      const fetchPaymentResult = async () => {
+        try {
+          const response = await Api.order.vnpayReturn(params);
+          const data = response.data;
+          if (data.success && data.data && data.data.code === '00') {
+            setVnpayStatus('success');
+            setVnpaySuccessInfo({
+              status: 'success',
+              message: data.message || 'Your order will be promptly prepared and sent to you.!',
+              orderId: data.data?.orderId || data.orderId || '',
+              amount: data.data?.amount || data.amount || '',
+              paymentMethod: data.data?.paymentMethod || 'VNPay',
+            });
+          } else {
+            setVnpayStatus('failed');
+            setVnpaySuccessInfo({
+              status: 'failed',
+              message: data.message || 'Payment failed. Please try again.',
+              orderId: data.data?.orderId || data.orderId || '',
+              amount: data.data?.amount || data.amount || '',
+              paymentMethod: 'VNPay',
+            });
+          }
+        } catch (err) {
+          setVnpayStatus('failed');
+          setVnpaySuccessInfo({
+            status: 'failed',
+            message: 'Payment verification failed. Please check your order status.',
+            orderId: '',
+            amount: '',
+            paymentMethod: 'VNPay',
+          });
+        }
+      };
+      fetchPaymentResult();
+      // Clear the URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [isAuthLoading, user]);
+
   // Setup Socket.IO for real-time order updates
   useEffect(() => {
     if (!user?._id) return;
@@ -87,7 +134,7 @@ const Orders = () => {
 
     // Connect and authenticate
     socket.on("connect", () => {
-      console.log("✅ Orders Socket connected:", socket.id);
+      console.log("Orders Socket connected:", socket.id);
       // Emit user connection
       socket.emit("userConnected", user._id);
       // Also try authentication if token available
@@ -194,7 +241,7 @@ const Orders = () => {
     });
 
     socket.on("connect_error", (err) => {
-      console.error("❌ Orders Socket connection error:", err.message);
+      console.error("Orders Socket connection error:", err.message);
     });
 
     socket.on("disconnect", (reason) => {
@@ -266,6 +313,15 @@ const Orders = () => {
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCloseVNPayModal = () => {
+    setVnpaySuccessInfo(null);
+    setVnpayStatus('pending');
+    // Force fetch orders to update the list
+    if (user?._id) {
+      fetchOrders();
+    }
   };
 
   const formatDate = (date) =>
@@ -691,6 +747,8 @@ const Orders = () => {
           onClose={() => setSelectedOrderId(null)}
         />
       )}
+
+      <OrderSuccessModal open={!!vnpaySuccessInfo} info={{ ...vnpaySuccessInfo, message: undefined }} onClose={handleCloseVNPayModal} />
     </div>
   );
 };

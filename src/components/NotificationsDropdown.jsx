@@ -1,9 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { Bell, Trash2, Settings, X } from "lucide-react";
 import IconButton from "./IconButton";
 import { useNavigate } from "react-router-dom";
 import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../utils/orderEmailNotification";
+import Api from "../common/SummaryAPI";
+
+const MAX_ORDER_CACHE = 20;
+
+// Shared across all component instances to prevent duplicate emails
+// when multiple NotificationsDropdown components are mounted (e.g., mobile + desktop)
+const emailedNotificationsSet = new Set();
 
 export default function NotificationsDropdown({ user }) {
   const [notifications, setNotifications] = useState([]);
@@ -13,6 +20,85 @@ export default function NotificationsDropdown({ user }) {
 
   // 🧩 Socket.IO: kết nối realtime
   const socketRef = useRef(null);
+  const orderCacheRef = useRef(new Map());
+
+  const hasDetailedOrderInfo = useCallback((order) => {
+    return Boolean(
+      order?.orderDetails?.some(
+        (detail) => detail?.variant_id?.productId?.productName
+      )
+    );
+  }, []);
+
+  const pruneCacheIfNeeded = useCallback(() => {
+    const cache = orderCacheRef.current;
+    if (cache.size <= MAX_ORDER_CACHE) return;
+    const firstKey = cache.keys().next().value;
+    if (firstKey) {
+      cache.delete(firstKey);
+    }
+  }, []);
+
+  const mergeOrderIntoCache = useCallback((suffixKey, orderData) => {
+    if (!suffixKey || !orderData) return;
+    const normalizedKey = suffixKey.toLowerCase();
+    orderCacheRef.current.set(normalizedKey, orderData);
+    pruneCacheIfNeeded();
+  }, [pruneCacheIfNeeded]);
+
+  const fetchOrderDataBySuffix = useCallback(
+    async (orderIdSuffix) => {
+      if (!orderIdSuffix || !user?._id) return null;
+      const normalizedSuffix = orderIdSuffix.toString().toLowerCase();
+      const cache = orderCacheRef.current;
+      const cachedOrder = cache.get(normalizedSuffix);
+      if (cachedOrder && hasDetailedOrderInfo(cachedOrder)) {
+        return cachedOrder;
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return cachedOrder || null;
+      }
+
+      try {
+        let orderIdToFetch = cachedOrder?._id;
+
+        if (!orderIdToFetch) {
+          const response = await Api.order.getOrders(user._id, token);
+          const ordersList = response.data?.data || [];
+          const matchedOrder = ordersList.find(
+            (orderItem) =>
+              orderItem?._id?.slice(-8).toLowerCase() === normalizedSuffix
+          );
+          if (!matchedOrder) {
+            return cachedOrder || null;
+          }
+          orderIdToFetch = matchedOrder._id;
+          mergeOrderIntoCache(normalizedSuffix, matchedOrder);
+          if (hasDetailedOrderInfo(matchedOrder)) {
+            return matchedOrder;
+          }
+        }
+
+        if (!orderIdToFetch) {
+          return cachedOrder || null;
+        }
+
+        const detailedResponse = await Api.order.getOrder(orderIdToFetch, token);
+        const detailedOrder = detailedResponse.data?.data;
+        if (detailedOrder) {
+          mergeOrderIntoCache(normalizedSuffix, detailedOrder);
+          return detailedOrder;
+        }
+      } catch (err) {
+        console.error("Failed to fetch order data for email:", err);
+      }
+
+      return cachedOrder || null;
+    },
+    [user, hasDetailedOrderInfo, mergeOrderIntoCache]
+  );
 
   useEffect(() => {
     if (!user?._id) {
@@ -24,7 +110,7 @@ export default function NotificationsDropdown({ user }) {
       return;
     }
 
-    // ✅ Lấy URL backend chính xác
+    // Lấy URL backend chính xác
     const baseURL =
       import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
 
@@ -45,7 +131,7 @@ export default function NotificationsDropdown({ user }) {
 
     // Khi user kết nối, gửi userId lên server
     const handleConnect = () => {
-      console.log("✅ Notification Socket connected:", socket.id);
+      console.log("Notification Socket connected:", socket.id);
       // Emit user connection to join notification room
       socket.emit("userConnected", user._id);
       console.log(`🔔 Emitted userConnected for user: ${user._id}`);
@@ -66,18 +152,39 @@ export default function NotificationsDropdown({ user }) {
       });
 
       // Send email notification if it's an order notification
-      if (data.type === 'order' && user?.email) {
-        const orderId = extractOrderIdFromMessage(data.message);
-        sendOrderNotificationEmail({
-          userEmail: user.email,
-          userName: user.name || user.username,
-          title: data.title,
-          message: data.message,
-          orderId: orderId,
-        }).catch(err => {
-          // Don't show error to user - email is optional
-          console.error('❌ Failed to send order notification email:', err);
-        });
+      // Check if we've already sent an email for this notification to prevent duplicates
+      // Use module-level Set to share state across all component instances
+      const notificationId = data._id?.toString() || data._id;
+      const hasSentEmail = emailedNotificationsSet.has(notificationId);
+      
+      if (data.type === 'order' && user?.email && !hasSentEmail) {
+        // Mark this notification as having triggered an email (shared across all instances)
+        emailedNotificationsSet.add(notificationId);
+        
+        const orderIdSuffix = extractOrderIdFromMessage(data.message);
+        (async () => {
+          try {
+            const orderInfo = orderIdSuffix
+              ? await fetchOrderDataBySuffix(orderIdSuffix)
+              : null;
+            await sendOrderNotificationEmail({
+              userEmail: user.email,
+              userName: user.name || user.username,
+              title: data.title,
+              message: data.message,
+              orderId: orderInfo?._id || orderIdSuffix,
+              orderInfo,
+            });
+            console.log(`📧 Email sent for notification ${notificationId}`);
+          } catch (err) {
+            // On error, remove from set so we can retry if notification comes again
+            emailedNotificationsSet.delete(notificationId);
+            // Don't show error to user - email is optional
+            console.error('Failed to send order notification email:', err);
+          }
+        })();
+      } else if (hasSentEmail) {
+        console.log(`⚠️ Email already sent for notification ${notificationId} (by another instance), skipping duplicate`);
       }
     };
 
@@ -94,7 +201,7 @@ export default function NotificationsDropdown({ user }) {
           const notificationData = await res.json();
           setNotifications(notificationData);
         } catch (err) {
-          console.error("❌ Lỗi khi refresh thông báo:", err);
+          console.error("Lỗi khi refresh thông báo:", err);
         }
       };
       fetchNotifications();
@@ -129,7 +236,7 @@ export default function NotificationsDropdown({ user }) {
         });
         
         if (filtered.length !== prev.length) {
-          console.log(`✅ Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
+          console.log(`Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
         } else {
           console.warn(`⚠️ Notification with ID ${notificationId} not found in current list, refreshing...`);
           // Fallback: refresh the list if notification not found (might be a race condition)
@@ -143,7 +250,7 @@ export default function NotificationsDropdown({ user }) {
                 const notificationData = await res.json();
                 setNotifications(notificationData);
               } catch (err) {
-                console.error("❌ Lỗi khi refresh thông báo:", err);
+                console.error("Lỗi khi refresh thông báo:", err);
               }
             };
             fetchNotifications();
@@ -154,9 +261,18 @@ export default function NotificationsDropdown({ user }) {
       });
     };
 
+    // Listen to order updates to hydrate cache for mailing details
+    const handleOrderUpdated = (payload) => {
+      const updatedOrder = payload?.order || payload;
+      const orderId = updatedOrder?._id;
+      if (!orderId) return;
+      const suffixKey = orderId.slice(-8).toLowerCase();
+      mergeOrderIntoCache(suffixKey, updatedOrder);
+    };
+
     // Log lỗi
     const handleConnectError = (err) => {
-      console.error("❌ Notification Socket connection error:", err.message);
+      console.error("Notification Socket connection error:", err.message);
     };
 
     // Ngắt kết nối
@@ -169,6 +285,7 @@ export default function NotificationsDropdown({ user }) {
     socket.on("newNotification", handleNewNotification);
     socket.on("notificationBadgeUpdate", handleBadgeUpdate);
     socket.on("notificationDeleted", handleNotificationDeleted);
+    socket.on("orderUpdated", handleOrderUpdated);
     socket.on("connect_error", handleConnectError);
     socket.on("disconnect", handleDisconnect);
 
@@ -190,12 +307,13 @@ export default function NotificationsDropdown({ user }) {
       socket.off("newNotification", handleNewNotification);
       socket.off("notificationBadgeUpdate", handleBadgeUpdate);
       socket.off("notificationDeleted", handleNotificationDeleted);
+      socket.off("orderUpdated", handleOrderUpdated);
       socket.off("reconnect", handleReconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("disconnect", handleDisconnect);
       // Don't disconnect here - keep socket alive for component lifecycle
     };
-  }, [user]);
+  }, [user, fetchOrderDataBySuffix, mergeOrderIntoCache]);
 
   // 🧠 Lấy danh sách thông báo từ backend
   useEffect(() => {
@@ -209,7 +327,7 @@ export default function NotificationsDropdown({ user }) {
         const data = await res.json();
         setNotifications(data);
       } catch (err) {
-        console.error("❌ Lỗi khi lấy thông báo:", err);
+        console.error("Lỗi khi lấy thông báo:", err);
       }
     };
 
@@ -232,7 +350,7 @@ export default function NotificationsDropdown({ user }) {
   // 🔢 Số lượng chưa đọc
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // ✅ Đánh dấu đã đọc
+  // Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
       await fetch(
@@ -243,11 +361,11 @@ export default function NotificationsDropdown({ user }) {
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
     } catch (err) {
-      console.error("❌ Lỗi khi đánh dấu đã đọc:", err);
+      console.error("Lỗi khi đánh dấu đã đọc:", err);
     }
   };
 
-  // ❌ Xóa 1 thông báo (cho user)
+  // Xóa 1 thông báo (cho user)
   const deleteNotification = async (id) => {
     try {
       await fetch(
@@ -256,7 +374,7 @@ export default function NotificationsDropdown({ user }) {
       );
       setNotifications((prev) => prev.filter((n) => n._id !== id));
     } catch (err) {
-      console.error("❌ Lỗi khi xóa thông báo:", err);
+      console.error("Lỗi khi xóa thông báo:", err);
     }
   };
 
@@ -269,7 +387,7 @@ export default function NotificationsDropdown({ user }) {
       );
       setNotifications([]);
     } catch (err) {
-      console.error("❌ Lỗi khi clear all:", err);
+      console.error("Lỗi khi clear all:", err);
     }
   };
 
@@ -322,7 +440,14 @@ export default function NotificationsDropdown({ user }) {
               {notifications.map((n) => (
                 <li
                   key={n._id}
-                  onClick={() => markAsRead(n._id)}
+                  onClick={() => {
+                    markAsRead(n._id);
+                    // Navigate to livestream if it's a livestream notification
+                    if (n.type === 'livestream' && n.livestreamId) {
+                      setShowNotifications(false);
+                      navigate(`/live/${n.livestreamId}`);
+                    }
+                  }}
                   className={`group flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
                     !n.isRead ? "bg-amber-50/50" : "bg-white"
                   }`}
@@ -337,7 +462,7 @@ export default function NotificationsDropdown({ user }) {
                     <p className="text-gray-900 text-sm sm:text-base leading-snug mb-1">
                       <strong className="font-semibold">{n.title}</strong>
                     </p>
-                    <p className="text-gray-600 text-xs sm:text-sm mb-2">
+                    <p className="text-gray-600 text-xs sm:text-sm mb-2 whitespace-pre-wrap">
                       {n.message}
                     </p>
 

@@ -47,7 +47,7 @@ const Login = () => {
       setIsLoading(true);
       try {
         await login(trimmedUsername, trimmedPassword);
-        showToast('Login successful!', 'success', ERROR_TIMEOUT);
+        showToast('Logged in successfully', 'success', ERROR_TIMEOUT);
         navigate(from, { replace: true });
       } catch (err) {
         const errorMessage =
@@ -73,7 +73,7 @@ const Login = () => {
       setIsLoading(true);
       try {
         await googleLogin(credentialResponse.credential);
-        showToast('Login successful!', 'success', ERROR_TIMEOUT);
+        showToast('Logged in successfully', 'success', ERROR_TIMEOUT);
         navigate(from, { replace: true });
       } catch (err) {
         showToast(LOGIN_ERROR_MESSAGES.GOOGLE_FAILED, "error", ERROR_TIMEOUT);
@@ -216,13 +216,13 @@ const Login = () => {
             disabled={isLoading}
             onClick={handlePasskeyLogin}
             className="w-full"
-            aria-label="Sign in with Biometrics"
+            aria-label="Sign in with Passkey"
           >
             <span className="flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              Sign in with Biometrics
+              Sign in with Passkey
             </span>
           </ProductButton>
         </div>

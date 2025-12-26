@@ -1,6 +1,5 @@
 import React, { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import ProductButton from "./ProductButton";
 import { useToast } from "../hooks/useToast";
 
 const EditProfileModal = ({
@@ -12,6 +11,7 @@ const EditProfileModal = ({
   handleCancel,
   selectedFile,
   profile,
+  loading,
 }) => {
   const { showToast } = useToast();
   const fileInputRef = useRef(null);
@@ -57,14 +57,14 @@ const EditProfileModal = ({
         if (currentFormData.image?.trim() && !selectedFile) {
           const imageUrl = currentFormData.image.trim().toLowerCase();
           if (!imageUrl.match(/\.(png|jpg|jpeg)$/i) && !imageUrl.startsWith('data:image/')) {
-            return 'Profile picture must be a PNG or JPG image';
+            return 'Please select a valid image type';
           }
         }
         // Check file type when a file is selected
         if (selectedFile) {
           const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
           if (!validTypes.includes(selectedFile.type.toLowerCase())) {
-            return 'Profile picture must be a PNG or JPG image';
+            return 'Please select a valid image type';
           }
         }
         return null;
@@ -149,11 +149,10 @@ const EditProfileModal = ({
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.18 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white rounded-2xl shadow-2xl border-2 w-full max-w-lg max-h-[90vh] flex flex-col"
-        style={{ borderColor: '#A86523' }}
+        className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-lg max-h-[90vh] flex flex-col"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b shrink-0" style={{ borderColor: '#A86523' }}>
+        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b border-gray-200 shrink-0">
           <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
             Edit Profile
           </h2>
@@ -211,7 +210,7 @@ const EditProfileModal = ({
                   } else {
                     setValidationErrors(prevErrors => ({
                       ...prevErrors,
-                      image: 'Profile picture must be a PNG or JPG image'
+                      image: 'Please select a valid image type'
                     }));
                   }
                 }
@@ -284,23 +283,34 @@ const EditProfileModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t shrink-0" style={{ borderColor: '#A86523' }}>
-          <ProductButton
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t border-gray-200 shrink-0">
+          <button
             type="button"
-            variant="secondary"
-            size="md"
             onClick={handleCancel}
+            className="px-5 py-2.5 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-offset-2"
+            style={{ '--tw-ring-color': '#A86523' }}
+            disabled={loading}
           >
             Cancel
-          </ProductButton>
-          <ProductButton
+          </button>
+          <button
             type="submit"
-            variant="primary"
-            size="md"
             onClick={handleSubmitWithValidation}
+            disabled={loading}
+            className="px-6 py-2.5 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:hover:shadow-md bg-gradient-to-r from-[#E9A319] to-[#A86523] hover:from-[#A86523] hover:to-[#8B4E1A] disabled:hover:from-[#E9A319] disabled:hover:to-[#A86523]"
+            style={{
+              '--tw-ring-color': '#A86523'
+            }}
           >
-            Save
-          </ProductButton>
+            {loading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                <span>Editing...</span>
+              </div>
+            ) : (
+              'Save'
+            )}
+          </button>
         </div>
       </motion.div>
     </div>

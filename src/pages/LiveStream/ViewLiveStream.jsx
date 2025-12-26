@@ -158,6 +158,7 @@ const LiveStreamDetail = () => {
             const newRoom = new Room(roomOptions);
 
             newRoom.on(RoomEvent.Connected, () => {
+                console.log('Connected to LiveKit room');
                 setConnectionState('connected');
 
                 // Initialize remote participants list (exclude local participant)
@@ -220,13 +221,12 @@ const LiveStreamDetail = () => {
                         // This is critical to prevent subscription from being dropped when other users join
                         publication.setSubscribed(true);
 
-                        // CRITICAL: If track is already available (host already streaming), attach it immediately
-                        // This handles the case when user joins after host has already started streaming
-                        // Each user attaches to their own video element, so there's no conflict
-                        // Multiple users can attach the same track to different video elements
-                        // IMPORTANT: attach() is safe to call multiple times - LiveKit handles it correctly
-                        if (publication.track && videoRef.current) {
-                            attachTrackToVideo(publication.track, publication.track.kind);
+                                console.log('Audio track attached on connect', {
+                                    trackId: publication.track.id,
+                                    enabled: publication.track.enabled,
+                                    muted: videoRef.current?.muted
+                                });
+                            }
                         }
                         // If track is not available yet, TrackSubscribed event will handle it
                         // TrackSubscribed fires for each user independently when their subscription is ready
@@ -316,6 +316,7 @@ const LiveStreamDetail = () => {
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
+                console.log('Disconnected from LiveKit:', reason);
                 setConnectionState('disconnected');
                 setRoom(null);
 
@@ -341,6 +342,7 @@ const LiveStreamDetail = () => {
                         if (token) {
                             await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
                             hasJoinedRef.current = false;
+                            console.log('Left livestream via API');
                         }
                     } catch (error) {
                         console.error('Error leaving livestream:', error);
@@ -1154,14 +1156,14 @@ const LiveStreamDetail = () => {
                                     <p className="text-white/70 text-[10px]">Featured items</p>
                                 </div>
                             </div>
-                            <button
+                            {/* <button
                                 onClick={() => setShowProducts(false)}
                                 className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
-                            </button>
+                            </button> */}
                         </div>
                         <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
                             <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />

@@ -523,7 +523,7 @@ const ProductDetail = () => {
         await Api.favorites.remove(favoriteId, token);
         setIsFavorited(false);
         setFavoriteId(null);
-        showToast("Product removed from favorites!", "success", TOAST_TIMEOUT);
+        showToast("Product removed from favorites successfully", "success", TOAST_TIMEOUT);
       } else {
         const favoriteItem = {
           acc_id: user._id,
@@ -577,7 +577,7 @@ const ProductDetail = () => {
       const token = localStorage.getItem("token");
       await Api.newCart.create(cartItem, token);
 
-      showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully!`, "success", TOAST_TIMEOUT);
+      showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully`, "success", TOAST_TIMEOUT);
     } catch (err) {
       const message = err.response?.data?.message || err.message || "Failed to add item to cart";
       showToast(message, "error", TOAST_TIMEOUT);
