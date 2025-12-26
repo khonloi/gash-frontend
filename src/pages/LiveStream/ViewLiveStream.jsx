@@ -170,43 +170,6 @@ const LiveStreamDetail = () => {
                     videoRef.current.muted = false;
                 }
 
-                // Function to attach track to video element
-                // This function is called for each user independently (up to 100 users)
-                // Each user has their own videoRef, so there's no conflict
-                const attachTrackToVideo = (track, kind) => {
-                    if (!videoRef.current) {
-                        // Retry if video element is not ready yet
-                        // Important when multiple users join quickly - each waits for their own video element
-                        setTimeout(() => {
-                            if (videoRef.current && track) {
-                                attachTrackToVideo(track, kind);
-                            }
-                        }, 100);
-                        return;
-                    }
-
-                    if (kind === 'video') {
-                        // Attach video track - LiveKit handles multiple attachments correctly
-                        // Each user (up to 100) attaches to their own video element
-                        // LiveKit delivers the same stream to all subscribers independently
-                        track.attach(videoRef.current);
-                        videoRef.current.muted = false;
-                        videoRef.current.play().catch((err) => {
-                            console.error('Video play error:', err);
-                        });
-                    } else if (kind === 'audio') {
-                        // Attach audio track - each user gets their own audio stream
-                        // LiveKit supports multiple audio subscribers (up to 100)
-                        track.attach(videoRef.current);
-                        if (track instanceof MediaStreamTrack) {
-                            track.enabled = true;
-                        }
-                        if (videoRef.current) {
-                            videoRef.current.muted = false;
-                        }
-                    }
-                };
-
                 // Subscribe to all remote tracks (video and audio) from all participants
                 // This ensures ALL users (up to 100) can see the host's video stream
                 // CRITICAL: Each user must subscribe independently to receive the stream data
@@ -221,13 +184,11 @@ const LiveStreamDetail = () => {
                         // This is critical to prevent subscription from being dropped when other users join
                         publication.setSubscribed(true);
 
-                                console.log('Audio track attached on connect', {
-                                    trackId: publication.track.id,
-                                    enabled: publication.track.enabled,
-                                    muted: videoRef.current?.muted
-                                });
-                            }
-                        }
+                        console.log('Audio track attached on connect', {
+                            trackId: publication.track.id,
+                            enabled: publication.track.enabled,
+                            muted: videoRef.current?.muted
+                        });
                         // If track is not available yet, TrackSubscribed event will handle it
                         // TrackSubscribed fires for each user independently when their subscription is ready
                     });
