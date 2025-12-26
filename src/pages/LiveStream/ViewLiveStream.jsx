@@ -38,11 +38,9 @@ const LiveStreamDetail = () => {
     useEffect(() => {
         tabIdRef.current = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         isMountedRef.current = true;
-        console.log('Tab ID initialized:', tabIdRef.current);
 
         return () => {
             isMountedRef.current = false;
-            console.log('Tab unmounting:', tabIdRef.current);
         };
     }, []);
 
@@ -99,18 +97,15 @@ const LiveStreamDetail = () => {
     const connectToLiveKit = useCallback(async (roomName, viewerToken, serverUrl = null) => {
         // Check if component is still mounted
         if (!isMountedRef.current) {
-            console.log('Component unmounted, skipping connection');
             return;
         }
 
         // Prevent multiple simultaneous connection attempts from the same tab instance
         // But allow different tabs from same account to connect independently
         if (isReconnectingRef.current) {
-            console.log('Already reconnecting for tab:', tabIdRef.current);
             return;
         }
         if (streamEndedRef.current) {
-            console.log('Stream ended for tab:', tabIdRef.current);
             return;
         }
 
@@ -189,12 +184,10 @@ const LiveStreamDetail = () => {
             newRoom.on(RoomEvent.Connected, () => {
                 // Check if component is still mounted before updating state
                 if (!isMountedRef.current) {
-                    console.log('Component unmounted during connection, disconnecting');
                     newRoom.disconnect().catch(() => { });
                     return;
                 }
 
-                console.log('Connected to LiveKit room for tab:', tabIdRef.current);
                 setConnectionState('connected');
 
                 // Initialize remote participants list (exclude local participant)
@@ -408,7 +401,6 @@ const LiveStreamDetail = () => {
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
-                console.log('Disconnected from LiveKit for tab:', tabIdRef.current, 'Reason:', reason);
 
                 // Only update state if component is still mounted
                 if (isMountedRef.current) {
@@ -441,7 +433,6 @@ const LiveStreamDetail = () => {
                                 tabId: tabIdRef.current
                             }, token);
                             hasJoinedRef.current = false;
-                            console.log('Left livestream for tab:', tabIdRef.current);
                         }
                     } catch (error) {
                         console.error('Error leaving livestream:', error);
@@ -466,7 +457,6 @@ const LiveStreamDetail = () => {
 
                 // Check if component is still mounted
                 if (!isMountedRef.current) {
-                    console.log('Component unmounted, ignoring TrackSubscribed');
                     return;
                 }
 
@@ -476,7 +466,6 @@ const LiveStreamDetail = () => {
                     return;
                 }
 
-                console.log('Track subscribed for tab:', tabIdRef.current, 'Kind:', track.kind);
 
                 // CRITICAL: Ensure subscription is maintained
                 if (!publication.isSubscribed) {
@@ -513,7 +502,6 @@ const LiveStreamDetail = () => {
                             if (videoRef.current) {
                                 videoRef.current.muted = false;
                                 videoRef.current.play().then(() => {
-                                    console.log('✅ Livestream connected and playing successfully');
                                 }).catch(err => {
                                     if (err.name !== 'AbortError') {
                                         console.error('Video play failed:', err);

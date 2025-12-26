@@ -177,21 +177,18 @@ export default function Header() {
 
         // Join user's room for targeted updates
         socket.on("connect", () => {
-            console.log("Header Socket connected:", socket.id);
             socket.emit("userConnected", user._id);
             socket.emit("joinRoom", user._id);
         });
 
         // Listen for cart updates
-        socket.on("cartUpdated", (data) => {
-            console.log("🛒 Cart updated via Socket.IO:", data);
+        socket.on("cartUpdated", () => {
             // Immediately fetch updated cart count
             debouncedFetchCartItemCount();
         });
 
         // Listen for livestream count changes
         socket.on("livestreamCountChanged", (data) => {
-            console.log("📺 Livestream count changed via Socket.IO:", data);
             // Update livestream count directly if count is provided, otherwise fetch
             if (typeof data.count === 'number') {
                 setLivestreamCount(data.count);
@@ -202,13 +199,11 @@ export default function Header() {
 
         // Listen for notification updates (already handled by NotificationsDropdown, but keep for consistency)
         socket.on("newNotification", () => {
-            console.log("🔔 New notification via Socket.IO");
             debouncedFetchNotificationCount();
         });
 
         // Listen for notification badge updates (when notifications are marked as read/deleted)
         socket.on("notificationBadgeUpdate", (data) => {
-            console.log("🔔 Notification badge update via Socket.IO:", data);
             // Only update if it's for this user or global
             if (!data.userId || data.userId === user._id) {
                 debouncedFetchNotificationCount();
@@ -216,8 +211,7 @@ export default function Header() {
         });
 
         // Listen for favorite updates
-        socket.on("favoriteUpdated", (data) => {
-            console.log("❤️ Favorite updated via Socket.IO:", data);
+        socket.on("favoriteUpdated", () => {
             // Immediately fetch updated favorite count
             debouncedFetchFavoriteCount();
         });
@@ -353,12 +347,10 @@ export default function Header() {
 
     useEffect(() => {
         if (!search.trim()) {
-            console.log("Search input empty, clearing results");
             setSearchResults([]);
             setShowDropdown(false);
             return;
         }
-        console.log("Debouncing search for:", search);
         const debounce = setTimeout(() => fetchSearchResults(search), SEARCH_DEBOUNCE_DELAY);
         return () => clearTimeout(debounce);
     }, [search, fetchSearchResults]);
@@ -413,7 +405,6 @@ export default function Header() {
                                     type="text"
                                     value={search}
                                     onChange={(e) => {
-                                        console.log("Search input changed:", e.target.value);
                                         setSearch(e.target.value);
                                     }}
                                     placeholder="Search..."
@@ -424,7 +415,6 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log("Clearing search input");
                                             setSearch("");
                                         }}
                                         className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
@@ -435,7 +425,6 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log("Closing mobile search");
                                             setMobileSearchOpen(false);
                                         }}
                                         className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
@@ -458,14 +447,12 @@ export default function Header() {
                                             {searchResults.map((item) => {
                                                 const minPrice = getMinPrice(item);
                                                 const imageUrl = getMainImageUrl(item);
-                                                console.log(`Rendering product ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                                 return (
                                                     <Link
                                                         key={item._id}
                                                         to={`/product/${item._id}`}
                                                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100 last:border-0"
                                                         onClick={() => {
-                                                            console.log(`Navigating to product ${item._id}`);
                                                             setShowDropdown(false);
                                                         }}
                                                     >
@@ -487,7 +474,6 @@ export default function Header() {
                                             })}
                                             <button
                                                 onClick={() => {
-                                                    console.log("Navigating to full search results:", search);
                                                     navigate(`/search?q=${encodeURIComponent(search)}`);
                                                     setShowDropdown(false);
                                                 }}
@@ -507,7 +493,6 @@ export default function Header() {
                             <div className="flex items-center w-full justify-between relative">
                                 <button
                                     onClick={() => {
-                                        console.log("Opening mobile search");
                                         setMobileSearchOpen(true);
                                     }}
                                     title="Search"
@@ -522,7 +507,6 @@ export default function Header() {
                                     <div className="relative">
                                         <button
                                             onClick={async () => {
-                                                console.log("Live Stream clicked (mobile)");
                                                 try {
                                                     const token = localStorage.getItem('token');
                                                     if (!token) {
@@ -570,10 +554,8 @@ export default function Header() {
                                         <button
                                             onClick={() => {
                                                 if (!user) {
-                                                    console.log("Navigating to login");
                                                     navigate("/login");
                                                 } else {
-                                                    console.log("Toggling user menu");
                                                     setShowUserMenu((prev) => !prev);
                                                 }
                                             }}
@@ -587,7 +569,6 @@ export default function Header() {
                                                 <button
                                                     onMouseDown={async (e) => {
                                                         e.stopPropagation();
-                                                        console.log("Navigating to livestream (mobile menu)");
                                                         try {
                                                             const token = localStorage.getItem('token');
                                                             if (!token) {
@@ -637,7 +618,6 @@ export default function Header() {
                                                 <button
                                                     onMouseDown={(e) => {
                                                         e.stopPropagation();
-                                                        console.log("Navigating to cart");
                                                         navigate('/cart');
                                                         setShowUserMenu(false);
                                                     }}
