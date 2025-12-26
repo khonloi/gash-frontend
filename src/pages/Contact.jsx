@@ -83,7 +83,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 m-0">Email</h3>
-                  <p className="text-sm text-gray-600 m-0">fptuniversityct@gmail.com</p>
+                  <p className="text-sm text-gray-600 m-0">quocbaong239@gmail.com</p>
                 </div>
               </div>
 
@@ -93,7 +93,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 m-0">Phone</h3>
-                  <p className="text-sm text-gray-600 m-0">0292 730 1866</p>
+                  <p className="text-sm text-gray-600 m-0">0815 129 329</p>
                 </div>
               </div>
 
@@ -104,7 +104,7 @@ const Contact = () => {
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 m-0">Address</h3>
                   <a
-                    href="https://www.google.com/maps/place/FPT+University+Can+Tho,+Street+600+Nguyen+Van+Cu,+An+Binh+Ward,+Ninh+Kieu,+Can+Tho/"
+                    href="https://maps.app.goo.gl/fVErCagr2ZRUqiNm9"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"

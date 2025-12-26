@@ -163,7 +163,7 @@ export default function Header() {
 
         // Get backend URL
         const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
-        
+
         // Connect to Socket.IO
         const socket = io(baseURL, {
             transports: ["websocket", "polling"],
@@ -288,8 +288,8 @@ export default function Header() {
         debouncedFetchFavoriteCount,
         location,
         user
-    ]);       
-    
+    ]);
+
     useEffect(() => {
         setSearch("");
         setSearchResults([]);
@@ -446,7 +446,7 @@ export default function Header() {
                             </form>
                             {showDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
-                                border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
+                                border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out]
                                 max-h-96 overflow-y-auto">
                                     {loading ? (
                                         <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
@@ -463,7 +463,7 @@ export default function Header() {
                                                     <Link
                                                         key={item._id}
                                                         to={`/product/${item._id}`}
-                                                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
+                                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100 last:border-0"
                                                         onClick={() => {
                                                             console.log(`Navigating to product ${item._id}`);
                                                             setShowDropdown(false);
@@ -491,7 +491,7 @@ export default function Header() {
                                                     navigate(`/search?q=${encodeURIComponent(search)}`);
                                                     setShowDropdown(false);
                                                 }}
-                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                                className="w-full text-center text-sm font-medium text-amber-600 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-t border-gray-100"
                                             >
                                                 View all results
                                             </button>
@@ -504,103 +504,202 @@ export default function Header() {
                         </div>
                     ) : (
                         <>
-                            <button
-                                onClick={() => {
-                                    console.log("Opening mobile search");
-                                    setMobileSearchOpen(true);
-                                }}
-                                title="Search"
-                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
-                            >
-                                <SearchIcon />
-                            </button>
-                            <Link to="/" className="flex items-center justify-center">
-                                <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
-                            </Link>
-                            <div className="relative" ref={userMenuRef}>
+                            <div className="flex items-center w-full justify-between relative">
                                 <button
                                     onClick={() => {
-                                        if (!user) {
-                                            console.log("Navigating to login");
-                                            navigate("/login");
-                                        } else {
-                                            console.log("Toggling user menu");
-                                            setShowUserMenu((prev) => !prev);
-                                        }
+                                        console.log("Opening mobile search");
+                                        setMobileSearchOpen(true);
                                     }}
-                                    title="My Account"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
+                                    title="Search"
+                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out z-10"
                                 >
-                                    <PermIdentityOutlinedIcon />
+                                    <SearchIcon />
                                 </button>
-                                {user && showUserMenu && (
-                                    <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                        <div className="px-4 py-2 hover:bg-[#ffb300]/20">
-                                            <NotificationsDropdown user={user} />
-                                        </div>
+                                <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10">
+                                    <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
+                                </Link>
+                                <div className="flex items-center gap-1 z-10" ref={userMenuRef}>
+                                    <div className="relative">
                                         <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                console.log("Navigating to cart");
-                                                navigate('/cart');
-                                                setShowUserMenu(false);
+                                            onClick={async () => {
+                                                console.log("Live Stream clicked (mobile)");
+                                                try {
+                                                    const token = localStorage.getItem('token');
+                                                    if (!token) {
+                                                        navigate("/login");
+                                                        return;
+                                                    }
+
+                                                    const response = await Api.livestream.getLiveNow(token);
+
+                                                    if (response.data?.success) {
+                                                        let streams = [];
+
+                                                        if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
+                                                            streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
+                                                        } else if (response.data?.data?.livestream) {
+                                                            const livestream = response.data.data.livestream;
+                                                            if (livestream && livestream.status === 'live') {
+                                                                streams = [livestream];
+                                                            }
+                                                        }
+
+                                                        if (streams.length > 0) {
+                                                            // Navigate to the first live stream
+                                                            navigate(`/live/${streams[0]._id}`);
+                                                        } else {
+                                                            // No live streams available, navigate to list page
+                                                            navigate("/live");
+                                                        }
+                                                    } else {
+                                                        // Fallback to list page if API fails
+                                                        navigate("/live");
+                                                    }
+                                                } catch (error) {
+                                                    console.error("Error fetching live streams:", error);
+                                                    // Fallback to list page on error
+                                                    navigate("/live");
+                                                }
                                             }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
+                                            title="Live Stream"
+                                            className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                                         >
-                                            <ShoppingBagOutlinedIcon fontSize="small" />
-                                            Cart
-                                            {cartItemCount > 0 && (
-                                                <span className={`${badgeClass} top-1 right-4`}>
-                                                    {cartItemCount}
-                                                </span>
-                                            )}
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                console.log("Navigating to notifications");
-                                                navigate('/notifications');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
-                                        >
-                                            <NotificationsOutlinedIcon fontSize="small" />
-                                            Notifications
-                                            {notificationCount > 0 && (
-                                                <span className={`${badgeClass} top-1 right-4`}>
-                                                    {notificationCount}
-                                                </span>
-                                            )}
-                                        </button>
-                                        <Link
-                                            to="/profile"
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
-                                        >
-                                            <button
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation();
-                                                    console.log("Navigating to profile");
-                                                    navigate('/profile');
-                                                    setShowUserMenu(false);
-                                                }}
-                                                className="flex items-center gap-2 w-full text-left"
-                                            >
-                                                <PermIdentityOutlinedIcon fontSize="small" /> My Account
-                                            </button>
-                                        </Link>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                console.log("Logging out");
-                                                handleLogout();
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
-                                        >
-                                            Sign Out
                                         </button>
                                     </div>
-                                )}
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => {
+                                                if (!user) {
+                                                    console.log("Navigating to login");
+                                                    navigate("/login");
+                                                } else {
+                                                    console.log("Toggling user menu");
+                                                    setShowUserMenu((prev) => !prev);
+                                                }
+                                            }}
+                                            title="My Account"
+                                            className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
+                                        >
+                                            <PermIdentityOutlinedIcon />
+                                        </button>
+                                        {user && showUserMenu && (
+                                            <div className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                                <button
+                                                    onMouseDown={async (e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Navigating to livestream (mobile menu)");
+                                                        try {
+                                                            const token = localStorage.getItem('token');
+                                                            if (!token) {
+                                                                navigate("/login");
+                                                                setShowUserMenu(false);
+                                                                return;
+                                                            }
+
+                                                            const response = await Api.livestream.getLiveNow(token);
+
+                                                            if (response.data?.success) {
+                                                                let streams = [];
+
+                                                                if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
+                                                                    streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
+                                                                } else if (response.data?.data?.livestream) {
+                                                                    const livestream = response.data.data.livestream;
+                                                                    if (livestream && livestream.status === 'live') {
+                                                                        streams = [livestream];
+                                                                    }
+                                                                }
+
+                                                                if (streams.length > 0) {
+                                                                    navigate(`/live/${streams[0]._id}`);
+                                                                } else {
+                                                                    navigate("/live");
+                                                                }
+                                                            } else {
+                                                                navigate("/live");
+                                                            }
+                                                        } catch (error) {
+                                                            console.error("Error fetching live streams:", error);
+                                                            navigate("/live");
+                                                        }
+                                                        setShowUserMenu(false);
+                                                    }}
+                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors relative border-b border-gray-100"
+                                                >
+                                                    <TvOutlinedIcon fontSize="small" />
+                                                    <span className="text-sm font-medium">Live Stream</span>
+                                                    {livestreamCount > 0 && (
+                                                        <span className={`${badgeClass} top-1.5 right-4`}>
+                                                            {livestreamCount}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                                <button
+                                                    onMouseDown={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Navigating to cart");
+                                                        navigate('/cart');
+                                                        setShowUserMenu(false);
+                                                    }}
+                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors relative border-b border-gray-100"
+                                                >
+                                                    <ShoppingBagOutlinedIcon fontSize="small" />
+                                                    <span className="text-sm font-medium">Cart</span>
+                                                    {cartItemCount > 0 && (
+                                                        <span className={`${badgeClass} top-1.5 right-4`}>
+                                                            {cartItemCount}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                                <button
+                                                    onMouseDown={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Navigating to notifications");
+                                                        navigate('/notifications');
+                                                        setShowUserMenu(false);
+                                                    }}
+                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors relative border-b border-gray-100"
+                                                >
+                                                    <NotificationsOutlinedIcon fontSize="small" />
+                                                    <span className="text-sm font-medium">Notifications</span>
+                                                    {notificationCount > 0 && (
+                                                        <span className={`${badgeClass} top-1.5 right-4`}>
+                                                            {notificationCount}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                                <Link
+                                                    to="/profile"
+                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
+                                                >
+                                                    <button
+                                                        onMouseDown={(e) => {
+                                                            e.stopPropagation();
+                                                            console.log("Navigating to profile");
+                                                            navigate('/profile');
+                                                            setShowUserMenu(false);
+                                                        }}
+                                                        className="flex items-center gap-2 w-full text-left"
+                                                    >
+                                                        <PermIdentityOutlinedIcon fontSize="small" />
+                                                        <span className="text-sm font-medium">My Account</span>
+                                                    </button>
+                                                </Link>
+                                                <button
+                                                    onMouseDown={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Logging out");
+                                                        handleLogout();
+                                                        setShowUserMenu(false);
+                                                    }}
+                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
+                                                >
+                                                    <span className="text-sm font-medium">Sign Out</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </>
                     )}
@@ -631,7 +730,7 @@ export default function Header() {
                             </button>
                         </form>
                         {showDropdown && (
-                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out] max-h-96 overflow-y-auto">
+                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out] max-h-96 overflow-y-auto">
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
                                         <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
@@ -647,7 +746,7 @@ export default function Header() {
                                                 <Link
                                                     key={item._id}
                                                     to={`/product/${item._id}`}
-                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
+                                                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100 last:border-0"
                                                     onClick={() => {
                                                         console.log(`Navigating to product (desktop) ${item._id}`);
                                                         setShowDropdown(false);
@@ -675,7 +774,7 @@ export default function Header() {
                                                 navigate(`/search?q=${encodeURIComponent(search)}`);
                                                 setShowDropdown(false);
                                             }}
-                                            className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                            className="w-full text-center text-sm font-medium text-amber-600 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-t border-gray-100"
                                         >
                                             View all results
                                         </button>
@@ -697,12 +796,12 @@ export default function Header() {
                                             navigate("/login");
                                             return;
                                         }
-                                        
+
                                         const response = await Api.livestream.getLiveNow(token);
-                                        
+
                                         if (response.data?.success) {
                                             let streams = [];
-                                            
+
                                             if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
                                                 streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
                                             } else if (response.data?.data?.livestream) {
@@ -711,7 +810,7 @@ export default function Header() {
                                                     streams = [livestream];
                                                 }
                                             }
-                                            
+
                                             if (streams.length > 0) {
                                                 // Navigate to the first live stream
                                                 navigate(`/live/${streams[0]._id}`);
@@ -809,7 +908,7 @@ export default function Header() {
                                 </span>
                             )}
                             {user && showUserMenu && (
-                                <div className="absolute right-0 top-full mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                <div className="absolute right-0 top-full mt-2 w-48 bg-white text-gray-900 rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -817,9 +916,9 @@ export default function Header() {
                                             navigate("/profile");
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
                                     >
-                                        My Account
+                                        <span className="text-sm font-medium">My Account</span>
                                     </button>
                                     <button
                                         onClick={(e) => {
@@ -828,9 +927,9 @@ export default function Header() {
                                             navigate("/orders");
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
                                     >
-                                        My Orders
+                                        <span className="text-sm font-medium">My Orders</span>
                                     </button>
                                     {/* <button
                                         onClick={(e) => {
@@ -839,9 +938,9 @@ export default function Header() {
                                             navigate("/feedback");
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
                                     >
-                                        My Feedback
+                                        <span className="text-sm font-medium">My Feedback</span>
                                     </button> */}
                                     <button
                                         onClick={(e) => {
@@ -850,9 +949,9 @@ export default function Header() {
                                             handleLogout();
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
                                     >
-                                        Sign Out
+                                        <span className="text-sm font-medium">Sign Out</span>
                                     </button>
                                 </div>
                             )}

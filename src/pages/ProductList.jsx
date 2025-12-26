@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { HiChevronDown, HiChevronUp } from "react-icons/hi2";
+import { FiFilter } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../components/ProductCard";
 import ProductCardSkeleton from "../components/ProductCardSkeleton";
@@ -73,14 +76,14 @@ const getMinPrice = (product) => {
   return prices.length > 0 ? Math.min(...prices) : 0;
 };
 
-// Helper function to get main image URL
-const getMainImageUrl = (product) => {
-  if (!product.productImageIds || product.productImageIds.length === 0) {
-    return "/placeholder-image.png";
-  }
-  const mainImage = product.productImageIds.find(img => img.isMain);
-  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-};
+// Helper function to get main image URL (currently unused but kept for future use)
+// const getMainImageUrl = (product) => {
+//   if (!product.productImageIds || product.productImageIds.length === 0) {
+//     return "/placeholder-image.png";
+//   }
+//   const mainImage = product.productImageIds.find(img => img.isMain);
+//   return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
+// };
 
 const ProductList = () => {
   // State management
@@ -92,6 +95,14 @@ const ProductList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isFiltering, setIsFiltering] = useState(false);
+
+  // State for showing all items in filter sections
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showAllColors, setShowAllColors] = useState(false);
+  const [showAllSizes, setShowAllSizes] = useState(false);
+
+  // State for mobile filter visibility
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Filter state
   const [searchParams] = useSearchParams();
@@ -108,12 +119,18 @@ const ProductList = () => {
   const [selectedSize, setSelectedSize] = useState(
     sanitizeParam(searchParams.get("size")) || storedFilters.size || DEFAULT_FILTERS.size
   );
-  const [minPrice, setMinPrice] = useState(
-    searchParams.get("minPrice") || storedFilters.minPrice || DEFAULT_FILTERS.minPrice
-  );
-  const [maxPrice, setMaxPrice] = useState(
-    searchParams.get("maxPrice") || storedFilters.maxPrice || DEFAULT_FILTERS.maxPrice
-  );
+  const [minPrice, setMinPrice] = useState(() => {
+    const param = searchParams.get("minPrice");
+    const stored = storedFilters.minPrice;
+    const defaultVal = DEFAULT_FILTERS.minPrice;
+    return param || stored || defaultVal;
+  });
+  const [maxPrice, setMaxPrice] = useState(() => {
+    const param = searchParams.get("maxPrice");
+    const stored = storedFilters.maxPrice;
+    const defaultVal = DEFAULT_FILTERS.maxPrice;
+    return param || stored || defaultVal;
+  });
   const [sortBy, setSortBy] = useState(
     sanitizeParam(searchParams.get("sortBy")) || storedFilters.sortBy || DEFAULT_FILTERS.sortBy
   );
@@ -130,7 +147,7 @@ const ProductList = () => {
   // Data fetching - use refs to prevent unnecessary re-renders
   const hasFetchedProductsRef = useRef(false);
   const hasFetchedVariantsRef = useRef(false);
-  
+
   const fetchProducts = useCallback(async () => {
     if (hasFetchedProductsRef.current) return;
     hasFetchedProductsRef.current = true;
@@ -239,21 +256,21 @@ const ProductList = () => {
       maxPrice: debouncedMaxPrice,
       sortBy: sortBy,
     };
-    
+
     // Only update if filters actually changed (skip initial render if no change)
     if (prevFiltersRef.current === null) {
       prevFiltersRef.current = currentFilters;
       return; // Skip on initial mount
     }
-    
-    const hasChanged = 
+
+    const hasChanged =
       prevFiltersRef.current.category !== currentFilters.category ||
       prevFiltersRef.current.color !== currentFilters.color ||
       prevFiltersRef.current.size !== currentFilters.size ||
       prevFiltersRef.current.minPrice !== currentFilters.minPrice ||
       prevFiltersRef.current.maxPrice !== currentFilters.maxPrice ||
       prevFiltersRef.current.sortBy !== currentFilters.sortBy;
-    
+
     if (hasChanged) {
       prevFiltersRef.current = currentFilters;
       setStoredFilters(currentFilters);
@@ -336,13 +353,13 @@ const ProductList = () => {
       active = active.filter((product) => {
         const productMinPrice = getMinPrice(product);
         if (productMinPrice === 0) return false;
-        
+
         const min = debouncedMinPrice ? parseFloat(debouncedMinPrice) : 0;
         const max = debouncedMaxPrice ? parseFloat(debouncedMaxPrice) : Infinity;
-        
+
         // Validate that min is not greater than max
         if (min > max) return false;
-        
+
         return productMinPrice >= min && productMinPrice <= max;
       });
     }
@@ -354,16 +371,18 @@ const ProductList = () => {
           return getMinPrice(a) - getMinPrice(b);
         case "price-high":
           return getMinPrice(b) - getMinPrice(a);
-        case "new":
+        case "new": {
           const dateA = new Date(a.createdAt || 0).getTime();
           const dateB = new Date(b.createdAt || 0).getTime();
           return dateB - dateA; // Newest first
-        case "popularity":
+        }
+        case "popularity": {
           // Since there's no popularity field, we'll use createdAt as a proxy (newer = more popular)
           // Or we could sort by name as fallback
           const popDateA = new Date(a.createdAt || 0).getTime();
           const popDateB = new Date(b.createdAt || 0).getTime();
           return popDateB - popDateA;
+        }
         case "name":
         default:
           return (a.productName || "").localeCompare(b.productName || "");
@@ -414,7 +433,7 @@ const ProductList = () => {
       default:
         console.warn(`Unknown filter type: ${filterType}`);
     }
-  }, []);
+  }, [maxPrice, minPrice]);
 
   const handleProductClick = useCallback(
     (id) => {
@@ -460,27 +479,54 @@ const ProductList = () => {
   }, []);
 
   // Filter section component
-  const FilterSection = ({ title, options, selectedValue, filterType }) => (
-    <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
-      <legend className="text-md font-semibold">{title}</legend>
-      {["All", ...options].map((option) => {
-        const value = option === "All" ? `All ${title}` : option;
-        return (
-          <label key={value} className="flex items-center my-1.5 text-sm cursor-pointer">
-            <input
-              type="radio"
-              name={filterType}
-              value={value}
-              checked={selectedValue === value}
-              onChange={(e) => handleFilterChange(filterType, e.target.value)}
-              className="mr-2 accent-amber-400"
-            />
-            {value}
-          </label>
-        );
-      })}
-    </fieldset>
-  );
+  const FilterSection = ({ title, options, selectedValue, filterType, showAll, onToggleShowAll }) => {
+    const ITEMS_TO_SHOW = 5;
+    const allOptions = ["All", ...options];
+    const displayOptions = showAll ? allOptions : allOptions.slice(0, ITEMS_TO_SHOW + 1); // +1 để bao gồm "All"
+    const hasMore = options.length > ITEMS_TO_SHOW;
+
+    return (
+      <fieldset className="mb-3 border-2 border-yellow-200/60 rounded-xl p-3 bg-gradient-to-br from-white to-yellow-50/20 shadow-[0_2px_8px_rgba(234,179,8,0.1)]">
+        <legend className="text-sm font-bold text-yellow-700 px-2">{title}</legend>
+        <div className="space-y-1 mt-1.5">
+          {displayOptions.map((option) => {
+            const value = option === "All" ? `All ${title}` : option;
+            const isSelected = selectedValue === value;
+            return (
+              <label key={value} className="flex items-center p-1.5 rounded-lg cursor-pointer transition-all duration-200 hover:bg-yellow-50/50 group">
+                <input
+                  type="radio"
+                  name={filterType}
+                  value={value}
+                  checked={isSelected}
+                  onChange={(e) => handleFilterChange(filterType, e.target.value)}
+                  className="mr-2 accent-yellow-500 w-3.5 h-3.5 cursor-pointer"
+                />
+                <span className={`text-xs transition-colors duration-200 ${isSelected ? 'text-yellow-700 font-semibold' : 'text-gray-700 group-hover:text-yellow-600'}`}>
+                  {value}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        {hasMore && (
+          <button
+            type="button"
+            onClick={onToggleShowAll}
+            className="mt-2 w-full text-yellow-600 hover:text-yellow-700 py-1.5 px-2 rounded-lg hover:bg-yellow-50/50 transition-all duration-200 border border-yellow-200/60 hover:border-yellow-300 flex items-center justify-center"
+            aria-label={showAll ? "Show Less" : `Show All (${options.length})`}
+            title={showAll ? "Show Less" : `Show All (${options.length})`}
+          >
+            {showAll ? (
+              <HiChevronUp className="text-lg font-bold" />
+            ) : (
+              <HiChevronDown className="text-lg font-bold" />
+            )}
+          </button>
+        )}
+      </fieldset>
+    );
+  };
 
   const hasActiveFilters =
     selectedCategory !== DEFAULT_FILTERS.category ||
@@ -498,17 +544,169 @@ const ProductList = () => {
   }, [debouncedCategory, debouncedColor, debouncedSize, debouncedMinPrice, debouncedMaxPrice, sortBy]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <aside className="w-full md:w-60 lg:w-64 px-0 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
-        <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 w-full">
-          <div className="flex justify-between items-center mb-4 h-8">
-            <h1 className="text-2xl m-0">Filters</h1>
+    <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto my-4 sm:my-5 md:my-6 p-4 sm:p-5 md:p-6 lg:p-7 text-gray-900">
+      {/* Mobile Filter Toggle Button */}
+      <div className="md:hidden mb-4 flex items-center justify-between">
+        <button
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-xl shadow-[0_4px_15px_rgba(234,179,8,0.3)] hover:shadow-[0_6px_20px_rgba(234,179,8,0.4)] transition-all duration-300 font-semibold text-sm"
+          aria-label="Toggle filters"
+        >
+          <FiFilter className="text-lg" />
+          <span>Filters</span>
+          {hasActiveFilters && (
+            <span className="bg-white text-yellow-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+              !
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Filter Overlay */}
+      {showMobileFilters && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-50 flex items-start justify-center overflow-y-auto"
+          onClick={() => setShowMobileFilters(false)}
+        >
+          <div
+            className="w-full max-w-sm bg-white rounded-t-3xl mt-auto shadow-2xl p-5 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-xl font-bold text-yellow-600 m-0">Filters</h1>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="p-2 rounded-lg hover:bg-yellow-50 transition-colors"
+                aria-label="Close filters"
+              >
+                <IoClose className="text-2xl text-gray-600" />
+              </button>
+            </div>
+            {hasActiveFilters && (
+              <div className="mb-4">
+                <ProductButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    clearAllFilters();
+                    setShowMobileFilters(false);
+                  }}
+                  className="text-yellow-600 hover:text-yellow-700 w-full"
+                  aria-label="Clear all filters"
+                >
+                  Clear All
+                </ProductButton>
+              </div>
+            )}
+
+            <FilterSection
+              title="Categories"
+              options={categories}
+              selectedValue={selectedCategory}
+              filterType="category"
+              showAll={showAllCategories}
+              onToggleShowAll={() => setShowAllCategories(!showAllCategories)}
+            />
+
+            <FilterSection
+              title="Colors"
+              options={colors}
+              selectedValue={selectedColor}
+              filterType="color"
+              showAll={showAllColors}
+              onToggleShowAll={() => setShowAllColors(!showAllColors)}
+            />
+
+            <FilterSection
+              title="Sizes"
+              options={sizes}
+              selectedValue={selectedSize}
+              filterType="size"
+              showAll={showAllSizes}
+              onToggleShowAll={() => setShowAllSizes(!showAllSizes)}
+            />
+
+            {/* Price Range Filter */}
+            <fieldset className="mb-3 border-2 border-yellow-200/60 rounded-xl p-3 bg-gradient-to-br from-white to-yellow-50/20 shadow-[0_2px_8px_rgba(234,179,8,0.1)]">
+              <legend className="text-sm font-bold text-yellow-700 px-2">Price Range</legend>
+              {priceRange.max > 0 ? (
+                <div className="space-y-4 mt-2">
+                  {/* Min Price Slider */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-gray-700">Min Price</label>
+                      <span className="text-xs font-semibold text-yellow-700">{formatPrice(Number(minPrice) || priceRange.min)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={priceRange.min}
+                      max={priceRange.max}
+                      step={Math.max(1000, Math.floor((priceRange.max - priceRange.min) / 100))}
+                      value={minPrice || priceRange.min}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (value <= (Number(maxPrice) || priceRange.max)) {
+                          handleFilterChange("minPrice", value);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-600 transition-all duration-200"
+                      style={{
+                        background: `linear-gradient(to right, #fbbf24 0%, #fbbf24 ${((Number(minPrice) || priceRange.min) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #e5e7eb ${((Number(minPrice) || priceRange.min) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                  </div>
+
+                  {/* Max Price Slider */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-gray-700">Max Price</label>
+                      <span className="text-xs font-semibold text-yellow-700">{formatPrice(Number(maxPrice) || priceRange.max)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={priceRange.min}
+                      max={priceRange.max}
+                      step={Math.max(1000, Math.floor((priceRange.max - priceRange.min) / 100))}
+                      value={maxPrice || priceRange.max}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (value >= (Number(minPrice) || priceRange.min)) {
+                          handleFilterChange("maxPrice", value);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-600 transition-all duration-200"
+                      style={{
+                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${((Number(maxPrice) || priceRange.max) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #fbbf24 ${((Number(maxPrice) || priceRange.max) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #fbbf24 100%)`
+                      }}
+                    />
+                  </div>
+
+                  {/* Price Range Display */}
+                  <div className="text-xs text-gray-600 bg-yellow-50/50 p-2 rounded-lg border border-yellow-200/50 text-center">
+                    <span className="font-semibold text-yellow-700">
+                      {formatPrice(Number(minPrice) || priceRange.min)} - {formatPrice(Number(maxPrice) || priceRange.max)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500 mt-2">Loading price range...</p>
+              )}
+            </fieldset>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Filter Sidebar */}
+      <aside className="hidden md:block w-full md:w-56 lg:w-64 px-0 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
+        <div className="bg-gradient-to-br from-white via-yellow-50/20 to-white rounded-2xl p-4 sm:p-5 md:p-5 shadow-[0_8px_30px_rgba(234,179,8,0.15)] border border-yellow-100/50 w-full sticky top-4">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-yellow-600 m-0">Filters</h1>
             {hasActiveFilters && (
               <ProductButton
-                variant="default"
+                variant="secondary"
                 size="sm"
                 onClick={clearAllFilters}
-                className="text-blue-600"
+                className="text-yellow-600 hover:text-yellow-700"
                 aria-label="Clear all filters"
               >
                 Clear All
@@ -521,6 +719,8 @@ const ProductList = () => {
             options={categories}
             selectedValue={selectedCategory}
             filterType="category"
+            showAll={showAllCategories}
+            onToggleShowAll={() => setShowAllCategories(!showAllCategories)}
           />
 
           <FilterSection
@@ -528,6 +728,8 @@ const ProductList = () => {
             options={colors}
             selectedValue={selectedColor}
             filterType="color"
+            showAll={showAllColors}
+            onToggleShowAll={() => setShowAllColors(!showAllColors)}
           />
 
           <FilterSection
@@ -535,60 +737,93 @@ const ProductList = () => {
             options={sizes}
             selectedValue={selectedSize}
             filterType="size"
+            showAll={showAllSizes}
+            onToggleShowAll={() => setShowAllSizes(!showAllSizes)}
           />
 
           {/* Price Range Filter */}
-          <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
-            <legend className="text-md font-semibold">Price Range</legend>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium mb-2">Min Price (VND)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1000"
-                  value={minPrice}
-                  onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-                  placeholder={priceRange.min > 0 ? priceRange.min.toString() : ""}
-                  className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
-                />
+          <fieldset className="mb-3 border-2 border-yellow-200/60 rounded-xl p-3 bg-gradient-to-br from-white to-yellow-50/20 shadow-[0_2px_8px_rgba(234,179,8,0.1)]">
+            <legend className="text-sm font-bold text-yellow-700 px-2">Price Range</legend>
+            {priceRange.max > 0 ? (
+              <div className="space-y-4 mt-2">
+                {/* Min Price Slider */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-semibold text-gray-700">Min Price</label>
+                    <span className="text-xs font-semibold text-yellow-700">{formatPrice(Number(minPrice) || priceRange.min)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={priceRange.min}
+                    max={priceRange.max}
+                    step={Math.max(1000, Math.floor((priceRange.max - priceRange.min) / 100))}
+                    value={minPrice || priceRange.min}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value <= (Number(maxPrice) || priceRange.max)) {
+                        handleFilterChange("minPrice", value);
+                      }
+                    }}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-600 transition-all duration-200"
+                    style={{
+                      background: `linear-gradient(to right, #fbbf24 0%, #fbbf24 ${((Number(minPrice) || priceRange.min) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #e5e7eb ${((Number(minPrice) || priceRange.min) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #e5e7eb 100%)`
+                    }}
+                  />
+                </div>
+
+                {/* Max Price Slider */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-semibold text-gray-700">Max Price</label>
+                    <span className="text-xs font-semibold text-yellow-700">{formatPrice(Number(maxPrice) || priceRange.max)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={priceRange.min}
+                    max={priceRange.max}
+                    step={Math.max(1000, Math.floor((priceRange.max - priceRange.min) / 100))}
+                    value={maxPrice || priceRange.max}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value >= (Number(minPrice) || priceRange.min)) {
+                        handleFilterChange("maxPrice", value);
+                      }
+                    }}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-600 transition-all duration-200"
+                    style={{
+                      background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${((Number(maxPrice) || priceRange.max) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #fbbf24 ${((Number(maxPrice) || priceRange.max) - priceRange.min) / (priceRange.max - priceRange.min) * 100}%, #fbbf24 100%)`
+                    }}
+                  />
+                </div>
+
+                {/* Price Range Display */}
+                <div className="text-xs text-gray-600 bg-yellow-50/50 p-2 rounded-lg border border-yellow-200/50 text-center">
+                  <span className="font-semibold text-yellow-700">
+                    {formatPrice(Number(minPrice) || priceRange.min)} - {formatPrice(Number(maxPrice) || priceRange.max)}
+                  </span>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Max Price (VND)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1000"
-                  value={maxPrice}
-                  onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-                  placeholder={priceRange.max > 0 ? priceRange.max.toString() : ""}
-                  className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
-                />
-              </div>
-              {priceRange.max > 0 && (
-                <p className="text-xs text-gray-500">
-                  Range: {formatPrice(priceRange.min)} - {formatPrice(priceRange.max)}
-                </p>
-              )}
-            </div>
+            ) : (
+              <p className="text-xs text-gray-500 mt-2">Loading price range...</p>
+            )}
           </fieldset>
         </div>
       </aside>
 
       <main className="flex-1 px-0 md:px-4 min-w-0" role="main">
-        <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
-          <header className="mb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
-              <h1 className="text-xl sm:text-2xl font-normal m-0">Product Listings</h1>
-              <div className="flex items-center gap-2">
-                <label htmlFor="sortBy" className="text-sm font-medium text-gray-700">
+        <section className="bg-gradient-to-br from-white via-yellow-50/20 to-white rounded-3xl p-5 sm:p-6 md:p-7 shadow-[0_8px_30px_rgba(234,179,8,0.15)] border border-yellow-100/50">
+          <header className="mb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 m-0">Product Listings</h1>
+              <div className="flex items-center gap-3">
+                <label htmlFor="sortBy" className="text-sm font-semibold text-gray-700">
                   Sort by:
                 </label>
                 <select
                   id="sortBy"
                   value={sortBy}
                   onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                  className="px-4 py-2.5 border-2 border-yellow-200/60 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-yellow-50/50 hover:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 bg-white text-gray-700 shadow-[0_2px_8px_rgba(234,179,8,0.1)]"
                   aria-label="Sort products"
                 >
                   <option value="name">Name (A-Z)</option>
@@ -599,51 +834,52 @@ const ProductList = () => {
                 </select>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 mb-3 leading-relaxed">
               Explore our range of products below. Select a product to view detailed information,
               pricing, and available variations.
             </p>
             {activeProducts.length > 0 && !loading && !isFiltering && (
-              <p className="text-sm text-gray-600 mb-4">
-                Showing {activeProducts.length} product{activeProducts.length !== 1 ? "s" : ""}
-                {hasActiveFilters && " matching your filters"}
+              <p className="text-sm text-gray-600 mb-4 bg-yellow-50/50 px-4 py-2 rounded-lg border border-yellow-200/50 inline-block">
+                Showing <span className="font-semibold text-yellow-700">{activeProducts.length}</span> product{activeProducts.length !== 1 ? "s" : ""}
+                {hasActiveFilters && <span className="text-yellow-600"> matching your filters</span>}
               </p>
             )}
           </header>
 
           {error && (
-            <div 
+            <div
               ref={errorRef}
-              className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" 
-              role="alert" 
-              tabIndex={0} 
+              className="text-center text-sm sm:text-base text-red-700 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border-2 border-red-200 rounded-3xl p-5 sm:p-6 md:p-7 mb-4 sm:mb-5 w-full flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 shadow-[0_8px_30px_rgba(239,68,68,0.2)]"
+              role="alert"
+              tabIndex={0}
               aria-live="polite"
             >
-              <span className="text-lg" aria-hidden="true">⚠</span>
-              {error}
+              <span className="text-2xl sm:text-3xl" aria-hidden="true">😊</span>
+              <span className="font-medium">{error}</span>
               <ProductButton
-                variant="default"
+                variant="secondary"
                 size="sm"
                 onClick={handleRetry}
                 disabled={loading}
-                className="text-blue-600"
+                className="mt-2 sm:mt-0 rounded-full px-4 py-2 text-sm"
                 aria-label="Retry loading products"
               >
-                Retry
+                Try Again
               </ProductButton>
             </div>
           )}
 
           {/* Product Grid Section - Always visible */}
           {!loading && !isFiltering && activeProducts.length === 0 && !error && (
-            <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
-              <p>No active products found for selected filters</p>
+            <div className="text-center text-sm sm:text-base text-gray-600 bg-gradient-to-br from-gray-50 to-yellow-50/30 border-2 border-yellow-200/60 rounded-3xl p-8 sm:p-10 md:p-12 mb-4 sm:mb-5 w-full min-h-[200px] flex flex-col items-center justify-center gap-5 shadow-[0_4px_15px_rgba(234,179,8,0.1)]" role="status">
+              <span className="text-4xl sm:text-5xl" aria-hidden="true">🔍</span>
+              <p className="font-medium text-lg">No active products found for selected filters</p>
               {hasActiveFilters && (
                 <ProductButton
-                  variant="default"
-                  size="sm"
+                  variant="secondary"
+                  size="md"
                   onClick={clearAllFilters}
-                  className="text-blue-600"
+                  className="text-yellow-600 hover:text-yellow-700 rounded-full"
                 >
                   Clear Filters
                 </ProductButton>
@@ -652,7 +888,7 @@ const ProductList = () => {
           )}
 
           <div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 justify-between"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5"
             role="grid"
             aria-label={(loading || isFiltering) ? "Loading products" : `${activeProducts.length} products`}
           >
