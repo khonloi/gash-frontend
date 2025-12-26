@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import { SOCKET_URL } from '../../common/axiosClient';
 import Api from '../../common/SummaryAPI';
 
-const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }) => {
+const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true, isMobile = false }) => {
     const { user } = useContext(AuthContext);
     // Keep reactionCounts for WebSocket updates (even though we don't display counts)
     // eslint-disable-next-line no-unused-vars
@@ -523,6 +523,47 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
         document.body
     );
 
+    // ============= MOBILE TIKTOK-STYLE VERTICAL REACTIONS =============
+    if (isMobile) {
+        return (
+            <>
+                {/* Floating Reactions Portal */}
+                {floatingReactionsPortal}
+
+                {/* Mobile Vertical Reactions - Right side */}
+                <div className="flex flex-col items-center gap-3">
+                    {/* Like/Heart button - Main reaction */}
+                    <button
+                        className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
+                        onMouseDown={(e) => handleMouseDown('love', e)}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        onTouchStart={(e) => handleMouseDown('love', e)}
+                        onTouchEnd={handleMouseUp}
+                    >
+                        <Favorite className="w-6 h-6 text-red-500" />
+                    </button>
+
+                    {/* Other reactions */}
+                    {REACTION_TYPES.filter(t => t !== 'love').slice(0, 4).map((type) => (
+                        <button
+                            key={type}
+                            className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
+                            onMouseDown={(e) => handleMouseDown(type, e)}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseUp}
+                            onTouchStart={(e) => handleMouseDown(type, e)}
+                            onTouchEnd={handleMouseUp}
+                        >
+                            <span className="text-xl">{REACTION_EMOJIS[type]}</span>
+                        </button>
+                    ))}
+                </div>
+            </>
+        );
+    }
+
+    // ============= DESKTOP UI (unchanged) =============
     return (
         <>
             {/* Floating Reactions Portal - Rendered outside component tree to ensure correct z-index */}

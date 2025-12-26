@@ -31,6 +31,8 @@ const LiveStreamDetail = () => {
 
     // Detect mobile on mount
     const [isMobile, setIsMobile] = useState(false);
+    // Mobile TikTok-style: show floating product
+    const [showMobileProduct, setShowMobileProduct] = useState(false);
 
     // Generate unique tab ID for this instance (to handle multiple tabs from same account)
     useEffect(() => {
@@ -48,11 +50,11 @@ const LiveStreamDetail = () => {
         const checkMobile = () => {
             const mobile = window.innerWidth < 768;
             setIsMobile(mobile);
-            // On mobile, hide panels by default for better video viewing experience
+            // On mobile TikTok style: show comments overlay by default
             if (mobile) {
                 setShowInfo(false);
                 setShowProducts(false);
-                setShowComments(false);
+                setShowComments(true); // Show comments overlay on mobile
             }
         };
         checkMobile();
@@ -1117,329 +1119,473 @@ const LiveStreamDetail = () => {
                     }
                 }}
             >
-                <div
-                    className={`relative bg-black/90 backdrop-blur-xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50
+                {/* ============= MOBILE TIKTOK-STYLE UI ============= */}
+                {isMobile ? (
+                    <div className="relative w-full h-full bg-black" ref={containerRef}>
+                        {/* Fullscreen Video */}
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            playsInline
+                            controls={false}
+                            muted={false}
+                            className="w-full h-full object-cover"
+                            style={{ backgroundColor: '#000' }}
+                            onError={(e) => console.error('Video error:', e)}
+                        />
+
+                        {/* Gradient overlay for better text visibility */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
+
+                        {/* Top Bar - Back button, Live status, Host info */}
+                        <div className="absolute top-0 left-0 right-0 p-3 flex items-start justify-between z-20">
+                            {/* Left: Back + Host Info */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={goBack}
+                                    className="bg-black/40 backdrop-blur-md text-white p-2 rounded-full active:bg-black/60"
+                                >
+                                    <ArrowBack className="w-5 h-5" />
+                                </button>
+
+                                {/* Host Info */}
+                                {selectedStream?.hostId && (
+                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full pl-1 pr-3 py-1">
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-xs font-bold">
+                                            {(selectedStream.hostId?.name || 'H').charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p className="text-white text-xs font-semibold leading-tight">
+                                                {selectedStream.hostId?.name || 'Host'}
+                                            </p>
+                                            <p className="text-white/60 text-[10px] leading-tight">Host</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Right: Live Badge + Viewers */}
+                            <div className="flex flex-col items-end gap-1.5">
+                                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${connectionState === 'connected'
+                                    ? 'bg-red-500 text-white'
+                                    : connectionState === 'connecting'
+                                        ? 'bg-yellow-500 text-white'
+                                        : 'bg-gray-600 text-white'
+                                    }`}>
+                                    <div className={`w-1.5 h-1.5 rounded-full bg-white ${connectionState === 'connected' ? 'animate-pulse' : ''}`} />
+                                    {connectionState === 'connected' ? 'LIVE' : connectionState === 'connecting' ? '...' : 'ENDED'}
+                                </div>
+
+                                <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full">
+                                    <Videocam className="w-3 h-3 text-white" />
+                                    <span className="text-white text-[10px] font-medium">{remoteParticipants.length}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Floating Product Card (TikTok style) - Above comments */}
+                        {showMobileProduct && (selectedStream?._id || id) && (
+                            <div className="absolute left-3 right-3 bottom-[45%] z-30 animate-fade-in">
+                                <LiveStreamProducts
+                                    key={`products-mobile-${selectedStream?._id || id}`}
+                                    liveId={selectedStream?._id || id}
+                                    isMobileFloating={true}
+                                    onClose={() => setShowMobileProduct(false)}
+                                />
+                            </div>
+                        )}
+
+                        {/* Comments Overlay (TikTok style - bottom left) */}
+                        {(selectedStream?._id || id) && (
+                            <LiveStreamComments
+                                liveId={selectedStream?._id || id}
+                                hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
+                                isVisible={showComments}
+                                onToggle={() => setShowComments(!showComments)}
+                                isMobile={true}
+                                onShowProducts={() => setShowMobileProduct(!showMobileProduct)}
+                                showMobileProduct={showMobileProduct}
+                                onShowInfo={() => setShowInfo(true)}
+                            />
+                        )}
+
+                        {/* Mobile Info Panel (Full screen overlay) */}
+                        {showInfo && selectedStream && (
+                            <>
+                                <div
+                                    className="fixed inset-0 bg-black/60 z-[60]"
+                                    onClick={() => setShowInfo(false)}
+                                />
+                                <div className="fixed bottom-0 left-0 right-0 bg-gray-900 rounded-t-3xl z-[61] max-h-[70vh] overflow-hidden animate-slide-up">
+                                    <div className="flex justify-center pt-2 pb-1">
+                                        <div className="w-10 h-1 bg-gray-600 rounded-full" />
+                                    </div>
+                                    <div className="p-4 space-y-3 overflow-y-auto max-h-[calc(70vh-3rem)]">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-white font-bold text-lg">Livestream Info</h3>
+                                            <button onClick={() => setShowInfo(false)} className="text-white/60 p-1">
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div className="bg-gray-800/50 p-3 rounded-xl">
+                                            <h4 className="text-white font-semibold mb-1">{selectedStream.title || 'Untitled'}</h4>
+                                            {selectedStream.description && (
+                                                <p className="text-gray-400 text-sm">{selectedStream.description}</p>
+                                            )}
+                                        </div>
+
+                                        {selectedStream.hostId && (
+                                            <div className="flex items-center gap-3 bg-gray-800/50 p-3 rounded-xl">
+                                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-lg font-bold">
+                                                    {(selectedStream.hostId?.name || 'H').charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <p className="text-white font-semibold">{selectedStream.hostId?.name || 'Unknown Host'}</p>
+                                                    <p className="text-gray-400 text-sm">Host</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="bg-gray-800/50 p-3 rounded-xl">
+                                            <p className="text-gray-400 text-xs mb-1">Started at</p>
+                                            <p className="text-white font-medium">{formatDateTime(selectedStream.startTime)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Ended Overlay */}
+                        {connectionState !== 'connected' && !streamEnded && (
+                            <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
+                                <div className="text-center text-white p-6">
+                                    <div className="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <LiveTv className="w-10 h-10 text-gray-400" />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">Livestream has ended</h3>
+                                    <p className="text-gray-400 mb-6">Thank you for watching!</p>
+                                    <button
+                                        type="button"
+                                        onClick={goBack}
+                                        className="px-6 py-2.5 bg-red-500 text-white rounded-full font-medium"
+                                    >
+                                        Go Back
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    /* ============= DESKTOP UI (unchanged) ============= */
+                    <>
+                        <div
+                            className={`relative bg-black/90 backdrop-blur-xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50
                         w-full h-full md:w-auto md:h-auto
                         rounded-none md:rounded-2xl
                         ${showInfo ? 'md:ml-80' : ''}
                         ${showComments && showProducts
-                            ? 'md:mr-[640px]'
-                            : showComments
-                                ? 'md:mr-[352px]'
-                                : showProducts
-                                    ? 'md:mr-[288px]'
-                                    : ''
-                        }
+                                    ? 'md:mr-[640px]'
+                                    : showComments
+                                        ? 'md:mr-[352px]'
+                                        : showProducts
+                                            ? 'md:mr-[288px]'
+                                            : ''
+                                }
                     `}
-                    style={{
-                        width: showInfo && showComments && showProducts
-                            ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
-                            : showInfo && showComments
-                                ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
-                                : showInfo && showProducts
-                                    ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
-                                    : showInfo
-                                        ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
-                                        : showComments && showProducts
-                                            ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
-                                            : showComments
-                                                ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
-                                                : showProducts
-                                                    ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
-                                                    : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
-                        aspectRatio: '9/16',
-                        maxWidth: '90vw',
-                        maxHeight: 'calc(100vh - 2rem)'
-                    }}
-                    ref={containerRef}
-                    onClick={(e) => {
-                        // Prevent any navigation or reload from container clicks
-                        const target = e.target;
-                        if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'SVG' || target.closest('svg')) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            return false;
-                        }
-                    }}
-                    onMouseDown={(e) => {
-                        // Prevent any mouse down events on buttons from propagating
-                        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                    }}
-                >
-                    <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        controls={false}
-                        muted={false}
-                        className="w-full h-full object-cover cursor-pointer"
-                        style={{ backgroundColor: '#000' }}
-                        onError={(e) => console.error('Video error:', e)}
-                        onClick={(e) => {
-                            // Prevent video clicks from bubbling up
-                            e.stopPropagation();
-                        }}
-                    />
+                            style={{
+                                width: showInfo && showComments && showProducts
+                                    ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
+                                    : showInfo && showComments
+                                        ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
+                                        : showInfo && showProducts
+                                            ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
+                                            : showInfo
+                                                ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
+                                                : showComments && showProducts
+                                                    ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
+                                                    : showComments
+                                                        ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
+                                                        : showProducts
+                                                            ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
+                                                            : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
+                                aspectRatio: '9/16',
+                                maxWidth: '90vw',
+                                maxHeight: 'calc(100vh - 2rem)'
+                            }}
+                            ref={containerRef}
+                            onClick={(e) => {
+                                const target = e.target;
+                                if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'SVG' || target.closest('svg')) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    return false;
+                                }
+                            }}
+                            onMouseDown={(e) => {
+                                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }
+                            }}
+                        >
+                            <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                controls={false}
+                                muted={false}
+                                className="w-full h-full object-cover cursor-pointer"
+                                style={{ backgroundColor: '#000' }}
+                                onError={(e) => console.error('Video error:', e)}
+                                onClick={(e) => e.stopPropagation()}
+                            />
 
-                    {/* Back Button */}
-                    <button
-                        type="button"
-                        onClick={goBack}
-                        className="absolute top-2 left-2 md:top-3 md:left-3 bg-black/60 backdrop-blur-md text-white p-2 md:p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 z-50 border border-white/10 shadow-lg hover:scale-110 transform active:scale-95"
-                    >
-                        <ArrowBack className="w-4 h-4 md:w-5 md:h-5" />
-                    </button>
+                            {/* Back Button */}
+                            <button
+                                type="button"
+                                onClick={goBack}
+                                className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 z-50 border border-white/10 shadow-lg hover:scale-110 transform active:scale-95"
+                            >
+                                <ArrowBack className="w-5 h-5" />
+                            </button>
 
-                    {/* Status & Viewers */}
-                    <div className="absolute top-2 right-2 md:top-3 md:right-3 flex flex-col items-end gap-2">
-                        <div className={`flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold backdrop-blur-md border transition-all duration-300 shadow-lg ${connectionState === 'connected'
-                            ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white border-red-500/50 animate-pulse'
-                            : connectionState === 'connecting'
-                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-yellow-500/50'
-                                : connectionState === 'error'
-                                    ? 'bg-gradient-to-r from-red-700 to-red-800 text-white border-red-600/50'
-                                    : 'bg-gray-700/80 text-white border-gray-600/50'
-                            }`}>
-                            <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${connectionState === 'connected'
-                                ? 'bg-white animate-ping'
-                                : connectionState === 'connecting'
-                                    ? 'bg-white animate-pulse'
-                                    : 'bg-white'
-                                }`}></div>
-                            <span>
-                                {connectionState === 'connected' ? 'LIVE' :
-                                    connectionState === 'connecting' ? 'CONNECTING' :
-                                        connectionState === 'error' ? 'ERROR' : 'ENDED'}
-                            </span>
+                            {/* Status & Viewers */}
+                            <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
+                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border transition-all duration-300 shadow-lg ${connectionState === 'connected'
+                                    ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white border-red-500/50 animate-pulse'
+                                    : connectionState === 'connecting'
+                                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-yellow-500/50'
+                                        : connectionState === 'error'
+                                            ? 'bg-gradient-to-r from-red-700 to-red-800 text-white border-red-600/50'
+                                            : 'bg-gray-700/80 text-white border-gray-600/50'
+                                    }`}>
+                                    <div className={`w-2 h-2 rounded-full ${connectionState === 'connected'
+                                        ? 'bg-white animate-ping'
+                                        : connectionState === 'connecting'
+                                            ? 'bg-white animate-pulse'
+                                            : 'bg-white'
+                                        }`}></div>
+                                    <span>
+                                        {connectionState === 'connected' ? 'LIVE' :
+                                            connectionState === 'connecting' ? 'CONNECTING' :
+                                                connectionState === 'error' ? 'ERROR' : 'ENDED'}
+                                    </span>
+                                </div>
+
+                                {selectedStream && (
+                                    <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
+                                        <Videocam className="w-4 h-4 text-blue-400" />
+                                        <span className="text-white font-semibold text-sm">{remoteParticipants.length}</span>
+                                        <span className="text-xs text-gray-300">viewers</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Ended Overlay */}
+                            {connectionState !== 'connected' && !streamEnded && (
+                                <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center">
+                                    <div className="text-center text-white">
+                                        <div className="relative mb-6">
+                                            <div className="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mx-auto backdrop-blur-md border border-gray-600/30">
+                                                <LiveTv className="w-10 h-10 text-gray-400" />
+                                            </div>
+                                            <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                                            Livestream has ended
+                                        </h3>
+                                        <p className="text-gray-300 mb-6">Thank you for watching!</p>
+                                        <button
+                                            type="button"
+                                            onClick={goBack}
+                                            className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Controls - Bottom buttons */}
+                            <div
+                                className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-auto z-10"
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInfo(!showInfo)}
+                                        className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showInfo ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border-blue-500/50' : ''
+                                            }`}
+                                    >
+                                        <Info className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowProducts(!showProducts)}
+                                        className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showProducts ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border-green-500/50' : ''
+                                            }`}
+                                    >
+                                        <ShoppingBag className="w-5 h-5" />
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowComments(!showComments)}
+                                        className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
+                                            }`}
+                                    >
+                                        <Chat className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
-                        {selectedStream && (
-                            <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-sm font-medium flex items-center gap-1.5 md:gap-2 border border-white/10 shadow-lg">
-                                <Videocam className="w-3 h-3 md:w-4 md:h-4 text-blue-400" />
-                                <span className="text-white font-semibold text-xs md:text-sm">{remoteParticipants.length}</span>
-                                <span className="text-[10px] md:text-xs text-gray-300">viewers</span>
+                        {/* Info Panel - Left side of Video (Desktop) */}
+                        {showInfo && selectedStream && (
+                            <div className="fixed left-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto border-r border-gray-800/50 transition-transform duration-300">
+                                <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+                                            <Info className="w-4 h-4 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-bold text-sm">Information</h3>
+                                            <p className="text-white/70 text-[10px]">Livestream details</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowInfo(false)}
+                                        className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-livestream">
+                                    <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-3 rounded-lg border border-blue-500/20">
+                                        <h2 className="text-white font-bold text-sm leading-tight">
+                                            {selectedStream.title || 'Untitled Livestream'}
+                                        </h2>
+                                    </div>
+
+                                    {selectedStream.description && (
+                                        <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                                            <h4 className="text-blue-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
+                                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                                                </svg>
+                                                Description
+                                            </h4>
+                                            <p className="text-gray-300 text-xs leading-relaxed">
+                                                {selectedStream.description}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {selectedStream.hostId && (
+                                        <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                                            <h4 className="text-blue-400 text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+                                                </svg>
+                                                Host
+                                            </h4>
+                                            <div>
+                                                <p className="text-white font-semibold text-xs">
+                                                    {selectedStream.hostId?.name || 'Unknown Host'}
+                                                </p>
+                                                {selectedStream.hostId?.email && (
+                                                    <p className="text-gray-400 text-[10px] mt-0.5">{selectedStream.hostId.email}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                                        <h4 className="text-blue-400 text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                                            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                                            </svg>
+                                            Stream Schedule
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {selectedStream.startTime && (
+                                                <div className="flex items-start gap-2">
+                                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                                    <div>
+                                                        <span className="text-gray-400 text-[10px] block mb-0.5">Started</span>
+                                                        <p className="text-white text-xs font-medium">
+                                                            {formatDateTime(selectedStream.startTime)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {selectedStream.endTime && selectedStream.status !== 'live' && (
+                                                <div className="flex items-start gap-2">
+                                                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                                    <div>
+                                                        <span className="text-gray-400 text-[10px] block mb-0.5">Ended</span>
+                                                        <p className="text-white text-xs font-medium">
+                                                            {formatDateTime(selectedStream.endTime)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
-                    </div>
 
-                    {/* Ended Overlay */}
-                    {connectionState !== 'connected' && !streamEnded && (
-                        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center">
-                            <div className="text-center text-white">
-                                <div className="relative mb-6">
-                                    <div className="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mx-auto backdrop-blur-md border border-gray-600/30">
-                                        <LiveTv className="w-10 h-10 text-gray-400" />
-                                    </div>
-                                    <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
-                                </div>
-                                <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                                    Livestream has ended
-                                </h3>
-                                <p className="text-gray-300 mb-6">Thank you for watching!</p>
-                                <button
-                                    type="button"
-                                    onClick={goBack}
-                                    className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Controls - Bottom buttons */}
-                    <div
-                        className="absolute bottom-2 left-2 right-2 md:bottom-3 md:left-3 md:right-3 flex items-center justify-between pointer-events-auto z-10"
-                        onClick={(e) => e.stopPropagation()}
-                        onMouseDown={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex items-center gap-1.5 md:gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowInfo(!showInfo)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2 md:p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showInfo ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border-blue-500/50' : ''
-                                    }`}
-                            >
-                                <Info className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 md:gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowProducts(!showProducts)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2 md:p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showProducts ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border-green-500/50' : ''
-                                    }`}
-                            >
-                                <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setShowComments(!showComments)}
-                                className={`bg-black/60 backdrop-blur-md text-white p-2 md:p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
-                                    }`}
-                            >
-                                <Chat className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* Backdrop for mobile panels */}
-                {(showInfo || showProducts) && (
-                    <div
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[35] md:hidden"
-                        onClick={() => {
-                            setShowInfo(false);
-                            setShowProducts(false);
-                        }}
-                    />
-                )}
-
-                {/* Info Panel - Left side of Video (Desktop) / Overlay (Mobile) */}
-                {showInfo && selectedStream && (
-                    <div className={`fixed left-0 top-0 h-full w-full md:w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto border-r border-gray-800/50 md:border-r-0 transition-transform duration-300 ${isMobile ? (showInfo ? 'translate-x-0' : '-translate-x-full') : ''}`}>
-                        <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                                    <Info className="w-4 h-4 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-white font-bold text-sm">Information</h3>
-                                    <p className="text-white/70 text-[10px]">Livestream details</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setShowInfo(false)}
-                                className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-3 md:p-3 space-y-3 scrollbar-livestream">
-                            {/* Title */}
-                            <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-3 rounded-lg border border-blue-500/20">
-                                <h2 className="text-white font-bold text-base md:text-sm leading-tight">
-                                    {selectedStream.title || 'Untitled Livestream'}
-                                </h2>
-                            </div>
-
-                            {/* Description */}
-                            {selectedStream.description && (
-                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                                    <h4 className="text-blue-400 text-xs md:text-[10px] font-bold mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
-                                        <svg className="w-3 h-3 md:w-2.5 md:h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
-                                        </svg>
-                                        Description
-                                    </h4>
-                                    <p className="text-gray-300 text-sm md:text-xs leading-relaxed">
-                                        {selectedStream.description}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Host Info */}
-                            {selectedStream.hostId && (
-                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                                    <h4 className="text-blue-400 text-xs md:text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                                        <svg className="w-3 h-3 md:w-2.5 md:h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-                                        </svg>
-                                        Host
-                                    </h4>
-                                    <div>
-                                        <p className="text-white font-semibold text-sm md:text-xs">
-                                            {selectedStream.hostId?.name || 'Unknown Host'}
-                                        </p>
-                                        {selectedStream.hostId?.email && (
-                                            <p className="text-gray-400 text-xs md:text-[10px] mt-0.5">{selectedStream.hostId.email}</p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Stream Time */}
-                            <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                                <h4 className="text-blue-400 text-xs md:text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                                    <svg className="w-3 h-3 md:w-2.5 md:h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                                    </svg>
-                                    Stream Schedule
-                                </h4>
-                                <div className="space-y-2">
-                                    {selectedStream.startTime && (
-                                        <div className="flex items-start gap-2">
-                                            <div className="w-2 h-2 md:w-1.5 md:h-1.5 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                                            <div>
-                                                <span className="text-gray-400 text-xs md:text-[10px] block mb-0.5">Started</span>
-                                                <p className="text-white text-sm md:text-xs font-medium">
-                                                    {formatDateTime(selectedStream.startTime)}
-                                                </p>
-                                            </div>
+                        {/* Products Panel - Between Video and Comments (Desktop) */}
+                        {showProducts && (selectedStream?._id || id) && (
+                            <div className={`fixed top-0 h-full w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-[352px]' : 'right-0'} border-l border-gray-800/50 transition-transform duration-300`}>
+                                <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+                                            <ShoppingBag className="w-4 h-4 text-white" />
                                         </div>
-                                    )}
-                                    {selectedStream.endTime && selectedStream.status !== 'live' && (
-                                        <div className="flex items-start gap-2">
-                                            <div className="w-2 h-2 md:w-1.5 md:h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                                            <div>
-                                                <span className="text-gray-400 text-xs md:text-[10px] block mb-0.5">Ended</span>
-                                                <p className="text-white text-sm md:text-xs font-medium">
-                                                    {formatDateTime(selectedStream.endTime)}
-                                                </p>
-                                            </div>
+                                        <div>
+                                            <h3 className="text-white font-bold text-sm">Products</h3>
+                                            <p className="text-white/70 text-[10px]">Featured items</p>
                                         </div>
-                                    )}
+                                    </div>
+                                    <button
+                                        onClick={() => setShowProducts(false)}
+                                        className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
+                                    <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                )}
+                        )}
 
-                {/* Products Panel - Between Video and Comments (Desktop) / Overlay (Mobile) */}
-                {showProducts && (selectedStream?._id || id) && (
-                    <div className={`fixed top-0 h-full w-full md:w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'md:right-[352px] right-0' : 'right-0'
-                        } border-l border-gray-800/50 transition-transform duration-300 ${isMobile ? (showProducts ? 'translate-x-0' : 'translate-x-full') : ''}`}>
-                        <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                                    <ShoppingBag className="w-4 h-4 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-white font-bold text-sm">Products</h3>
-                                    <p className="text-white/70 text-[10px]">Featured items</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setShowProducts(false)}
-                                className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
-                            <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />
-                        </div>
-                    </div>
-                )}
-
-                {/* Comments Panel */}
-                {(selectedStream?._id || id) && (
-                    <LiveStreamComments
-                        liveId={selectedStream?._id || id}
-                        hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
-                        isVisible={showComments}
-                        onToggle={() => setShowComments(!showComments)}
-                    />
+                        {/* Comments Panel (Desktop) */}
+                        {(selectedStream?._id || id) && (
+                            <LiveStreamComments
+                                liveId={selectedStream?._id || id}
+                                hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
+                                isVisible={showComments}
+                                onToggle={() => setShowComments(!showComments)}
+                                isMobile={false}
+                            />
+                        )}
+                    </>
                 )}
             </div>
         </div>

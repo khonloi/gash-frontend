@@ -7,7 +7,7 @@ import Api from '../../common/SummaryAPI';
 import LiveStreamReactions from './LiveStreamReactions';
 
 // ============= CommentInput Component (Inline) =============
-const CommentInput = ({ onSendComment, isSending }) => {
+const CommentInput = ({ onSendComment, isSending, isMobile = false }) => {
     const [commentText, setCommentText] = useState('');
     const maxLength = 100;
 
@@ -29,6 +29,38 @@ const CommentInput = ({ onSendComment, isSending }) => {
         }
     };
 
+    // Mobile TikTok-style input
+    if (isMobile) {
+        return (
+            <div className="p-2 pointer-events-auto">
+                <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+                    <input
+                        type="text"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Say something..."
+                        maxLength={maxLength}
+                        className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2.5 text-white text-sm placeholder-white/50 focus:outline-none focus:border-white/40"
+                        disabled={isSending}
+                    />
+                    <button
+                        type="submit"
+                        disabled={!commentText.trim() || isSending}
+                        className="bg-red-500 disabled:bg-gray-600 text-white p-2.5 rounded-full transition-all"
+                    >
+                        {isSending ? (
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <Send className="w-5 h-5" />
+                        )}
+                    </button>
+                </form>
+            </div>
+        );
+    }
+
+    // Desktop input
     return (
         <div className="bg-gray-900/70 backdrop-blur-sm border-t border-gray-700/50 p-3">
             <form onSubmit={handleSubmit} className="flex gap-2">
@@ -190,7 +222,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
 
 // ============= Main LiveStreamComments Component =============
 
-const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
+const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle, isMobile = false, onShowProducts, showMobileProduct = false, onShowInfo }) => {
     const { user } = useContext(AuthContext);
     const [comments, setComments] = useState([]);
     const [isSending, setIsSending] = useState(false);
@@ -506,6 +538,127 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
     if (!isVisible) return null;
 
+    // ============= MOBILE TIKTOK-STYLE OVERLAY =============
+    if (isMobile) {
+        return (
+            <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+                {/* Right Side Actions (TikTok style) */}
+                <div className="absolute right-3 bottom-20 flex flex-col items-center gap-3 pointer-events-auto">
+                    {/* Products Button */}
+                    {onShowProducts && (
+                        <button
+                            type="button"
+                            onClick={onShowProducts}
+                            className={`flex flex-col items-center gap-0.5 ${showMobileProduct ? 'text-yellow-400' : 'text-white'}`}
+                        >
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center ${showMobileProduct ? 'bg-yellow-500' : 'bg-black/40 backdrop-blur-md'}`}>
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-medium">Shop</span>
+                        </button>
+                    )}
+
+                    {/* Info Button */}
+                    {onShowInfo && (
+                        <button
+                            type="button"
+                            onClick={onShowInfo}
+                            className="flex flex-col items-center gap-0.5 text-white"
+                        >
+                            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-medium">Info</span>
+                        </button>
+                    )}
+
+                    {/* Reactions */}
+                    {liveId && (
+                        <LiveStreamReactions liveId={liveId} horizontal={false} showComments={isVisible} isMobile={true} />
+                    )}
+                </div>
+
+                {/* Comments List - Bottom left overlay */}
+                <div className="absolute left-0 right-16 bottom-16 max-h-[35vh] overflow-hidden pointer-events-auto">
+                    <div
+                        className="overflow-y-auto max-h-[35vh] px-3 space-y-1.5 scrollbar-hide"
+                        ref={commentsContainerRef}
+                    >
+                        {/* Pinned Comment */}
+                        {comments.filter(c => c.isPinned).slice(0, 1).map((comment) => {
+                            const senderData = comment.sender || comment.senderId;
+                            const senderName = senderData?.name || senderData?.username || 'User';
+                            return (
+                                <div key={comment._id} className="flex items-start gap-2 bg-yellow-500/20 backdrop-blur-sm rounded-lg px-2 py-1.5">
+                                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                                        {senderName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-yellow-400 text-xs font-semibold">{senderName}</span>
+                                            <PushPin className="w-3 h-3 text-yellow-400" />
+                                        </div>
+                                        <p className="text-white text-xs break-words">{comment.content}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {/* Regular Comments - Show last 10 */}
+                        {comments
+                            .filter(c => !c.isPinned)
+                            .slice(-10)
+                            .map((comment, index, arr) => {
+                                const senderData = comment.sender || comment.senderId;
+                                const senderName = senderData?.name || senderData?.username || 'User';
+                                const isNew = index >= arr.length - 3;
+                                return (
+                                    <div
+                                        key={comment._id}
+                                        className={`flex items-start gap-2 bg-black/30 backdrop-blur-sm rounded-lg px-2 py-1.5 ${isNew ? 'animate-fade-in' : ''}`}
+                                    >
+                                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                                            {senderName.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <span className="text-white/70 text-xs font-medium">{senderName}</span>
+                                            <p className="text-white text-xs break-words">{comment.content}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        <div ref={commentsEndRef} />
+                    </div>
+                </div>
+
+                {/* Comment Input - Bottom */}
+                <div className="absolute bottom-0 left-0 right-0 pb-safe">
+                    {user ? (
+                        <CommentInput
+                            onSendComment={handleSendComment}
+                            isSending={isSending}
+                            isMobile={true}
+                        />
+                    ) : (
+                        <div className="p-3 pointer-events-auto">
+                            <a
+                                href="/login"
+                                className="block w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2.5 text-white/60 text-sm text-center"
+                            >
+                                Login to comment...
+                            </a>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    // ============= DESKTOP UI (unchanged) =============
     return (
         <div className="fixed right-0 top-0 h-full w-[352px] bg-black/95 backdrop-blur-xl border-l border-gray-800/50 flex flex-col z-[45] shadow-2xl pointer-events-auto">
             <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
@@ -518,15 +671,9 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                         <p className="text-white/70 text-[10px]">Live chat</p>
                     </div>
                 </div>
-                {/* <button
-                    onClick={onToggle}
-                    className="text-white hover:bg-white/20 p-1.5 rounded-full transition-all duration-300 hover:scale-110 transform border border-white/10"
-                >
-                    <Close className="w-4 h-4" />
-                </button> */}
             </div>
 
-            {/* Reactions Section - Same row as header */}
+            {/* Reactions Section */}
             {liveId && (
                 <div className="bg-gradient-to-r from-gray-900/60 via-gray-800/40 to-gray-900/60 border-b border-gray-700/50 p-2 backdrop-blur-sm">
                     <div className="flex justify-center">
@@ -535,10 +682,9 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 </div>
             )}
 
-            {/* Pinned Comments Section - Sticky below reactions */}
+            {/* Pinned Comments Section */}
             {comments.some(c => c.isPinned) && (
                 <div className="bg-yellow-900/30 border-b border-yellow-500/40">
-                    {/* Pinned Comment Content */}
                     <div className="p-3 max-h-40 overflow-y-auto scrollbar-livestream">
                         {comments
                             .filter(c => c.isPinned)
@@ -558,7 +704,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                 </div>
             )}
 
-            {/* Regular Comments Section - Scrollable */}
+            {/* Regular Comments Section */}
             <div
                 className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-livestream"
                 ref={commentsContainerRef}
@@ -585,7 +731,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                         {comments
                             .filter(c => !c.isPinned)
                             .map((comment, index, filteredArray) => {
-                                // Mark last 3 comments as "new" for visual feedback
                                 const isNewComment = index >= filteredArray.length - 3;
                                 return (
                                     <div
