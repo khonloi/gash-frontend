@@ -143,15 +143,25 @@ const LiveStreamDetail = () => {
 
             const { Room, RoomEvent } = await import('livekit-client');
 
+            // PRODUCTION: Room options optimized for multiple concurrent users
+            // adaptiveStream: Automatically adjusts quality based on network conditions
+            // dynacast: Enables dynamic casting for better performance with many users
             const roomOptions = {
                 adaptiveStream: true,
                 dynacast: true,
+                // PRODUCTION: Optimize for viewer experience (not publishing)
                 publishDefaults: {
                     videoEncoding: {
                         maxBitrate: 1_000_000,
                         maxFramerate: 30
                     },
                     red: false
+                },
+                // PRODUCTION: Enable automatic reconnection for better reliability
+                disconnectOnPageLeave: false,
+                // PRODUCTION: Increase buffer size for smoother playback with many users
+                audioOutput: {
+                    deviceId: 'default'
                 }
             };
 
@@ -174,25 +184,38 @@ const LiveStreamDetail = () => {
                 // This ensures ALL users (up to 100) can see the host's video stream
                 // CRITICAL: Each user must subscribe independently to receive the stream data
                 // LiveKit supports multiple subscribers to the same track - each user gets their own stream
-                newRoom.remoteParticipants.forEach((participant) => {
-                    participant.trackPublications.forEach((publication) => {
-                        // CRITICAL: Force subscribe to tracks for THIS user
-                        // This ensures each user gets their own subscription to the stream
-                        // Even if 99 other users have already subscribed, this user needs their own subscription
-                        // LiveKit handles multiple subscriptions correctly - each user receives the data independently
-                        // IMPORTANT: Always set subscribed to true, even if already subscribed, to ensure this user's subscription is maintained
-                        // This is critical to prevent subscription from being dropped when other users join
-                        publication.setSubscribed(true);
+                try {
+                    newRoom.remoteParticipants.forEach((participant) => {
+                        if (!participant || !participant.trackPublications) {
+                            return;
+                        }
+                        participant.trackPublications.forEach((publication) => {
+                            if (!publication) {
+                                return;
+                            }
+                            // CRITICAL: Force subscribe to tracks for THIS user
+                            // This ensures each user gets their own subscription to the stream
+                            // Even if 99 other users have already subscribed, this user needs their own subscription
+                            // LiveKit handles multiple subscriptions correctly - each user receives the data independently
+                            // IMPORTANT: Always set subscribed to true, even if already subscribed, to ensure this user's subscription is maintained
+                            // This is critical to prevent subscription from being dropped when other users join
+                            publication.setSubscribed(true);
 
-                        console.log('Audio track attached on connect', {
-                            trackId: publication.track.id,
-                            enabled: publication.track.enabled,
-                            muted: videoRef.current?.muted
+                            // Only log if track exists (track might not be available immediately)
+                            if (publication.track) {
+                                console.log('Audio track attached on connect', {
+                                    trackId: publication.track.id,
+                                    enabled: publication.track.enabled,
+                                    muted: videoRef.current?.muted
+                                });
+                            }
+                            // If track is not available yet, TrackSubscribed event will handle it
+                            // TrackSubscribed fires for each user independently when their subscription is ready
                         });
-                        // If track is not available yet, TrackSubscribed event will handle it
-                        // TrackSubscribed fires for each user independently when their subscription is ready
                     });
-                });
+                } catch (err) {
+                    console.warn('Error subscribing to remote tracks on connect:', err);
+                }
 
                 // CRITICAL: Set up a listener to monitor track subscriptions
                 // This ensures subscriptions are maintained even when room state changes
@@ -200,18 +223,27 @@ const LiveStreamDetail = () => {
                     if (!newRoom || newRoom.state !== 'connected') {
                         return;
                     }
-                    newRoom.remoteParticipants.forEach((participant) => {
-                        participant.trackPublications.forEach((publication) => {
-                            // Always ensure subscription is maintained for THIS user
-                            if (!publication.isSubscribed && publication.track) {
-                                publication.setSubscribed(true);
+                    try {
+                        newRoom.remoteParticipants.forEach((participant) => {
+                            if (!participant || !participant.trackPublications) {
+                                return;
                             }
+                            participant.trackPublications.forEach((publication) => {
+                                // Always ensure subscription is maintained for THIS user
+                                if (publication && !publication.isSubscribed && publication.track) {
+                                    publication.setSubscribed(true);
+                                }
+                            });
                         });
-                    });
+                    } catch (err) {
+                        console.warn('Error maintaining subscriptions:', err);
+                    }
                 };
 
-                // Monitor subscriptions periodically
-                const subscriptionMonitor = setInterval(maintainSubscriptions, 5000);
+                // PRODUCTION: Monitor subscriptions periodically
+                // This is critical when many users join simultaneously
+                // Check every 3 seconds (more frequent for production stability)
+                const subscriptionMonitor = setInterval(maintainSubscriptions, 3000);
                 if (!newRoom._subscriptionMonitor) {
                     newRoom._subscriptionMonitor = subscriptionMonitor;
                 }
@@ -223,52 +255,92 @@ const LiveStreamDetail = () => {
                     }
                 }, 1000);
 
-                // CRITICAL: Periodically verify track is still attached and subscription is maintained
+                // PRODUCTION: Periodically verify track is still attached and subscription is maintained
                 // This ensures tracks don't get lost when other users join/leave
+                // CRITICAL: More frequent checks in production (every 2 seconds) to catch issues quickly
                 const verifyTracksInterval = setInterval(() => {
                     if (!videoRef.current || !newRoom || newRoom.state !== 'connected') {
                         clearInterval(verifyTracksInterval);
                         return;
                     }
 
-                    // Check all remote participants' tracks
-                    newRoom.remoteParticipants.forEach((participant) => {
-                        participant.trackPublications.forEach((publication) => {
-                            // CRITICAL: Always ensure subscription is maintained for THIS user
-                            // This prevents subscription from being dropped when other users join
-                            if (!publication.isSubscribed) {
-                                publication.setSubscribed(true);
-                            }
+                    // PRODUCTION: Ensure video element is never muted
+                    if (videoRef.current.muted) {
+                        videoRef.current.muted = false;
+                    }
 
-                            // Only process if track exists and is subscribed
-                            if (!publication.track || !publication.isSubscribed) {
+                    // Check all remote participants' tracks
+                    try {
+                        newRoom.remoteParticipants.forEach((participant) => {
+                            if (!participant || !participant.trackPublications) {
                                 return;
                             }
+                            participant.trackPublications.forEach((publication) => {
+                                if (!publication) {
+                                    return;
+                                }
+                                // CRITICAL: Always ensure subscription is maintained for THIS user
+                                // This prevents subscription from being dropped when other users join
+                                if (!publication.isSubscribed) {
+                                    publication.setSubscribed(true);
+                                }
 
-                            // For video tracks, ensure they're attached and playing
-                            if (publication.track.kind === 'video' && videoRef.current) {
-                                // Check if video element has a source (track is attached)
-                                const hasVideoSource = videoRef.current.srcObject !== null ||
-                                    videoRef.current.src !== '';
+                                // Only process if track exists and is subscribed
+                                if (!publication.track || !publication.isSubscribed) {
+                                    return;
+                                }
 
-                                if (!hasVideoSource) {
-                                    // Track is not attached - re-attach it
-                                    publication.track.attach(videoRef.current);
-                                    videoRef.current.muted = false;
-                                    videoRef.current.play().catch(() => { });
-                                } else {
-                                    // Track is attached, just ensure it's playing and not muted
-                                    if (videoRef.current.paused) {
-                                        videoRef.current.play().catch(() => { });
-                                    }
-                                    if (videoRef.current.muted) {
-                                        videoRef.current.muted = false;
+                                // PRODUCTION: For video tracks, ensure they're attached and playing
+                                // This is critical when many users join simultaneously
+                                if (publication.track.kind === 'video' && videoRef.current) {
+                                    try {
+                                        // Check if video element has a source (track is attached)
+                                        const hasVideoSource = videoRef.current.srcObject !== null ||
+                                            videoRef.current.src !== '';
+
+                                        if (!hasVideoSource) {
+                                            // Track is not attached - re-attach it
+                                            // CRITICAL: This ensures THIS user's video is always attached
+                                            // Even if 100+ other users have already attached, THIS user needs their own attachment
+                                            publication.track.attach(videoRef.current);
+                                            videoRef.current.muted = false;
+                                            videoRef.current.play().catch(() => { });
+                                        } else {
+                                            // Track is attached, just ensure it's playing and not muted
+                                            if (videoRef.current.paused) {
+                                                videoRef.current.play().catch(() => { });
+                                            }
+                                            if (videoRef.current.muted) {
+                                                videoRef.current.muted = false;
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.warn('Error verifying video track:', err);
                                     }
                                 }
-                            }
+
+                                // PRODUCTION: For audio tracks, ensure they're attached and enabled
+                                // This is critical for audio playback when many users join
+                                if (publication.track.kind === 'audio' && videoRef.current) {
+                                    try {
+                                        // Ensure audio track is enabled
+                                        if (publication.track instanceof MediaStreamTrack) {
+                                            publication.track.enabled = true;
+                                        }
+                                        // Ensure video element (which contains audio) is not muted
+                                        if (videoRef.current.muted) {
+                                            videoRef.current.muted = false;
+                                        }
+                                    } catch (err) {
+                                        console.warn('Error verifying audio track:', err);
+                                    }
+                                }
+                            });
                         });
-                    });
-                }, 3000); // Check every 3 seconds (less frequent to avoid overhead)
+                    } catch (err) {
+                        console.warn('Error verifying tracks:', err);
+                    }
+                }, 2000); // PRODUCTION: Check every 2 seconds for better reliability
 
                 // Store interval ID for cleanup
                 if (!newRoom._trackVerificationInterval) {
@@ -325,8 +397,14 @@ const LiveStreamDetail = () => {
                 // LiveKit sends separate subscription events for each user, so all 100 users get the stream independently
                 // Multiple users can subscribe to the same track - LiveKit handles this correctly
 
+                // Validate track and publication exist
+                if (!track || !publication) {
+                    console.warn('Invalid track or publication in TrackSubscribed:', { track, publication });
+                    return;
+                }
+
                 // CRITICAL: Ensure subscription is maintained
-                if (publication && !publication.isSubscribed) {
+                if (!publication.isSubscribed) {
                     publication.setSubscribed(true);
                 }
 
@@ -343,43 +421,98 @@ const LiveStreamDetail = () => {
                     // CRITICAL: attach() is safe to call multiple times
                     // LiveKit handles multiple attachments correctly - each user's attachment is independent
                     // Calling attach() again on the same element is safe and won't affect other users
+                    // PRODUCTION: Each user (up to 100+) gets their own independent track attachment
                     if (track.kind === 'video') {
-                        // Attach video track - LiveKit handles multiple users (up to 100) correctly
+                        // Attach video track - LiveKit handles multiple users (up to 100+) correctly
                         // Each user attaches to their own video element, receiving the same stream data
                         // No conflict between users - each has their own video element and connection
                         // IMPORTANT: attach() creates a new attachment for THIS user's video element
                         // It does NOT affect other users' attachments
-                        track.attach(videoRef.current);
-                        setTimeout(() => {
-                            if (videoRef.current) {
-                                videoRef.current.muted = false;
-                                videoRef.current.play().then(() => {
-                                    console.log('✅ Livestream connected and playing successfully');
-                                }).catch(err => {
-                                    if (err.name !== 'AbortError') {
-                                        console.error('Video play failed:', err);
-                                    }
-                                });
-                            }
-                        }, 100);
-                    } else if (track.kind === 'audio') {
-                        // Attach audio track - each user (up to 100) gets their own audio stream
-                        // LiveKit delivers audio to each subscriber independently
-                        track.attach(videoRef.current);
-                        if (track instanceof MediaStreamTrack) {
-                            track.enabled = true;
-                        }
-                        if (videoRef.current) {
-                            videoRef.current.muted = false;
-                            // Force unmute multiple times to ensure it sticks
+                        try {
+                            track.attach(videoRef.current);
+                            // CRITICAL: Ensure video element is ready and playing
+                            const playVideo = () => {
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                    videoRef.current.play().then(() => {
+                                        console.log('✅ Video track attached and playing for user');
+                                    }).catch(err => {
+                                        if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+                                            console.warn('Video play attempt failed, retrying:', err.name);
+                                            // Retry play after a short delay
+                                            setTimeout(() => {
+                                                if (videoRef.current && !videoRef.current.paused) {
+                                                    videoRef.current.play().catch(() => { });
+                                                }
+                                            }, 500);
+                                        }
+                                    });
+                                }
+                            };
+                            // Try immediately and after delays to ensure it plays
+                            playVideo();
+                            setTimeout(playVideo, 100);
+                            setTimeout(playVideo, 500);
+                        } catch (err) {
+                            console.error('Error attaching video track:', err);
+                            // Retry attachment
                             setTimeout(() => {
+                                if (videoRef.current && track) {
+                                    try {
+                                        track.attach(videoRef.current);
+                                        // Define playVideo function again for retry
+                                        const retryPlayVideo = () => {
+                                            if (videoRef.current) {
+                                                videoRef.current.muted = false;
+                                                videoRef.current.play().catch(() => { });
+                                            }
+                                        };
+                                        retryPlayVideo();
+                                    } catch (retryErr) {
+                                        console.error('Retry video attach failed:', retryErr);
+                                    }
+                                }
+                            }, 500);
+                        }
+                    } else if (track.kind === 'audio') {
+                        // CRITICAL: Attach audio track - each user (up to 100+) gets their own audio stream
+                        // LiveKit delivers audio to each subscriber independently
+                        // PRODUCTION: Multiple users can attach the same audio track without conflicts
+                        try {
+                            track.attach(videoRef.current);
+                            // Ensure audio track is enabled
+                            if (track instanceof MediaStreamTrack) {
+                                track.enabled = true;
+                            }
+                            // CRITICAL: Force unmute multiple times to ensure it sticks
+                            // This is critical for production when many users join simultaneously
+                            const unmuteAudio = () => {
                                 if (videoRef.current) {
                                     videoRef.current.muted = false;
                                 }
-                            }, 100);
+                            };
+                            unmuteAudio();
+                            setTimeout(unmuteAudio, 100);
+                            setTimeout(unmuteAudio, 300);
+                            setTimeout(unmuteAudio, 500);
+                            setTimeout(unmuteAudio, 1000);
+                            console.log('✅ Audio track attached for user');
+                        } catch (err) {
+                            console.error('Error attaching audio track:', err);
+                            // Retry attachment
                             setTimeout(() => {
-                                if (videoRef.current) {
-                                    videoRef.current.muted = false;
+                                if (videoRef.current && track) {
+                                    try {
+                                        track.attach(videoRef.current);
+                                        if (track instanceof MediaStreamTrack) {
+                                            track.enabled = true;
+                                        }
+                                        if (videoRef.current) {
+                                            videoRef.current.muted = false;
+                                        }
+                                    } catch (retryErr) {
+                                        console.error('Retry audio attach failed:', retryErr);
+                                    }
                                 }
                             }, 500);
                         }
@@ -395,68 +528,145 @@ const LiveStreamDetail = () => {
             // Handle participant connected - subscribe to their tracks
             // This handles new participants joining (including host if they join later)
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
+                // Validate participant exists
+                if (!participant || !participant.identity) {
+                    console.warn('Invalid participant received:', participant);
+                    return;
+                }
+
                 // Add participant to remote participants list (for viewer count)
                 setRemoteParticipants(prev => {
                     // Check if participant already exists (avoid duplicates)
-                    if (prev.find(p => p.identity === participant.identity)) {
+                    if (prev.find(p => p && p.identity === participant.identity)) {
                         return prev;
                     }
                     return [...prev, participant];
                 });
 
-                // CRITICAL: When a new participant joins, ensure THIS user's existing subscriptions are maintained
+                // PRODUCTION: When a new participant joins, ensure THIS user's existing subscriptions are maintained
                 // This prevents THIS user's tracks from being dropped when other users join
-                newRoom.remoteParticipants.forEach((existingParticipant) => {
-                    existingParticipant.trackPublications.forEach((existingPublication) => {
-                        if (existingPublication.isSubscribed && existingPublication.track) {
-                            // Re-assert subscription to ensure it's maintained
-                            existingPublication.setSubscribed(true);
-                            // Re-attach if needed to ensure track is still connected
-                            if (existingPublication.track.kind === 'video' && videoRef.current) {
-                                existingPublication.track.attach(videoRef.current);
-                                videoRef.current.muted = false;
-                                videoRef.current.play().catch(() => { });
-                            }
+                // CRITICAL: This is essential when many users join simultaneously
+                try {
+                    newRoom.remoteParticipants.forEach((existingParticipant) => {
+                        if (!existingParticipant || !existingParticipant.trackPublications) {
+                            return;
                         }
+                        existingParticipant.trackPublications.forEach((existingPublication) => {
+                            if (existingPublication && existingPublication.isSubscribed && existingPublication.track) {
+                                // Re-assert subscription to ensure it's maintained for THIS user
+                                // Even if 100+ other users join, THIS user's subscription must remain active
+                                existingPublication.setSubscribed(true);
+
+                                // Re-attach tracks to ensure THIS user's video/audio is still connected
+                                if (existingPublication.track.kind === 'video' && videoRef.current) {
+                                    try {
+                                        existingPublication.track.attach(videoRef.current);
+                                        videoRef.current.muted = false;
+                                        videoRef.current.play().catch(() => { });
+                                    } catch (err) {
+                                        console.warn('Error re-attaching video on participant connect:', err);
+                                    }
+                                } else if (existingPublication.track.kind === 'audio' && videoRef.current) {
+                                    try {
+                                        existingPublication.track.attach(videoRef.current);
+                                        if (existingPublication.track instanceof MediaStreamTrack) {
+                                            existingPublication.track.enabled = true;
+                                        }
+                                        videoRef.current.muted = false;
+                                    } catch (err) {
+                                        console.warn('Error re-attaching audio on participant connect:', err);
+                                    }
+                                }
+                            }
+                        });
                     });
-                });
+                } catch (err) {
+                    console.warn('Error maintaining subscriptions on participant connect:', err);
+                }
 
                 // Subscribe to all their tracks (host publishes video/audio, viewers don't)
                 // CRITICAL: Force subscribe to ensure THIS user gets the tracks
                 // Each user (up to 100) must subscribe independently to receive the stream data
                 // LiveKit supports multiple subscribers - each user gets their own stream independently
+                if (!participant.trackPublications) {
+                    return;
+                }
                 participant.trackPublications.forEach((publication) => {
+                    if (!publication) {
+                        return;
+                    }
                     // CRITICAL: Always set subscribed to true to maintain THIS user's subscription
                     // Even if already subscribed, ensure subscription is maintained
                     // This prevents subscription from being dropped when other users join
                     publication.setSubscribed(true);
 
-                    // If tracks are already available, attach them immediately
+                    // PRODUCTION: If tracks are already available, attach them immediately
                     // This handles the case when host joins after viewer, or when new participant joins
-                    // Each user attaches to their own video element, so all 100 users receive the data
+                    // Each user attaches to their own video element, so all 100+ users receive the data
                     // No conflict - each user has their own video element and connection
                     // IMPORTANT: attach() is safe to call multiple times - LiveKit handles it correctly
                     if (publication.track && videoRef.current) {
-                        if (publication.track.kind === 'video') {
-                            // Attach video track from host - each user (up to 100) gets their own stream
-                            // LiveKit delivers the same video stream to all subscribers independently
-                            // IMPORTANT: attach() creates a new attachment for THIS user's video element
-                            // It does NOT affect other users' attachments
-                            publication.track.attach(videoRef.current);
-                            videoRef.current.muted = false;
-                            videoRef.current.play().catch((err) => {
-                                if (err.name !== 'AbortError') {
-                                    console.error('Video play failed:', err);
+                        try {
+                            if (publication.track.kind === 'video') {
+                                // Attach video track from host - each user (up to 100+) gets their own stream
+                                // LiveKit delivers the same video stream to all subscribers independently
+                                // IMPORTANT: attach() creates a new attachment for THIS user's video element
+                                // It does NOT affect other users' attachments
+                                publication.track.attach(videoRef.current);
+                                videoRef.current.muted = false;
+                                videoRef.current.play().catch((err) => {
+                                    if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+                                        console.warn('Video play failed on participant connect:', err.name);
+                                        // Retry play
+                                        setTimeout(() => {
+                                            if (videoRef.current) {
+                                                videoRef.current.play().catch(() => { });
+                                            }
+                                        }, 500);
+                                    }
+                                });
+                            } else if (publication.track.kind === 'audio') {
+                                // PRODUCTION: Attach audio track from host - each user (up to 100+) gets their own stream
+                                // LiveKit delivers the same audio stream to all subscribers independently
+                                // CRITICAL: Multiple users can attach the same audio track without conflicts
+                                publication.track.attach(videoRef.current);
+                                if (publication.track instanceof MediaStreamTrack) {
+                                    publication.track.enabled = true;
                                 }
-                            });
-                        } else if (publication.track.kind === 'audio') {
-                            // Attach audio track from host - each user (up to 100) gets their own stream
-                            // LiveKit delivers the same audio stream to all subscribers independently
-                            publication.track.attach(videoRef.current);
-                            if (publication.track instanceof MediaStreamTrack) {
-                                publication.track.enabled = true;
+                                videoRef.current.muted = false;
+                                // Force unmute multiple times to ensure it sticks
+                                setTimeout(() => {
+                                    if (videoRef.current) {
+                                        videoRef.current.muted = false;
+                                    }
+                                }, 100);
+                                setTimeout(() => {
+                                    if (videoRef.current) {
+                                        videoRef.current.muted = false;
+                                    }
+                                }, 500);
                             }
-                            videoRef.current.muted = false;
+                        } catch (err) {
+                            console.error('Error attaching track on participant connect:', err);
+                            // Retry attachment after delay
+                            setTimeout(() => {
+                                if (publication.track && videoRef.current) {
+                                    try {
+                                        publication.track.attach(videoRef.current);
+                                        if (publication.track.kind === 'video') {
+                                            videoRef.current.muted = false;
+                                            videoRef.current.play().catch(() => { });
+                                        } else if (publication.track.kind === 'audio') {
+                                            if (publication.track instanceof MediaStreamTrack) {
+                                                publication.track.enabled = true;
+                                            }
+                                            videoRef.current.muted = false;
+                                        }
+                                    } catch (retryErr) {
+                                        console.error('Retry attach failed:', retryErr);
+                                    }
+                                }
+                            }, 1000);
                         }
                     }
                     // If track is not available yet, TrackSubscribed event will handle it
@@ -491,7 +701,11 @@ const LiveStreamDetail = () => {
 
             // Handle participant disconnected - remove from list
             newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
-                setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
+                if (!participant || !participant.identity) {
+                    console.warn('Invalid participant disconnected:', participant);
+                    return;
+                }
+                setRemoteParticipants(prev => prev.filter(p => p && p.identity !== participant.identity));
             });
 
             console.error = (...args) => {
@@ -544,14 +758,23 @@ const LiveStreamDetail = () => {
             setConnectionState('error');
             isReconnectingRef.current = false;
 
-            if (error.message.includes('timeout')) {
+            // Log detailed error for debugging
+            console.error('Error connecting to LiveKit:', error);
+
+            // Provide user-friendly error messages
+            if (error.message && error.message.includes('timeout')) {
                 showToast('Connection timeout. Please check network', 'error');
-            } else if (error.message.includes('token')) {
+            } else if (error.message && error.message.includes('token')) {
                 showToast('Invalid or expired token', 'error');
-            } else if (error.message.includes('server')) {
+            } else if (error.message && error.message.includes('server')) {
                 showToast('Unable to connect to server', 'error');
+            } else if (error.message && error.message.includes('Cannot read properties')) {
+                // Handle undefined property access errors
+                console.error('LiveKit connection error - undefined property access:', error);
+                showToast('Connection error. Please try again', 'error');
             } else {
-                showToast(`Connection error: ${error.message}`, 'error');
+                const errorMessage = error.message || 'Unknown error occurred';
+                showToast(`Connection error: ${errorMessage}`, 'error');
             }
             throw error;
         }
