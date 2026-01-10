@@ -554,7 +554,6 @@ const LiveStreamDetail = () => {
                     return;
                 }
 
-                console.log('Participant connected for tab:', tabIdRef.current, 'Participant:', participant.identity);
 
                 // Add participant to remote participants list (for viewer count)
                 setRemoteParticipants(prev => {
@@ -725,7 +724,6 @@ const LiveStreamDetail = () => {
             if (isMountedRef.current) {
                 setRoom(newRoom);
                 roomRef.current = newRoom;
-                console.log('Room connection established for tab:', tabIdRef.current);
             } else {
                 // Component unmounted during connection, disconnect immediately
                 newRoom.disconnect().catch(() => { });
@@ -818,7 +816,6 @@ const LiveStreamDetail = () => {
                     streamDataRef.current = streamData;
                     setSelectedStream(streamData);
                     hasJoinedRef.current = true; // Mark as joined for this tab
-                    console.log('Stream loaded for tab:', tabIdRef.current);
                 } else {
                     showToast('Livestream not found', 'error');
                     navigate('/');
@@ -875,14 +872,12 @@ const LiveStreamDetail = () => {
 
             // Check if already connected (for this tab instance)
             if (roomRef.current && roomRef.current.state === 'connected') {
-                console.log('Already connected for tab:', tabIdRef.current);
                 return;
             }
 
             // Connect to LiveKit - use serverUrl from API response
             // Each tab gets its own connection, even from the same account
             try {
-                console.log('Connecting to LiveKit for tab:', tabIdRef.current);
                 await connectToLiveKit(
                     streamDataRef.current.roomName,
                     streamDataRef.current.viewerToken,
@@ -941,7 +936,6 @@ const LiveStreamDetail = () => {
                             tabId: tabIdRef.current
                         }, token);
                         hasJoinedRef.current = false;
-                        console.log('Left livestream for tab:', tabIdRef.current);
                     } catch (apiError) {
                         console.error('Error calling leave API:', apiError);
                     }
@@ -981,7 +975,6 @@ const LiveStreamDetail = () => {
         return () => {
             // Mark component as unmounted
             isMountedRef.current = false;
-            console.log('Cleaning up tab:', currentTabId);
 
             // Leave livestream if still joined (for this tab instance)
             if (hasJoinedRef.current && selectedStream?._id) {

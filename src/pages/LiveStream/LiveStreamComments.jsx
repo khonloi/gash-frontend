@@ -295,7 +295,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle, isMobile = fa
             if (response.data?.success) {
                 // Comment will be added automatically via WebSocket in real-time
                 // No need to fetch again - WebSocket handles it
-                console.log('Comment sent, waiting for WebSocket update...');
                 // Auto-scroll to bottom after sending comment
                 setTimeout(() => {
                     if (commentsContainerRef.current) {
@@ -343,7 +342,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle, isMobile = fa
 
             if (response.data?.success) {
                 // Comment will be deleted automatically via WebSocket in real-time
-                console.log('Comment deleted, waiting for WebSocket update...');
             } else {
                 setError(response.data?.message || 'Unable to delete comment');
             }
@@ -387,7 +385,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle, isMobile = fa
                     // Check if comment already exists (prevent duplicates)
                     const exists = prev.some(c => c._id === newComment._id);
                     if (exists) {
-                        console.log('⚠️ Duplicate comment ignored:', newComment._id);
                         // Update existing comment to preserve isPinned if it was already set
                         return prev.map(c =>
                             c._id === newComment._id
@@ -405,7 +402,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle, isMobile = fa
                         if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
                         return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                     });
-                    console.log('📝 Real-time comment added via WebSocket:', newComment.commentText?.substring(0, 50));
                     return updated;
                 });
 
@@ -430,7 +426,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle, isMobile = fa
             const currentLiveId = liveId?.toString?.() || liveId;
             if (data?.commentId && dataLiveId === currentLiveId) {
                 setComments(prev => prev.filter(c => c._id !== data.commentId));
-                console.log('🗑️ Comment deleted via WebSocket');
             }
         });
 

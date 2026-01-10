@@ -634,7 +634,6 @@ export default function Header() {
                                                 <button
                                                     onMouseDown={(e) => {
                                                         e.stopPropagation();
-                                                        console.log("Navigating to notifications");
                                                         navigate('/notifications');
                                                         setShowUserMenu(false);
                                                     }}
@@ -655,7 +654,6 @@ export default function Header() {
                                                     <button
                                                         onMouseDown={(e) => {
                                                             e.stopPropagation();
-                                                            console.log("Navigating to profile");
                                                             navigate('/profile');
                                                             setShowUserMenu(false);
                                                         }}
@@ -668,7 +666,6 @@ export default function Header() {
                                                 <button
                                                     onMouseDown={(e) => {
                                                         e.stopPropagation();
-                                                        console.log("Logging out");
                                                         handleLogout();
                                                         setShowUserMenu(false);
                                                     }}
@@ -699,7 +696,6 @@ export default function Header() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => {
-                                    console.log("Search input changed (desktop):", e.target.value);
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
@@ -721,14 +717,12 @@ export default function Header() {
                                         {searchResults.map((item) => {
                                             const minPrice = getMinPrice(item);
                                             const imageUrl = getMainImageUrl(item);
-                                            console.log(`Rendering product (desktop) ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                             return (
                                                 <Link
                                                     key={item._id}
                                                     to={`/product/${item._id}`}
                                                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100 last:border-0"
                                                     onClick={() => {
-                                                        console.log(`Navigating to product (desktop) ${item._id}`);
                                                         setShowDropdown(false);
                                                     }}
                                                 >
@@ -750,7 +744,6 @@ export default function Header() {
                                         })}
                                         <button
                                             onClick={() => {
-                                                console.log("Navigating to full search results (desktop):", search);
                                                 navigate(`/search?q=${encodeURIComponent(search)}`);
                                                 setShowDropdown(false);
                                             }}
@@ -769,7 +762,6 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={async () => {
-                                    console.log("Live Stream clicked");
                                     try {
                                         const token = localStorage.getItem('token');
                                         if (!token) {
@@ -822,7 +814,6 @@ export default function Header() {
                         <div className="relative">
                             <IconButton
                                 onClick={() => {
-                                    console.log("Favorites clicked, user:", !!user);
                                     user ? navigate("/favorites") : navigate("/login");
                                 }}
                                 title="Favorites"
@@ -835,7 +826,6 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={() => {
-                                    console.log("Cart clicked, user:", !!user);
                                     user ? navigate("/cart") : navigate("/login");
                                 }}
                                 title="Cart"
@@ -862,7 +852,6 @@ export default function Header() {
                             <div className="relative">
                                 <button
                                     onClick={() => {
-                                        console.log("Notifications clicked, navigating to login");
                                         navigate("/login");
                                     }}
                                     title="Notifications"
@@ -873,7 +862,6 @@ export default function Header() {
                             </div>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
-                            console.log("Account menu clicked, user:", !!user);
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
                             <button
@@ -892,7 +880,6 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to profile (desktop)");
                                             navigate("/profile");
                                             setShowUserMenu(false);
                                         }}
@@ -903,7 +890,6 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to orders");
                                             navigate("/orders");
                                             setShowUserMenu(false);
                                         }}
@@ -914,7 +900,6 @@ export default function Header() {
                                     {/* <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("My Feedback clicked");
                                             navigate("/feedback");
                                             setShowUserMenu(false);
                                         }}
@@ -925,7 +910,6 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Logging out (desktop)");
                                             handleLogout();
                                             setShowUserMenu(false);
                                         }}

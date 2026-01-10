@@ -219,15 +219,10 @@ export default function NotificationsDropdown({ user }) {
           const nId = n._id?.toString() || n._id;
           const deletedId = notificationId?.toString() || notificationId;
           const shouldKeep = nId !== deletedId;
-          if (!shouldKeep) {
-            console.log("🗑️ Removing notification from list:", { nId, deletedId });
-          }
           return shouldKeep;
         });
 
-        if (filtered.length !== prev.length) {
-          console.log(`Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
-        } else {
+        if (filtered.length === prev.length) {
           console.warn(`⚠️ Notification with ID ${notificationId} not found in current list, refreshing...`);
           // Fallback: refresh the list if notification not found (might be a race condition)
           setTimeout(() => {
@@ -282,12 +277,10 @@ export default function NotificationsDropdown({ user }) {
     // If already connected, emit userConnected immediately
     if (socket.connected) {
       socket.emit("userConnected", user._id);
-      console.log(`🔔 Emitted userConnected immediately for user: ${user._id}`);
     }
 
     // Re-join rooms on reconnect
     const handleReconnect = () => {
-      console.log("🔄 Socket reconnected, rejoining notification rooms");
       socket.emit("userConnected", user._id);
     };
     socket.on("reconnect", handleReconnect);
