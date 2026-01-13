@@ -144,9 +144,9 @@ const ProductFavorite = () => {
 
     const query = searchQuery.toLowerCase().trim();
     return favorites.filter((favorite) => {
-      if (!favorite.pro_id) return false;
+      if (!favorite.productId) return false;
       // Search by product name
-      const productName = favorite.pro_id?.productName?.toLowerCase() || "";
+      const productName = favorite.productId?.productName?.toLowerCase() || "";
       return productName.includes(query);
     });
   }, [favorites, searchQuery]);
@@ -285,10 +285,10 @@ const ProductFavorite = () => {
             ))
           ) : (
             filteredFavorites.map((favorite) => {
-              if (!favorite.pro_id) {
-                return null; // Skip rendering if pro_id is missing
+              if (!favorite.productId) {
+                return null; // Skip rendering if productId is missing
               }
-              const product = favorite.pro_id;
+              const product = favorite.productId;
               return (
                 <FavoriteProductCard
                   key={favorite._id}
@@ -309,8 +309,8 @@ const ProductFavorite = () => {
         isOpen={showDeleteConfirm}
         title="Remove from Favorites"
         message={
-          favoriteToDelete?.favorite?.pro_id
-            ? `Are you sure you want to remove "${favoriteToDelete.favorite.pro_id.productName || "this product"}" from your favorites?`
+          favoriteToDelete?.favorite?.productId
+            ? `Are you sure you want to remove "${favoriteToDelete.favorite.productId.productName || "this product"}" from your favorites?`
             : "Are you sure you want to remove this product from your favorites?"
         }
         confirmText="Remove"

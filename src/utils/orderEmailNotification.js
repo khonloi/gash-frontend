@@ -63,7 +63,7 @@ const buildOrderItemsPayload = (orderInfo) => {
 
   const items = orderInfo.orderDetails
     .map((detail) => {
-      const variant = detail?.variant_id || {};
+      const variant = detail?.variantId || {};
       const productName =
         variant?.productId?.productName ||
         variant?.productName ||
@@ -71,12 +71,12 @@ const buildOrderItemsPayload = (orderInfo) => {
       if (!productName) return null;
 
       const color =
-        variant?.productColorId?.color_name ||
+        variant?.productColorId?.productColorName ||
         variant?.color ||
         detail?.color ||
         '';
       const size =
-        variant?.productSizeId?.size_name ||
+        variant?.productSizeId?.productSizeName ||
         variant?.size ||
         detail?.size ||
         '';
@@ -86,7 +86,7 @@ const buildOrderItemsPayload = (orderInfo) => {
         detail?.qty ??
         1;
       const unitPrice =
-        detail?.UnitPrice ??
+        detail?.unitPrice ??
         detail?.unitPrice ??
         detail?.price ??
         null;
@@ -196,15 +196,15 @@ export async function sendOrderNotificationEmail({
     to_name: userName || userEmail.split('@')[0], // Use provided name or extract from email
     subject: title,
     message: message,
-    order_id: orderId || orderInfo?._id || '', // Order ID (formatted as #XXXXXXXX if provided)
-    order_status: orderInfo?.order_status || orderInfo?.status || '',
-    order_payment_status: orderInfo?.pay_status || orderInfo?.payment_status || '',
+    orderId: orderId || orderInfo?._id || '', // Order ID (formatted as #XXXXXXXX if provided)
+    orderStatus: orderInfo?.orderStatus || orderInfo?.status || '',
+    order_payment_status: orderInfo?.payStatus || orderInfo?.payment_status || '',
     order_shipping_address: orderInfo?.addressReceive || orderInfo?.shippingAddress || '',
     order_recipient_name: orderInfo?.name || orderInfo?.recipientName || '',
     order_total_price: formatCurrency(orderInfo?.totalPrice),
     order_discount_amount: formatCurrency(orderInfo?.discountAmount),
     order_final_price: formatCurrency(orderInfo?.finalPrice),
-    order_updated_at: orderInfo?.updatedAt
+    order_updatedAt: orderInfo?.updatedAt
       ? new Date(orderInfo.updatedAt).toLocaleString('vi-VN')
       : '',
     order_details_text: detailsPayload?.text || '',
@@ -221,6 +221,7 @@ export async function sendOrderNotificationEmail({
     );
 
     if (response.status === 200) {
+      console.log('Order notification email sent successfully to', userEmail);
     } else {
       console.warn('⚠️ Unexpected EmailJS response status:', response.status);
     }
@@ -231,7 +232,7 @@ export async function sendOrderNotificationEmail({
     
     // Log helpful error messages for common issues
     if (error.status === 422) {
-      console.error('   💡 Template variables mismatch. Check your EmailJS template uses: {{to_email}}, {{to_name}}, {{subject}}, {{message}}, {{order_id}}');
+      console.error('   💡 Template variables mismatch. Check your EmailJS template uses: {{to_email}}, {{to_name}}, {{subject}}, {{message}}, {{orderId}}');
     } else if (error.status === 401) {
       console.error('   💡 Unauthorized - Check your EmailJS public key');
     } else if (error.status === 404) {

@@ -55,7 +55,7 @@ const Api = {
   // ==== Cart ====
   cart: {
     fetch: (userId, token) =>
-      axiosClient.get(`/carts?acc_id=${userId}`, {
+      axiosClient.get(`/carts?accountId=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
     addItem: (cartItem, token) =>
@@ -76,7 +76,7 @@ const Api = {
         headers: { Authorization: `Bearer ${token}` },
       }),
     clearCart: async (userId, token) => {
-      const res = await axiosClient.get(`/carts?acc_id=${userId}`, {
+      const res = await axiosClient.get(`/carts?accountId=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const items = Array.isArray(res.data) ? res.data : [];
@@ -236,7 +236,7 @@ const Api = {
   // ==== Products ====
   products: {
     getProduct: (productId) => axiosClient.get(`/products/${productId}`),
-    getVariants: (productId) => axiosClient.get(`/variants?pro_id=${productId}`),
+    getVariants: (productId) => axiosClient.get(`/variants?productId=${productId}`),
     getImages: (productId) => axiosClient.get(`/specifications/image/product/${productId}`),
     getFeedbacks: (productId) => axiosClient.get(`/order-details/product/${productId}`),
     search: (query) => {

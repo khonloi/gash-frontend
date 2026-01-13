@@ -151,10 +151,10 @@ const ProductDetail = () => {
     activeVariants.forEach((variant) => {
       // Only index variants with non-deleted colors and sizes
       const color = variant.productColorId && !variant.productColorId.isDeleted
-        ? variant.productColorId.color_name
+        ? variant.productColorId.productColorName
         : null;
       const size = variant.productSizeId && !variant.productSizeId.isDeleted
-        ? variant.productSizeId.size_name
+        ? variant.productSizeId.productSizeName
         : null;
       if (color) {
         index.byColor[color] = index.byColor[color] || [];
@@ -274,7 +274,7 @@ const ProductDetail = () => {
           ...new Set(
             productVariants
               .filter((v) => v.productColorId && !v.productColorId.isDeleted)
-              .map((v) => v.productColorId?.color_name)
+              .map((v) => v.productColorId?.productColorName)
               .filter(Boolean)
           ),
         ].sort();
@@ -283,7 +283,7 @@ const ProductDetail = () => {
           ...new Set(
             productVariants
               .filter((v) => v.productSizeId && !v.productSizeId.isDeleted)
-              .map((v) => v.productSizeId?.size_name)
+              .map((v) => v.productSizeId?.productSizeName)
               .filter(Boolean)
           ),
         ].sort();
@@ -326,7 +326,7 @@ const ProductDetail = () => {
         const favorites = response.data?.favorites || response.data || [];
 
         const favoriteEntry = favorites.find(fav =>
-          fav.pro_id?._id === id || fav.pro_id === id
+          fav.productId?._id === id || fav.productId === id
         );
 
         if (favoriteEntry) {
@@ -425,8 +425,8 @@ const ProductDetail = () => {
 
       if (thumbnail.variant) {
         const variant = thumbnail.variant;
-        const color = variant.productColorId?.color_name;
-        const size = variant.productSizeId?.size_name;
+        const color = variant.productColorId?.productColorName;
+        const size = variant.productSizeId?.productSizeName;
 
         setSelectedColor(color);
         setSelectedSize(size);
@@ -526,8 +526,8 @@ const ProductDetail = () => {
         showToast("Product removed from favorites successfully", "success", TOAST_TIMEOUT);
       } else {
         const favoriteItem = {
-          acc_id: user._id,
-          pro_id: id,
+          accountId: user._id,
+          productId: id,
         };
         const response = await Api.favorites.add(favoriteItem, token);
         const newFavorite = response.data?.favorite || response.data;
@@ -704,10 +704,10 @@ const ProductDetail = () => {
     (color, size) => {
       const variant = variants.find(v => {
         const variantColor = v.productColorId && !v.productColorId.isDeleted
-          ? v.productColorId.color_name
+          ? v.productColorId.productColorName
           : null;
         const variantSize = v.productSizeId && !v.productSizeId.isDeleted
-          ? v.productSizeId.size_name
+          ? v.productSizeId.productSizeName
           : null;
         return variantColor === color && variantSize === size;
       });
@@ -725,7 +725,7 @@ const ProductDetail = () => {
     (color) => {
       const colorVariants = variants.filter(v => {
         const variantColor = v.productColorId && !v.productColorId.isDeleted
-          ? v.productColorId.color_name
+          ? v.productColorId.productColorName
           : null;
         return variantColor === color;
       });
@@ -744,7 +744,7 @@ const ProductDetail = () => {
     (color) => {
       const colorVariants = variants.filter(v => {
         const variantColor = v.productColorId && !v.productColorId.isDeleted
-          ? v.productColorId.color_name
+          ? v.productColorId.productColorName
           : null;
         return variantColor === color;
       });
@@ -764,10 +764,10 @@ const ProductDetail = () => {
         // Check specific color-size combination
         const variant = variants.find(v => {
           const variantColor = v.productColorId && !v.productColorId.isDeleted
-            ? v.productColorId.color_name
+            ? v.productColorId.productColorName
             : null;
           const variantSize = v.productSizeId && !v.productSizeId.isDeleted
-            ? v.productSizeId.size_name
+            ? v.productSizeId.productSizeName
             : null;
           return variantColor === selectedColor && variantSize === size;
         });
@@ -780,7 +780,7 @@ const ProductDetail = () => {
       // Check all variants with this size
       const sizeVariants = variants.filter(v => {
         const variantSize = v.productSizeId && !v.productSizeId.isDeleted
-          ? v.productSizeId.size_name
+          ? v.productSizeId.productSizeName
           : null;
         return variantSize === size;
       });
@@ -801,10 +801,10 @@ const ProductDetail = () => {
         // Check specific color-size combination
         const variant = variants.find(v => {
           const variantColor = v.productColorId && !v.productColorId.isDeleted
-            ? v.productColorId.color_name
+            ? v.productColorId.productColorName
             : null;
           const variantSize = v.productSizeId && !v.productSizeId.isDeleted
-            ? v.productSizeId.size_name
+            ? v.productSizeId.productSizeName
             : null;
           return variantColor === selectedColor && variantSize === size;
         });
@@ -813,7 +813,7 @@ const ProductDetail = () => {
       // Check all variants with this size
       const sizeVariants = variants.filter(v => {
         const variantSize = v.productSizeId && !v.productSizeId.isDeleted
-          ? v.productSizeId.size_name
+          ? v.productSizeId.productSizeName
           : null;
         return variantSize === size;
       });
@@ -1005,7 +1005,7 @@ const ProductDetail = () => {
   }
 
   // Get category name for breadcrumb
-  const categoryName = product?.categoryId?.cat_name || null;
+  const categoryName = product?.categoryId?.categoryName || null;
   const categoryLink = categoryName 
     ? `/products?category=${encodeURIComponent(categoryName)}`
     : null;

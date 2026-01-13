@@ -163,7 +163,7 @@ export default function Header() {
 
         // Get backend URL
         const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
-
+        
         // Connect to Socket.IO
         const socket = io(baseURL, {
             transports: ["websocket", "polling"],
@@ -177,18 +177,21 @@ export default function Header() {
 
         // Join user's room for targeted updates
         socket.on("connect", () => {
+            console.log("Header Socket connected:", socket.id);
             socket.emit("userConnected", user._id);
             socket.emit("joinRoom", user._id);
         });
 
         // Listen for cart updates
-        socket.on("cartUpdated", () => {
+        socket.on("cartUpdated", (data) => {
+            console.log("🛒 Cart updated via Socket.IO:", data);
             // Immediately fetch updated cart count
             debouncedFetchCartItemCount();
         });
 
         // Listen for livestream count changes
         socket.on("livestreamCountChanged", (data) => {
+            console.log("📺 Livestream count changed via Socket.IO:", data);
             // Update livestream count directly if count is provided, otherwise fetch
             if (typeof data.count === 'number') {
                 setLivestreamCount(data.count);
@@ -199,11 +202,13 @@ export default function Header() {
 
         // Listen for notification updates (already handled by NotificationsDropdown, but keep for consistency)
         socket.on("newNotification", () => {
+            console.log("🔔 New notification via Socket.IO");
             debouncedFetchNotificationCount();
         });
 
         // Listen for notification badge updates (when notifications are marked as read/deleted)
         socket.on("notificationBadgeUpdate", (data) => {
+            console.log("🔔 Notification badge update via Socket.IO:", data);
             // Only update if it's for this user or global
             if (!data.userId || data.userId === user._id) {
                 debouncedFetchNotificationCount();
@@ -211,7 +216,8 @@ export default function Header() {
         });
 
         // Listen for favorite updates
-        socket.on("favoriteUpdated", () => {
+        socket.on("favoriteUpdated", (data) => {
+            console.log("❤️ Favorite updated via Socket.IO:", data);
             // Immediately fetch updated favorite count
             debouncedFetchFavoriteCount();
         });
@@ -282,8 +288,8 @@ export default function Header() {
         debouncedFetchFavoriteCount,
         location,
         user
-    ]);
-
+    ]);       
+    
     useEffect(() => {
         setSearch("");
         setSearchResults([]);
@@ -347,10 +353,12 @@ export default function Header() {
 
     useEffect(() => {
         if (!search.trim()) {
+            console.log("Search input empty, clearing results");
             setSearchResults([]);
             setShowDropdown(false);
             return;
         }
+        console.log("Debouncing search for:", search);
         const debounce = setTimeout(() => fetchSearchResults(search), SEARCH_DEBOUNCE_DELAY);
         return () => clearTimeout(debounce);
     }, [search, fetchSearchResults]);
@@ -405,6 +413,7 @@ export default function Header() {
                                     type="text"
                                     value={search}
                                     onChange={(e) => {
+                                        console.log("Search input changed:", e.target.value);
                                         setSearch(e.target.value);
                                     }}
                                     placeholder="Search..."
@@ -415,6 +424,7 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
+                                            console.log("Clearing search input");
                                             setSearch("");
                                         }}
                                         className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
@@ -425,6 +435,7 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
+                                            console.log("Closing mobile search");
                                             setMobileSearchOpen(false);
                                         }}
                                         className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
@@ -435,7 +446,7 @@ export default function Header() {
                             </form>
                             {showDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
-                                border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out]
+                                border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
                                 max-h-96 overflow-y-auto">
                                     {loading ? (
                                         <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
@@ -447,12 +458,14 @@ export default function Header() {
                                             {searchResults.map((item) => {
                                                 const minPrice = getMinPrice(item);
                                                 const imageUrl = getMainImageUrl(item);
+                                                console.log(`Rendering product ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                                 return (
                                                     <Link
                                                         key={item._id}
                                                         to={`/product/${item._id}`}
-                                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100 last:border-0"
+                                                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                         onClick={() => {
+                                                            console.log(`Navigating to product ${item._id}`);
                                                             setShowDropdown(false);
                                                         }}
                                                     >
@@ -474,10 +487,11 @@ export default function Header() {
                                             })}
                                             <button
                                                 onClick={() => {
+                                                    console.log("Navigating to full search results:", search);
                                                     navigate(`/search?q=${encodeURIComponent(search)}`);
                                                     setShowDropdown(false);
                                                 }}
-                                                className="w-full text-center text-sm font-medium text-amber-600 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-t border-gray-100"
+                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                             >
                                                 View all results
                                             </button>
@@ -490,193 +504,103 @@ export default function Header() {
                         </div>
                     ) : (
                         <>
-                            <div className="flex items-center w-full justify-between relative">
+                            <button
+                                onClick={() => {
+                                    console.log("Opening mobile search");
+                                    setMobileSearchOpen(true);
+                                }}
+                                title="Search"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
+                            >
+                                <SearchIcon />
+                            </button>
+                            <Link to="/" className="flex items-center justify-center">
+                                <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
+                            </Link>
+                            <div className="relative" ref={userMenuRef}>
                                 <button
                                     onClick={() => {
-                                        setMobileSearchOpen(true);
+                                        if (!user) {
+                                            console.log("Navigating to login");
+                                            navigate("/login");
+                                        } else {
+                                            console.log("Toggling user menu");
+                                            setShowUserMenu((prev) => !prev);
+                                        }
                                     }}
-                                    title="Search"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out z-10"
+                                    title="My Account"
+                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                                 >
-                                    <SearchIcon />
+                                    <PermIdentityOutlinedIcon />
                                 </button>
-                                <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10">
-                                    <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
-                                </Link>
-                                <div className="flex items-center gap-1 z-10" ref={userMenuRef}>
-                                    <div className="relative">
+                                {user && showUserMenu && (
+                                    <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                        <div className="px-4 py-2 hover:bg-[#ffb300]/20">
+                                            <NotificationsDropdown user={user} />
+                                        </div>
                                         <button
-                                            onClick={async () => {
-                                                try {
-                                                    const token = localStorage.getItem('token');
-                                                    if (!token) {
-                                                        navigate("/login");
-                                                        return;
-                                                    }
-
-                                                    const response = await Api.livestream.getLiveNow(token);
-
-                                                    if (response.data?.success) {
-                                                        let streams = [];
-
-                                                        if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
-                                                            streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
-                                                        } else if (response.data?.data?.livestream) {
-                                                            const livestream = response.data.data.livestream;
-                                                            if (livestream && livestream.status === 'live') {
-                                                                streams = [livestream];
-                                                            }
-                                                        }
-
-                                                        if (streams.length > 0) {
-                                                            // Navigate to the first live stream
-                                                            navigate(`/live/${streams[0]._id}`);
-                                                        } else {
-                                                            // No live streams available, navigate to list page
-                                                            navigate("/live");
-                                                        }
-                                                    } else {
-                                                        // Fallback to list page if API fails
-                                                        navigate("/live");
-                                                    }
-                                                } catch (error) {
-                                                    console.error("Error fetching live streams:", error);
-                                                    // Fallback to list page on error
-                                                    navigate("/live");
-                                                }
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                console.log("Navigating to cart");
+                                                navigate('/cart');
+                                                setShowUserMenu(false);
                                             }}
-                                            title="Live Stream"
-                                            className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
                                         >
+                                            <ShoppingBagOutlinedIcon fontSize="small" />
+                                            Cart
+                                            {cartItemCount > 0 && (
+                                                <span className={`${badgeClass} top-1 right-4`}>
+                                                    {cartItemCount}
+                                                </span>
+                                            )}
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                console.log("Navigating to notifications");
+                                                navigate('/notifications');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
+                                        >
+                                            <NotificationsOutlinedIcon fontSize="small" />
+                                            Notifications
+                                            {notificationCount > 0 && (
+                                                <span className={`${badgeClass} top-1 right-4`}>
+                                                    {notificationCount}
+                                                </span>
+                                            )}
+                                        </button>
+                                        <Link
+                                            to="/profile"
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
+                                        >
+                                            <button
+                                                onMouseDown={(e) => {
+                                                    e.stopPropagation();
+                                                    console.log("Navigating to profile");
+                                                    navigate('/profile');
+                                                    setShowUserMenu(false);
+                                                }}
+                                                className="flex items-center gap-2 w-full text-left"
+                                            >
+                                                <PermIdentityOutlinedIcon fontSize="small" /> My Account
+                                            </button>
+                                        </Link>
+                                        <button
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                console.log("Logging out");
+                                                handleLogout();
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                                        >
+                                            Sign Out
                                         </button>
                                     </div>
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => {
-                                                if (!user) {
-                                                    navigate("/login");
-                                                } else {
-                                                    setShowUserMenu((prev) => !prev);
-                                                }
-                                            }}
-                                            title="My Account"
-                                            className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
-                                        >
-                                            <PermIdentityOutlinedIcon />
-                                        </button>
-                                        {user && showUserMenu && (
-                                            <div className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                                <button
-                                                    onMouseDown={async (e) => {
-                                                        e.stopPropagation();
-                                                        try {
-                                                            const token = localStorage.getItem('token');
-                                                            if (!token) {
-                                                                navigate("/login");
-                                                                setShowUserMenu(false);
-                                                                return;
-                                                            }
-
-                                                            const response = await Api.livestream.getLiveNow(token);
-
-                                                            if (response.data?.success) {
-                                                                let streams = [];
-
-                                                                if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
-                                                                    streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
-                                                                } else if (response.data?.data?.livestream) {
-                                                                    const livestream = response.data.data.livestream;
-                                                                    if (livestream && livestream.status === 'live') {
-                                                                        streams = [livestream];
-                                                                    }
-                                                                }
-
-                                                                if (streams.length > 0) {
-                                                                    navigate(`/live/${streams[0]._id}`);
-                                                                } else {
-                                                                    navigate("/live");
-                                                                }
-                                                            } else {
-                                                                navigate("/live");
-                                                            }
-                                                        } catch (error) {
-                                                            console.error("Error fetching live streams:", error);
-                                                            navigate("/live");
-                                                        }
-                                                        setShowUserMenu(false);
-                                                    }}
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors relative border-b border-gray-100"
-                                                >
-                                                    <TvOutlinedIcon fontSize="small" />
-                                                    <span className="text-sm font-medium">Live Stream</span>
-                                                    {livestreamCount > 0 && (
-                                                        <span className={`${badgeClass} top-1.5 right-4`}>
-                                                            {livestreamCount}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                                <button
-                                                    onMouseDown={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate('/cart');
-                                                        setShowUserMenu(false);
-                                                    }}
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors relative border-b border-gray-100"
-                                                >
-                                                    <ShoppingBagOutlinedIcon fontSize="small" />
-                                                    <span className="text-sm font-medium">Cart</span>
-                                                    {cartItemCount > 0 && (
-                                                        <span className={`${badgeClass} top-1.5 right-4`}>
-                                                            {cartItemCount}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                                <button
-                                                    onMouseDown={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate('/notifications');
-                                                        setShowUserMenu(false);
-                                                    }}
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors relative border-b border-gray-100"
-                                                >
-                                                    <NotificationsOutlinedIcon fontSize="small" />
-                                                    <span className="text-sm font-medium">Notifications</span>
-                                                    {notificationCount > 0 && (
-                                                        <span className={`${badgeClass} top-1.5 right-4`}>
-                                                            {notificationCount}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                                <Link
-                                                    to="/profile"
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
-                                                >
-                                                    <button
-                                                        onMouseDown={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate('/profile');
-                                                            setShowUserMenu(false);
-                                                        }}
-                                                        className="flex items-center gap-2 w-full text-left"
-                                                    >
-                                                        <PermIdentityOutlinedIcon fontSize="small" />
-                                                        <span className="text-sm font-medium">My Account</span>
-                                                    </button>
-                                                </Link>
-                                                <button
-                                                    onMouseDown={(e) => {
-                                                        e.stopPropagation();
-                                                        handleLogout();
-                                                        setShowUserMenu(false);
-                                                    }}
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
-                                                >
-                                                    <span className="text-sm font-medium">Sign Out</span>
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </>
                     )}
@@ -696,6 +620,7 @@ export default function Header() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => {
+                                    console.log("Search input changed (desktop):", e.target.value);
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
@@ -706,7 +631,7 @@ export default function Header() {
                             </button>
                         </form>
                         {showDropdown && (
-                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out] max-h-96 overflow-y-auto">
+                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out] max-h-96 overflow-y-auto">
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
                                         <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
@@ -717,12 +642,14 @@ export default function Header() {
                                         {searchResults.map((item) => {
                                             const minPrice = getMinPrice(item);
                                             const imageUrl = getMainImageUrl(item);
+                                            console.log(`Rendering product (desktop) ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                             return (
                                                 <Link
                                                     key={item._id}
                                                     to={`/product/${item._id}`}
-                                                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100 last:border-0"
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                     onClick={() => {
+                                                        console.log(`Navigating to product (desktop) ${item._id}`);
                                                         setShowDropdown(false);
                                                     }}
                                                 >
@@ -744,10 +671,11 @@ export default function Header() {
                                         })}
                                         <button
                                             onClick={() => {
+                                                console.log("Navigating to full search results (desktop):", search);
                                                 navigate(`/search?q=${encodeURIComponent(search)}`);
                                                 setShowDropdown(false);
                                             }}
-                                            className="w-full text-center text-sm font-medium text-amber-600 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-t border-gray-100"
+                                            className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                         >
                                             View all results
                                         </button>
@@ -762,18 +690,19 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={async () => {
+                                    console.log("Live Stream clicked");
                                     try {
                                         const token = localStorage.getItem('token');
                                         if (!token) {
                                             navigate("/login");
                                             return;
                                         }
-
+                                        
                                         const response = await Api.livestream.getLiveNow(token);
-
+                                        
                                         if (response.data?.success) {
                                             let streams = [];
-
+                                            
                                             if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
                                                 streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
                                             } else if (response.data?.data?.livestream) {
@@ -782,7 +711,7 @@ export default function Header() {
                                                     streams = [livestream];
                                                 }
                                             }
-
+                                            
                                             if (streams.length > 0) {
                                                 // Navigate to the first live stream
                                                 navigate(`/live/${streams[0]._id}`);
@@ -814,6 +743,7 @@ export default function Header() {
                         <div className="relative">
                             <IconButton
                                 onClick={() => {
+                                    console.log("Favorites clicked, user:", !!user);
                                     user ? navigate("/favorites") : navigate("/login");
                                 }}
                                 title="Favorites"
@@ -826,6 +756,7 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={() => {
+                                    console.log("Cart clicked, user:", !!user);
                                     user ? navigate("/cart") : navigate("/login");
                                 }}
                                 title="Cart"
@@ -852,6 +783,7 @@ export default function Header() {
                             <div className="relative">
                                 <button
                                     onClick={() => {
+                                        console.log("Notifications clicked, navigating to login");
                                         navigate("/login");
                                     }}
                                     title="Notifications"
@@ -862,6 +794,7 @@ export default function Header() {
                             </div>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
+                            console.log("Account menu clicked, user:", !!user);
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
                             <button
@@ -876,46 +809,50 @@ export default function Header() {
                                 </span>
                             )}
                             {user && showUserMenu && (
-                                <div className="absolute right-0 top-full mt-2 w-48 bg-white text-gray-900 rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                <div className="absolute right-0 top-full mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            console.log("Navigating to profile (desktop)");
                                             navigate("/profile");
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
-                                        <span className="text-sm font-medium">My Account</span>
+                                        My Account
                                     </button>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            console.log("Navigating to orders");
                                             navigate("/orders");
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
-                                        <span className="text-sm font-medium">My Orders</span>
+                                        My Orders
                                     </button>
                                     {/* <button
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            console.log("My Feedback clicked");
                                             navigate("/feedback");
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-[#ffb300]/20 transition-colors border-b border-gray-100"
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
-                                        <span className="text-sm font-medium">My Feedback</span>
+                                        My Feedback
                                     </button> */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            console.log("Logging out (desktop)");
                                             handleLogout();
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
+                                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
                                     >
-                                        <span className="text-sm font-medium">Sign Out</span>
+                                        Sign Out
                                     </button>
                                 </div>
                             )}

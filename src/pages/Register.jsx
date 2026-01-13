@@ -18,7 +18,7 @@ const Register = () => {
     password: location.state?.formData?.password || '',
     repeatPassword: location.state?.formData?.repeatPassword || '',
     role: 'user',
-    acc_status: 'active',
+    accountStatus: 'active',
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -62,16 +62,27 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-    const validateForm = useCallback(() => {
-        const username = formData.username.trim();
-        const name = formData.name.trim();
-        const email = formData.email.trim();
-        const phone = formData.phone.trim();
-        const address = formData.address.trim();
-        const password = formData.password.trim();
-        const repeatPassword = formData.repeatPassword.trim();
+  const validateForm = useCallback(() => {
+    const username = formData.username.trim();
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    const phone = formData.phone.trim();
+    const address = formData.address.trim();
+    const password = formData.password.trim();
+    const repeatPassword = formData.repeatPassword.trim();
 
-        // Check required fields
+    console.log('🔍 Form validation:', {
+      username: username.length,
+      name: name.length,
+      email: email,
+      phone: phone,
+      address: address.length,
+      password: password.length,
+      repeatPassword: repeatPassword.length,
+      invalidFile
+    });
+
+    // Check required fields
     if (!username) return 'Please fill in all required fields';
     if (!name) return 'Please fill in all required fields';
     if (!email) return 'Please fill in all required fields';
@@ -121,6 +132,7 @@ const Register = () => {
         // Skip image upload for now to debug register issue
         let imageUrl = '';
         if (selectedFile) {
+          console.log('⚠️ Skipping image upload for debugging');
           // const uploadResponse = await Api.upload.image(selectedFile);
           // imageUrl = uploadResponse.data?.url;
           // if (!imageUrl) {
@@ -130,13 +142,14 @@ const Register = () => {
         }
 
         // Filter out fields that backend doesn't expect
-        const { repeatPassword, role, acc_status, ...filteredFormData } = formData;
+        const { repeatPassword, role, accountStatus, ...filteredFormData } = formData;
         
         const signupData = {
           ...filteredFormData,
           image: imageUrl,
         };
 
+        console.log('📝 Signup data being sent:', signupData);
         await signup(signupData);
         showToast('Register successfully', 'success', 2000);
         

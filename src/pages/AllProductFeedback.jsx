@@ -71,7 +71,7 @@ const AllProductFeedback = () => {
         .sort((a, b) => {
           if (a.customer?.is_current_user && !b.customer?.is_current_user) return -1;
           if (!a.customer?.is_current_user && b.customer?.is_current_user) return 1;
-          return new Date(b.feedback?.created_at || b.order_date) - new Date(a.feedback?.created_at || a.order_date);
+          return new Date(b.feedback?.createdAt || b.order_date) - new Date(a.feedback?.createdAt || a.order_date);
         });
 
       setFeedbacks(validFeedbacks);
@@ -240,7 +240,7 @@ const AllProductFeedback = () => {
               {filteredFeedbacks.slice(0, feedbacksToShow).map(feedback => {
                 const userImg = feedback.customer?.image || null;
                 const variantLabel = `${feedback.variant?.color || 'N/A'} • ${feedback.variant?.size || 'N/A'}`;
-                const dateStr = formatDate(feedback.feedback?.created_at || feedback.order_date);
+                const dateStr = formatDate(feedback.feedback?.createdAt || feedback.order_date);
 
                 return (
                   <article
@@ -299,7 +299,7 @@ const AllProductFeedback = () => {
                     {/* Bottom half: Review content */}
                     <div className="mt-2">
                       {feedback.feedback?.content?.trim() ? (
-                        <p className={`text-sm leading-relaxed m-0 ${feedback.feedback?.is_deleted ? 'text-gray-500 italic' : 'text-gray-700'}`}>
+                        <p className={`text-sm leading-relaxed m-0 ${feedback.feedback?.isDeleted ? 'text-gray-500 italic' : 'text-gray-700'}`}>
                           {feedback.feedback.content}
                         </p>
                       ) : (

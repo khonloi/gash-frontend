@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
@@ -17,6 +17,7 @@ const Feedback = () => {
   const [eligibleItems, setEligibleItems] = useState([]);
   const [filteredEligibleItems, setFilteredEligibleItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -35,11 +36,11 @@ const Feedback = () => {
         order.orderDetails.forEach((detail, index) => {
           // Check for feedback in multiple possible locations
           const feedback = detail.feedback || detail.feedbackId || null;
-
+          
           if (feedback) {
             // Handle both object and ID reference
             const feedbackObj = typeof feedback === 'object' ? feedback : null;
-
+            
             if (feedbackObj) {
               // Check for actual content/rating
               const hasContent = feedbackObj.content && feedbackObj.content.trim() !== '';
@@ -47,51 +48,63 @@ const Feedback = () => {
               // Also check has_* flags if they exist
               const hasContentFlag = feedbackObj.has_content === true;
               const hasRatingFlag = feedbackObj.has_rating === true;
+              const isDeleted = feedbackObj.isDeleted === true;
+
+              console.log(`Processing feedback for order ${order._id}, detail ${index}:`, {
+                hasContent,
+                hasRating,
+                hasContentFlag,
+                hasRatingFlag,
+                isDeleted,
+                feedback: feedbackObj,
+                detail: detail
+              });
+
               // Include feedback ONLY if it has content OR rating (checking both direct values and flags)
               // Filter out feedbacks with no rating and no content
               // Include deleted feedbacks so they can be shown with deletion message (but only if they have rating or content)
               if ((hasContent || hasRating || hasContentFlag || hasRatingFlag)) {
-                // Note: getUserOrdersService returns variant_id (not variant) with populated productId
+                // Note: getUserOrdersService returns variantId (not variant) with populated productId
                 // But getOrder returns variant, so we need to handle both
-                const variantId = detail.variant_id?._id || detail.variant?._id || detail.variant_id || detail.variant || null;
+                const variantId = detail.variantId?._id || detail.variant?._id || detail.variantId || detail.variant || null;
                 const variantKey = variantId || `item_${index}`;
-
+                
                 // Try multiple paths for product information
-                const productName =
-                  detail.variant_id?.productId?.productName ||
-                  detail.variant_id?.productId?.name ||
+                const productName = 
+                  detail.variantId?.productId?.productName || 
+                  detail.variantId?.productId?.name ||
                   detail.variant?.productId?.productName ||
-                  detail.variant?.product?.name ||
+                  detail.variant?.product?.name || 
                   detail.variant?.productId?.name ||
                   "Product (Variant not available)";
-
-                const productImage =
-                  detail.variant_id?.variantImage ||
-                  detail.variant_id?.image ||
-                  detail.variant?.variantImage ||
-                  detail.variant?.image ||
+                
+                const productImage = 
+                  detail.variantId?.variantImage || 
+                  detail.variantId?.image ||
+                  detail.variant?.variantImage || 
+                  detail.variant?.image || 
                   "/placeholder.png";
-
-                const color =
-                  detail.variant_id?.productColorId?.color_name ||
-                  detail.variant_id?.color?.name ||
-                  detail.variant?.productColorId?.color_name ||
-                  detail.variant?.color?.name ||
+                
+                const color = 
+                  detail.variantId?.productColorId?.productColorName || 
+                  detail.variantId?.color?.name ||
+                  detail.variant?.productColorId?.productColorName || 
+                  detail.variant?.color?.name || 
                   "N/A";
-
-                const size =
-                  detail.variant_id?.productSizeId?.size_name ||
-                  detail.variant_id?.size?.name ||
-                  detail.variant?.productSizeId?.size_name ||
-                  detail.variant?.size?.name ||
+                
+                const size = 
+                  detail.variantId?.productSizeId?.productSizeName || 
+                  detail.variantId?.size?.name ||
+                  detail.variant?.productSizeId?.productSizeName || 
+                  detail.variant?.size?.name || 
                   "N/A";
-
+                
                 feedbackList.push({
                   _id: `${order._id}_${variantKey}`,
                   orderId: order._id,
                   orderDate: order.orderDate || order.createdAt,
-                  orderStatus: order.order_status,
-                  variant: detail.variant_id || detail.variant,
+                  orderStatus: order.orderStatus,
+                  variant: detail.variantId || detail.variant,
                   variantId: variantId,
                   feedback: feedbackObj,
                   orderDetail: detail,
@@ -100,7 +113,7 @@ const Feedback = () => {
                   color,
                   size,
                   quantity: detail.quantity,
-                  unitPrice: detail.unitPrice || detail.UnitPrice,
+                  unitPrice: detail.unitPrice || detail.unitPrice,
                   totalPrice: detail.totalPrice || detail.TotalPrice,
                 });
               }
@@ -120,7 +133,7 @@ const Feedback = () => {
 
     orders.forEach((order) => {
       // Only process delivered orders
-      if (order.order_status?.toLowerCase() !== 'delivered') {
+      if (order.orderStatus?.toLowerCase() !== 'delivered') {
         return;
       }
 
@@ -129,7 +142,7 @@ const Feedback = () => {
           // Check if feedback exists
           const feedback = detail.feedback || detail.feedbackId || null;
           const feedbackObj = typeof feedback === 'object' ? feedback : null;
-
+          
           // Check if feedback exists and is valid (must have rating or content)
           let hasValidFeedback = false;
           if (feedbackObj) {
@@ -137,52 +150,52 @@ const Feedback = () => {
             const hasRating = feedbackObj.rating !== null && feedbackObj.rating !== undefined && feedbackObj.rating >= 1 && feedbackObj.rating <= 5;
             const hasContentFlag = feedbackObj.has_content === true;
             const hasRatingFlag = feedbackObj.has_rating === true;
-
+            
             // Only consider valid if it has rating OR content
             hasValidFeedback = (hasContent || hasRating || hasContentFlag || hasRatingFlag);
           }
 
           // If no valid feedback exists, this item is eligible
           if (!hasValidFeedback) {
-            const variantId = detail.variant_id?._id || detail.variant?._id || detail.variant_id || detail.variant || null;
+            const variantId = detail.variantId?._id || detail.variant?._id || detail.variantId || detail.variant || null;
             const variantKey = variantId || `item_${index}`;
-
+            
             // Try multiple paths for product information
-            const productName =
-              detail.variant_id?.productId?.productName ||
-              detail.variant_id?.productId?.name ||
+            const productName = 
+              detail.variantId?.productId?.productName || 
+              detail.variantId?.productId?.name ||
               detail.variant?.productId?.productName ||
-              detail.variant?.product?.name ||
+              detail.variant?.product?.name || 
               detail.variant?.productId?.name ||
               "Product (Variant not available)";
-
-            const productImage =
-              detail.variant_id?.variantImage ||
-              detail.variant_id?.image ||
-              detail.variant?.variantImage ||
-              detail.variant?.image ||
+            
+            const productImage = 
+              detail.variantId?.variantImage || 
+              detail.variantId?.image ||
+              detail.variant?.variantImage || 
+              detail.variant?.image || 
               "/placeholder.png";
-
-            const color =
-              detail.variant_id?.productColorId?.color_name ||
-              detail.variant_id?.color?.name ||
-              detail.variant?.productColorId?.color_name ||
-              detail.variant?.color?.name ||
+            
+            const color = 
+              detail.variantId?.productColorId?.productColorName || 
+              detail.variantId?.color?.name ||
+              detail.variant?.productColorId?.productColorName || 
+              detail.variant?.color?.name || 
               "N/A";
-
-            const size =
-              detail.variant_id?.productSizeId?.size_name ||
-              detail.variant_id?.size?.name ||
-              detail.variant?.productSizeId?.size_name ||
-              detail.variant?.size?.name ||
+            
+            const size = 
+              detail.variantId?.productSizeId?.productSizeName || 
+              detail.variantId?.size?.name ||
+              detail.variant?.productSizeId?.productSizeName || 
+              detail.variant?.size?.name || 
               "N/A";
-
+            
             eligibleList.push({
               _id: `${order._id}_${variantKey}`,
               orderId: order._id,
               orderDate: order.orderDate || order.createdAt,
-              orderStatus: order.order_status,
-              variant: detail.variant_id || detail.variant,
+              orderStatus: order.orderStatus,
+              variant: detail.variantId || detail.variant,
               variantId: variantId,
               orderDetail: detail,
               productName,
@@ -190,7 +203,7 @@ const Feedback = () => {
               color,
               size,
               quantity: detail.quantity,
-              unitPrice: detail.unitPrice || detail.UnitPrice,
+              unitPrice: detail.unitPrice || detail.unitPrice,
               totalPrice: detail.totalPrice || detail.TotalPrice,
             });
           }
@@ -209,11 +222,15 @@ const Feedback = () => {
         return;
       }
       setLoading(true);
+      setError("");
       try {
         const token = localStorage.getItem("token");
         const response = await Api.order.getOrders(user._id, token);
         const data = response.data.data || [];
 
+        console.log("Full orders response:", response);
+        console.log("Orders data:", data);
+        console.log("Number of orders:", data.length);
 
         if (!Array.isArray(data)) {
           showToast("Invalid API response format", "error");
@@ -223,24 +240,43 @@ const Feedback = () => {
           return;
         }
 
-        data.forEach((order) => {
+        // Debug: Check if any order has feedbacks
+        let totalFeedbacksFound = 0;
+        data.forEach((order, orderIndex) => {
           if (order.orderDetails && Array.isArray(order.orderDetails)) {
-            order.orderDetails.forEach(() => { });
+            order.orderDetails.forEach((detail, detailIndex) => {
+              if (detail.feedback) {
+                totalFeedbacksFound++;
+                console.log(`Order ${orderIndex}, Detail ${detailIndex} has feedback:`, {
+                  orderId: order._id,
+                  detailId: detail._id,
+                  feedback: detail.feedback,
+                  variantId: detail.variantId,
+                  variant: detail.variant
+                });
+              }
+            });
           }
         });
+        console.log(`Total feedbacks found in orders: ${totalFeedbacksFound}`);
 
         // Extract feedbacks from all orders
         const feedbackList = extractFeedbacksFromOrders(data);
-
+        console.log("Extracted feedback list:", feedbackList);
+        console.log("Number of feedbacks extracted:", feedbackList.length);
+        
         // Extract eligible items (delivered orders without feedback)
         const eligibleList = extractEligibleItems(data);
-
+        console.log("Extracted eligible items:", eligibleList);
+        console.log("Number of eligible items:", eligibleList.length);
+        
         setFeedbacks(feedbackList);
         setFilteredFeedbacks(feedbackList);
         setEligibleItems(eligibleList);
         setFilteredEligibleItems(eligibleList);
       } catch (err) {
         console.error("Error fetching feedbacks:", err);
+        setError(err.message || "Failed to load feedbacks");
         showToast("Failed to load feedbacks", "error");
         setFeedbacks([]);
         setFilteredFeedbacks([]);
@@ -325,6 +361,14 @@ const Feedback = () => {
     });
 
   // Format price helper
+  const formatPrice = useCallback((price) => {
+    if (typeof price !== "number" || isNaN(price)) return "N/A";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  }, []);
+
   // Render star rating
   const renderStars = (rating) => {
     if (!rating || rating < 1) return null;
@@ -587,7 +631,7 @@ const Feedback = () => {
                           )}
 
                           {/* Feedback Content */}
-                          {feedback?.is_deleted ? (
+                          {feedback?.isDeleted ? (
                             <p className="text-sm text-gray-500 italic m-0 line-clamp-3">
                               This feedback has been deleted by staff/admin
                             </p>

@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import { SOCKET_URL } from '../../common/axiosClient';
 import Api from '../../common/SummaryAPI';
 
-const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
+const LiveStreamProducts = ({ liveId }) => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [productPriceCache, setProductPriceCache] = useState({}); // Cache for product prices
@@ -179,6 +179,16 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
 
             if (productsData.length > 0 || (response && (response.success !== false || response.data?.success !== false))) {
 
+                // Debug: Log raw data to check isPinned values
+                if (import.meta.env.DEV) {
+                    console.log('📦 Raw products data:', productsData.map(p => ({
+                        _id: p._id,
+                        isPinned: p.isPinned,
+                        isPinnedType: typeof p.isPinned,
+                        productName: p.productId?.productName || p.product?.productName
+                    })));
+                }
+
                 // Ensure isPinned is explicitly set for all products (default to false if not provided)
                 // Convert to boolean explicitly to handle null, undefined, string "true"/"false", etc.
                 const productsWithPin = productsData.map(p => {
@@ -204,6 +214,15 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
                         isPinned: isPinnedValue
                     };
                 });
+
+                // Debug: Log converted data
+                if (import.meta.env.DEV) {
+                    console.log('📌 Converted products with isPinned:', productsWithPin.map(p => ({
+                        _id: p._id,
+                        isPinned: p.isPinned,
+                        productName: p.productId?.productName || p.product?.productName
+                    })));
+                }
 
                 // Sort products: pinned first, then by added date
                 setProducts(sortProducts(productsWithPin));
@@ -355,120 +374,6 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
         }
     };
 
-    // ============= MOBILE FLOATING CARD STYLE (TikTok) =============
-    if (isMobileFloating) {
-        if (isLoading) {
-            return (
-                <div className="bg-black/70 backdrop-blur-md rounded-2xl p-3 animate-pulse">
-                    <div className="h-16 bg-gray-700/50 rounded-xl" />
-                </div>
-            );
-        }
-
-        if (products.length === 0) {
-            return (
-                <div className="bg-black/70 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between">
-                    <p className="text-white/60 text-sm">No products available</p>
-                    <button onClick={onClose} className="text-white/40 p-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            );
-        }
-
-        // Show only pinned product or first product
-        const featuredProduct = products.find(p => p.isPinned) || products[0];
-        const product = featuredProduct.product || featuredProduct.productId || {};
-        const productName = getProductName(product);
-        const productId = typeof featuredProduct.productId === 'string' ? featuredProduct.productId : (product._id || featuredProduct.productId?._id || '');
-        const productImageUrl = getMainImageUrl(product);
-        let minPrice = getMinPrice(product);
-        if (minPrice === 0) {
-            minPrice = product.price || product.productPrice || product.minPrice || 0;
-        }
-        if (minPrice === 0 && productId) {
-            minPrice = productPriceCache[productId] || productPriceCacheRef.current[productId] || 0;
-        }
-
-        return (
-            <div className="bg-black/70 backdrop-blur-md rounded-2xl overflow-hidden">
-                {/* Header */}
-                <div className="flex items-center justify-between px-3 py-2 border-b border-white/10">
-                    <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                        </div>
-                        <span className="text-white text-xs font-semibold">{products.length} Products</span>
-                    </div>
-                    <button onClick={onClose} className="text-white/60 p-1 active:bg-white/10 rounded-full">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                {/* Featured Product */}
-                <div
-                    className="flex items-center gap-3 p-3 active:bg-white/5"
-                    onClick={() => handleProductClick(productId)}
-                >
-                    {/* Product Image */}
-                    <div className="relative flex-shrink-0">
-                        {productImageUrl ? (
-                            <img
-                                src={productImageUrl}
-                                alt={productName}
-                                className="w-14 h-14 object-cover rounded-xl"
-                                onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%23666" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/%3E%3C/svg%3E';
-                                }}
-                            />
-                        ) : (
-                            <div className="w-14 h-14 bg-gray-700 rounded-xl flex items-center justify-center">
-                                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                        )}
-                        {featuredProduct.isPinned && (
-                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                                <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9z" />
-                                </svg>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="flex-1 min-w-0">
-                        <h4 className="text-white text-sm font-semibold truncate">{productName}</h4>
-                        {minPrice > 0 && (
-                            <p className="text-red-400 text-sm font-bold">{formatPrice(minPrice)}</p>
-                        )}
-                    </div>
-
-                    {/* Buy Button */}
-                    <button className="bg-red-500 text-white text-xs font-semibold px-4 py-2 rounded-full flex-shrink-0">
-                        Buy
-                    </button>
-                </div>
-
-                {/* More products indicator */}
-                {products.length > 1 && (
-                    <div className="px-3 pb-2">
-                        <p className="text-white/40 text-[10px] text-center">Swipe up to see more products</p>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    // ============= DESKTOP UI (unchanged) =============
     if (isLoading) {
         return (
             <div className="space-y-2">
@@ -496,15 +401,20 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
     return (
         <div className="space-y-2">
             {products.map((lp, index) => {
+                // Handle both API format (lp.productId as object) and WebSocket format (lp.product as object)
                 const product = lp.product || lp.productId || {};
                 const productName = getProductName(product);
+                // productId can be string ID (WebSocket) or object with _id (API)
                 const productId = typeof lp.productId === 'string' ? lp.productId : (product._id || lp.productId?._id || lp.productId || '');
                 const productImageUrl = getMainImageUrl(product);
 
+                // Try to get price from multiple sources
                 let minPrice = getMinPrice(product);
+                // If no price from variants, try direct price field
                 if (minPrice === 0) {
                     minPrice = product.price || product.productPrice || product.minPrice || 0;
                 }
+                // If still no price, check cache (both state and ref for immediate access)
                 if (minPrice === 0 && productId) {
                     minPrice = productPriceCache[productId] || productPriceCacheRef.current[productId] || 0;
                 }
@@ -521,7 +431,7 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
                             }`}
                     >
                         {/* Order Number Badge */}
-                        <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] border backdrop-blur-sm shadow-sm transition-all duration-300 ${lp.isPinned
+                        <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] border backdrop-blur-sm shadow-sm border border-gray-200 transition-all duration-300 ${lp.isPinned
                             ? 'bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-yellow-400/80 shadow-yellow-500/50'
                             : 'bg-gradient-to-br from-red-500 to-pink-600 text-white border-red-400/80 shadow-red-500/50'
                             }`}>
@@ -534,14 +444,14 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
                                 <img
                                     src={productImageUrl}
                                     alt={productName}
-                                    className="w-12 h-12 object-cover rounded-lg border border-gray-700/50 shadow-sm group-hover:scale-105 transition-transform duration-300"
+                                    className="w-12 h-12 object-cover rounded-lg border border-gray-700/50 shadow-sm border border-gray-200 group-hover:scale-105 transition-transform duration-300"
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%23999" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/%3E%3C/svg%3E';
                                     }}
                                 />
                             ) : (
-                                <div className="w-12 h-12 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-lg border border-gray-700/50 items-center justify-center flex shadow-sm">
+                                <div className="w-12 h-12 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-lg border border-gray-700/50 items-center justify-center flex shadow-sm border border-gray-200">
                                     <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
@@ -558,9 +468,11 @@ const LiveStreamProducts = ({ liveId, isMobileFloating = false, onClose }) => {
 
                         {/* Product Info */}
                         <div className="min-w-0 flex-1">
+                            {/* Always show product name */}
                             <h4 className="text-xs font-semibold text-white truncate group-hover:text-yellow-400 transition-colors leading-tight" title={productName || 'Unnamed Product'}>
                                 {productName || 'Unnamed Product'}
                             </h4>
+                            {/* Always show price below name */}
                             {minPrice > 0 ? (
                                 <p className="text-xs font-bold text-red-400 mt-0.5">{formatPrice(minPrice)}</p>
                             ) : (

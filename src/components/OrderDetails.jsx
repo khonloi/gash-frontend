@@ -65,35 +65,31 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         const feedbackMap = {};
 
-        // Extract feedbacks from orderDetails
         order.orderDetails.forEach((detail, index) => {
-            // Use index as key when variant is null, or variant._id when available
             const key = detail.variant?._id || `item_${index}`;
 
-            if (detail.feedback) {
-                // Check if feedback has rating or content (using flags from backend)
-                const hasRating = detail.feedback.has_rating === true &&
-                    detail.feedback.rating !== null &&
-                    detail.feedback.rating !== undefined;
-
-                const hasContent = detail.feedback.has_content === true &&
-                    detail.feedback.content &&
-                    detail.feedback.content.trim() !== '' &&
-                    detail.feedback.content !== 'This feedback has been deleted by staff/admin';
-
-                // Include feedback if it has rating OR content and is not deleted
-                if ((hasContent || hasRating) && !detail.feedback.is_deleted) {
-                    feedbackMap[key] = {
-                        rating: detail.feedback.rating,
-                        content: detail.feedback.content,
-                        has_rating: hasRating,
-                        has_content: hasContent,
-                        is_deleted: false,
-                        created_at: detail.feedback.created_at,
-                        updated_at: detail.feedback.updated_at
-                    };
-                }
+            if (!detail.feedback) {
+                return; // No feedback object at all
             }
+
+            const isDeleted = detail.feedback.isDeleted === true;
+
+            // Always include if there's any feedback record (even deleted)
+            // We want to block re-submission and show deletion message
+            const hasOriginalRating = detail.feedback.rating !== null && detail.feedback.rating !== undefined && detail.feedback.rating >= 1 && detail.feedback.rating <= 5;
+            const hasOriginalContent = detail.feedback.content && detail.feedback.content.trim() !== '' && detail.feedback.content !== 'This feedback has been deleted by staff/admin';
+
+            feedbackMap[key] = {
+                rating: isDeleted ? null : detail.feedback.rating,
+                content: isDeleted 
+                    ? 'This feedback has been deleted by staff/admin'
+                    : detail.feedback.content || '',
+                has_rating: !isDeleted && hasOriginalRating,
+                has_content: !isDeleted ? hasOriginalContent : true, // deleted feedback "has content" (the message)
+                isDeleted: isDeleted,
+                createdAt: detail.feedback.createdAt,
+                updatedAt: detail.feedback.updatedAt
+            };
         });
 
         setExistingFeedbacks(feedbackMap);
@@ -111,7 +107,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     }, [order?.orderDetails, extractFeedbacksFromOrder]);
 
     useEffect(() => {
-        if (order?.payment_method === 'VNPAY' && order?.pay_status === 'unpaid' && order?.vnpay_expiry_time) {
+        if (order?.paymentMethod === 'VNPAY' && order?.payStatus === 'unpaid' && order?.vnpay_expiry_time) {
             const expiryTime = new Date(order.vnpay_expiry_time);
             const now = new Date();
 
@@ -163,6 +159,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Connect and authenticate
         socket.on("connect", () => {
+            console.log("OrderDetails Socket connected:", socket.id);
             // Emit user connection
             socket.emit("userConnected", user._id);
             // Also try authentication if token available
@@ -175,17 +172,19 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         // Listen for order updates
         socket.on("orderUpdated", (payload) => {
             const updatedOrder = payload.order || payload;
-            const orderUserId = payload.userId || updatedOrder.acc_id?._id || updatedOrder.acc_id;
+            const orderUserId = payload.userId || updatedOrder.accountId?._id || updatedOrder.accountId;
 
             // Only update if this order belongs to the current user and matches the current orderId
             if (orderUserId && orderUserId.toString() === user._id.toString() && updatedOrder._id === orderId) {
+                console.log("📦 Order updated via Socket.IO in OrderDetails:", updatedOrder._id);
+
                 // Update the order state while preserving populated orderDetails structure
                 setOrder((prevOrder) => {
                     if (!prevOrder) return updatedOrder;
 
                     // Check if updated order has properly populated orderDetails
                     const hasPopulatedDetails = updatedOrder.orderDetails?.some(
-                        (detail) => detail?.variant_id?.productId?.productName
+                        (detail) => detail?.variantId?.productId?.productName
                     );
 
                     // Preserve existing orderDetails if updated order doesn't have populated ones
@@ -584,6 +583,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             const reason = cancelFormData.cancelReason === "other"
                 ? cancelFormData.customReason
                 : cancelFormData.cancelReason;
+            console.log("Sending cancel request with reason:", reason); // Debug log
             await Api.order.cancel(orderId, reason, token);
             showToast("Order cancelled successfully", "success");
             fetchOrderDetails();
@@ -629,7 +629,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 Order #{order._id}
                             </h2>
                             {/* View Bill button in header - only show if order is paid */}
-                            {order.pay_status?.toLowerCase() === 'paid' && (
+                            {order.payStatus?.toLowerCase() === 'paid' && (
                                 <ProductButton
                                     variant="default"
                                     size="md"
@@ -653,9 +653,9 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex flex-wrap items-center gap-3 text-sm">
                                     <span className="text-gray-600 font-medium">Order Status:</span>
-                                    {getStatusBadge(order.order_status, "order")}
+                                    {getStatusBadge(order.orderStatus, "order")}
                                     <span className="text-gray-600 font-medium">Payment:</span>
-                                    {getStatusBadge(order.pay_status, "pay")}
+                                    {getStatusBadge(order.payStatus, "pay")}
                                 </div>
                                 <span className="text-sm text-gray-500">
                                     Placed on {new Date(order.orderDate || order.createdAt).toLocaleDateString('vi-VN')}
@@ -663,7 +663,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             </div>
 
                             {/* Cancel Reason (if cancelled) */}
-                            {order.order_status?.toLowerCase() === "cancelled" && order.cancelReason && (
+                            {order.orderStatus?.toLowerCase() === "cancelled" && order.cancelReason && (
                                 <div className="mt-4 pt-4 border-t border-gray-200">
                                     <span className="text-gray-600 font-medium">Cancellation Reason:</span>
                                     <p className="mt-1 text-gray-700">{order.cancelReason}</p>
@@ -672,7 +672,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         </div>
 
                         {/* VNPay Payment Countdown */}
-                        {order?.payment_method === 'VNPAY' && order?.pay_status === 'unpaid' && order?.order_status !== 'cancelled' && (
+                        {order?.paymentMethod === 'VNPAY' && order?.payStatus === 'unpaid' && order?.orderStatus !== 'cancelled' && (
                             <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex flex-col gap-2">
@@ -730,7 +730,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">Payment Information</h4>
                                 <div className="space-y-2 text-sm">
                                     <p className="text-gray-700">
-                                        <span className="font-medium">Method:</span> {order.payment_method}
+                                        <span className="font-medium">Method:</span> {order.paymentMethod}
                                     </p>
                                     {order.voucher && (
                                         <p className="text-blue-600 font-medium">
@@ -748,7 +748,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 {order.summary && (
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span className="font-medium">Items:</span>
-                                        <span>{order.summary.totalItems} item(s) • {order.summary.totalQuantity} qty</span>
+                                        <span>{order.summary.totalItems} item(s) - {order.summary.totalQuantity} quantity</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-gray-700">
@@ -771,7 +771,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
                         {/* Products */}
                         <div className="space-y-3">
-                            <h4 className="text-xl sm:text-2xl font-normal text-gray-900 mb-4">Order Items</h4>
+                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h4>
                             {order.orderDetails && order.orderDetails.length > 0 ? (
                                 order.orderDetails.map((d, index) => {
                                     const feedbackKey = d.variant?._id || `item_${index}`;
@@ -809,29 +809,29 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                                     </div>
                                                     <div className="flex items-center gap-2 flex-wrap">
                                                         <p className="text-sm text-gray-600 m-0">
-                                                            Color: {d.variant?.color?.name || "N/A"}  •  Size: {d.variant?.size?.name || "N/A"}
+                                                            Color: {d.variant?.color?.name || "N/A"}  -  Size: {d.variant?.size?.name || "N/A"}
                                                         </p>
                                                     </div>
                                                     <p className="text-sm text-gray-600 m-0">Unit Price: {formatPrice(d.unitPrice)}</p>
-                                                    {(isOutOfStock || isDiscontinued) && (
+                                                    {/* {(isOutOfStock || isDiscontinued) && (
                                                         <p className="text-sm font-semibold text-red-600">
                                                             {isDiscontinued ? "Discontinued" : "Out of Stock"}
                                                         </p>
-                                                    )}
+                                                    )} */}
                                                     <p className="text-base font-semibold text-red-600 m-0 mt-1">Total: {formatPrice(d.totalPrice)}</p>
                                                 </div>
                                             </div>
                                             {/* Quantity and Feedback Buttons */}
-                                            <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
+                                            <div className="flex flex-col sm:flex-row items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
                                                 <div className="flex items-center justify-center">
                                                     <div className="px-4 py-2 bg-gray-100 rounded-lg text-center min-w-20">
-                                                        <span className="text-sm text-gray-600">Qty</span>
+                                                        <span className="text-sm text-gray-600">Quantity</span>
                                                         <p className="text-lg font-semibold text-gray-900">{d.quantity}</p>
                                                     </div>
                                                 </div>
                                                 {/* Feedback Buttons – Only if Delivered */}
-                                                {order.order_status?.toLowerCase() === "delivered" && (
-                                                    <div className="flex gap-2">
+                                                {order.orderStatus?.toLowerCase() === "delivered" && (
+                                                    <div className="flex flex-col gap-2">
                                                         <ProductButton
                                                             variant="secondary"
                                                             size="sm"
@@ -884,19 +884,19 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         </div>
 
                         {/* Refund Card */}
-                        {order.refund_status && order.refund_status !== "not_applicable" && (
+                        {order.refundStatus && order.refundStatus !== "not_applicable" && (
                             <div className="mt-6 bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm">
                                 <h4 className="font-semibold text-gray-700 mb-3">Refund Information</h4>
                                 <div className="flex items-center gap-3 mb-3">
                                     <span className="text-gray-600 font-medium">Status:</span>
-                                    {getStatusBadge(order.refund_status, "refund")}
+                                    {getStatusBadge(order.refundStatus, "refund")}
                                 </div>
-                                {order.refund_proof && (
+                                {order.refundProof && (
                                     <img
-                                        src={order.refund_proof}
+                                        src={order.refundProof}
                                         alt="Refund Proof"
                                         className="w-32 h-32 object-cover rounded border cursor-pointer hover:opacity-80"
-                                        onClick={() => setSelectedImage({ src: order.refund_proof, alt: "Refund Proof" })}
+                                        onClick={() => setSelectedImage({ src: order.refundProof, alt: "Refund Proof" })}
                                     />
                                 )}
                             </div>
@@ -910,8 +910,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             </div>
                         )}
 
-                        {(order.order_status?.toLowerCase() === "pending" ||
-                            order.order_status?.toLowerCase() === "confirmed") && (
+                        {(order.orderStatus?.toLowerCase() === "pending" ||
+                            order.orderStatus?.toLowerCase() === "confirmed") && (
                                 <ProductButton
                                     variant="danger"
                                     size="md"
@@ -989,6 +989,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     isDeleting={loadingStates.deleting?.[selectedVariantId] || false}
                     showDeleteButton={!!existingFeedbacks[selectedVariantId]}
                     productName={selectedProductName}
+                    existingFeedback={existingFeedbacks[selectedVariantId]}
                 />
             )}
 

@@ -372,7 +372,7 @@ const Checkout = () => {
     const isBuyNow = !!buyNowState;
     const itemsToOrder = isBuyNow
       ? [{
-          variant_id: buyNowState.variant._id,
+          variantId: buyNowState.variant._id,
           pro_price: buyNowState.variant.variantPrice || 0,
           pro_quantity: buyNowState.quantity,
           pro_name: buyNowState.product.productName,
@@ -410,15 +410,15 @@ const Checkout = () => {
       if (!token) throw new Error('No authentication token found');
 
       const orderData = {
-        acc_id: user._id,
+        accountId: user._id,
         addressReceive: trimmedAddress,
         phone: trimmedPhone,
         name: trimmedName,
-        payment_method: paymentMethod,
+        paymentMethod: paymentMethod,
         voucherCode: appliedVoucher?.code || null,
         items: itemsToOrder.map(item => ({
-          variant_id: item.variantId?._id || item.variant_id || item.variant?._id,
-          UnitPrice: item.productPrice || item.pro_price || item.variantId?.variantPrice || item.variant?.variantPrice || 0,
+          variantId: item.variantId?._id || item.variantId || item.variant?._id,
+          unitPrice: item.productPrice || item.pro_price || item.variantId?.variantPrice || item.variant?.variantPrice || 0,
           Quantity: item.productQuantity || item.quantity || item.pro_quantity,
         })),
         totalPrice: totalPrice,
@@ -432,8 +432,8 @@ const Checkout = () => {
           try {
             const boughtCartIds = itemsToOrder
               .map(item => {
-                const variantId = item.variantId?._id || item.variant_id || item.variant?._id;
-                const cartItem = cartItems.find(ci => (ci.variantId?._id || ci.variant_id || ci.variant?._id) === variantId);
+                const variantId = item.variantId?._id || item.variantId || item.variant?._id;
+                const cartItem = cartItems.find(ci => (ci.variantId?._id || ci.variantId || ci.variant?._id) === variantId);
                 return cartItem?._id;
               })
               .filter(Boolean);
@@ -620,7 +620,7 @@ const Checkout = () => {
                           {productData?.productName || 'Unnamed Product'}
                         </p>
                         <p className="text-sm text-gray-600 m-0">
-                          Color: {variantData?.productColorId?.color_name || 'N/A'}, Size: {variantData?.productSizeId?.size_name || 'N/A'}
+                          Color: {variantData?.productColorId?.productColorName || 'N/A'}, Size: {variantData?.productSizeId?.productSizeName || 'N/A'}
                         </p>
                         <p className="text-sm text-gray-600 m-0">
                           Price: {formatPrice(price)}

@@ -114,9 +114,9 @@ const FavoriteProductCard = ({ product, favoriteId, handleProductClick, handleKe
             >
               {product.productName || "Unnamed Product"}
             </h2>
-            {product.categoryId?.cat_name && (
+            {product.categoryId?.categoryName && (
               <p className="text-gray-600 text-sm">
-                {product.categoryId.cat_name}
+                {product.categoryId.categoryName}
               </p>
             )}
             <div className="pt-1">

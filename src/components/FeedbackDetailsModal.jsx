@@ -50,7 +50,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
   );
   
   // Check if feedback is deleted by staff/admin
-  const isDeletedByStaff = feedback?.feedback?.is_deleted === true;
+  const isDeletedByStaff = feedback?.feedback?.isDeleted === true;
 
   // Create feedback
   const handleCreateFeedback = useCallback(async (variantId, comment, rating) => {

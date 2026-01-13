@@ -24,41 +24,9 @@ const LiveStreamDetail = () => {
     const [selectedStream, setSelectedStream] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     // const [isFullscreen, setIsFullscreen] = useState(false); // Removed - no longer needed after removing toggle buttons
-    // On mobile, hide panels by default for better video viewing experience
     const [showComments, setShowComments] = useState(true);
     const [showProducts, setShowProducts] = useState(true);
     const [showInfo, setShowInfo] = useState(true);
-
-    // Detect mobile on mount
-    const [isMobile, setIsMobile] = useState(false);
-    // Mobile TikTok-style: show floating product
-    const [showMobileProduct, setShowMobileProduct] = useState(false);
-
-    // Generate unique tab ID for this instance (to handle multiple tabs from same account)
-    useEffect(() => {
-        tabIdRef.current = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        isMountedRef.current = true;
-
-        return () => {
-            isMountedRef.current = false;
-        };
-    }, []);
-
-    useEffect(() => {
-        const checkMobile = () => {
-            const mobile = window.innerWidth < 768;
-            setIsMobile(mobile);
-            // On mobile TikTok style: show comments overlay by default
-            if (mobile) {
-                setShowInfo(false);
-                setShowProducts(false);
-                setShowComments(true); // Show comments overlay on mobile
-            }
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
     const [connectionState, setConnectionState] = useState('disconnected');
     const [streamEnded, setStreamEnded] = useState(false);
     const [_room, setRoom] = useState(null);
@@ -71,9 +39,6 @@ const LiveStreamDetail = () => {
     const streamEndedRef = useRef(false);
     const socketRef = useRef(null);
     const hasJoinedRef = useRef(false);
-    const streamDataRef = useRef(null); // Store stream data for connection
-    const tabIdRef = useRef(null); // Unique ID for this tab instance
-    const isMountedRef = useRef(true); // Track if component is still mounted
 
     // Helper: Format date/time to dd/mm/yyyy HH:mm
     const formatDateTime = (dateString) => {
@@ -92,22 +57,9 @@ const LiveStreamDetail = () => {
     };
 
     // Connect to LiveKit - moved before useEffect
-    // This function is safe to call from multiple users simultaneously
-    // Each user gets their own unique token and room connection
-    const connectToLiveKit = useCallback(async (roomName, viewerToken, serverUrl = null) => {
-        // Check if component is still mounted
-        if (!isMountedRef.current) {
-            return;
-        }
-
-        // Prevent multiple simultaneous connection attempts from the same tab instance
-        // But allow different tabs from same account to connect independently
-        if (isReconnectingRef.current) {
-            return;
-        }
-        if (streamEndedRef.current) {
-            return;
-        }
+    const connectToLiveKit = useCallback(async (roomName, viewerToken) => {
+        if (isReconnectingRef.current) return;
+        if (streamEndedRef.current) return;
 
         if (!roomName || !viewerToken) {
             showToast('Missing connection information', 'error');
@@ -119,31 +71,12 @@ const LiveStreamDetail = () => {
             return;
         }
 
-        // Use serverUrl from API response, fallback to config, then to env
-        // Validate serverUrl from API first - if invalid/empty, use fallback
-        let livekitServerUrl = serverUrl;
-
-        // Check if serverUrl from API is valid
-        if (!livekitServerUrl ||
-            typeof livekitServerUrl !== 'string' ||
-            livekitServerUrl.trim() === '' ||
-            livekitServerUrl.includes('your-livekit-server.com')) {
-            // Fallback to config or env
-            livekitServerUrl = LIVEKIT_CONFIG.serverUrl || import.meta.env.VITE_LIVEKIT_SERVER_URL;
-        }
-
-        // Final validation
-        if (!livekitServerUrl ||
-            typeof livekitServerUrl !== 'string' ||
-            livekitServerUrl.trim() === '' ||
-            livekitServerUrl.includes('your-livekit-server.com')) {
-            console.error('LiveKit server URL not configured:', { serverUrl, config: LIVEKIT_CONFIG.serverUrl, env: import.meta.env.VITE_LIVEKIT_SERVER_URL });
+        if (!LIVEKIT_CONFIG.serverUrl || LIVEKIT_CONFIG.serverUrl.includes('your-livekit-server.com')) {
             showToast('LiveKit server not configured', 'error');
             return;
         }
 
-        if (!livekitServerUrl.startsWith('wss://') && !livekitServerUrl.startsWith('ws://')) {
-            console.error('Invalid LiveKit server URL format:', livekitServerUrl);
+        if (!LIVEKIT_CONFIG.serverUrl.startsWith('wss://') && !LIVEKIT_CONFIG.serverUrl.startsWith('ws://')) {
             showToast('Invalid LiveKit server URL', 'error');
             return;
         }
@@ -152,6 +85,7 @@ const LiveStreamDetail = () => {
 
         try {
             isReconnectingRef.current = true;
+            console.log('🔗 Connecting to LiveKit room:', roomName);
             setConnectionState('connecting');
 
             const existingRoom = roomRef.current;
@@ -182,12 +116,7 @@ const LiveStreamDetail = () => {
             const newRoom = new Room(roomOptions);
 
             newRoom.on(RoomEvent.Connected, () => {
-                // Check if component is still mounted before updating state
-                if (!isMountedRef.current) {
-                    newRoom.disconnect().catch(() => { });
-                    return;
-                }
-
+                console.log('Connected to LiveKit room');
                 setConnectionState('connected');
 
                 // Initialize remote participants list (exclude local participant)
@@ -199,111 +128,42 @@ const LiveStreamDetail = () => {
                     videoRef.current.muted = false;
                 }
 
-                // Function to attach track to video element
-                // This function is called for each user independently (up to 100 users)
-                // Each user has their own videoRef, so there's no conflict
-                const attachTrackToVideo = (track, kind) => {
-                    if (!videoRef.current) {
-                        // Retry if video element is not ready yet
-                        // Important when multiple users join quickly - each waits for their own video element
-                        setTimeout(() => {
-                            if (videoRef.current && track) {
-                                attachTrackToVideo(track, kind);
-                            }
-                        }, 100);
-                        return;
-                    }
-
-                    if (kind === 'video') {
-                        // Attach video track - LiveKit handles multiple attachments correctly
-                        // Each user (up to 100) attaches to their own video element
-                        // LiveKit delivers the same stream to all subscribers independently
-                        track.attach(videoRef.current);
-                        videoRef.current.muted = false;
-                        videoRef.current.play().catch((err) => {
-                            console.error('Video play error:', err);
-                        });
-                    } else if (kind === 'audio') {
-                        // Attach audio track - each user gets their own audio stream
-                        // LiveKit supports multiple audio subscribers (up to 100)
-                        track.attach(videoRef.current);
-                        if (track instanceof MediaStreamTrack) {
-                            track.enabled = true;
-                        }
-                        if (videoRef.current) {
-                            videoRef.current.muted = false;
-                        }
-                    }
-                };
-
-                // Subscribe to all remote tracks (video and audio) from all participants
-                // This ensures ALL users (up to 100) can see the host's video stream
-                // CRITICAL: Each user must subscribe independently to receive the stream data
-                // LiveKit supports multiple subscribers to the same track - each user gets their own stream
-                try {
-                    newRoom.remoteParticipants.forEach((participant) => {
-                        if (!participant || !participant.trackPublications) {
-                            return;
-                        }
-                        participant.trackPublications.forEach((publication) => {
-                            if (!publication) {
-                                return;
-                            }
-                            // CRITICAL: Force subscribe to tracks for THIS user
-                            // This ensures each user gets their own subscription to the stream
-                            // Even if 99 other users have already subscribed, this user needs their own subscription
-                            // LiveKit handles multiple subscriptions correctly - each user receives the data independently
-                            // IMPORTANT: Always set subscribed to true, even if already subscribed, to ensure this user's subscription is maintained
-                            // This is critical to prevent subscription from being dropped when other users join
+                // Subscribe to all remote tracks (video and audio)
+                newRoom.remoteParticipants.forEach((participant) => {
+                    participant.trackPublications.forEach((publication) => {
+                        // Subscribe to the track if not already subscribed
+                        if (!publication.isSubscribed) {
                             publication.setSubscribed(true);
+                        }
 
-                            // CRITICAL: If track is already available (host already streaming), attach it immediately
-                            // This handles the case when user joins after host has already started streaming
-                            // Each user attaches to their own video element, so there's no conflict
-                            // Multiple users can attach the same track to different video elements
-                            // IMPORTANT: attach() is safe to call multiple times - LiveKit handles it correctly
-                            if (publication.track && videoRef.current) {
-                                attachTrackToVideo(publication.track, publication.track.kind);
+                        // If track is available, attach it immediately
+                        if (publication.track) {
+                            if (publication.track.kind === 'video' && videoRef.current) {
+                                publication.track.attach(videoRef.current);
+                                videoRef.current.muted = false; // Ensure not muted
+                                videoRef.current.play().catch(() => { });
+                            } else if (publication.track.kind === 'audio' && videoRef.current) {
+                                publication.track.attach(videoRef.current);
+
+                                // CRITICAL: Enable audio track
+                                if (publication.track instanceof MediaStreamTrack) {
+                                    publication.track.enabled = true;
+                                }
+
+                                // CRITICAL: Ensure video is not muted
+                                if (videoRef.current) {
+                                    videoRef.current.muted = false;
+                                }
+
+                                console.log('Audio track attached on connect', {
+                                    trackId: publication.track.id,
+                                    enabled: publication.track.enabled,
+                                    muted: videoRef.current?.muted
+                                });
                             }
-                            // If track is not available yet, TrackSubscribed event will handle it
-                            // TrackSubscribed fires for each user independently when their subscription is ready
-                        });
+                        }
                     });
-                } catch (err) {
-                    console.warn('Error subscribing to remote tracks on connect:', err);
-                }
-
-                // CRITICAL: Set up a listener to monitor track subscriptions
-                // This ensures subscriptions are maintained even when room state changes
-                const maintainSubscriptions = () => {
-                    if (!newRoom || newRoom.state !== 'connected') {
-                        return;
-                    }
-                    try {
-                        newRoom.remoteParticipants.forEach((participant) => {
-                            if (!participant || !participant.trackPublications) {
-                                return;
-                            }
-                            participant.trackPublications.forEach((publication) => {
-                                if (!publication) {
-                                    return;
-                                }
-                                // Always ensure subscription is maintained for THIS user
-                                if (!publication.isSubscribed && publication.track) {
-                                    publication.setSubscribed(true);
-                                }
-                            });
-                        });
-                    } catch (err) {
-                        console.warn('Error maintaining subscriptions:', err);
-                    }
-                };
-
-                // Monitor subscriptions periodically
-                const subscriptionMonitor = setInterval(maintainSubscriptions, 5000);
-                if (!newRoom._subscriptionMonitor) {
-                    newRoom._subscriptionMonitor = subscriptionMonitor;
-                }
+                });
 
                 // Double-check video is not muted after a short delay
                 setTimeout(() => {
@@ -311,128 +171,24 @@ const LiveStreamDetail = () => {
                         videoRef.current.muted = false;
                     }
                 }, 1000);
-
-                // CRITICAL: Periodically verify track is still attached and subscription is maintained
-                // This ensures tracks don't get lost when other users join/leave
-                const verifyTracksInterval = setInterval(() => {
-                    if (!videoRef.current || !newRoom || newRoom.state !== 'connected') {
-                        clearInterval(verifyTracksInterval);
-                        return;
-                    }
-
-                    // PRODUCTION: Ensure video element is never muted
-                    if (videoRef.current.muted) {
-                        videoRef.current.muted = false;
-                    }
-
-                    // Check all remote participants' tracks
-                    try {
-                        newRoom.remoteParticipants.forEach((participant) => {
-                            if (!participant || !participant.trackPublications) {
-                                return;
-                            }
-                            participant.trackPublications.forEach((publication) => {
-                                if (!publication) {
-                                    return;
-                                }
-                                // CRITICAL: Always ensure subscription is maintained for THIS user
-                                // This prevents subscription from being dropped when other users join
-                                if (!publication.isSubscribed) {
-                                    publication.setSubscribed(true);
-                                }
-
-                                // Only process if track exists and is subscribed
-                                if (!publication.track || !publication.isSubscribed) {
-                                    return;
-                                }
-
-                                // For video tracks, ensure they're attached and playing
-                                if (publication.track.kind === 'video' && videoRef.current) {
-                                    try {
-                                        // Check if video element has a source (track is attached)
-                                        const hasVideoSource = videoRef.current.srcObject !== null ||
-                                            videoRef.current.src !== '';
-
-                                        if (!hasVideoSource) {
-                                            // Track is not attached - re-attach it
-                                            publication.track.attach(videoRef.current);
-                                            videoRef.current.muted = false;
-                                            videoRef.current.play().catch(() => { });
-                                        } else {
-                                            // Track is attached, just ensure it's playing and not muted
-                                            if (videoRef.current.paused) {
-                                                videoRef.current.play().catch(() => { });
-                                            }
-                                            if (videoRef.current.muted) {
-                                                videoRef.current.muted = false;
-                                            }
-                                        }
-                                    } catch (err) {
-                                        console.warn('Error verifying video track:', err);
-                                    }
-                                }
-
-                                // PRODUCTION: For audio tracks, ensure they're attached and enabled
-                                if (publication.track.kind === 'audio' && videoRef.current) {
-                                    try {
-                                        // Ensure audio track is enabled
-                                        if (publication.track instanceof MediaStreamTrack) {
-                                            publication.track.enabled = true;
-                                        }
-                                        // Ensure video element (which contains audio) is not muted
-                                        if (videoRef.current.muted) {
-                                            videoRef.current.muted = false;
-                                        }
-                                    } catch (err) {
-                                        console.warn('Error verifying audio track:', err);
-                                    }
-                                }
-                            });
-                        });
-                    } catch (err) {
-                        console.warn('Error verifying tracks:', err);
-                    }
-                }, 3000); // Check every 3 seconds (less frequent to avoid overhead)
-
-                // Store interval ID for cleanup
-                if (!newRoom._trackVerificationInterval) {
-                    newRoom._trackVerificationInterval = verifyTracksInterval;
-                }
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
-
-                // Only update state if component is still mounted
-                if (isMountedRef.current) {
-                    setConnectionState('disconnected');
-                    setRoom(null);
-                }
-
-                // Clear track verification interval
-                if (newRoom._trackVerificationInterval) {
-                    clearInterval(newRoom._trackVerificationInterval);
-                    newRoom._trackVerificationInterval = null;
-                }
-
-                // Clear subscription monitor
-                if (newRoom._subscriptionMonitor) {
-                    clearInterval(newRoom._subscriptionMonitor);
-                    newRoom._subscriptionMonitor = null;
-                }
+                console.log('Disconnected from LiveKit:', reason);
+                setConnectionState('disconnected');
+                setRoom(null);
 
                 // Clear remote participants
                 setRemoteParticipants([]);
 
-                // Leave livestream via API (for this tab instance)
-                if (hasJoinedRef.current && selectedStream?._id && isMountedRef.current) {
+                // Leave livestream via API
+                if (hasJoinedRef.current && selectedStream?._id) {
                     try {
                         const token = localStorage.getItem('token');
                         if (token) {
-                            await Api.livestream.leave({
-                                livestreamId: selectedStream._id,
-                                tabId: tabIdRef.current
-                            }, token);
+                            await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
                             hasJoinedRef.current = false;
+                            console.log('Left livestream via API');
                         }
                     } catch (error) {
                         console.error('Error leaving livestream:', error);
@@ -440,69 +196,22 @@ const LiveStreamDetail = () => {
                 }
 
                 if (reason === 'SERVER_SHUTDOWN' || reason === 'ROOM_DELETED') {
-                    if (isMountedRef.current) {
-                        showToast('Livestream has ended', 'info');
-                        setStreamEnded(true);
-                        setSelectedStream(prev => prev ? { ...prev, status: 'ended' } : null);
-                    }
+                    showToast('Livestream has ended', 'info');
                     streamEndedRef.current = true;
+                    setStreamEnded(true);
+                    setSelectedStream(prev => prev ? { ...prev, status: 'ended' } : null);
                 }
             });
 
-            newRoom.on(RoomEvent.TrackSubscribed, (track, publication) => {
-                // This event fires when a track is subscribed for THIS tab instance
-                // CRITICAL: Each tab gets its own TrackSubscribed event independently
-                // Multiple tabs from same account can subscribe to the same track without conflicts
-                // LiveKit handles multiple subscriptions correctly - each tab gets its own stream
-
-                // Check if component is still mounted
-                if (!isMountedRef.current) {
-                    return;
-                }
-
-                // Validate track and publication exist
-                if (!track || !publication) {
-                    console.warn('Invalid track or publication in TrackSubscribed:', { track, publication });
-                    return;
-                }
-
-
-                // CRITICAL: Ensure subscription is maintained
-                if (!publication.isSubscribed) {
-                    publication.setSubscribed(true);
-                }
-
-                // Function to attach track with retry logic
-                const attachTrack = () => {
-                    if (!videoRef.current) {
-                        // Retry if video element is not ready
-                        // This ensures the track is attached even if DOM is not ready yet
-                        // Important for users joining quickly one after another
-                        setTimeout(attachTrack, 100);
-                        return;
-                    }
-
-                    // Validate track exists before accessing properties
-                    if (!track) {
-                        console.warn('Track is undefined in attachTrack');
-                        return;
-                    }
-
-                    // CRITICAL: attach() is safe to call multiple times
-                    // LiveKit handles multiple attachments correctly - each user's attachment is independent
-                    // Calling attach() again on the same element is safe and won't affect other users
+            newRoom.on(RoomEvent.TrackSubscribed, (track) => {
+                if (videoRef.current) {
                     if (track.kind === 'video') {
-                        // Attach video track - LiveKit handles multiple users (up to 100) correctly
-                        // Each user attaches to their own video element, receiving the same stream data
-                        // No conflict between users - each has their own video element and connection
-                        // IMPORTANT: attach() creates a new attachment for THIS user's video element
-                        // It does NOT affect other users' attachments
                         track.attach(videoRef.current);
                         setTimeout(() => {
                             if (videoRef.current) {
+                                // Ensure video is not muted when playing
                                 videoRef.current.muted = false;
-                                videoRef.current.play().then(() => {
-                                }).catch(err => {
+                                videoRef.current.play().catch(err => {
                                     if (err.name !== 'AbortError') {
                                         console.error('Video play failed:', err);
                                     }
@@ -510,12 +219,15 @@ const LiveStreamDetail = () => {
                             }
                         }, 100);
                     } else if (track.kind === 'audio') {
-                        // Attach audio track - each user (up to 100) gets their own audio stream
-                        // LiveKit delivers audio to each subscriber independently
+                        // Attach audio track to video element
                         track.attach(videoRef.current);
+
+                        // CRITICAL: Ensure audio track is enabled
                         if (track instanceof MediaStreamTrack) {
                             track.enabled = true;
                         }
+
+                        // CRITICAL: Ensure video element is not muted
                         if (videoRef.current) {
                             videoRef.current.muted = false;
                             // Force unmute multiple times to ensure it sticks
@@ -531,155 +243,53 @@ const LiveStreamDetail = () => {
                             }, 500);
                         }
                     }
-                };
-
-                // Try to attach immediately
-                // This ensures the track is attached as soon as it's subscribed for this user
-                // Works correctly even with 100 concurrent users
-                attachTrack();
+                }
             });
 
             // Handle participant connected - subscribe to their tracks
-            // This handles new participants joining (including host if they join later)
-            // CRITICAL: Each tab instance handles this independently
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
-                // Check if component is still mounted
-                if (!isMountedRef.current) {
-                    return;
-                }
+                console.log('👤 Participant connected:', participant.identity);
 
-                // Validate participant exists
-                if (!participant || !participant.identity) {
-                    console.warn('Invalid participant received:', participant);
-                    return;
-                }
-
-
-                // Add participant to remote participants list (for viewer count)
+                // Add participant to remote participants list
                 setRemoteParticipants(prev => {
                     // Check if participant already exists (avoid duplicates)
-                    if (prev.find(p => p && p.identity === participant.identity)) {
+                    if (prev.find(p => p.identity === participant.identity)) {
                         return prev;
                     }
                     return [...prev, participant];
                 });
 
-                // CRITICAL: When a new participant joins, ensure THIS user's existing subscriptions are maintained
-                // This prevents THIS user's tracks from being dropped when other users join
-                try {
-                    newRoom.remoteParticipants.forEach((existingParticipant) => {
-                        if (!existingParticipant || !existingParticipant.trackPublications) {
-                            return;
-                        }
-                        existingParticipant.trackPublications.forEach((existingPublication) => {
-                            if (existingPublication && existingPublication.isSubscribed && existingPublication.track) {
-                                // Re-assert subscription to ensure it's maintained
-                                existingPublication.setSubscribed(true);
-                                // Re-attach if needed to ensure track is still connected
-                                if (existingPublication.track.kind === 'video' && videoRef.current) {
-                                    existingPublication.track.attach(videoRef.current);
-                                    videoRef.current.muted = false;
-                                    videoRef.current.play().catch(() => { });
-                                }
-                            }
-                        });
-                    });
-                } catch (err) {
-                    console.warn('Error maintaining subscriptions on participant connect:', err);
-                }
-
-                // Subscribe to all their tracks (host publishes video/audio, viewers don't)
-                // CRITICAL: Force subscribe to ensure THIS user gets the tracks
-                // Each user (up to 100) must subscribe independently to receive the stream data
-                // LiveKit supports multiple subscribers - each user gets their own stream independently
-                if (!participant.trackPublications) {
-                    return;
-                }
+                // Subscribe to all their tracks
                 participant.trackPublications.forEach((publication) => {
-                    if (!publication) {
-                        return;
+                    if (!publication.isSubscribed) {
+                        publication.setSubscribed(true);
                     }
-                    // CRITICAL: Always set subscribed to true to maintain THIS user's subscription
-                    // Even if already subscribed, ensure subscription is maintained
-                    // This prevents subscription from being dropped when other users join
-                    publication.setSubscribed(true);
 
-                    // If tracks are already available, attach them immediately
-                    // This handles the case when host joins after viewer, or when new participant joins
-                    // Each user attaches to their own video element, so all 100 users receive the data
-                    // No conflict - each user has their own video element and connection
-                    // IMPORTANT: attach() is safe to call multiple times - LiveKit handles it correctly
-                    if (publication.track && videoRef.current) {
-                        if (publication.track.kind === 'video') {
-                            // Attach video track from host - each user (up to 100) gets their own stream
-                            // LiveKit delivers the same video stream to all subscribers independently
-                            // IMPORTANT: attach() creates a new attachment for THIS user's video element
-                            // It does NOT affect other users' attachments
-                            publication.track.attach(videoRef.current);
-                            videoRef.current.muted = false;
-                            videoRef.current.play().catch((err) => {
-                                if (err.name !== 'AbortError') {
-                                    console.error('Video play failed:', err);
-                                }
-                            });
-                        } else if (publication.track.kind === 'audio') {
-                            // Attach audio track from host - each user (up to 100) gets their own stream
-                            // LiveKit delivers the same audio stream to all subscribers independently
-                            publication.track.attach(videoRef.current);
-                            if (publication.track instanceof MediaStreamTrack) {
-                                publication.track.enabled = true;
-                            }
-                            videoRef.current.muted = false;
+                    // If audio track is already available, attach and enable it
+                    if (publication.track && publication.track.kind === 'audio' && videoRef.current) {
+                        publication.track.attach(videoRef.current);
+                        if (publication.track instanceof MediaStreamTrack) {
+                            publication.track.enabled = true;
                         }
+                        videoRef.current.muted = false;
                     }
-                    // If track is not available yet, TrackSubscribed event will handle it
-                    // TrackSubscribed fires for each user independently when their subscription is ready
-                    // Works correctly even with 100 concurrent users
                 });
             });
 
-            newRoom.on(RoomEvent.TrackUnsubscribed, (track, publication) => {
-                // CRITICAL: Only detach if this track is actually unsubscribed for THIS user
-                // TrackUnsubscribed fires when THIS user's subscription ends
-                // IMPORTANT: Do NOT detach if subscription was dropped due to other users joining
-                // Only detach if the publication is truly unsubscribed for THIS user
-
-                // Validate track and publication exist
-                if (!track || !publication) {
-                    console.warn('Invalid track or publication in TrackUnsubscribed:', { track, publication });
-                    return;
-                }
-
+            newRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
                 if (videoRef.current) {
-                    // Double-check: Only detach if publication is confirmed unsubscribed
-                    // Sometimes TrackUnsubscribed fires temporarily - we should verify
-                    if (!publication.isSubscribed) {
-                        // Wait a bit to see if subscription is restored
-                        setTimeout(() => {
-                            // Only detach if still unsubscribed after delay
-                            if (videoRef.current && publication && !publication.isSubscribed && track) {
-                                try {
-                                    if (track.kind === 'video') {
-                                        track.detach(videoRef.current);
-                                    } else if (track.kind === 'audio') {
-                                        track.detach(videoRef.current);
-                                    }
-                                } catch (err) {
-                                    console.warn('Error detaching track:', err);
-                                }
-                            }
-                        }, 500);
+                    if (track.kind === 'video') {
+                        track.detach(videoRef.current);
+                    } else if (track.kind === 'audio') {
+                        track.detach(videoRef.current);
                     }
                 }
             });
 
             // Handle participant disconnected - remove from list
             newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
-                if (!participant || !participant.identity) {
-                    console.warn('Invalid participant disconnected:', participant);
-                    return;
-                }
-                setRemoteParticipants(prev => prev.filter(p => p && p.identity !== participant.identity));
+                console.log('👤 Participant disconnected:', participant.identity);
+                setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
             });
 
             console.error = (...args) => {
@@ -690,7 +300,7 @@ const LiveStreamDetail = () => {
                 originalConsoleError.apply(console, args);
             };
 
-            const connectPromise = newRoom.connect(livekitServerUrl, viewerToken);
+            const connectPromise = newRoom.connect(LIVEKIT_CONFIG.serverUrl, viewerToken);
             const timeoutPromise = new Promise((_, reject) => {
                 const timeoutId = setTimeout(() => {
                     reject(new Error(`Connection timeout after 45 seconds`));
@@ -720,16 +330,8 @@ const LiveStreamDetail = () => {
                 throw error;
             }
 
-            // Only set room if component is still mounted
-            if (isMountedRef.current) {
-                setRoom(newRoom);
-                roomRef.current = newRoom;
-            } else {
-                // Component unmounted during connection, disconnect immediately
-                newRoom.disconnect().catch(() => { });
-                return null;
-            }
-
+            setRoom(newRoom);
+            roomRef.current = newRoom;
             isReconnectingRef.current = false;
             console.error = originalConsoleError;
             return newRoom;
@@ -740,34 +342,14 @@ const LiveStreamDetail = () => {
             setConnectionState('error');
             isReconnectingRef.current = false;
 
-            // Log detailed error for debugging
-            console.error('Error connecting to LiveKit:', error);
-
-            // Safely extract error message
-            let errorMessage = 'Unknown error occurred';
-            try {
-                if (error && typeof error === 'object' && error.message) {
-                    errorMessage = error.message;
-                } else if (error) {
-                    errorMessage = String(error);
-                }
-            } catch (err) {
-                console.warn('Error extracting error message:', err);
-            }
-
-            // Provide user-friendly error messages
-            if (errorMessage.includes('timeout')) {
+            if (error.message.includes('timeout')) {
                 showToast('Connection timeout. Please check network', 'error');
-            } else if (errorMessage.includes('token')) {
+            } else if (error.message.includes('token')) {
                 showToast('Invalid or expired token', 'error');
-            } else if (errorMessage.includes('server')) {
+            } else if (error.message.includes('server')) {
                 showToast('Unable to connect to server', 'error');
-            } else if (errorMessage.includes('Cannot read properties') || errorMessage.includes('reading')) {
-                // Handle undefined property access errors
-                console.error('LiveKit connection error - undefined property access:', error);
-                showToast('Connection error. Please try again', 'error');
             } else {
-                showToast(`Connection error: ${errorMessage}`, 'error');
+                showToast(`Connection error: ${error.message}`, 'error');
             }
             throw error;
         }
@@ -777,11 +359,6 @@ const LiveStreamDetail = () => {
     // Load stream details
     useEffect(() => {
         const loadStream = async () => {
-            // Prevent multiple simultaneous loads
-            if (!isMountedRef.current) {
-                return;
-            }
-
             try {
                 setIsLoading(true);
                 const token = localStorage.getItem('token');
@@ -791,19 +368,10 @@ const LiveStreamDetail = () => {
                     return;
                 }
 
-                // Include tab ID in join request to allow multiple tabs from same account
-                const response = await Api.livestream.join({
-                    livestreamId: id,
-                    tabId: tabIdRef.current // Include tab ID to identify this tab instance
-                }, token);
+                const response = await Api.livestream.join({ livestreamId: id }, token);
 
                 if (response.data?.success) {
                     const streamData = response.data.data;
-
-                    // Check if component is still mounted before updating state
-                    if (!isMountedRef.current) {
-                        return;
-                    }
 
                     if (streamData.status !== 'live') {
                         showToast('Livestream has ended', 'info');
@@ -812,89 +380,28 @@ const LiveStreamDetail = () => {
                         return;
                     }
 
-                    // Store stream data for connection
-                    streamDataRef.current = streamData;
                     setSelectedStream(streamData);
-                    hasJoinedRef.current = true; // Mark as joined for this tab
+                    hasJoinedRef.current = true; // Mark as joined
+
+                    // Connect to LiveKit
+                    await connectToLiveKit(streamData.roomName, streamData.viewerToken);
+                    showToast('Joined livestream!', 'success');
                 } else {
                     showToast('Livestream not found', 'error');
                     navigate('/');
                 }
             } catch (error) {
                 console.error('Error loading stream:', error);
-                if (isMountedRef.current) {
-                    showToast('Error loading livestream', 'error');
-                    navigate('/');
-                }
+                showToast('Error loading livestream', 'error');
+                navigate('/');
             } finally {
-                if (isMountedRef.current) {
-                    setIsLoading(false);
-                }
+                setIsLoading(false);
             }
         };
 
         loadStream();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
-
-    // Connect to LiveKit when both stream data and video element are ready
-    useEffect(() => {
-        const connectWhenReady = async () => {
-            // Check if component is still mounted
-            if (!isMountedRef.current) {
-                return;
-            }
-
-            // Wait for both selectedStream and videoRef to be available
-            if (!selectedStream || !streamDataRef.current || streamDataRef.current.status !== 'live') {
-                return;
-            }
-
-            // Wait for video element to be mounted in DOM
-            let retries = 0;
-            const maxRetries = 20; // Increased retries for slower devices
-            while (!videoRef.current && retries < maxRetries && isMountedRef.current) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
-
-            if (!isMountedRef.current) {
-                return;
-            }
-
-            if (!videoRef.current) {
-                console.error('Video element not found after waiting');
-                if (isMountedRef.current) {
-                    showToast('Video player not ready', 'error');
-                }
-                return;
-            }
-
-            // Check if already connected (for this tab instance)
-            if (roomRef.current && roomRef.current.state === 'connected') {
-                return;
-            }
-
-            // Connect to LiveKit - use serverUrl from API response
-            // Each tab gets its own connection, even from the same account
-            try {
-                await connectToLiveKit(
-                    streamDataRef.current.roomName,
-                    streamDataRef.current.viewerToken,
-                    streamDataRef.current.serverUrl
-                );
-                if (isMountedRef.current) {
-                    showToast('Joined livestream!', 'success');
-                }
-            } catch (error) {
-                console.error('Error connecting to LiveKit:', error);
-                // Error toast is already shown in connectToLiveKit
-            }
-        };
-
-        connectWhenReady();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedStream, connectToLiveKit]);
+    }, [id, connectToLiveKit]);
 
     // Note: Reactions and Floating Reactions are now handled inside LiveStreamReactions component
 
@@ -926,15 +433,12 @@ const LiveStreamDetail = () => {
 
     const leaveLivestream = async () => {
         try {
-            // Leave via API (for this tab instance)
+            // Leave via API
             if (hasJoinedRef.current && selectedStream?._id) {
                 const token = localStorage.getItem('token');
                 if (token) {
                     try {
-                        await Api.livestream.leave({
-                            livestreamId: selectedStream._id,
-                            tabId: tabIdRef.current
-                        }, token);
+                        await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
                         hasJoinedRef.current = false;
                     } catch (apiError) {
                         console.error('Error calling leave API:', apiError);
@@ -942,9 +446,7 @@ const LiveStreamDetail = () => {
                 }
             }
             await disconnectFromLiveKit();
-            if (isMountedRef.current) {
-                showToast('Left livestream', 'info');
-            }
+            showToast('Left livestream', 'info');
         } catch (error) {
             console.error('Error leaving livestream:', error);
         }
@@ -970,53 +472,23 @@ const LiveStreamDetail = () => {
     useEffect(() => {
         const room = roomRef.current;
         const socket = socketRef.current;
-        const currentTabId = tabIdRef.current;
 
         return () => {
-            // Mark component as unmounted
-            isMountedRef.current = false;
-
-            // Leave livestream if still joined (for this tab instance)
+            // Leave livestream if still joined
             if (hasJoinedRef.current && selectedStream?._id) {
                 const token = localStorage.getItem('token');
                 if (token) {
-                    // Include tabId in leave request to identify which tab is leaving
-                    Api.livestream.leave({
-                        livestreamId: selectedStream._id,
-                        tabId: currentTabId
-                    }, token).catch((err) => {
-                        console.error('Error leaving livestream on cleanup:', err);
-                    });
+                    Api.livestream.leave({ livestreamId: selectedStream._id }, token).catch(console.error);
                     hasJoinedRef.current = false;
                 }
             }
 
-            // Disconnect room for this tab
             if (room) {
-                try {
-                    room.removeAllListeners();
-                    if (room.state !== 'disconnected') {
-                        room.disconnect().catch((err) => {
-                            console.error('Error disconnecting room on cleanup:', err);
-                        });
-                    }
-                } catch (err) {
-                    console.error('Error cleaning up room:', err);
-                }
+                room.disconnect().catch(console.error);
             }
-
-            // Disconnect socket for this tab
             if (socket) {
-                try {
-                    socket.disconnect();
-                } catch (err) {
-                    console.error('Error cleaning up socket:', err);
-                }
+                socket.disconnect();
             }
-
-            // Clear refs
-            roomRef.current = null;
-            socketRef.current = null;
         };
     }, [selectedStream?._id]);
 
@@ -1091,7 +563,7 @@ const LiveStreamDetail = () => {
         >
             {/* Video Modal - Full Screen */}
             <div
-                className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black z-50 flex items-center justify-center p-0 md:p-4"
+                className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black z-50 flex items-center justify-center p-4"
                 onClick={(e) => {
                     // Prevent default behavior for any clicks on background
                     if (e.target === e.currentTarget) {
@@ -1100,473 +572,278 @@ const LiveStreamDetail = () => {
                     }
                 }}
             >
-                {/* ============= MOBILE TIKTOK-STYLE UI ============= */}
-                {isMobile ? (
-                    <div className="relative w-full h-full bg-black" ref={containerRef}>
-                        {/* Fullscreen Video */}
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            controls={false}
-                            muted={false}
-                            className="w-full h-full object-cover"
-                            style={{ backgroundColor: '#000' }}
-                            onError={(e) => console.error('Video error:', e)}
-                        />
+                <div
+                    className={`relative bg-black/90 backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50 ${showInfo
+                        ? 'ml-80'
+                        : ''
+                        } ${showComments && showProducts
+                            ? 'mr-[640px]'
+                            : showComments
+                                ? 'mr-[352px]'
+                                : showProducts
+                                    ? 'mr-[288px]'
+                                    : ''
+                        }`}
+                    style={{
+                        width: showInfo && showComments && showProducts
+                            ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
+                            : showInfo && showComments
+                                ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
+                                : showInfo && showProducts
+                                    ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
+                                    : showInfo
+                                        ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
+                                        : showComments && showProducts
+                                            ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
+                                            : showComments
+                                                ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
+                                                : showProducts
+                                                    ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
+                                                    : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
+                        aspectRatio: '9/16',
+                        maxWidth: '90vw',
+                        maxHeight: 'calc(100vh - 2rem)'
+                    }}
+                    ref={containerRef}
+                    onClick={(e) => {
+                        // Prevent any navigation or reload from container clicks
+                        const target = e.target;
+                        if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'SVG' || target.closest('svg')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+                        }
+                    }}
+                    onMouseDown={(e) => {
+                        // Prevent any mouse down events on buttons from propagating
+                        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    }}
+                >
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        controls={false}
+                        muted={false}
+                        className="w-full h-full object-cover cursor-pointer"
+                        style={{ backgroundColor: '#000' }}
+                        onError={(e) => console.error('Video error:', e)}
+                        onClick={(e) => {
+                            // Prevent video clicks from bubbling up
+                            e.stopPropagation();
+                        }}
+                    />
 
-                        {/* Gradient overlay for better text visibility */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
+                    {/* Back Button */}
+                    <button
+                        type="button"
+                        onClick={goBack}
+                        className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 z-50 border border-white/10 shadow-lg hover:scale-110 transform"
+                    >
+                        <ArrowBack className="w-5 h-5" />
+                    </button>
 
-                        {/* Top Bar - Back button, Live status, Host info */}
-                        <div className="absolute top-0 left-0 right-0 p-3 flex items-start justify-between z-20">
-                            {/* Left: Back + Host Info */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={goBack}
-                                    className="bg-black/40 backdrop-blur-md text-white p-2 rounded-full active:bg-black/60"
-                                >
-                                    <ArrowBack className="w-5 h-5" />
-                                </button>
-
-                                {/* Host Info */}
-                                {selectedStream?.hostId && (
-                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full pl-1 pr-3 py-1">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-xs font-bold">
-                                            {(selectedStream.hostId?.name || 'H').charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <p className="text-white text-xs font-semibold leading-tight">
-                                                {selectedStream.hostId?.name || 'Host'}
-                                            </p>
-                                            <p className="text-white/60 text-[10px] leading-tight">Host</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Right: Live Badge + Viewers */}
-                            <div className="flex flex-col items-end gap-1.5">
-                                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${connectionState === 'connected'
-                                    ? 'bg-red-500 text-white'
-                                    : connectionState === 'connecting'
-                                        ? 'bg-yellow-500 text-white'
-                                        : 'bg-gray-600 text-white'
-                                    }`}>
-                                    <div className={`w-1.5 h-1.5 rounded-full bg-white ${connectionState === 'connected' ? 'animate-pulse' : ''}`} />
-                                    {connectionState === 'connected' ? 'LIVE' : connectionState === 'connecting' ? '...' : 'ENDED'}
-                                </div>
-
-                                <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full">
-                                    <Videocam className="w-3 h-3 text-white" />
-                                    <span className="text-white text-[10px] font-medium">{remoteParticipants.length}</span>
-                                </div>
-                            </div>
+                    {/* Status & Viewers */}
+                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
+                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border transition-all duration-300 shadow-lg ${connectionState === 'connected'
+                            ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white border-red-500/50 animate-pulse'
+                            : connectionState === 'connecting'
+                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-yellow-500/50'
+                                : connectionState === 'error'
+                                    ? 'bg-gradient-to-r from-red-700 to-red-800 text-white border-red-600/50'
+                                    : 'bg-gray-700/80 text-white border-gray-600/50'
+                            }`}>
+                            <div className={`w-2 h-2 rounded-full ${connectionState === 'connected'
+                                ? 'bg-white animate-ping'
+                                : connectionState === 'connecting'
+                                    ? 'bg-white animate-pulse'
+                                    : 'bg-white'
+                                }`}></div>
+                            <span>
+                                {connectionState === 'connected' ? 'LIVE' :
+                                    connectionState === 'connecting' ? 'CONNECTING' :
+                                        connectionState === 'error' ? 'ERROR' : 'ENDED'}
+                            </span>
                         </div>
 
-                        {/* Floating Product Card (TikTok style) - Above comments */}
-                        {showMobileProduct && (selectedStream?._id || id) && (
-                            <div className="absolute left-3 right-3 bottom-[45%] z-30 animate-fade-in">
-                                <LiveStreamProducts
-                                    key={`products-mobile-${selectedStream?._id || id}`}
-                                    liveId={selectedStream?._id || id}
-                                    isMobileFloating={true}
-                                    onClose={() => setShowMobileProduct(false)}
-                                />
-                            </div>
-                        )}
-
-                        {/* Comments Overlay (TikTok style - bottom left) */}
-                        {(selectedStream?._id || id) && (
-                            <LiveStreamComments
-                                liveId={selectedStream?._id || id}
-                                hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
-                                isVisible={showComments}
-                                onToggle={() => setShowComments(!showComments)}
-                                isMobile={true}
-                                onShowProducts={() => setShowMobileProduct(!showMobileProduct)}
-                                showMobileProduct={showMobileProduct}
-                                onShowInfo={() => setShowInfo(true)}
-                            />
-                        )}
-
-                        {/* Mobile Info Panel (Full screen overlay) */}
-                        {showInfo && selectedStream && (
-                            <>
-                                <div
-                                    className="fixed inset-0 bg-black/60 z-[60]"
-                                    onClick={() => setShowInfo(false)}
-                                />
-                                <div className="fixed bottom-0 left-0 right-0 bg-gray-900 rounded-t-3xl z-[61] max-h-[70vh] overflow-hidden animate-slide-up">
-                                    <div className="flex justify-center pt-2 pb-1">
-                                        <div className="w-10 h-1 bg-gray-600 rounded-full" />
-                                    </div>
-                                    <div className="p-4 space-y-3 overflow-y-auto max-h-[calc(70vh-3rem)]">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="text-white font-bold text-lg">Livestream Info</h3>
-                                            <button onClick={() => setShowInfo(false)} className="text-white/60 p-1">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="bg-gray-800/50 p-3 rounded-xl">
-                                            <h4 className="text-white font-semibold mb-1">{selectedStream.title || 'Untitled'}</h4>
-                                            {selectedStream.description && (
-                                                <p className="text-gray-400 text-sm">{selectedStream.description}</p>
-                                            )}
-                                        </div>
-
-                                        {selectedStream.hostId && (
-                                            <div className="flex items-center gap-3 bg-gray-800/50 p-3 rounded-xl">
-                                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-lg font-bold">
-                                                    {(selectedStream.hostId?.name || 'H').charAt(0).toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <p className="text-white font-semibold">{selectedStream.hostId?.name || 'Unknown Host'}</p>
-                                                    <p className="text-gray-400 text-sm">Host</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <div className="bg-gray-800/50 p-3 rounded-xl">
-                                            <p className="text-gray-400 text-xs mb-1">Started at</p>
-                                            <p className="text-white font-medium">{formatDateTime(selectedStream.startTime)}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Ended Overlay */}
-                        {connectionState !== 'connected' && !streamEnded && (
-                            <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
-                                <div className="text-center text-white p-6">
-                                    <div className="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <LiveTv className="w-10 h-10 text-gray-400" />
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-2">Livestream has ended</h3>
-                                    <p className="text-gray-400 mb-6">Thank you for watching!</p>
-                                    <button
-                                        type="button"
-                                        onClick={goBack}
-                                        className="px-6 py-2.5 bg-red-500 text-white rounded-full font-medium"
-                                    >
-                                        Go Back
-                                    </button>
-                                </div>
+                        {selectedStream && (
+                            <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
+                                <Videocam className="w-4 h-4 text-blue-400" />
+                                <span className="text-white font-semibold">{remoteParticipants.length}</span>
+                                <span className="text-xs text-gray-300">viewers</span>
                             </div>
                         )}
                     </div>
-                ) : (
-                    /* ============= DESKTOP UI (unchanged) ============= */
-                    <>
-                        <div
-                            className={`relative bg-black/90 backdrop-blur-xl overflow-hidden transition-all duration-500 shadow-2xl border border-gray-800/50
-                        w-full h-full md:w-auto md:h-auto
-                        rounded-none md:rounded-2xl
-                        ${showInfo ? 'md:ml-80' : ''}
-                        ${showComments && showProducts
-                                    ? 'md:mr-[640px]'
-                                    : showComments
-                                        ? 'md:mr-[352px]'
-                                        : showProducts
-                                            ? 'md:mr-[288px]'
-                                            : ''
-                                }
-                    `}
-                            style={{
-                                width: showInfo && showComments && showProducts
-                                    ? 'min(calc(100vw - 960px), calc((100vh - 2rem) * 9 / 16))'
-                                    : showInfo && showComments
-                                        ? 'min(calc(100vw - 672px), calc((100vh - 2rem) * 9 / 16))'
-                                        : showInfo && showProducts
-                                            ? 'min(calc(100vw - 608px), calc((100vh - 2rem) * 9 / 16))'
-                                            : showInfo
-                                                ? 'min(calc(100vw - 340px), calc((100vh - 2rem) * 9 / 16))'
-                                                : showComments && showProducts
-                                                    ? 'min(calc(100vw - 640px), calc((100vh - 2rem) * 9 / 16))'
-                                                    : showComments
-                                                        ? 'min(calc(100vw - 372px), calc((100vh - 2rem) * 9 / 16))'
-                                                        : showProducts
-                                                            ? 'min(calc(100vw - 308px), calc((100vh - 2rem) * 9 / 16))'
-                                                            : 'min(90vw, calc((100vh - 2rem) * 9 / 16))',
-                                aspectRatio: '9/16',
-                                maxWidth: '90vw',
-                                maxHeight: 'calc(100vh - 2rem)'
-                            }}
-                            ref={containerRef}
-                            onClick={(e) => {
-                                const target = e.target;
-                                if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'SVG' || target.closest('svg')) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    return false;
-                                }
-                            }}
-                            onMouseDown={(e) => {
-                                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                }
-                            }}
-                        >
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                playsInline
-                                controls={false}
-                                muted={false}
-                                className="w-full h-full object-cover cursor-pointer"
-                                style={{ backgroundColor: '#000' }}
-                                onError={(e) => console.error('Video error:', e)}
-                                onClick={(e) => e.stopPropagation()}
-                            />
 
-                            {/* Back Button */}
-                            <button
-                                type="button"
-                                onClick={goBack}
-                                className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 z-50 border border-white/10 shadow-lg hover:scale-110 transform active:scale-95"
-                            >
-                                <ArrowBack className="w-5 h-5" />
-                            </button>
-
-                            {/* Status & Viewers */}
-                            <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
-                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border transition-all duration-300 shadow-lg ${connectionState === 'connected'
-                                    ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white border-red-500/50 animate-pulse'
-                                    : connectionState === 'connecting'
-                                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-yellow-500/50'
-                                        : connectionState === 'error'
-                                            ? 'bg-gradient-to-r from-red-700 to-red-800 text-white border-red-600/50'
-                                            : 'bg-gray-700/80 text-white border-gray-600/50'
-                                    }`}>
-                                    <div className={`w-2 h-2 rounded-full ${connectionState === 'connected'
-                                        ? 'bg-white animate-ping'
-                                        : connectionState === 'connecting'
-                                            ? 'bg-white animate-pulse'
-                                            : 'bg-white'
-                                        }`}></div>
-                                    <span>
-                                        {connectionState === 'connected' ? 'LIVE' :
-                                            connectionState === 'connecting' ? 'CONNECTING' :
-                                                connectionState === 'error' ? 'ERROR' : 'ENDED'}
-                                    </span>
-                                </div>
-
-                                {selectedStream && (
-                                    <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white/10 shadow-lg">
-                                        <Videocam className="w-4 h-4 text-blue-400" />
-                                        <span className="text-white font-semibold text-sm">{remoteParticipants.length}</span>
-                                        <span className="text-xs text-gray-300">viewers</span>
+                    {/* Ended Overlay */}
+                    {connectionState !== 'connected' && !streamEnded && (
+                        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center">
+                            <div className="text-center text-white">
+                                <div className="relative mb-6">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mx-auto backdrop-blur-md border border-gray-600/30">
+                                        <LiveTv className="w-10 h-10 text-gray-400" />
                                     </div>
-                                )}
+                                    <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                                    Livestream has ended
+                                </h3>
+                                <p className="text-gray-300 mb-6">Thank you for watching!</p>
+                                <button
+                                    type="button"
+                                    onClick={goBack}
+                                    className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Info Panel - Left side of Video */}
+                {showInfo && selectedStream && (
+                    <div className="fixed left-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto border-r border-gray-800/50">
+                        <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+                                    <Info className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-bold text-sm">Information</h3>
+                                    <p className="text-white/70 text-[10px]">Livestream details</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowInfo(false)}
+                                className="text-white hover:bg-white/20 p-1.5 rounded-full transition-all duration-300 hover:scale-110 transform border border-white/10"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-livestream">
+                            {/* Title */}
+                            <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-3 rounded-lg border border-blue-500/20">
+                                <h2 className="text-white font-bold text-sm leading-tight">
+                                    {selectedStream.title || 'Untitled Livestream'}
+                                </h2>
                             </div>
 
-                            {/* Ended Overlay */}
-                            {connectionState !== 'connected' && !streamEnded && (
-                                <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center">
-                                    <div className="text-center text-white">
-                                        <div className="relative mb-6">
-                                            <div className="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mx-auto backdrop-blur-md border border-gray-600/30">
-                                                <LiveTv className="w-10 h-10 text-gray-400" />
-                                            </div>
-                                            <div className="absolute inset-0 bg-gray-500/20 rounded-full animate-ping"></div>
-                                        </div>
-                                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                                            Livestream has ended
-                                        </h3>
-                                        <p className="text-gray-300 mb-6">Thank you for watching!</p>
-                                        <button
-                                            type="button"
-                                            onClick={goBack}
-                                            className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-red-500/50 font-medium"
-                                        >
-                                            Close
-                                        </button>
+                            {/* Description */}
+                            {selectedStream.description && (
+                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                                    <h4 className="text-blue-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
+                                        <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                                        </svg>
+                                        Description
+                                    </h4>
+                                    <p className="text-gray-300 text-xs leading-relaxed">
+                                        {selectedStream.description}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Host Info */}
+                            {selectedStream.hostId && (
+                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                                    <h4 className="text-blue-400 text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                                        <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+                                        </svg>
+                                        Host
+                                    </h4>
+                                    <div>
+                                        <p className="text-white font-semibold text-xs">
+                                            {selectedStream.hostId?.name || 'Unknown Host'}
+                                        </p>
+                                        {selectedStream.hostId?.email && (
+                                            <p className="text-gray-400 text-[10px] mt-0.5">{selectedStream.hostId.email}</p>
+                                        )}
                                     </div>
                                 </div>
                             )}
 
-                            {/* Controls - Bottom buttons */}
-                            <div
-                                className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-auto z-10"
-                                onClick={(e) => e.stopPropagation()}
-                                onMouseDown={(e) => e.stopPropagation()}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowInfo(!showInfo)}
-                                        className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showInfo ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border-blue-500/50' : ''
-                                            }`}
-                                    >
-                                        <Info className="w-5 h-5" />
-                                    </button>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowProducts(!showProducts)}
-                                        className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showProducts ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border-green-500/50' : ''
-                                            }`}
-                                    >
-                                        <ShoppingBag className="w-5 h-5" />
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowComments(!showComments)}
-                                        className={`bg-black/60 backdrop-blur-md text-white p-2.5 rounded-full hover:bg-black/80 transition-all duration-300 border border-white/10 shadow-lg hover:scale-110 active:scale-95 transform ${showComments ? 'bg-gradient-to-r from-red-600/80 to-pink-600/80 border-red-500/50' : ''
-                                            }`}
-                                    >
-                                        <Chat className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Info Panel - Left side of Video (Desktop) */}
-                        {showInfo && selectedStream && (
-                            <div className="fixed left-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto border-r border-gray-800/50 transition-transform duration-300">
-                                <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                                            <Info className="w-4 h-4 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-white font-bold text-sm">Information</h3>
-                                            <p className="text-white/70 text-[10px]">Livestream details</p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => setShowInfo(false)}
-                                        className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-livestream">
-                                    <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-3 rounded-lg border border-blue-500/20">
-                                        <h2 className="text-white font-bold text-sm leading-tight">
-                                            {selectedStream.title || 'Untitled Livestream'}
-                                        </h2>
-                                    </div>
-
-                                    {selectedStream.description && (
-                                        <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                                            <h4 className="text-blue-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
-                                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
-                                                </svg>
-                                                Description
-                                            </h4>
-                                            <p className="text-gray-300 text-xs leading-relaxed">
-                                                {selectedStream.description}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {selectedStream.hostId && (
-                                        <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                                            <h4 className="text-blue-400 text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-                                                </svg>
-                                                Host
-                                            </h4>
+                            {/* Stream Time */}
+                            <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                                <h4 className="text-blue-400 text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                                    </svg>
+                                    Stream Schedule
+                                </h4>
+                                <div className="space-y-2">
+                                    {selectedStream.startTime && (
+                                        <div className="flex items-start gap-2">
+                                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
                                             <div>
-                                                <p className="text-white font-semibold text-xs">
-                                                    {selectedStream.hostId?.name || 'Unknown Host'}
+                                                <span className="text-gray-400 text-[10px] block mb-0.5">Started</span>
+                                                <p className="text-white text-xs font-medium">
+                                                    {formatDateTime(selectedStream.startTime)}
                                                 </p>
-                                                {selectedStream.hostId?.email && (
-                                                    <p className="text-gray-400 text-[10px] mt-0.5">{selectedStream.hostId.email}</p>
-                                                )}
                                             </div>
                                         </div>
                                     )}
-
-                                    <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                                        <h4 className="text-blue-400 text-[10px] font-bold mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                                            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                                            </svg>
-                                            Stream Schedule
-                                        </h4>
-                                        <div className="space-y-2">
-                                            {selectedStream.startTime && (
-                                                <div className="flex items-start gap-2">
-                                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                                                    <div>
-                                                        <span className="text-gray-400 text-[10px] block mb-0.5">Started</span>
-                                                        <p className="text-white text-xs font-medium">
-                                                            {formatDateTime(selectedStream.startTime)}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {selectedStream.endTime && selectedStream.status !== 'live' && (
-                                                <div className="flex items-start gap-2">
-                                                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                                                    <div>
-                                                        <span className="text-gray-400 text-[10px] block mb-0.5">Ended</span>
-                                                        <p className="text-white text-xs font-medium">
-                                                            {formatDateTime(selectedStream.endTime)}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )}
+                                    {selectedStream.endTime && selectedStream.status !== 'live' && (
+                                        <div className="flex items-start gap-2">
+                                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                            <div>
+                                                <span className="text-gray-400 text-[10px] block mb-0.5">Ended</span>
+                                                <p className="text-white text-xs font-medium">
+                                                    {formatDateTime(selectedStream.endTime)}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
-                        )}
+                        </div>
+                    </div>
+                )}
 
-                        {/* Products Panel - Between Video and Comments (Desktop) */}
-                        {showProducts && (selectedStream?._id || id) && (
-                            <div className={`fixed top-0 h-full w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-[352px]' : 'right-0'} border-l border-gray-800/50 transition-transform duration-300`}>
-                                <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                                            <ShoppingBag className="w-4 h-4 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-white font-bold text-sm">Products</h3>
-                                            <p className="text-white/70 text-[10px]">Featured items</p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => setShowProducts(false)}
-                                        className="text-white hover:bg-white/20 active:bg-white/30 p-1.5 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 transform border border-white/10"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                {/* Products Panel - Between Video and Comments */}
+                {showProducts && (selectedStream?._id || id) && (
+                    <div className={`fixed top-0 h-full w-[288px] bg-black/95 backdrop-blur-xl flex flex-col z-[40] shadow-2xl pointer-events-auto ${showComments ? 'right-[352px]' : 'right-0'
+                        } border-l border-gray-800/50`}>
+                        <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+                                    <ShoppingBag className="w-4 h-4 text-white" />
                                 </div>
-                                <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
-                                    <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />
+                                <div>
+                                    <h3 className="text-white font-bold text-sm">Products</h3>
+                                    <p className="text-white/70 text-[10px]">Featured items</p>
                                 </div>
                             </div>
-                        )}
+                            {/* <button
+                                onClick={() => setShowProducts(false)}
+                                className="text-white hover:bg-white/20 p-1.5 rounded-full transition-all duration-300 hover:scale-110 transform border border-white/10"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button> */}
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-3 scrollbar-livestream">
+                            <LiveStreamProducts key={`products-${selectedStream?._id || id}-${showProducts}`} liveId={selectedStream?._id || id} />
+                        </div>
+                    </div>
+                )}
 
-                        {/* Comments Panel (Desktop) */}
-                        {(selectedStream?._id || id) && (
-                            <LiveStreamComments
-                                liveId={selectedStream?._id || id}
-                                hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
-                                isVisible={showComments}
-                                onToggle={() => setShowComments(!showComments)}
-                                isMobile={false}
-                            />
-                        )}
-                    </>
+                {/* Comments Panel */}
+                {(selectedStream?._id || id) && (
+                    <LiveStreamComments
+                        liveId={selectedStream?._id || id}
+                        hostId={selectedStream?.hostId?._id || selectedStream?.hostId}
+                        isVisible={showComments}
+                        onToggle={() => setShowComments(!showComments)}
+                    />
                 )}
             </div>
         </div>

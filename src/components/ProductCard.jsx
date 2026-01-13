@@ -95,7 +95,7 @@ const ProductCard = ({ product, handleProductClick, handleKeyDown }) => {
             {product.productName || "Unnamed Product"}
           </h2>
           <p className="text-gray-600 text-sm">
-            {product.categoryId?.cat_name || "Uncategorized"}
+            {product.categoryId?.categoryName || "Uncategorized"}
           </p>
           <div className="pt-1">
             <StatusBadge status={product.productStatus} />

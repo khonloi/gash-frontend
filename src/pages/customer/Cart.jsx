@@ -71,6 +71,7 @@ const Cart = () => {
   const fetchCartItems = useCallback(
     async (showLoading = true) => {
       if (!user?._id) {
+        console.log("No user ID, skipping fetch");
         return;
       }
 
@@ -83,6 +84,7 @@ const Cart = () => {
         cacheAge < 30000 &&
         !showLoading
       ) {
+        console.log("Using cached cart items");
         setCartItems(cartCache.current.items);
         return;
       }
@@ -94,10 +96,12 @@ const Cart = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
 
+        console.log("Fetching cart for user:", user._id);
         const response = await fetchWithRetry(() =>
           Api.newCart.getByAccount(user._id, token)
         );
 
+        console.log("Cart fetch response:", response);
         const data = response?.data || response;
         const items = Array.isArray(data)
           ? data
@@ -106,11 +110,12 @@ const Cart = () => {
                 console.warn("Cart item missing variantId:", i);
                 return null;
               }
-              return { ...i, checked: i.selected || false };
+                return { ...i, checked: i.selected || false };
             })
             .filter((item) => item !== null)
           : [];
 
+        console.log("Processed cart items:", items);
         setCartItems(items);
         cartCache.current = { items, timestamp: now };
 
@@ -127,7 +132,7 @@ const Cart = () => {
       } catch (err) {
         console.error("Fetch cart error:", err);
         let errorMessage = "Failed to load cart items";
-
+        
         if (err?.response?.data?.message) {
           errorMessage = err.response.data.message;
         } else if (err?.message) {
@@ -135,7 +140,7 @@ const Cart = () => {
         } else if (!err.response) {
           errorMessage = "Failed to load cart items. Please try again later.";
         }
-
+        
         setError(errorMessage);
         showToast(errorMessage, "error", TOAST_TIMEOUT);
       } finally {
@@ -147,6 +152,7 @@ const Cart = () => {
 
   // Initial fetch
   useEffect(() => {
+    console.log("User:", user, "Token:", localStorage.getItem("token"));
     if (!user && !localStorage.getItem("token")) {
       navigate("/login", { replace: true });
     } else if (user) {
@@ -159,7 +165,7 @@ const Cart = () => {
     const updateQuantities = async () => {
       if (!user?._id || Object.keys(debouncedQuantities).length === 0) return;
 
-      const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
       if (!token) return;
 
       // Use functional update to get the latest cartItems state
@@ -175,24 +181,24 @@ const Cart = () => {
           // Skip if empty string
           if (newQuantityRaw === "" || newQuantityRaw === null || newQuantityRaw === undefined) continue;
 
-          const newQuantity = typeof newQuantityRaw === "number"
-            ? newQuantityRaw
+          const newQuantity = typeof newQuantityRaw === "number" 
+            ? newQuantityRaw 
             : parseInt(newQuantityRaw, 10);
-
+          
           if (isNaN(newQuantity) || newQuantity < 1) continue;
 
           // Compare against last saved quantity (not optimistic update)
           const lastSavedQty = lastSavedQuantities.current[cartId];
           const savedQuantity = lastSavedQty !== undefined ? lastSavedQty : (parseInt(item.productQuantity, 10) || 1);
-
+          
           // Only update if different from what was last saved
           if (newQuantity === savedQuantity) continue;
 
-          updates.push({
-            cartId,
-            newQuantity,
+          updates.push({ 
+          cartId,
+            newQuantity, 
             originalQuantity: savedQuantity,
-            item
+            item 
           });
           updatingIds.add(cartId);
         }
@@ -208,6 +214,7 @@ const Cart = () => {
         // Perform API updates
         Promise.all(
           updates.map(async ({ cartId, newQuantity }) => {
+            console.log("Updating cart item:", cartId, "to quantity:", newQuantity);
             try {
               const response = await Api.newCart.update(
                 cartId,
@@ -215,17 +222,18 @@ const Cart = () => {
                 token
               );
               return { cartId, response, newQuantity, success: true };
-            } catch (err) {
+      } catch (err) {
               console.error("API update error for", cartId, ":", err);
               return { cartId, error: err, newQuantity, success: false };
             }
           })
         )
           .then((results) => {
+            console.log("Update results:", results);
 
             // Check if all updates succeeded
             const allSucceeded = results.every(r => r.success);
-
+            
             if (allSucceeded) {
               // Update local state using API response data when available
               setCartItems((prevItems) => {
@@ -234,33 +242,35 @@ const Cart = () => {
                   if (result && result.success) {
                     // Try to get updated quantity from API response
                     let updatedQuantity = result.newQuantity;
-
+                    
                     if (result.response?.data) {
                       const responseData = result.response.data?.data || result.response.data;
                       if (responseData?.productQuantity !== undefined) {
                         updatedQuantity = parseInt(responseData.productQuantity, 10);
+                        console.log("Using API response quantity:", updatedQuantity);
                       }
                     }
 
-                    const updatedItem = {
-                      ...item,
+                    const updatedItem = { 
+                      ...item, 
                       productQuantity: updatedQuantity.toString()
                     };
+                    console.log("Updated item:", updatedItem);
                     return updatedItem;
                   }
                   return item;
                 });
-
+                
                 // Update cache with fresh data
                 cartCache.current = { items: updatedItems, timestamp: 0 };
-
+                
                 // Update last saved quantities
                 results.forEach(({ cartId, newQuantity }) => {
                   if (newQuantity !== undefined) {
                     lastSavedQuantities.current[cartId] = newQuantity;
                   }
                 });
-
+                
                 // Sync quantityValues with updated quantities
                 setQuantityValues((prev) => {
                   const updated = { ...prev };
@@ -271,14 +281,14 @@ const Cart = () => {
                   });
                   return updated;
                 });
-
+                
                 return updatedItems;
               });
             } else {
               // Some updates failed - revert all
               const failedResults = results.filter(r => !r.success);
               console.error("Some updates failed:", failedResults);
-
+              
               const errorMessage = "Failed to update quantity";
               showToast(errorMessage, "error", TOAST_TIMEOUT);
 
@@ -287,14 +297,14 @@ const Cart = () => {
                 const revertedItems = prevItems.map((item) => {
                   const update = updates.find((u) => u.cartId === item._id);
                   if (update) {
-                    return {
-                      ...item,
-                      productQuantity: update.originalQuantity.toString()
+                    return { 
+                      ...item, 
+                      productQuantity: update.originalQuantity.toString() 
                     };
                   }
                   return item;
                 });
-
+                
                 // Also revert quantityValues and last saved quantities
                 setQuantityValues((prev) => {
                   const updated = { ...prev };
@@ -304,7 +314,7 @@ const Cart = () => {
                   });
                   return updated;
                 });
-
+                
                 return revertedItems;
               });
             }
@@ -355,6 +365,7 @@ const Cart = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
 
+        console.log("Removing cart item:", cartId);
         await Api.newCart.delete(cartId, token);
 
         cartCache.current = {
@@ -405,12 +416,12 @@ const Cart = () => {
       if (productName.includes(query)) return true;
 
       // Search by color
-      const colorName = item.variantId?.productColorId?.color_name?.toLowerCase() || "";
-      if (colorName.includes(query)) return true;
+      const productColorName = item.variantId?.productColorId?.productColorName?.toLowerCase() || "";
+      if (productColorName.includes(query)) return true;
 
       // Search by size
-      const sizeName = item.variantId?.productSizeId?.size_name?.toLowerCase() || "";
-      if (sizeName.includes(query)) return true;
+      const productSizeName = item.variantId?.productSizeId?.productSizeName?.toLowerCase() || "";
+      if (productSizeName.includes(query)) return true;
 
       return false;
     });
@@ -481,15 +492,15 @@ const Cart = () => {
       // Update local state immediately for responsive UI
       // Only update quantityValues - let the debounced effect handle cartItems update
       setQuantityValues((prev) => ({ ...prev, [cartId]: newQuantity }));
-
+      
       // Optimistically update cartItems for immediate UI feedback
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item._id === cartId
+        setCartItems((prev) =>
+          prev.map((item) =>
+            item._id === cartId
             ? { ...item, productQuantity: newQuantity.toString() }
-            : item
-        )
-      );
+              : item
+          )
+        );
     },
     [cartItems, showToast]
   );
@@ -607,31 +618,31 @@ const Cart = () => {
           </div>
         )}
 
-        {error && (
-          <div
+      {error && (
+        <div
             ref={errorRef}
             className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap"
-            role="alert"
-            tabIndex={0}
-            aria-live="polite"
-          >
+          role="alert"
+          tabIndex={0}
+          aria-live="polite"
+        >
             <span className="text-lg" aria-hidden="true">
-              ⚠
-            </span>
-            {error}
-            <ProductButton
-              variant="secondary"
-              size="sm"
-              onClick={handleRetry}
-              disabled={loading}
-              aria-label="Retry loading cart items"
-            >
-              Retry
-            </ProductButton>
-          </div>
-        )}
+            ⚠
+          </span>
+          {error}
+          <ProductButton
+            variant="secondary"
+            size="sm"
+            onClick={handleRetry}
+            disabled={loading}
+            aria-label="Retry loading cart items"
+          >
+            Retry
+          </ProductButton>
+        </div>
+      )}
 
-        {!loading && cartItems.length === 0 && !error && !searchQuery ? (
+      {!loading && cartItems.length === 0 && !error && !searchQuery ? (
           <div
             className="text-center text-xs sm:text-sm text-gray-500 p-4 sm:p-6 md:p-8 w-full min-h-[200px] flex flex-col items-center justify-center gap-4"
             role="status"
@@ -639,16 +650,16 @@ const Cart = () => {
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 m-0">
               Your cart is empty.
             </h3>
-            <ProductButton
-              variant="primary"
-              size="md"
-              onClick={() => navigate("/products")}
-              aria-label="Continue shopping"
-            >
-              Continue Shopping
-            </ProductButton>
-          </div>
-        ) : (
+          <ProductButton
+            variant="primary"
+            size="md"
+            onClick={() => navigate("/products")}
+            aria-label="Continue shopping"
+          >
+            Continue Shopping
+          </ProductButton>
+        </div>
+      ) : (
           <main className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8" role="main">
             <section className="flex-1 min-w-0" aria-label="Cart items">
               {loading ? (
@@ -674,109 +685,109 @@ const Cart = () => {
                 </div>
               ) : (
                 filteredCartItems.map((item) => {
-                  const quantityValue = quantityValues[item._id];
-                  const quantity = quantityValue !== undefined && quantityValue !== ""
-                    ? (typeof quantityValue === "number" ? quantityValue : parseInt(quantityValue, 10))
-                    : parseInt(item.productQuantity, 10) || 1;
-                  const maxQuantity = item.variantId?.stockQuantity || Infinity;
-                  const isUpdating = updatingQuantities.has(item._id);
-                  const stockQuantity = item.variantId?.stockQuantity ?? 0;
-                  const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
-                  const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
-                  const isOutOfStock = stockQuantity <= 0;
-                  const isInactive = isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
-                  const inactiveMessage = isProductDiscontinued || isVariantDiscontinued
-                    ? "Discontinued"
-                    : isOutOfStock
-                      ? "Out of Stock"
-                      : "";
+                const quantityValue = quantityValues[item._id];
+                const quantity = quantityValue !== undefined && quantityValue !== ""
+                  ? (typeof quantityValue === "number" ? quantityValue : parseInt(quantityValue, 10))
+                  : parseInt(item.productQuantity, 10) || 1;
+                const maxQuantity = item.variantId?.stockQuantity || Infinity;
+                const isUpdating = updatingQuantities.has(item._id);
+                const stockQuantity = item.variantId?.stockQuantity ?? 0;
+                const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+                const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+                const isOutOfStock = stockQuantity <= 0;
+                const isInactive = isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+                const inactiveMessage = isProductDiscontinued || isVariantDiscontinued 
+                  ? "Discontinued" 
+                  : isOutOfStock 
+                    ? "Out of Stock" 
+                    : "";
 
-                  return (
-                    <article
-                      key={item._id}
-                      className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200 ${isInactive ? "opacity-60 grayscale" : ""}`}
-                      tabIndex={0}
-                      aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
-                    >
-                      <div className="flex items-stretch gap-6 flex-1">
+              return (
+                <article
+                  key={item._id}
+                    className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200 ${isInactive ? "opacity-60 grayscale" : ""}`}
+                  tabIndex={0}
+                    aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
+                >
+                    <div className="flex items-stretch gap-6 flex-1">
+                  <input
+                    type="checkbox"
+                    checked={item.checked || false}
+                    onChange={() => toggleChecked(item._id)}
+                        className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={`Select ${item.variantId?.productId?.productName || "product"} for checkout`}
+                        disabled={isInactive}
+                  />
+                  <img
+                        src={item.variantId?.variantImage || "/placeholder-image.png"}
+                    alt={item.variantId?.productId?.productName || "Product"}
+                        className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
+                        onError={(e) => {
+                          e.target.src = "/placeholder-image.png";
+                        }}
+                      />
+                      <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                        <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
+                      {item.variantId?.productId?.productName || "Unnamed Product"}
+                    </p>
+                        <p className="text-sm text-gray-600 m-0">
+                          Color: {item.variantId?.productColorId?.productColorName || "N/A"}, Size:{" "}
+                          {item.variantId?.productSizeId?.productSizeName || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-600 m-0">
+                      Price: {formatPrice(item.productPrice)}
+                    </p>
+                        <p className="text-sm text-gray-600 m-0">
+                          Stock: {stockQuantity}
+                    </p>
+                        {isInactive && (
+                          <p className="text-sm font-semibold text-red-600 m-0">
+                            {inactiveMessage}
+                          </p>
+                        )}
+                        <p className="text-base font-semibold text-red-600 m-0">
+                          Total: {formatPrice((item.productPrice || 0) * quantity)}
+                    </p>
+                  </div>
+                    </div>
+
+                    <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
+                      <div className="flex flex-col gap-2">
                         <input
-                          type="checkbox"
-                          checked={item.checked || false}
-                          onChange={() => toggleChecked(item._id)}
-                          className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 self-center disabled:opacity-50 disabled:cursor-not-allowed"
-                          aria-label={`Select ${item.variantId?.productId?.productName || "product"} for checkout`}
-                          disabled={isInactive}
-                        />
-                        <img
-                          src={item.variantId?.variantImage || "/placeholder-image.png"}
-                          alt={item.variantId?.productId?.productName || "Product"}
-                          className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
-                          onError={(e) => {
-                            e.target.src = "/placeholder-image.png";
+                          type="number"
+                          id={`quantity-${item._id}`}
+                          min="1"
+                          max={maxQuantity}
+                          value={quantityValue !== undefined ? quantityValue : quantity}
+                          onChange={(e) => handleQuantityChange(item._id, e.target.value)}
+                          onBlur={(e) => {
+                            // Ensure valid value on blur
+                            const value = e.target.value;
+                            if (value === "" || isNaN(parseInt(value, 10))) {
+                              const currentQty = parseInt(item.productQuantity, 10) || 1;
+                              setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
+                            }
                           }}
+                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
+                          disabled={isUpdating || actionInProgress || isInactive}
                         />
-                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-                          <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
-                            {item.variantId?.productId?.productName || "Unnamed Product"}
-                          </p>
-                          <p className="text-sm text-gray-600 m-0">
-                            Color: {item.variantId?.productColorId?.color_name || "N/A"}, Size:{" "}
-                            {item.variantId?.productSizeId?.size_name || "N/A"}
-                          </p>
-                          <p className="text-sm text-gray-600 m-0">
-                            Price: {formatPrice(item.productPrice)}
-                          </p>
-                          <p className="text-sm text-gray-600 m-0">
-                            Stock: {stockQuantity}
-                          </p>
-                          {isInactive && (
-                            <p className="text-sm font-semibold text-red-600 m-0">
-                              {inactiveMessage}
-                            </p>
-                          )}
-                          <p className="text-base font-semibold text-red-600 m-0">
-                            Total: {formatPrice((item.productPrice || 0) * quantity)}
-                          </p>
-                        </div>
                       </div>
-
-                      <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
-                        <div className="flex flex-col gap-2">
-                          <input
-                            type="number"
-                            id={`quantity-${item._id}`}
-                            min="1"
-                            max={maxQuantity}
-                            value={quantityValue !== undefined ? quantityValue : quantity}
-                            onChange={(e) => handleQuantityChange(item._id, e.target.value)}
-                            onBlur={(e) => {
-                              // Ensure valid value on blur
-                              const value = e.target.value;
-                              if (value === "" || isNaN(parseInt(value, 10))) {
-                                const currentQty = parseInt(item.productQuantity, 10) || 1;
-                                setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
-                              }
-                            }}
-                            className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                            aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
-                            disabled={isUpdating || actionInProgress || isInactive}
-                          />
-                        </div>
-                        <ProductButton
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleRemoveItemClick(item._id)}
-                          aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
-                          disabled={isUpdating || actionInProgress}
-                        >
-                          Remove
-                        </ProductButton>
-                      </div>
-                    </article>
-                  );
-                })
+                      <ProductButton
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleRemoveItemClick(item._id)}
+                        aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
+                        disabled={isUpdating || actionInProgress}
+                      >
+                        Remove
+                      </ProductButton>
+                  </div>
+                </article>
+              );
+              })
               )}
-            </section>
+          </section>
 
             {!loading && filteredCartItems.length > 0 && (
               <aside
@@ -786,28 +797,28 @@ const Cart = () => {
                 <p className="text-lg sm:text-xl font-bold text-red-600 mb-4 m-0">
                   Total: {formatPrice(totalPrice)}
                 </p>
-                <ProductButton
-                  variant="primary"
-                  size="lg"
-                  onClick={() => {
-                    const selectedItems = filteredCartItems.filter((i) => i.checked);
-                    navigate("/checkout", { state: { selectedItems } });
-                  }}
-                  disabled={
-                    filteredCartItems.filter((i) => i.checked).length === 0 ||
-                    loading ||
-                    actionInProgress ||
-                    hasInactiveSelectedItems
-                  }
-                  aria-label="Proceed to checkout"
-                  className="w-full"
-                >
-                  Proceed to Checkout
-                </ProductButton>
-              </aside>
-            )}
-          </main>
-        )}
+              <ProductButton
+                variant="primary"
+                size="lg"
+                onClick={() => {
+                  const selectedItems = filteredCartItems.filter((i) => i.checked);
+                  navigate("/checkout", { state: { selectedItems } });
+                }}
+                disabled={
+                  filteredCartItems.filter((i) => i.checked).length === 0 ||
+                  loading ||
+                  actionInProgress ||
+                  hasInactiveSelectedItems
+                }
+                aria-label="Proceed to checkout"
+                className="w-full"
+              >
+                Proceed to Checkout
+              </ProductButton>
+            </aside>
+          )}
+        </main>
+      )}
       </section>
 
       {/* Confirmation Modal for Removing Item */}

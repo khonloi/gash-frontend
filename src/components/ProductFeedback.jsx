@@ -60,8 +60,8 @@ const ProductFeedback = ({ productId }) => {
                     }
 
                     // If both are current user or both are not, sort by date (newest first)
-                    const dateA = new Date(a.feedback?.created_at || a.order_date || 0);
-                    const dateB = new Date(b.feedback?.created_at || b.order_date || 0);
+                    const dateA = new Date(a.feedback?.createdAt || a.order_date || 0);
+                    const dateB = new Date(b.feedback?.createdAt || b.order_date || 0);
                     return dateB - dateA;
                 });
 
@@ -301,8 +301,8 @@ const ProductFeedback = ({ productId }) => {
                                         </div>
                                         <div className="text-right">
                                             <div className="text-sm text-gray-500">
-                                                {feedback.feedback?.created_at
-                                                    ? formatDate(feedback.feedback.created_at)
+                                                {feedback.feedback?.createdAt
+                                                    ? formatDate(feedback.feedback.createdAt)
                                                     : feedback.order_date
                                                         ? formatDate(feedback.order_date)
                                                         : 'Unknown Date'}
@@ -334,7 +334,7 @@ const ProductFeedback = ({ productId }) => {
                                         <div className="mb-4">
                                             <p 
                                                 className={`text-base leading-relaxed p-4 rounded-xl border-l-4 break-words whitespace-pre-wrap max-w-full ${
-                                                    feedback.feedback?.is_deleted 
+                                                    feedback.feedback?.isDeleted 
                                                         ? 'text-gray-500 italic bg-gray-100 border-gray-400' 
                                                         : 'text-gray-700 bg-gray-50 border-yellow-400'
                                                 }`}
