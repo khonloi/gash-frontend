@@ -213,6 +213,11 @@ const Api = {
       axiosClient.get(`/order-details/get-order-details-by-product/${productId}`),
   },
 
+  // ==== Categories ====
+  categories: {
+    getAll: () => axiosClient.get("/categories/get-all-categories"),
+  },
+
   // ==== Feedback ====
   feedback: {
     getAllFeedback: (variantId, page = 1, limit = 10) =>

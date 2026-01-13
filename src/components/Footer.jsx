@@ -26,12 +26,14 @@ const Footer = () => {
           <h4 className="text-xl font-semibold mb-5">Contact Information</h4>
           <p className="font-medium mb-2">Call Us 24/7 Free</p>
           <p className="text-3xl font-semibold text-amber-500 mt-3 mb-3">
-            1 001 234 5678
+            +1 (305) 555-4274
           </p>
-          <p className="mb-2">Support@domain.com</p>
+          <p className="mb-2">support@gash.com</p>
           <p>
-            No. 45, National Road 1, Sangkat Bavet, Krong Bavet, Svay Rieng
-            Province, Cambodia
+            GASH Corporate Office <br></br>
+            1200 Commerce Avenue
+            Downtown Vice City, FL 33130
+            United States
           </p>
         </div>
 

@@ -46,6 +46,7 @@ export default function Header() {
     const [notificationCount, setNotificationCount] = useState(0);
     const [livestreamCount, setLivestreamCount] = useState(0);
     const [favoriteCount, setFavoriteCount] = useState(0);
+    const [randomCategories, setRandomCategories] = useState([]);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -112,6 +113,21 @@ export default function Header() {
         }
     }, [user]);
 
+    // Fetch random categories
+    const fetchCategories = useCallback(async () => {
+        try {
+            const response = await fetchWithRetry(() => Api.categories.getAll());
+            const categories = response?.data || [];
+            if (categories.length > 0) {
+                // Shuffle and pick 5
+                const shuffled = [...categories].sort(() => 0.5 - Math.random());
+                setRandomCategories(shuffled.slice(0, 5));
+            }
+        } catch (error) {
+            console.error("Error fetching categories for header:", error);
+        }
+    }, []);
+
     // Fetch favorite count
     const fetchFavoriteCount = useCallback(async () => {
         if (!user) {
@@ -163,7 +179,7 @@ export default function Header() {
 
         // Get backend URL
         const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
-        
+
         // Connect to Socket.IO
         const socket = io(baseURL, {
             transports: ["websocket", "polling"],
@@ -243,6 +259,7 @@ export default function Header() {
         fetchNotificationCount();   // guaranteed to run
         fetchLivestreamCount();
         fetchFavoriteCount();
+        fetchCategories();
 
         // ---- 2. EVENT LISTENERS (debounced) - Keep for backward compatibility ----
         const handleCartUpdate = () => debouncedFetchCartItemCount();
@@ -288,8 +305,8 @@ export default function Header() {
         debouncedFetchFavoriteCount,
         location,
         user
-    ]);       
-    
+    ]);
+
     useEffect(() => {
         setSearch("");
         setSearchResults([]);
@@ -400,6 +417,23 @@ export default function Header() {
 
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
+            {/* Category Bar */}
+            <div className="hidden sm:block border-b border-gray-700/50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 flex items-center justify-center gap-8 py-3 text-sm font-medium tracking-wide">
+                    {randomCategories.map((cat) => (
+                        <Link
+                            key={cat._id}
+                            to={`/products?category=${encodeURIComponent(cat.categoryName)}`}
+                            className="hover:text-amber-500 transition-colors uppercase"
+                        >
+                            {cat.categoryName}
+                        </Link>
+                    ))}
+                    {randomCategories.length === 0 && (
+                        <span className="text-gray-500 italic">Explore our latest collections</span>
+                    )}
+                </div>
+            </div>
             <div className="max-w-7xl mx-auto h-16 sm:h-20 md:h-24 flex items-center px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12">
                 {/* ==== MOBILE HEADER ==== */}
                 <div className="flex w-full items-center justify-between sm:hidden">
@@ -591,6 +625,33 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
+                                                console.log("Navigating to orders (mobile)");
+                                                navigate('/orders');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                        >
+                                            <ShoppingBagOutlinedIcon fontSize="small" /> My Orders
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
+                                                console.log("Navigating to favorites (mobile)");
+                                                navigate('/favorites');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
+                                        >
+                                            <FavoriteBorderIcon fontSize="small" /> My Favorites
+                                            {favoriteCount > 0 && (
+                                                <span className={`${badgeClass} top-1 right-4`}>
+                                                    {favoriteCount}
+                                                </span>
+                                            )}
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
                                                 console.log("Logging out");
                                                 handleLogout();
                                                 setShowUserMenu(false);
@@ -697,12 +758,12 @@ export default function Header() {
                                             navigate("/login");
                                             return;
                                         }
-                                        
+
                                         const response = await Api.livestream.getLiveNow(token);
-                                        
+
                                         if (response.data?.success) {
                                             let streams = [];
-                                            
+
                                             if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
                                                 streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
                                             } else if (response.data?.data?.livestream) {
@@ -711,7 +772,7 @@ export default function Header() {
                                                     streams = [livestream];
                                                 }
                                             }
-                                            
+
                                             if (streams.length > 0) {
                                                 // Navigate to the first live stream
                                                 navigate(`/live/${streams[0]._id}`);
@@ -739,19 +800,6 @@ export default function Header() {
                                     </span>
                                 )}
                             </button>
-                        </div>
-                        <div className="relative">
-                            <IconButton
-                                onClick={() => {
-                                    console.log("Favorites clicked, user:", !!user);
-                                    user ? navigate("/favorites") : navigate("/login");
-                                }}
-                                title="Favorites"
-                                badge={favoriteCount > 0 ? favoriteCount : undefined}
-                                badgeColor="bg-amber-500"
-                            >
-                                <FavoriteBorderIcon />
-                            </IconButton>
                         </div>
                         <div className="relative">
                             <button
@@ -831,6 +879,22 @@ export default function Header() {
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
                                         My Orders
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            console.log("Navigating to favorites");
+                                            navigate("/favorites");
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors relative"
+                                    >
+                                        My Favorites
+                                        {favoriteCount > 0 && (
+                                            <span className={`${badgeClass} top-1 right-4`}>
+                                                {favoriteCount}
+                                            </span>
+                                        )}
                                     </button>
                                     {/* <button
                                         onClick={(e) => {

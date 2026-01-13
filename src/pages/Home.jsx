@@ -108,6 +108,7 @@ const Home = () => {
   const [forYouProducts, setForYouProducts] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [randomCategories, setRandomCategories] = useState([]);
+  const [randomCategorySections, setRandomCategorySections] = useState([]);
   const categorySliderRef = useRef(null);
   const [categoryScrollPosition, setCategoryScrollPosition] = useState(0);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -122,10 +123,22 @@ const Home = () => {
   }, [products]);
 
   useEffect(() => {
-    if (categories.length > 0) {
-      setRandomCategories(getRandomItems(categories, 16));
+    if (categories.length > 0 && products.length > 0) {
+      setRandomCategories(categories); // Now using full list and slider handles visibility
+
+      // Pick 2 random categories for specific home sections
+      const shuffledCategories = [...categories].sort(() => 0.5 - Math.random());
+      const selectedCategories = shuffledCategories.slice(0, 2);
+
+      const sections = selectedCategories.map(catName => {
+        const catProducts = products
+          .filter(p => p.categoryId?.categoryName === catName)
+          .slice(0, 5);
+        return { categoryName: catName, products: catProducts };
+      });
+      setRandomCategorySections(sections);
     }
-  }, [categories]);
+  }, [categories, products]);
 
   const handleProductClick = useCallback(
     (id) => {
@@ -160,9 +173,9 @@ const Home = () => {
   // Category slider navigation
   const handleCategoryPrev = () => {
     if (categorySliderRef.current) {
-      const cardWidth = 144; // 9em ≈ 144px (assuming 1em = 16px)
-      const gap = 20; // gap-5 = 1.25rem = 20px
-      const scrollAmount = cardWidth + gap;
+      const cardWidth = 160; // Increased width for 7 items
+      const gap = 20;
+      const scrollAmount = (cardWidth + gap) * 1;
       const newPosition = Math.max(0, categoryScrollPosition - scrollAmount);
       categorySliderRef.current.scrollTo({
         left: newPosition,
@@ -174,9 +187,9 @@ const Home = () => {
 
   const handleCategoryNext = () => {
     if (categorySliderRef.current) {
-      const cardWidth = 144;
+      const cardWidth = 160;
       const gap = 20;
-      const scrollAmount = cardWidth + gap;
+      const scrollAmount = (cardWidth + gap) * 1;
       const maxScroll = categorySliderRef.current.scrollWidth - categorySliderRef.current.clientWidth;
       const newPosition = Math.min(maxScroll, categoryScrollPosition + scrollAmount);
       categorySliderRef.current.scrollTo({
@@ -233,7 +246,7 @@ const Home = () => {
     <div>
       {/* Carousel Section - full viewport width */}
       <div className="w-full overflow-x-hidden">
-        <div className="relative w-full min-h-[200px] sm:min-h-[280px] md:min-h-[340px] h-[40vw] sm:h-[38vw] md:h-[36vw] max-h-[300px] sm:max-h-[350px] md:max-h-[400px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 overflow-hidden box-border">
+        <div className="relative w-full min-h-[200px] sm:min-h-[280px] md:min-h-[340px] h-[40vw] sm:h-[38vw] md:h-[36vw] lg:h-[calc(100vh-128px)] max-h-[300px] sm:max-h-[350px] md:max-h-[400px] lg:max-h-none flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 overflow-hidden box-border">
           <button
             className="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-transparent border-none cursor-pointer text-xl sm:text-2xl"
             onClick={handlePrevCarousel}
@@ -276,93 +289,24 @@ const Home = () => {
           <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Categories</h2>
             {loading ? (
-              <>
-                {/* Category skeleton - Mobile */}
-                <div className="lg:hidden">
-                  <div className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    {[...Array(8)].map((_, index) => (
-                      <div
-                        key={index}
-                        className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col"
-                      >
-                        <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
-                          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Category skeleton - Desktop */}
-                <div className="hidden lg:grid lg:grid-cols-8 gap-4 lg:gap-5">
-                  {[...Array(8)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="w-[9em] border border-gray-300 rounded-xl overflow-hidden flex flex-col"
-                    >
-                      <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
-                        <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Mobile: Horizontal slider with navigation */}
-                <div className="lg:hidden relative">
+              <div className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {[...Array(7)].map((_, index) => (
                   <div
-                    ref={categorySliderRef}
-                    onScroll={handleCategoryScroll}
-                    className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-                    role="list"
-                    aria-label={`${randomCategories.length} categories`}
+                    key={index}
+                    className="w-[10em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col"
                   >
-                    {randomCategories.map((category) => {
-                      return (
-                        <div
-                          key={category}
-                          className="w-[9em] flex-shrink-0 border border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
-                          tabIndex={0}
-                          role="listitem"
-                          aria-label={`View products in ${category}`}
-                          onClick={() => handleCategoryClick(category)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
-                          }}
-                        >
-                          {/* Category name */}
-                          <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
-                            <span className="font-semibold text-sm text-center line-clamp-2">
-                              {category}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
+                      <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+                    </div>
                   </div>
-                  {/* Navigation buttons for mobile */}
-                  {categoryScrollPosition > 0 && (
-                    <button
-                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
-                      onClick={handleCategoryPrev}
-                      aria-label="Previous categories"
-                    >
-                      <i className="lni lni-chevron-left text-lg sm:text-xl"></i>
-                    </button>
-                  )}
-                  {canScrollNext && (
-                    <button
-                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
-                      onClick={handleCategoryNext}
-                      aria-label="Next categories"
-                    >
-                      <i className="lni lni-chevron-right text-lg sm:text-xl"></i>
-                    </button>
-                  )}
-                </div>
-                {/* Desktop: Grid layout */}
+                ))}
+              </div>
+            ) : (
+              <div className="relative">
                 <div
-                  className="hidden lg:grid lg:grid-cols-8 gap-4 lg:gap-5"
+                  ref={categorySliderRef}
+                  onScroll={handleCategoryScroll}
+                  className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                   role="list"
                   aria-label={`${randomCategories.length} categories`}
                 >
@@ -370,7 +314,7 @@ const Home = () => {
                     return (
                       <div
                         key={category}
-                        className="w-[9em] border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
+                        className="w-[10em] flex-shrink-0 border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
                         tabIndex={0}
                         role="listitem"
                         aria-label={`View products in ${category}`}
@@ -379,9 +323,8 @@ const Home = () => {
                           if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
                         }}
                       >
-                        {/* Category name */}
                         <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
-                          <span className="font-semibold text-base text-center line-clamp-2">
+                          <span className="font-semibold text-sm sm:text-base text-center line-clamp-2">
                             {category}
                           </span>
                         </div>
@@ -389,7 +332,25 @@ const Home = () => {
                     );
                   })}
                 </div>
-              </>
+                {categoryScrollPosition > 0 && (
+                  <button
+                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-lg cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
+                    onClick={handleCategoryPrev}
+                    aria-label="Previous categories"
+                  >
+                    <i className="lni lni-chevron-left text-xl"></i>
+                  </button>
+                )}
+                {canScrollNext && (
+                  <button
+                    className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-lg cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
+                    onClick={handleCategoryNext}
+                    aria-label="Next categories"
+                  >
+                    <i className="lni lni-chevron-right text-xl"></i>
+                  </button>
+                )}
+              </div>
             )}
           </section>
         )}
@@ -445,7 +406,7 @@ const Home = () => {
                 ))
               )}
             </div>
-            {!loading && (
+            {/* {!loading && (
               <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
                 <ProductButton
                   variant="primary"
@@ -456,9 +417,41 @@ const Home = () => {
                   View All
                 </ProductButton>
               </div>
-            )}
+            )} */}
           </section>
         )}
+
+        {/* Dynamic Category Sections */}
+        {!error && !loading && randomCategorySections.map((section, idx) => (
+          <section key={idx} className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between mb-4 sm:mb-5 md:mb-6">
+              <h2 className="text-left text-lg sm:text-xl md:text-xl font-semibold">
+                {section.categoryName}
+              </h2>
+              <button
+                onClick={() => handleCategoryClick(section.categoryName)}
+                className="text-amber-600 text-sm font-medium hover:underline"
+              >
+                Explore More
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between">
+              {section.products.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  handleProductClick={handleProductClick}
+                  handleKeyDown={handleKeyDown}
+                />
+              ))}
+              {section.products.length === 0 && (
+                <div className="col-span-full py-10 text-center text-gray-500 italic">
+                  No products available in this category yet.
+                </div>
+              )}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );
