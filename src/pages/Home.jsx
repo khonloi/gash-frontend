@@ -9,6 +9,8 @@ import {
 import ProductCard from "../components/ProductCard";
 import ProductCardSkeleton from "../components/ProductCardSkeleton";
 import ProductButton from "../components/ProductButton";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
   for (let i = 0; i < retries; i++) {
@@ -334,20 +336,20 @@ const Home = () => {
                 </div>
                 {categoryScrollPosition > 0 && (
                   <button
-                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-lg cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
+                    className="absolute -left-4 top-[calc(50%-4px)] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-lg cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
                     onClick={handleCategoryPrev}
                     aria-label="Previous categories"
                   >
-                    <i className="lni lni-chevron-left text-xl"></i>
+                    <ChevronLeftIcon className="text-gray-900" />
                   </button>
                 )}
                 {canScrollNext && (
                   <button
-                    className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-lg cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
+                    className="absolute -right-4 top-[calc(50%-4px)] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full shadow-lg cursor-pointer hover:bg-gray-50 focus:outline-none transition-colors"
                     onClick={handleCategoryNext}
                     aria-label="Next categories"
                   >
-                    <i className="lni lni-chevron-right text-xl"></i>
+                    <ChevronRightIcon className="text-gray-900" />
                   </button>
                 )}
               </div>
@@ -422,6 +424,16 @@ const Home = () => {
         )}
 
         {/* Dynamic Category Sections */}
+        {!error && !loading && randomCategorySections.length > 0 && (
+          <div className="w-full mt-8 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <div className="relative w-full min-h-[160px] sm:min-h-[220px] md:min-h-[260px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 py-12 px-6">
+              <div className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 tracking-wide leading-tight max-w-4xl select-none">
+                Explore our curated categories and find your signature style.
+              </div>
+            </div>
+          </div>
+        )}
+
         {!error && !loading && randomCategorySections.map((section, idx) => (
           <section key={idx} className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-4 sm:mb-5 md:mb-6">
@@ -452,6 +464,16 @@ const Home = () => {
             </div>
           </section>
         ))}
+
+        {!error && !loading && randomCategorySections.length > 0 && (
+          <div className="w-full mt-8 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <div className="relative w-full min-h-[160px] sm:min-h-[220px] md:min-h-[260px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 py-12 px-6">
+              <div className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 tracking-wide leading-tight max-w-4xl select-none">
+                Elevate your wardrobe with GASH's exclusive seasonal picks.
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

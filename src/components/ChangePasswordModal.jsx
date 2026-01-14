@@ -222,26 +222,21 @@ const ChangePasswordModal = ({ handleCancel }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
-            {/* Modal */}
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.18 }}
-                onClick={(e) => e.stopPropagation()}
-                className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md max-h-[90vh] flex flex-col"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="bg-white rounded-xl shadow-2xl border-2 border-gray-300 w-full max-w-md overflow-hidden flex flex-col"
             >
                 {/* Modal Header */}
-                <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b border-gray-200 shrink-0">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
-                        Change Password
-                    </h2>
+                <div className="flex items-center justify-between px-6 py-4 border-b-2 border-gray-300 bg-gray-50">
+                    <h2 className="text-xl font-semibold text-gray-900">Change Password</h2>
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                        style={{ '--tw-ring-color': '#A86523' }}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-all border border-transparent hover:border-gray-200"
                         aria-label="Close modal"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,73 +246,61 @@ const ChangePasswordModal = ({ handleCancel }) => {
                 </div>
 
                 {/* Modal Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="p-6 lg:p-8 overflow-y-auto">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {[
-                            { label: "Old Password", key: "oldPassword" },
+                            { label: "Current Password", key: "oldPassword" },
                             { label: "New Password", key: "newPassword" },
-                            { label: "Repeat Password", key: "repeatPassword" },
+                            { label: "Confirm New Password", key: "repeatPassword" },
                         ].map((field) => (
                             <div key={field.key} className="relative">
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
                                     {field.label} <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type={showPassword[field.key] ? "text" : "password"}
-                                    value={form[field.key]}
-                                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                                    className={`w-full px-3 py-2 lg:px-4 lg:py-3 border-2 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 backdrop-blur-sm text-sm lg:text-base shadow-md hover:shadow-lg pr-10 ${validationErrors[field.key]
-                                        ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-                                        : 'border-gray-300/60 focus:border-amber-500 focus:ring-amber-500/30 hover:border-yellow-400/60'
-                                        }`}
-                                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => togglePasswordVisibility(field.key)}
-                                    className="absolute right-3 top-9 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                                >
-                                    {showPassword[field.key] ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
+                                <div className="relative">
+                                    <input
+                                        type={showPassword[field.key] ? "text" : "password"}
+                                        value={form[field.key]}
+                                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                                        className={`w-full pl-4 pr-11 py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none ${validationErrors[field.key] ? 'border-red-500 bg-red-50/30' : 'border-gray-300 focus:border-amber-400 focus:bg-white'}`}
+                                        placeholder={`Enter ${field.label.toLowerCase()}`}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => togglePasswordVisibility(field.key)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        {showPassword[field.key] ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
+                                </div>
                                 {validationErrors[field.key] && (
-                                    <p className="mt-1.5 text-sm text-red-600">{validationErrors[field.key]}</p>
+                                    <p className="mt-1.5 text-xs font-bold text-red-500 uppercase tracking-wider">{validationErrors[field.key]}</p>
                                 )}
                             </div>
                         ))}
                     </form>
                 </div>
 
-                {/* Footer */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t border-gray-200 shrink-0">
+                {/* Modal Footer */}
+                <div className="px-6 py-4 bg-gray-50 border-t-2 border-gray-300 flex items-center justify-end gap-3">
                     <ProductButton
-                        type="button"
                         variant="secondary"
-                        size="md"
                         onClick={handleCancel}
                         disabled={loading}
+                        className="px-6 py-2.5"
                     >
                         Cancel
                     </ProductButton>
                     <ProductButton
-                        type="submit"
                         variant="primary"
-                        size="md"
                         onClick={handleSubmit}
                         disabled={loading}
+                        className="px-8 py-2.5 min-w-[120px] justify-center"
                     >
-                        {loading ? (
-                            <div className="flex items-center justify-center space-x-2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                                <span>Saving...</span>
-                            </div>
-                        ) : (
-                            'Save'
-                        )}
+                        {loading ? <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Updating...</span>
+                        </div> : 'Update Password'}
                     </ProductButton>
                 </div>
             </motion.div>

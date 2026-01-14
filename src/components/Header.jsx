@@ -116,12 +116,26 @@ export default function Header() {
     // Fetch random categories
     const fetchCategories = useCallback(async () => {
         try {
+            // Check if we already have random categories in sessionStorage
+            const cached = sessionStorage.getItem('header_random_categories');
+            if (cached) {
+                setRandomCategories(JSON.parse(cached));
+                return;
+            }
+
             const response = await fetchWithRetry(() => Api.categories.getAll());
             const categories = response?.data || [];
-            if (categories.length > 0) {
+
+            // Filter only active categories (not deleted)
+            const activeCategories = categories.filter(cat => !cat.isDeleted);
+
+            if (activeCategories.length > 0) {
                 // Shuffle and pick 5
-                const shuffled = [...categories].sort(() => 0.5 - Math.random());
-                setRandomCategories(shuffled.slice(0, 5));
+                const shuffled = [...activeCategories].sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, 5);
+                setRandomCategories(selected);
+                // Store in sessionStorage to persist across page transitions
+                sessionStorage.setItem('header_random_categories', JSON.stringify(selected));
             }
         } catch (error) {
             console.error("Error fetching categories for header:", error);

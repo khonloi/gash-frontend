@@ -117,6 +117,7 @@ const ProductDetail = () => {
   const [forYouProducts, setForYouProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   // Local storage
   const [, setStoredState] = useLocalStorage(DETAIL_STORAGE_KEY, {});
@@ -344,6 +345,49 @@ const ProductDetail = () => {
 
     checkIfFavorited();
   }, [user, id]);
+
+  // Track Recently Viewed
+  useEffect(() => {
+    if (!id) return;
+
+    try {
+      const stored = localStorage.getItem("recently_viewed_ids");
+      let ids = stored ? JSON.parse(stored) : [];
+
+      // Remove if already exists and add to front
+      ids = ids.filter(itemId => itemId !== id);
+      ids.unshift(id);
+
+      // Limit to 10 products
+      const limitedIds = ids.slice(0, 10);
+      localStorage.setItem("recently_viewed_ids", JSON.stringify(limitedIds));
+    } catch (err) {
+      console.warn("Failed to update recently viewed products:", err);
+    }
+  }, [id]);
+
+  // Update recently viewed products details when all products load
+  useEffect(() => {
+    if (allProducts.length > 0) {
+      try {
+        const stored = localStorage.getItem("recently_viewed_ids");
+        const ids = stored ? JSON.parse(stored) : [];
+
+        // Filter out current product's ID for the recently viewed list
+        const otherIds = ids.filter(itemId => itemId !== id);
+
+        // Map IDs to product objects from allProducts
+        const detailedProducts = otherIds
+          .map(itemId => allProducts.find(p => p._id === itemId))
+          .filter(Boolean)
+          .slice(0, 5); // Display top 5
+
+        setRecentlyViewed(detailedProducts);
+      } catch (err) {
+        console.warn("Failed to load recently viewed products:", err);
+      }
+    }
+  }, [allProducts, id]);
 
   // Stock status - based on selected variant (include inactive variants with stock)
   const isInStock = useMemo(
@@ -1094,8 +1138,8 @@ const ProductDetail = () => {
                   <div
                     key={thumbnail._id || index}
                     className={`border-2 p-1 cursor-pointer rounded transition-colors flex-shrink-0 ${selectedImage === thumbnail.imageUrl
-                        ? "border-amber-400"
-                        : "border-gray-300 hover:border-amber-400"
+                      ? "border-amber-400"
+                      : "border-gray-300 hover:border-amber-400"
                       }`}
                     onClick={() => handleImageClick(thumbnail)}
                     role="button"
@@ -1148,8 +1192,8 @@ const ProductDetail = () => {
             <div>
               <span
                 className={`text-sm px-2 py-1 rounded inline-block ${colorStockInfo.inStock
-                    ? "text-green-700 bg-green-100"
-                    : "text-red-600 bg-red-50 opacity-50"
+                  ? "text-green-700 bg-green-100"
+                  : "text-red-600 bg-red-50 opacity-50"
                   }`}
               >
                 {colorStockInfo.message}
@@ -1170,10 +1214,10 @@ const ProductDetail = () => {
                         <button
                           key={color}
                           className={`px-3 py-1.5 border-2 rounded-md bg-white text-sm transition-colors focus:outline-none ${isDisabled
-                              ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
-                              : selectedColor === color
-                                ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
-                                : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
+                            ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
+                            : selectedColor === color
+                              ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
+                              : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
                             }`}
                           onClick={() => !isDisabled && handleColorClick(color)}
                           disabled={isDisabled}
@@ -1204,10 +1248,10 @@ const ProductDetail = () => {
                         <button
                           key={size}
                           className={`px-3 py-1.5 border-2 rounded-md bg-white text-sm transition-colors focus:outline-none ${isDisabled
-                              ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
-                              : selectedSize === size
-                                ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
-                                : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
+                            ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
+                            : selectedSize === size
+                              ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
+                              : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
                             }`}
                           onClick={() => !isDisabled && handleSizeClick(size)}
                           disabled={isDisabled}
@@ -1392,6 +1436,27 @@ const ProductDetail = () => {
           )}
         </div>
       </section>
+
+      {/* Recently Viewed Section */}
+      {recentlyViewed.length > 0 && (
+        <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
+          <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recently Viewed</h2>
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+            role="grid"
+            aria-label={`${recentlyViewed.length} recently viewed products`}
+          >
+            {recentlyViewed.map((product) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                handleProductClick={handleProductClick}
+                handleKeyDown={handleKeyDown}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

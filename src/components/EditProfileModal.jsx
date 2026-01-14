@@ -1,6 +1,8 @@
 import React, { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../hooks/useToast";
+import { Camera, User, Tag, Phone, MapPin, Users, Calendar } from "lucide-react";
+import ProductButton from "./ProductButton";
 
 const EditProfileModal = ({
   formData,
@@ -141,26 +143,21 @@ const EditProfileModal = ({
   }, [validateForm, handleSubmit, showToast]);
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
-      {/* Modal */}
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.18 }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-lg max-h-[90vh] flex flex-col"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="bg-white rounded-xl shadow-2xl border-2 border-gray-300 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-5 border-b border-gray-200 shrink-0">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
-            Edit Profile
-          </h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-gray-300 bg-gray-50">
+          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
           <button
             type="button"
             onClick={handleCancel}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-            style={{ '--tw-ring-color': '#A86523' }}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-all border border-transparent hover:border-gray-200"
             aria-label="Close modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,26 +167,27 @@ const EditProfileModal = ({
         </div>
 
         {/* Modal Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 overflow-y-auto p-6 lg:p-8">
           {/* Profile Picture */}
-          <div className="flex flex-col items-center mb-6">
-            <div className={`w-24 h-24 rounded-full p-[2px] bg-gradient-to-tr from-[#E9A319] via-[#A86523] to-[#8B4E1A] ${validationErrors.image ? 'ring-2 ring-red-500' : ''}`}>
-              <img
-                src={previewUrl || formData.image || "https://via.placeholder.com/96x96?text=No+Image"}
-                alt="Preview"
-                className="w-full h-full rounded-full object-cover border-2 border-white"
-                onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/96x96?text=No+Image";
-                }}
-              />
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative group">
+              <div className={`w-28 h-28 rounded-full p-1 bg-white border-2 ${validationErrors.image ? 'border-red-500' : 'border-gray-300 shadow-sm'}`}>
+                <img
+                  src={previewUrl || formData.image || "https://via.placeholder.com/128x128?text=User"}
+                  alt="Preview"
+                  className="w-full h-full rounded-full object-cover"
+                  onError={(e) => { e.target.src = "https://via.placeholder.com/128x128?text=User"; }}
+                />
+              </div>
+              <button
+                type="button"
+                className="absolute bottom-0 right-0 w-9 h-9 bg-amber-500 text-white rounded-full flex items-center justify-center border-4 border-white shadow-lg hover:bg-amber-600 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+                title="Change Photo"
+              >
+                <Camera className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              className="mt-3 px-4 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition-all duration-200 border border-gray-300 hover:border-gray-400"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Change Profile Picture
-            </button>
             <input
               ref={fileInputRef}
               type="file"
@@ -197,120 +195,85 @@ const EditProfileModal = ({
               className="hidden"
               onChange={(e) => {
                 handleFileChange(e);
-                // Revalidate image after file change
-                if (e.target.files && e.target.files.length > 0) {
-                  const file = e.target.files[0];
-                  const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-                  if (validTypes.includes(file.type.toLowerCase())) {
-                    setValidationErrors(prevErrors => {
-                      const newErrors = { ...prevErrors };
-                      delete newErrors.image;
-                      return newErrors;
-                    });
-                  } else {
-                    setValidationErrors(prevErrors => ({
-                      ...prevErrors,
-                      image: 'Please select a valid image type'
-                    }));
-                  }
+                if (e.target.files?.length > 0) {
+                  setValidationErrors(prev => {
+                    const next = { ...prev };
+                    delete next.image;
+                    return next;
+                  });
                 }
               }}
             />
             {validationErrors.image && (
-              <p className="mt-1.5 text-sm text-red-600">{validationErrors.image}</p>
+              <p className="mt-2 text-xs font-bold text-red-500 uppercase tracking-wider">{validationErrors.image}</p>
             )}
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmitWithValidation} className="space-y-4">
-            {/* Fields theo model ERD */}
-            {[
-              { label: "Email", type: "email", key: "email", disabled: true, required: false },
-              { label: "Username", type: "text", key: "username", disabled: true, required: false },
-              { label: "Name", type: "text", key: "name", required: true },
-              { label: "Phone", type: "text", key: "phone", required: true },
-              { label: "Address", type: "text", key: "address", required: true },
-              { label: "Gender", type: "select", key: "gender", options: ["Male", "Female", "Other"], required: false },
-              { label: "Date of Birth", type: "date", key: "dob", required: true },
-            ].map((field) => (
-              <div key={field.key}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                </label>
-                {field.type === "select" ? (
-                  <>
-                    <select
-                      value={formData[field.key] ?? ""}
-                      onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                      className={`w-full px-3 py-2 lg:px-4 lg:py-3 border-2 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 backdrop-blur-sm text-sm lg:text-base shadow-md hover:shadow-lg ${validationErrors[field.key]
-                        ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-                        : 'border-gray-300/60 focus:border-amber-500 focus:ring-amber-500/30 hover:border-yellow-400/60'
-                        }`}
-                    >
-                      {field.options.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    {validationErrors[field.key] && (
-                      <p className="mt-1.5 text-sm text-red-600">{validationErrors[field.key]}</p>
+          <form onSubmit={handleSubmitWithValidation} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              {[
+                { label: "Full Name", type: "text", key: "name", required: true, icon: Tag },
+                { label: "Phone Number", type: "text", key: "phone", required: true, icon: Phone },
+                { label: "Address", type: "text", key: "address", required: true, icon: MapPin },
+                { label: "Gender", type: "select", key: "gender", options: ["Male", "Female", "Other"], icon: Users },
+                { label: "Date of Birth", type: "date", key: "dob", required: true, icon: Calendar },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                    {field.label} {field.required && <span className="text-red-500">*</span>}
+                  </label>
+                  <div className="relative">
+                    {field.type === "select" ? (
+                      <select
+                        value={formData[field.key] ?? ""}
+                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        className={`w-full pl-11 pr-4 py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none appearance-none ${validationErrors[field.key] ? 'border-red-500 bg-red-50/30' : 'border-gray-300 focus:border-amber-400 focus:bg-white'}`}
+                      >
+                        {field.options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type}
+                        value={formData[field.key] ?? ""}
+                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        className={`w-full pl-11 pr-4 py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none ${validationErrors[field.key] ? 'border-red-500 bg-red-50/30' : 'border-gray-300 focus:border-amber-400 focus:bg-white'}`}
+                      />
                     )}
-                  </>
-                ) : (
-                  <>
-                    <input
-                      type={field.type}
-                      value={formData[field.key] ?? ""}
-                      onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                      placeholder={`Enter your ${field.label.toLowerCase()}`}
-                      disabled={field.disabled}
-                      className={`w-full px-3 py-2 lg:px-4 lg:py-3 border-2 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 backdrop-blur-sm text-sm lg:text-base shadow-md hover:shadow-lg ${field.disabled
-                          ? "bg-gray-100 text-gray-500 border-gray-300/60"
-                          : validationErrors[field.key]
-                            ? "border-red-400 focus:border-red-500 focus:ring-red-500"
-                            : "border-gray-300/60 focus:border-amber-500 focus:ring-amber-500/30 hover:border-yellow-400/60"
-                        }`}
-                    />
-                    {validationErrors[field.key] && (
-                      <p className="mt-1.5 text-sm text-red-600">{validationErrors[field.key]}</p>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                      <field.icon className="w-5 h-5" />
+                    </div>
+                  </div>
+                  {validationErrors[field.key] && (
+                    <p className="mt-1.5 text-xs font-bold text-red-500 uppercase tracking-wider">{validationErrors[field.key]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
           </form>
         </div>
 
-        {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 border-t border-gray-200 shrink-0">
-          <button
-            type="button"
+        {/* Modal Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t-2 border-gray-300 flex items-center justify-end gap-3">
+          <ProductButton
+            variant="secondary"
             onClick={handleCancel}
-            className="px-5 py-2.5 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-offset-2"
-            style={{ '--tw-ring-color': '#A86523' }}
             disabled={loading}
+            className="px-6 py-2.5"
           >
             Cancel
-          </button>
-          <button
-            type="submit"
+          </ProductButton>
+          <ProductButton
+            variant="primary"
             onClick={handleSubmitWithValidation}
             disabled={loading}
-            className="px-6 py-2.5 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:hover:shadow-md bg-gradient-to-r from-[#E9A319] to-[#A86523] hover:from-[#A86523] hover:to-[#8B4E1A] disabled:hover:from-[#E9A319] disabled:hover:to-[#A86523]"
-            style={{
-              '--tw-ring-color': '#A86523'
-            }}
+            className="px-8 py-2.5 min-w-[120px] justify-center"
           >
-            {loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                <span>Editing...</span>
-              </div>
-            ) : (
-              'Save'
-            )}
-          </button>
+            {loading ? <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Saving...</span>
+            </div> : 'Save Changes'}
+          </ProductButton>
         </div>
       </motion.div>
     </div>
