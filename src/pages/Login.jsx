@@ -90,7 +90,7 @@ const Login = () => {
 
   const handlePasskeyLogin = useCallback(async () => {
     const trimmedUsername = formData.username.trim();
-    
+
     if (!trimmedUsername) {
       showToast('Please enter your username to use passkey login.', "error", ERROR_TIMEOUT);
       usernameRef.current?.focus();
@@ -121,121 +121,137 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
-        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
-          Sign In
-        </h1>
+      <section className="bg-white rounded-xl w-full max-w-sm md:max-w-4xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="flex flex-col md:flex-row">
+          {/* Part 1: Sign In Heading and Forms */}
+          <div className="flex-1 p-4 sm:p-5 md:p-8 lg:p-10">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
+              Sign In
+            </h1>
 
-        <form
-          onSubmit={handleSubmit}
-          role="form"
-          aria-label="Sign in form"
-          className="space-y-4 sm:space-y-5"
-        >
-          <fieldset className="flex flex-col">
-            <label htmlFor="username" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-              Username <span className="text-red-600">*</span>
-            </label>
-            <input
-              id="username"
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              ref={usernameRef}
-              required
-              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-              aria-required="true"
-              placeholder="Enter your username"
-            />
-          </fieldset>
-
-          <fieldset className="flex flex-col">
-            <label htmlFor="password" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-              Password <span className="text-red-600">*</span>
-            </label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-              aria-required="true"
-              placeholder="Enter your password"
-            />
-          </fieldset>
-
-          <div className="text-right">
-            <Link 
-              to="/forgot-password" 
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
+            <form
+              onSubmit={handleSubmit}
+              role="form"
+              aria-label="Sign in form"
+              className="space-y-4 sm:space-y-5"
             >
-              Forgot Password?
-            </Link>
+              <fieldset className="flex flex-col">
+                <label htmlFor="username" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
+                  Username <span className="text-red-600">*</span>
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  ref={usernameRef}
+                  required
+                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  placeholder="Enter your username"
+                />
+              </fieldset>
+
+              <fieldset className="flex flex-col">
+                <label htmlFor="password" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
+                  Password <span className="text-red-600">*</span>
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  placeholder="Enter your password"
+                />
+              </fieldset>
+
+              <div className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <ProductButton
+                type="submit"
+                variant="primary"
+                size="lg"
+                disabled={isLoading}
+                aria-busy={isLoading}
+                className="w-full py-3.5"
+              >
+                <span aria-live="polite">
+                  {isLoading ? "Signing In..." : "Sign In"}
+                </span>
+              </ProductButton>
+            </form>
           </div>
 
-          <ProductButton
-            type="submit"
-            variant="primary"
-            size="lg"
-            disabled={isLoading}
-            aria-busy={isLoading}
-            className="w-full"
-          >
-            <span aria-live="polite">
-              {isLoading ? "Signing In..." : "Sign In"}
-            </span>
-          </ProductButton>
-        </form>
+          {/* Part 2: Login Options */}
+          <div className="flex-1 p-4 sm:p-5 md:p-8 lg:p-10 bg-gray-50/50 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
+              Other Login Options
+            </h2>
 
-        <div className="mt-4 sm:mt-5 space-y-3">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-            text="signin_with"
-            size="large"
-            width="100%"
-            aria-label="Sign in with Google"
-          />
-          
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+            <div className="space-y-4">
+              <div className="flex justify-start">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  text="signin_with"
+                  size="large"
+                  width="100%"
+                  aria-label="Sign in with Google"
+                />
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-[#f9fafb] text-gray-500">Or</span>
+                </div>
+              </div>
+
+              <ProductButton
+                type="button"
+                variant="secondary"
+                size="lg"
+                disabled={isLoading}
+                onClick={handlePasskeyLogin}
+                className="w-full"
+                aria-label="Sign in with Passkey"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Sign in with Passkey
+                </span>
+              </ProductButton>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or</span>
+
+            <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-10">
+              <p className="text-center text-sm text-gray-600">
+                New to GASH?{" "}
+                <Link
+                  to="/signup"
+                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
+                >
+                  Create your GASH account
+                </Link>
+              </p>
             </div>
           </div>
-
-          <ProductButton
-            type="button"
-            variant="secondary"
-            size="lg"
-            disabled={isLoading}
-            onClick={handlePasskeyLogin}
-            className="w-full"
-            aria-label="Sign in with Passkey"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Sign in with Passkey
-            </span>
-          </ProductButton>
         </div>
-
-        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
-          New to GASH?{" "}
-          <Link 
-            to="/signup" 
-            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
-          >
-            Create your GASH account
-          </Link>
-        </p>
       </section>
     </div>
   );

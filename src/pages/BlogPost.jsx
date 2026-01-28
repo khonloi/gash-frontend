@@ -5,7 +5,7 @@ import { Pencil, Clock, MessageSquare } from "lucide-react";
 const BlogPost = () => {
   // Mock data similar to the original
   const featuredPost = {
-    image: "https://n7media.coolmate.me/uploads/June2025/mceclip9_63.jpg",
+    image: "https://n7media.coolmate.me/uploads/June2026/mceclip9_63.jpg",
     category: "Style Guide",
     title: "How to Build a Timeless Wardrobe: Essentials for Every Season",
     author: "LINH NGUYEN",
@@ -18,28 +18,28 @@ const BlogPost = () => {
   const recentPosts = [
     {
       id: 1,
-      image: "https://n7media.coolmate.me/uploads/June2025/quan-short-chino-nam-7inch-1-8-den_91.jpg?aio=w-585",
+      image: "https://n7media.coolmate.me/uploads/June2026/quan-short-chino-nam-7inch-1-8-den_91.jpg?aio=w-585",
       title: "Top 5 Summer Shorts for Effortless Comfort",
       author: "Mai Tran",
       date: "10 Jun 2024",
     },
     {
       id: 2,
-      image: "https://n7media.coolmate.me/uploads/June2025/quan-short-chino-nam-7inch-1-8-den_91.jpg?aio=w-585",
+      image: "https://n7media.coolmate.me/uploads/June2026/quan-short-chino-nam-7inch-1-8-den_91.jpg?aio=w-585",
       title: "Mix & Match: Creating Outfits with Statement Tees",
       author: "Linh Nguyen",
       date: "08 Jun 2024",
     },
     {
       id: 3,
-      image: "https://n7media.coolmate.me/uploads/June2025/ao-polo-premium-aircool-1167-trang_10.jpg?aio=w-585",
+      image: "https://n7media.coolmate.me/uploads/June2026/ao-polo-premium-aircool-1167-trang_10.jpg?aio=w-585",
       title: "The Rise of Polo Shirts: From Sport to Street Style",
       author: "Huy Le",
       date: "05 Jun 2024",
     },
     {
       id: 4,
-      image: "https://n7media.coolmate.me/uploads/March2025/ao-in-cotton-cs-nu-cuoi-2d-den_85.jpg?aio=w-355",
+      image: "https://n7media.coolmate.me/uploads/March2026/ao-in-cotton-cs-nu-cuoi-2d-den_85.jpg?aio=w-355",
       title: "Graphic Tees: Express Yourself with Every Outfit",
       author: "Mai Tran",
       date: "03 Jun 2024",

@@ -1267,8 +1267,8 @@ const ProductDetail = () => {
                   </div>
                 </fieldset>
               )}
-              <fieldset className="mb-4 sm:mb-5 flex flex-col">
-                <legend className="text-sm sm:text-base font-semibold m-0">Quantity:</legend>
+              <div className="mb-1 flex items-center gap-3">
+                <span className="text-sm sm:text-base font-semibold">Quantity:</span>
                 <input
                   type="number"
                   className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
@@ -1278,11 +1278,11 @@ const ProductDetail = () => {
                   disabled={!selectedVariant || !isInStock || isProductInactive || isProductDiscontinued}
                   aria-label="Select quantity"
                 />
-              </fieldset>
+              </div>
             </div>
           </div>
 
-          <div className="flex-1 min-w-[200px] max-w-full sm:max-w-[260px] p-4 sm:p-5 border-2 border-gray-300 rounded-xl bg-gray-50 flex flex-col gap-2">
+          <div className="flex-1 min-w-[200px] max-w-full sm:max-w-[320px] p-4 sm:p-5 border-2 border-gray-300 rounded-xl bg-gray-50 flex flex-col gap-2">
             <ProductButton
               variant="secondary"
               onClick={handleAddToFavorites}

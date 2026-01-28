@@ -108,7 +108,7 @@ const Signup = () => {
           console.log('EmailJS Success:', emailjsResponse);
           showToast('OTP sent successfully', 'success', 3000);
         }
-        
+
         navigate('/otp-verification', {
           state: { email: formData.email, type: 'register', formData },
         });
@@ -177,8 +177,8 @@ const Signup = () => {
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Already have an account?{' '}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
           >
             Sign In
