@@ -42,6 +42,9 @@ const Profile = () => {
     image: "",
   });
 
+  const isDemoMode = import.meta.env.VITE_APP_USE_MOCK === 'true';
+  const showDemoNotice = () => showToast("This is a demo mode and that you can clone the project to test it locally", "info", 5000);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -535,22 +538,34 @@ const Profile = () => {
                   <div className="p-6 space-y-3">
                     {!isDeleted ? (
                       <>
-                        <ProductButton variant="primary" onClick={() => setEditMode(true)} className="w-full justify-center py-3">
+                        <ProductButton
+                          variant="primary"
+                          onClick={() => isDemoMode ? showDemoNotice() : setEditMode(true)}
+                          className="w-full justify-center py-3"
+                        >
                           Edit Profile
                         </ProductButton>
-                        <ProductButton variant="secondary" onClick={() => setShowChangePassword(true)} className="w-full justify-center py-3">
+                        <ProductButton
+                          variant="secondary"
+                          onClick={() => isDemoMode ? showDemoNotice() : setShowChangePassword(true)}
+                          className="w-full justify-center py-3"
+                        >
                           Change Password
                         </ProductButton>
                         <ProductButton
                           variant="secondary"
-                          onClick={handleSetupPasskey}
-                          disabled={isSettingUpPasskey || passkeys.length > 0}
+                          onClick={() => isDemoMode ? showDemoNotice() : handleSetupPasskey()}
+                          disabled={!isDemoMode && (isSettingUpPasskey || passkeys.length > 0)}
                           className="w-full justify-center py-3"
                         >
                           {isSettingUpPasskey ? 'Setting up...' : passkeys.length > 0 ? 'Passkey Enabled ✓' : 'Setup Passkey'}
                         </ProductButton>
                         <div className="pt-4 border-t-2 border-gray-300">
-                          <ProductButton variant="danger" onClick={() => setShowDeleteConfirm(true)} className="w-full justify-center py-3">
+                          <ProductButton
+                            variant="danger"
+                            onClick={() => isDemoMode ? showDemoNotice() : setShowDeleteConfirm(true)}
+                            className="w-full justify-center py-3"
+                          >
                             Close Account
                           </ProductButton>
                         </div>
@@ -619,7 +634,7 @@ const Profile = () => {
                         <input
                           type="checkbox"
                           checked={requireAuthForCheckout}
-                          onChange={(e) => handleToggleCheckoutAuth(e.target.checked)}
+                          onChange={(e) => isDemoMode ? showDemoNotice() : handleToggleCheckoutAuth(e.target.checked)}
                           className="sr-only peer"
                         />
                         <div className="w-12 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
