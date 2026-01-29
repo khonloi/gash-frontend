@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
           const msg = error.response.data?.message || '';
           if (status === 401 || (status === 403 && msg.includes('inactive'))) {
             if (localStorage.getItem('token')) {
-              const logoutMessage = status === 401 
+              const logoutMessage = status === 401
                 ? 'Your session has expired or token is invalid. You will be logged out.'
                 : 'Your account has been suspended or deactivated. You will be logged out.';
               handleForcedLogout(logoutMessage);
@@ -225,7 +225,7 @@ export const AuthProvider = ({ children }) => {
   const passkeyLogin = async (username) => {
     try {
       const { startAuthentication } = await import('@simplewebauthn/browser');
-      
+
       // Step 1: Get authentication options from server
       const response = await axiosClient.post('/passkeys/auth/generate', { username });
       const { options } = response.data;
@@ -263,6 +263,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Demo Mode Restriction
+    if (import.meta.env.VITE_APP_USE_MOCK === 'true') {
+      showToast("This is a demo mode and that you can clone the project to test it locally", 'info');
+      return;
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
