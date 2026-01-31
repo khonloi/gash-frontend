@@ -444,7 +444,7 @@ export default function Header() {
                         </Link>
                     ))}
                     {randomCategories.length === 0 && (
-                        <span className="text-gray-500 italic">Demonstration purposes - Not intended for production</span>
+                        <span className="text-gray-500 italic">Demonstration purposes — Limited functionality</span>
                     )}
                 </div>
             </div>

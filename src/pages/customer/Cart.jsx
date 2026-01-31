@@ -577,7 +577,7 @@ const Cart = () => {
                       placeholder="Search by product name, color, or size..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                       aria-label="Search cart items"
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -766,7 +766,7 @@ const Cart = () => {
                               setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
                             }
                           }}
-                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
                           disabled={isUpdating || actionInProgress || isInactive}
                         />
@@ -791,7 +791,7 @@ const Cart = () => {
                 className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 sm:p-5 flex-shrink-0 sm:w-64 w-full"
                 aria-label="Cart summary"
               >
-                <p className="text-base sm:text-xl font-bold text-red-600 mb-4 m-0">
+                <p className="text-lg sm:text-xl font-bold text-red-600 mb-4 m-0">
                   Total: {formatPrice(totalPrice)}
                 </p>
                 <ProductButton

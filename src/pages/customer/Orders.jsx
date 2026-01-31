@@ -425,7 +425,7 @@ const Orders = () => {
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Orders</h1>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-xs sm:text-sm text-gray-600 mb-4">
             View and manage your order history. Click on an order to see detailed information.
           </p>
         </header>
@@ -443,7 +443,7 @@ const Orders = () => {
                       placeholder="Search by product name, order ID, or status..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      className="w-full p-3 pl-10 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg
@@ -482,7 +482,7 @@ const Orders = () => {
         </div>
 
         <div className="mb-6">
-          <p className="text-sm text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             Showing {Math.min(startIndex + 1, filteredOrders.length)}–
             {Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length}{" "}
             orders
@@ -510,17 +510,17 @@ const Orders = () => {
             </div>
             {orders.length === 0 ? (
               <>
-                <p className="text-gray-500 italic text-lg">No orders found</p>
-                <p className="text-gray-400 text-sm mt-2">
+                <p className="text-gray-500 italic text-base sm:text-lg">No orders found</p>
+                <p className="text-gray-400 text-xs sm:text-sm mt-2">
                   Your orders will appear here once you make a purchase
                 </p>
               </>
             ) : (
               <>
-                <p className="text-gray-500 italic text-lg">
+                <p className="text-gray-500 italic text-base sm:text-lg">
                   No orders match your search
                 </p>
-                <p className="text-gray-400 text-sm mt-2">
+                <p className="text-gray-400 text-xs sm:text-sm mt-2">
                   Try adjusting your search criteria or filters
                 </p>
                 <ProductButton
@@ -579,11 +579,11 @@ const Orders = () => {
                       </div>
 
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm text-gray-600 m-0">
+                        <p className="text-xs sm:text-sm text-gray-600 m-0">
                           Order #{order._id.slice(-8).toUpperCase()}
                         </p>
                         <span className="text-gray-400">•</span>
-                        <p className="text-sm text-gray-600 m-0">
+                        <p className="text-xs sm:text-sm text-gray-600 m-0">
                           {formatDate(order.orderDate)}
                         </p>
                       </div>

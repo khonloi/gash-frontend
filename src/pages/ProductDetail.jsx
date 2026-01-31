@@ -1030,7 +1030,7 @@ const ProductDetail = () => {
             <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
             <button
-              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 bg-transparent border-2 border-gray-300 text-blue-600 text-xs sm:text-sm rounded-lg cursor-pointer hover:bg-gray-100 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               onClick={handleRetry}
               disabled={loading}
               type="button"
@@ -1091,7 +1091,7 @@ const ProductDetail = () => {
           <li aria-hidden="true">
             <span className="text-gray-400">/</span>
           </li>
-          <li className="text-gray-900 font-medium" aria-current="page">
+          <li className="text-sm sm:text-base text-gray-900 font-medium" aria-current="page">
             {product?.productName || "Product"}
           </li>
         </ol>
@@ -1202,7 +1202,7 @@ const ProductDetail = () => {
             <div className="space-y-3 sm:space-y-4">
               {availableColors.length > 0 && (
                 <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-                  <legend className="text-xs sm:text-base font-semibold m-0">Color:</legend>
+                  <legend className="text-sm sm:text-base font-semibold m-0">Color:</legend>
                   <div className="flex flex-wrap gap-2">
                     {availableColors.map((color) => {
                       // Disable if product is inactive/discontinued OR if all variants with this color are inactive/discontinued
@@ -1235,7 +1235,7 @@ const ProductDetail = () => {
               )}
               {availableSizes.length > 0 && (
                 <fieldset className="mb-4 sm:mb-5 border-2 border-gray-300 rounded-xl p-3 sm:p-4">
-                  <legend className="text-xs sm:text-base font-semibold m-0">Size:</legend>
+                  <legend className="text-sm sm:text-base font-semibold m-0">Size:</legend>
                   <div className="flex flex-wrap gap-2">
                     {availableSizes.map((size) => {
                       // Disable if product is inactive/discontinued OR if the specific size (or color-size combo) is inactive/discontinued
@@ -1386,7 +1386,7 @@ const ProductDetail = () => {
               >
                 <i className="lni lni-zoom-out text-sm sm:text-base text-gray-900"></i>
               </button>
-              <span className="text-gray-900 text-sm bg-white px-2 py-1 rounded">
+              <span className="text-gray-900 text-xs sm:text-sm bg-white px-2 py-1 rounded">
                 {lightboxIndex + 1} / {allThumbnails.length}
               </span>
             </div>
@@ -1396,7 +1396,7 @@ const ProductDetail = () => {
 
       {product?.description && (
         <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full mb-4 sm:mb-5 md:mb-6 shadow-sm border border-gray-200">
-          <h2 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900">Product Description</h2>
+          <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900">Product Description</h2>
           <div className="leading-relaxed text-sm sm:text-base text-gray-700 [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-semibold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_h4]:mt-4 [&_h4]:mb-2 [&_h4]:font-semibold [&_h5]:mt-4 [&_h5]:mb-2 [&_h5]:font-semibold [&_h6]:mt-4 [&_h6]:mb-2 [&_h6]:font-semibold [&_p]:my-2 [&_ul]:my-2 [&_ul]:pl-8 [&_ol]:my-2 [&_ol]:pl-8 [&_li]:mb-1 [&_a]:text-blue-600 [&_a]:no-underline [&_a:hover]:underline [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-gray-100 [&_pre]:p-4 [&_pre]:rounded [&_pre]:overflow-x-auto [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:my-4 [&_blockquote]:pl-4 [&_blockquote]:pr-4 [&_blockquote]:bg-gray-50 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_br]:block [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded [&_img]:my-2">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -1416,7 +1416,7 @@ const ProductDetail = () => {
       <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
         <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
         <div
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
           role="grid"
           aria-label={productsLoading ? "Loading products" : `${forYouProducts.length} personalized products`}
         >
@@ -1442,7 +1442,7 @@ const ProductDetail = () => {
         <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
           <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recently Viewed</h2>
           <div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
             role="grid"
             aria-label={`${recentlyViewed.length} recently viewed products`}
           >

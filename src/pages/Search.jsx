@@ -110,13 +110,13 @@ const Search = () => {
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">
             {query ? `Search Results for "${query}"` : "Search Products"}
           </h1>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-xs sm:text-sm text-gray-600 mb-4">
             {query
               ? `Searching for products matching "${query}"`
               : "Enter a search query to find products"}
           </p>
           {!loading && !error && products.length > 0 && (
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4">
               Showing {products.length} product{products.length !== 1 ? "s" : ""}
             </p>
           )}
@@ -155,7 +155,7 @@ const Search = () => {
         )}
 
         <div
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
           role="grid"
           aria-label={loading ? "Loading search results" : `${products.length} products`}
         >

@@ -156,11 +156,11 @@ export default function NotificationsDropdown({ user }) {
       // Use module-level Set to share state across all component instances
       const notificationId = data._id?.toString() || data._id;
       const hasSentEmail = emailedNotificationsSet.has(notificationId);
-      
+
       if (data.type === 'order' && user?.email && !hasSentEmail) {
         // Mark this notification as having triggered an email (shared across all instances)
         emailedNotificationsSet.add(notificationId);
-        
+
         const orderIdSuffix = extractOrderIdFromMessage(data.message);
         (async () => {
           try {
@@ -211,18 +211,18 @@ export default function NotificationsDropdown({ user }) {
     const handleNotificationDeleted = (data) => {
       console.log("🗑️ Notification deleted event received:", data);
       const { notificationId, userId } = data;
-      
+
       if (!notificationId) {
         console.warn("⚠️ notificationDeleted event received without notificationId:", data);
         return;
       }
-      
+
       // If userId is provided and doesn't match current user, ignore (for global notifications this might be null)
       if (userId && user?._id && userId.toString() !== user._id.toString()) {
         console.log(`⚠️ Deletion event for different user (${userId} vs ${user._id}), ignoring`);
         return;
       }
-      
+
       // Remove the notification from the list immediately
       setNotifications((prev) => {
         const filtered = prev.filter((n) => {
@@ -234,7 +234,7 @@ export default function NotificationsDropdown({ user }) {
           }
           return shouldKeep;
         });
-        
+
         if (filtered.length !== prev.length) {
           console.log(`Notification removed from list. Count: ${prev.length} → ${filtered.length}`);
         } else {
@@ -256,7 +256,7 @@ export default function NotificationsDropdown({ user }) {
             fetchNotifications();
           }, 500);
         }
-        
+
         return filtered;
       });
     };
@@ -301,7 +301,7 @@ export default function NotificationsDropdown({ user }) {
       socket.emit("userConnected", user._id);
     };
     socket.on("reconnect", handleReconnect);
-    
+
     return () => {
       socket.off("connect", handleConnect);
       socket.off("newNotification", handleNewNotification);
@@ -448,13 +448,11 @@ export default function NotificationsDropdown({ user }) {
                       navigate(`/live/${n.livestreamId}`);
                     }
                   }}
-                  className={`group flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                    !n.isRead ? "bg-amber-50/50" : "bg-white"
-                  }`}
+                  className={`group flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 hover:bg-gray-50 transition-colors cursor-pointer ${!n.isRead ? "bg-amber-50/50" : "bg-white"
+                    }`}
                 >
-                  <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center self-center ${
-                    !n.isRead ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-600"
-                  }`}>
+                  <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center self-center ${!n.isRead ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-600"
+                    }`}>
                     <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
 
@@ -466,7 +464,7 @@ export default function NotificationsDropdown({ user }) {
                       {n.message}
                     </p>
 
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-500">
                       <span>
                         {new Date(n.createdAt).toLocaleTimeString([], {
                           hour: "2-digit",

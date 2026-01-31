@@ -20,12 +20,12 @@ const Footer = () => {
       </div>
 
       {/* Links and Contact Information */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 py-10 text-sm">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 py-10 text-xs sm:text-sm">
         {/* Contact Information */}
         <div>
-          <h4 className="text-xl font-semibold mb-5">Contact Information</h4>
+          <h4 className="text-lg sm:text-xl font-semibold mb-5">Contact Information</h4>
           <p className="font-medium mb-2">Call Us 24/7 Free</p>
-          <p className="text-3xl font-semibold text-amber-500 mt-3 mb-3">
+          <p className="text-2xl sm:text-3xl font-semibold text-amber-500 mt-3 mb-3">
             +1 (305) 555-4274
           </p>
           <p className="mb-2">support@gash.com</p>

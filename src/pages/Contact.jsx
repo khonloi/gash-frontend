@@ -82,8 +82,8 @@ const Contact = () => {
                   <Mail size={22} color="white" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 m-0">Email</h3>
-                  <p className="text-sm text-gray-600 m-0">fptuniversityct@gmail.com</p>
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 m-0">Email</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 m-0">fptuniversityct@gmail.com</p>
                 </div>
               </div>
 
@@ -92,8 +92,8 @@ const Contact = () => {
                   <Phone size={22} color="white" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 m-0">Phone</h3>
-                  <p className="text-sm text-gray-600 m-0">0292 730 1866</p>
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 m-0">Phone</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 m-0">0292 730 1866</p>
                 </div>
               </div>
 
@@ -107,7 +107,7 @@ const Contact = () => {
                     href="https://www.google.com/maps/place/FPT+University+Can+Tho,+Street+600+Nguyen+Van+Cu,+An+Binh+Ward,+Ninh+Kieu,+Can+Tho/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                   >
                     FPT University Can Tho, Street 600 Nguyen Van Cu, An Binh Ward,
                     Ninh Kieu District, Can Tho City
@@ -139,7 +139,7 @@ const Contact = () => {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {error && (
-                <div className="text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-3 sm:p-4 text-sm">
+                <div className="text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-3 sm:p-4 text-xs sm:text-sm">
                   {error}
                 </div>
               )}
@@ -151,7 +151,7 @@ const Contact = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               />
 
               <input
@@ -161,7 +161,7 @@ const Contact = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               />
 
               <input
@@ -170,7 +170,7 @@ const Contact = () => {
                 placeholder="Your Phone (optional)"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               />
 
               <textarea

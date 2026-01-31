@@ -324,17 +324,17 @@ const Bill = () => {
                                     <div className="w-50 h-16 rounded-lg flex items-center justify-center mr-4 p-2" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
                                         <img src={gashLogo} alt="GASH Logo" className="h-12 w-auto" />
                                     </div>
-                                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>Modern fashion for everyone</p>
+                                    <p className="text-xs sm:text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>Modern fashion for everyone</p>
                                 </div>
                             </div>
 
                             {/* Invoice Title */}
                             <div className="text-right">
-                                <h2 className="text-3xl font-bold text-white mb-2">INVOICE</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">INVOICE</h2>
                                 <p style={{ color: 'rgba(255,255,255,0.9)' }}>
                                     Date: {formatDate(billData.order?.orderDate || new Date())}
                                 </p>
-                                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                                <p className="text-xs sm:text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
                                     Order ID: #{billData.order?.orderId || 'N/A'}
                                 </p>
                             </div>
@@ -346,7 +346,7 @@ const Bill = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Bill To */}
                             <div className="p-6 rounded-lg" style={{ backgroundColor: '#FFCF71', borderLeft: '4px solid #B6771D' }}>
-                                <h3 className="text-lg font-bold mb-4" style={{ color: '#7B542F' }}>BILL TO:</h3>
+                                <h3 className="text-base sm:text-lg font-bold mb-4" style={{ color: '#7B542F' }}>BILL TO:</h3>
                                 <div className="text-gray-700 space-y-1">
                                     <p className="text-gray-600">Email: {billData.customer?.email || 'N/A'}</p>
                                     <p className="text-gray-600">Phone: {billData.customer?.phone || 'N/A'}</p>
@@ -356,7 +356,7 @@ const Bill = () => {
 
                             {/* Pay To */}
                             <div className="p-6 rounded-lg" style={{ backgroundColor: '#FFCF71', borderLeft: '4px solid #B6771D' }}>
-                                <h3 className="text-lg font-bold mb-4" style={{ color: '#7B542F' }}>PAY TO:</h3>
+                                <h3 className="text-base sm:text-lg font-bold mb-4" style={{ color: '#7B542F' }}>PAY TO:</h3>
                                 <div className="text-gray-700 space-y-1">
                                     <p className="font-semibold text-gray-900">GASH Company</p>
                                     <p className="text-gray-600">support@gash.com</p>
@@ -369,7 +369,7 @@ const Bill = () => {
 
                     {/* Items Table */}
                     <div className="p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4">ORDER ITEMS</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-4">ORDER ITEMS</h3>
                         <div className="overflow-x-auto">
                             <table className="w-full border-collapse border border-gray-300">
                                 <thead>

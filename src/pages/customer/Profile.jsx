@@ -514,7 +514,7 @@ const Profile = () => {
         ) : (
           <React.Fragment>
             <div className="flex items-center justify-between mb-8">
-              <h1 className="text-xl sm:text-3xl font-bold text-gray-900">My Profile</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Profile</h1>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -535,7 +535,7 @@ const Profile = () => {
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight truncate">
                         {profile.name || profile.username}
                       </h2>
-                      <p className="text-amber-600 font-medium mt-0.5 sm:mt-1 truncate">@{profile.username}</p>
+                      <p className="text-sm sm:text-base text-amber-600 font-medium mt-0.5 sm:mt-1 truncate">@{profile.username}</p>
                     </div>
                   </div>
 
@@ -630,7 +630,7 @@ const Profile = () => {
                     <div className="flex items-start justify-between p-4 bg-gray-50 rounded-xl border-2 border-gray-300">
                       <div className="mr-4">
                         <h4 className="text-sm sm:text-base font-bold text-gray-900 mb-1">Require Authentication for Checkout</h4>
-                        <p className="text-sm text-gray-500 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
                           For extra security, you'll be asked to authenticate via password, Google, or Passkey before placing any order.
                         </p>
                       </div>
@@ -647,7 +647,7 @@ const Profile = () => {
 
                     {/* Passkeys */}
                     <div className="space-y-4">
-                      <h4 className="text-[10px] sm:text-sm font-bold text-gray-400 uppercase tracking-wider">Passkeys</h4>
+                      <h4 className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Passkeys</h4>
                       {passkeys.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {passkeys.map((pk) => (

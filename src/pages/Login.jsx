@@ -147,7 +147,7 @@ const Login = () => {
                   onChange={handleInputChange}
                   ref={usernameRef}
                   required
-                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                   aria-required="true"
                   placeholder="Enter your username"
                 />
@@ -164,7 +164,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                   aria-required="true"
                   placeholder="Enter your password"
                 />
@@ -173,7 +173,7 @@ const Login = () => {
               <div className="text-right">
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
                 >
                   Forgot Password?
                 </Link>
@@ -216,7 +216,7 @@ const Login = () => {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
-                <div className="relative flex justify-center text-sm">
+                <div className="relative flex justify-center text-xs sm:text-sm">
                   <span className="px-2 bg-[#f9fafb] text-gray-500">Or</span>
                 </div>
               </div>
@@ -240,7 +240,7 @@ const Login = () => {
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-10">
-              <p className="text-center text-sm text-gray-600">
+              <p className="text-center text-xs sm:text-sm text-gray-600">
                 New to GASH?{" "}
                 <Link
                   to="/signup"

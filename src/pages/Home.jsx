@@ -362,7 +362,7 @@ const Home = () => {
           <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
             <div
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
               role="grid"
               aria-label={loading ? "Loading products" : `${forYouProducts.length} personalized products`}
             >
@@ -389,7 +389,7 @@ const Home = () => {
           <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommendations</h2>
             <div
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
               role="grid"
               aria-label={loading ? "Loading products" : `${recommendedProducts.length} recommended products`}
             >
@@ -442,12 +442,12 @@ const Home = () => {
               </h2>
               <button
                 onClick={() => handleCategoryClick(section.categoryName)}
-                className="text-amber-600 text-sm font-medium hover:underline"
+                className="text-amber-600 text-xs sm:text-sm font-medium hover:underline"
               >
                 Explore More
               </button>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-between">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center">
               {section.products.map((product) => (
                 <ProductCard
                   key={product._id}
@@ -457,7 +457,7 @@ const Home = () => {
                 />
               ))}
               {section.products.length === 0 && (
-                <div className="col-span-full py-10 text-center text-gray-500 italic">
+                <div className="col-span-full py-10 text-center text-sm sm:text-base text-gray-500 italic">
                   No products available in this category yet.
                 </div>
               )}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../components/ProductCard";
@@ -117,6 +118,7 @@ const ProductList = () => {
   const [sortBy, setSortBy] = useState(
     sanitizeParam(searchParams.get("sortBy")) || storedFilters.sortBy || DEFAULT_FILTERS.sortBy
   );
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const navigate = useNavigate();
 
@@ -462,11 +464,11 @@ const ProductList = () => {
   // Filter section component
   const FilterSection = ({ title, options, selectedValue, filterType }) => (
     <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
-      <legend className="text-md font-semibold">{title}</legend>
+      <legend className="text-sm sm:text-base font-semibold">{title}</legend>
       {["All", ...options].map((option) => {
         const value = option === "All" ? `All ${title}` : option;
         return (
-          <label key={value} className="flex items-center my-1.5 text-sm cursor-pointer">
+          <label key={value} className="flex items-center my-1.5 text-xs sm:text-sm cursor-pointer">
             <input
               type="radio"
               name={filterType}
@@ -501,77 +503,98 @@ const ProductList = () => {
     <div className="page-container flex flex-col md:flex-row">
       <aside className="w-full md:w-60 lg:w-64 px-0 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
         <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 w-full">
-          <div className="flex justify-between items-center mb-4 h-8">
-            <h1 className="text-2xl m-0">Filters</h1>
-            {hasActiveFilters && (
-              <ProductButton
-                variant="default"
-                size="sm"
-                onClick={clearAllFilters}
-                className="text-blue-600"
-                aria-label="Clear all filters"
-              >
-                Clear All
-              </ProductButton>
-            )}
-          </div>
-
-          <FilterSection
-            title="Categories"
-            options={categories}
-            selectedValue={selectedCategory}
-            filterType="category"
-          />
-
-          <FilterSection
-            title="Colors"
-            options={colors}
-            selectedValue={selectedColor}
-            filterType="color"
-          />
-
-          <FilterSection
-            title="Sizes"
-            options={sizes}
-            selectedValue={selectedSize}
-            filterType="size"
-          />
-
-          {/* Price Range Filter */}
-          <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
-            <legend className="text-md font-semibold">Price Range</legend>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium mb-2">Min Price (VND)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1000"
-                  value={minPrice}
-                  onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-                  placeholder={priceRange.min > 0 ? priceRange.min.toString() : ""}
-                  className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Max Price (VND)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1000"
-                  value={maxPrice}
-                  onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-                  placeholder={priceRange.max > 0 ? priceRange.max.toString() : ""}
-                  className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
-                />
-              </div>
-              {priceRange.max > 0 && (
-                <p className="text-xs text-gray-500">
-                  Range: {formatPrice(priceRange.min)} - {formatPrice(priceRange.max)}
-                </p>
+          <button
+            className="flex justify-between items-center w-full md:mb-4 h-8 focus:outline-none"
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            aria-expanded={showMobileFilters}
+            aria-controls="mobile-filters-content"
+          >
+            <h1 className="text-xl sm:text-2xl m-0 flex items-center gap-2">
+              Filters
+              <span className="md:hidden">
+                {showMobileFilters ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              </span>
+            </h1>
+            <div className="flex items-center gap-2">
+              {hasActiveFilters && (
+                <ProductButton
+                  variant="default"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearAllFilters();
+                  }}
+                  className="text-blue-600"
+                  aria-label="Clear all filters"
+                >
+                  Clear All
+                </ProductButton>
               )}
             </div>
-          </fieldset>
+          </button>
+
+          <div
+            id="mobile-filters-content"
+            className={`${showMobileFilters ? "block" : "hidden"} md:block`}
+          >
+
+            <FilterSection
+              title="Categories"
+              options={categories}
+              selectedValue={selectedCategory}
+              filterType="category"
+            />
+
+            <FilterSection
+              title="Colors"
+              options={colors}
+              selectedValue={selectedColor}
+              filterType="color"
+            />
+
+            <FilterSection
+              title="Sizes"
+              options={sizes}
+              selectedValue={selectedSize}
+              filterType="size"
+            />
+
+            {/* Price Range Filter */}
+            <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">
+              <legend className="text-sm sm:text-base font-semibold">Price Range</legend>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium mb-2">Min Price (VND)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={minPrice}
+                    onChange={(e) => handleFilterChange("minPrice", e.target.value)}
+                    placeholder={priceRange.min > 0 ? priceRange.min.toString() : ""}
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium mb-2">Max Price (VND)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={maxPrice}
+                    onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                    placeholder={priceRange.max > 0 ? priceRange.max.toString() : ""}
+                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
+                  />
+                </div>
+                {priceRange.max > 0 && (
+                  <p className="text-xs text-gray-500">
+                    Range: {formatPrice(priceRange.min)} - {formatPrice(priceRange.max)}
+                  </p>
+                )}
+              </div>
+            </fieldset>
+          </div>
         </div>
       </aside>
 
@@ -581,14 +604,14 @@ const ProductList = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
               <h1 className="text-xl sm:text-2xl font-normal m-0">Product Listings</h1>
               <div className="flex items-center gap-2">
-                <label htmlFor="sortBy" className="text-sm font-medium text-gray-700">
+                <label htmlFor="sortBy" className="text-xs sm:text-sm font-medium text-gray-700">
                   Sort by:
                 </label>
                 <select
                   id="sortBy"
                   value={sortBy}
                   onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
                   aria-label="Sort products"
                 >
                   <option value="name">Name (A-Z)</option>
@@ -599,7 +622,7 @@ const ProductList = () => {
                 </select>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4">
               Explore our range of products below. Select a product to view detailed information,
               pricing, and available variations.
             </p>
@@ -652,7 +675,7 @@ const ProductList = () => {
           )}
 
           <div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 justify-between"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
             role="grid"
             aria-label={(loading || isFiltering) ? "Loading products" : `${activeProducts.length} products`}
           >
