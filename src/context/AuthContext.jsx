@@ -280,7 +280,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     // Demo Mode Restriction
     if (import.meta.env.VITE_APP_USE_MOCK === 'true') {
-      showToast("This is a demo mode and that you can clone the project to test it locally", 'info');
+      showToast("This page is running in demo mode. To fully explore the project, please clone it and run it locally.", 'info');
       return;
     }
 

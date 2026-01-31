@@ -16,7 +16,7 @@ export const setupMocks = () => {
   
   const mock = new AxiosMockAdapter(axiosClient, { delayResponse: 500 });
   
-  const restrictedMessage = "This is a demo mode and that you can clone the project to test it locally";
+  const restrictedMessage = "This page is running in demo mode. To fully explore the project, please clone it and run it locally.";
   
   // -- Auth --
   mock.onGet(/.*\/auth\/check-status/).reply(200, { message: 'Active' });

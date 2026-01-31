@@ -114,7 +114,7 @@ const Footer = () => {
 
       {/* Bottom */}
       <div className="bg-[#0f1111] text-center py-4 text-xs border-t border-gray-700">
-        <p>© 2026 GASH - All rights reserved.</p>
+        <p>© 2026 GASH. A Kaison Group company - All rights reserved.</p>
       </div>
     </footer>
   );

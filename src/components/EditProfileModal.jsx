@@ -153,7 +153,7 @@ const EditProfileModal = ({
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b-2 border-gray-300 bg-gray-50">
-          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Update Profile</h2>
           <button
             type="button"
             onClick={handleCancel}

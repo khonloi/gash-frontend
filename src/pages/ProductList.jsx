@@ -622,10 +622,6 @@ const ProductList = () => {
                 </select>
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-gray-600 mb-4">
-              Explore our range of products below. Select a product to view detailed information,
-              pricing, and available variations.
-            </p>
             {activeProducts.length > 0 && !loading && !isFiltering && (
               <p className="text-sm text-gray-600 mb-4">
                 Showing {activeProducts.length} product{activeProducts.length !== 1 ? "s" : ""}

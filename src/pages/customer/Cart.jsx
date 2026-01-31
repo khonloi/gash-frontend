@@ -560,7 +560,7 @@ const Cart = () => {
   return (
     <div className="page-container page-container-centered">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
-        <h2 className="text-lg sm:text-2xl font-normal mb-4 sm:mb-5 md:mb-6 m-0">
+        <h2 className="text-xl sm:text-2xl font-normal mb-4 sm:mb-5 md:mb-6 m-0">
           Shopping Cart
         </h2>
 

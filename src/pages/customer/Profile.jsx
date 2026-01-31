@@ -43,7 +43,7 @@ const Profile = () => {
   });
 
   const isDemoMode = import.meta.env.VITE_APP_USE_MOCK === 'true';
-  const showDemoNotice = () => showToast("This is a demo mode and that you can clone the project to test it locally", "info", 5000);
+  const showDemoNotice = () => showToast("This page is running in demo mode. To fully explore the project, please clone it and run it locally.", "info", 5000);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -547,7 +547,7 @@ const Profile = () => {
                           onClick={() => isDemoMode ? showDemoNotice() : setEditMode(true)}
                           className="w-full justify-center py-3"
                         >
-                          Edit Profile
+                          Update Profile
                         </ProductButton>
                         <ProductButton
                           variant="secondary"
@@ -700,7 +700,7 @@ const Profile = () => {
           </React.Fragment>
         )}
 
-        {/* Modal Edit Profile */}
+        {/* Modal Update Profile */}
         {editMode && (
           <EditProfileModal
             formData={formData}

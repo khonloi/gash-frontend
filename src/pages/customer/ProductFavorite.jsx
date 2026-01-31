@@ -164,9 +164,6 @@ const ProductFavorite = () => {
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Your Favorite Products</h1>
-          <p className="text-xs sm:text-sm text-gray-600 mb-4">
-            Browse your favorite products below. Click a product to view details or remove it from your favorites.
-          </p>
         </header>
 
         {/* Search Bar */}
