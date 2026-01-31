@@ -20,12 +20,19 @@ export const AuthProvider = ({ children }) => {
     navigate('/login');
   };
 
+  const isDemoMode = import.meta.env.VITE_APP_USE_MOCK === 'true';
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     const loginTime = localStorage.getItem('loginTime');
 
     if (token && storedUser && loginTime) {
+      if (isDemoMode) {
+        setUser(JSON.parse(storedUser));
+        return;
+      }
+
       const currentTime = Date.now();
       const sessionDuration = 24 * 60 * 60 * 1000; // 1 day
       const timeElapsed = currentTime - parseInt(loginTime);
@@ -40,7 +47,7 @@ export const AuthProvider = ({ children }) => {
         }, remainingTime);
       }
     }
-  }, [showToast]);
+  }, [showToast, isDemoMode]);
 
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
@@ -97,9 +104,11 @@ export const AuthProvider = ({ children }) => {
 
 
 
-      setTimeout(() => {
-        handleForcedLogout('Your session has expired. You will be logged out.');
-      }, 24 * 60 * 60 * 1000);
+      if (!isDemoMode) {
+        setTimeout(() => {
+          handleForcedLogout('Your session has expired. You will be logged out.');
+        }, 24 * 60 * 60 * 1000);
+      }
 
       navigate('/');
     } catch (error) {
@@ -123,9 +132,11 @@ export const AuthProvider = ({ children }) => {
 
       showToast('Google logged in successfully', 'success');
 
-      setTimeout(() => {
-        handleForcedLogout('Your session has expired. You will be logged out.');
-      }, 24 * 60 * 60 * 1000);
+      if (!isDemoMode) {
+        setTimeout(() => {
+          handleForcedLogout('Your session has expired. You will be logged out.');
+        }, 24 * 60 * 60 * 1000);
+      }
 
       navigate('/');
     } catch (error) {
@@ -195,9 +206,11 @@ export const AuthProvider = ({ children }) => {
 
       showToast('Account created successfully', 'success');
 
-      setTimeout(() => {
-        handleForcedLogout('Your session has expired. You will be logged out.');
-      }, 24 * 60 * 60 * 1000);
+      if (!isDemoMode) {
+        setTimeout(() => {
+          handleForcedLogout('Your session has expired. You will be logged out.');
+        }, 24 * 60 * 60 * 1000);
+      }
 
       navigate('/');
     } catch (error) {
@@ -250,9 +263,11 @@ export const AuthProvider = ({ children }) => {
 
       showToast('Passkey logged in successfully', 'success');
 
-      setTimeout(() => {
-        handleForcedLogout('Your session has expired. You will be logged out.');
-      }, 24 * 60 * 60 * 1000);
+      if (!isDemoMode) {
+        setTimeout(() => {
+          handleForcedLogout('Your session has expired. You will be logged out.');
+        }, 24 * 60 * 60 * 1000);
+      }
 
       navigate('/');
     } catch (error) {

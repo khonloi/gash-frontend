@@ -293,7 +293,7 @@ const Bill = () => {
 
     return (
         <div className="min-h-screen py-8 bg-white">
-            <div className="max-w-5xl mx-auto px-4">
+            <div className="page-container max-w-5xl">
                 {/* Header Actions */}
                 <div className="mb-6 flex justify-between items-center no-print">
                     <div className="flex gap-3">

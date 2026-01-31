@@ -121,6 +121,76 @@ export const setupMocks = () => {
       ORDERS: 'GASH_MOCK_ORDERS'
   };
 
+  // -- Initialize Demo Data --
+  const currentCart = getStored(MOCK_KEYS.CART);
+  const initialVariants = ["69183e9eef9cc2d8dc359b3d", "69185569a17ac3f26c226e30"];
+  let cartChanged = false;
+  initialVariants.forEach((vId, idx) => {
+      if (!currentCart.find(item => getID(item.variantId) === vId)) {
+          currentCart.push({ _id: `initial_cart_${idx + 1}`, variantId: vId, quantity: idx + 1 });
+          cartChanged = true;
+      }
+  });
+  if (cartChanged) setStored(MOCK_KEYS.CART, currentCart);
+
+  const currentFavs = getStored(MOCK_KEYS.FAVORITES);
+  const initialProducts = ["6916c4f34945cd9a5d8631fb", "691836f7bc4af928d6320cb3"];
+  let favsChanged = false;
+  initialProducts.forEach((pId, idx) => {
+      if (!currentFavs.find(item => getID(item.productId) === pId)) {
+          currentFavs.push({ _id: `initial_fav_${idx + 1}`, productId: pId });
+          favsChanged = true;
+      }
+  });
+  if (favsChanged) setStored(MOCK_KEYS.FAVORITES, currentFavs);
+
+  const currentOrders = getStored(MOCK_KEYS.ORDERS);
+  const initialOrderIds = ["demo_order_1", "demo_order_2"];
+  let ordersChanged = false;
+  
+  if (!currentOrders.find(o => o._id === "demo_order_1")) {
+      currentOrders.push({
+          _id: "demo_order_1",
+          orderDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          orderStatus: "delivered",
+          payStatus: "paid",
+          totalPrice: 125,
+          finalPrice: 125,
+          paymentMethod: "PayPal",
+          addressReceive: mockUser.address,
+          phone: mockUser.phone,
+          customer: { name: mockUser.name, email: mockUser.email, username: mockUser.username },
+          orderDetails: [
+              { variantId: "6916c92382ece642cea141c1", quantity: 1, productPrice: 45 },
+              { variantId: "69183e9eef9cc2d8dc359b3d", quantity: 1, productPrice: 80 }
+          ]
+      });
+      ordersChanged = true;
+  }
+  
+  if (!currentOrders.find(o => o._id === "demo_order_2")) {
+      currentOrders.push({
+          _id: "demo_order_2",
+          orderDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          orderStatus: "shipping",
+          payStatus: "paid",
+          totalPrice: 110,
+          finalPrice: 110,
+          paymentMethod: "Credit Card",
+          addressReceive: mockUser.address,
+          phone: mockUser.phone,
+          customer: { name: mockUser.name, email: mockUser.email, username: mockUser.username },
+          orderDetails: [
+              { variantId: "69185569a17ac3f26c226e30", quantity: 2, productPrice: 55 }
+          ]
+      });
+      ordersChanged = true;
+  }
+  
+  if (ordersChanged) setStored(MOCK_KEYS.ORDERS, currentOrders);
+
   // Helper to enrich cart/favorite items with product/variant data
   const enrichItem = (item) => {
       // Handle item.variantId being either a string ID or an object with an _id

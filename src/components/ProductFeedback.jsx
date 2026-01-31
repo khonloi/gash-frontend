@@ -179,8 +179,8 @@ const ProductFeedback = ({ productId }) => {
         <div className="w-full">
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-gray-900">Product Reviews</h3>
-                    <span className="text-sm text-gray-500">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Product Reviews</h3>
+                    <span className="text-xs sm:text-sm text-gray-500">
                         {feedbackStats?.total_feedbacks || feedbacks.length} review{(feedbackStats?.total_feedbacks || feedbacks.length) !== 1 ? 's' : ''}
                     </span>
                 </div>
@@ -195,7 +195,7 @@ const ProductFeedback = ({ productId }) => {
                                     {/* Rating Stats Section */}
                                     <div className="flex flex-col items-center lg:items-start">
                                         <div className="flex items-center mb-3">
-                                            <span className="text-4xl font-bold text-yellow-600 mr-3">
+                                            <span className="text-3xl sm:text-4xl font-bold text-yellow-600 mr-3">
                                                 {feedbackStats.average_rating.toFixed(1)}
                                             </span>
                                             <div className="flex">
@@ -212,18 +212,18 @@ const ProductFeedback = ({ productId }) => {
                                             </div>
                                         </div>
                                         <div className="text-gray-700 text-center lg:text-left">
-                                            <div className="text-lg font-medium">
+                                            <div className="text-base sm:text-lg font-medium">
                                                 Based on {feedbackStats.total_feedbacks} review{feedbackStats.total_feedbacks !== 1 ? 's' : ''}
                                             </div>
-                                            <div className="text-sm text-gray-600">
+                                            <div className="text-xs sm:text-sm text-gray-600">
                                                 {feedbackStats.total_ratings} with ratings
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Rating Distribution - Below on desktop, below on mobile */}
                                     <div className="flex flex-col w-full">
-                                        <div className="text-lg font-medium text-gray-700 mb-2 text-center lg:text-left">Rating Distribution</div>
+                                        <div className="text-base sm:text-lg font-medium text-gray-700 mb-2 text-center lg:text-left">Rating Distribution</div>
                                         <div className="flex flex-col gap-2">
                                             {[5, 4, 3, 2, 1].map((rating) => (
                                                 <div key={rating} className="flex items-center gap-2">
@@ -258,96 +258,95 @@ const ProductFeedback = ({ productId }) => {
                                             <div className="flex items-center gap-4">
                                                 <div className="relative">
                                                     <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                                                    {feedback.customer?.image ? (
-                                                        <img
-                                                            src={feedback.customer.image}
-                                                            alt={feedback.customer?.username || 'User'}
-                                                            className="w-full h-full object-cover"
-                                                            onError={(e) => {
-                                                                e.target.style.display = 'none';
-                                                                e.target.nextSibling.style.display = 'flex';
-                                                            }}
-                                                        />
-                                                    ) : null}
-                                                    <div
-                                                        className={`w-full h-full flex items-center justify-center text-white font-bold text-lg ${feedback.customer?.image ? 'hidden' : 'flex'}`}
-                                                    >
-                                                        {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
-                                                    </div>
-                                                </div>
-                                                {feedback.customer?.is_current_user && (
-                                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                                        <i className="lni lni-check text-white text-xs"></i>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="font-semibold text-gray-900 text-base">
-                                                        {feedback.customer?.username || "Anonymous"}
+                                                        {feedback.customer?.image ? (
+                                                            <img
+                                                                src={feedback.customer.image}
+                                                                alt={feedback.customer?.username || 'User'}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.nextSibling.style.display = 'flex';
+                                                                }}
+                                                            />
+                                                        ) : null}
+                                                        <div
+                                                            className={`w-full h-full flex items-center justify-center text-white font-bold text-lg ${feedback.customer?.image ? 'hidden' : 'flex'}`}
+                                                        >
+                                                            {feedback.customer?.username?.charAt(0).toUpperCase() || 'A'}
+                                                        </div>
                                                     </div>
                                                     {feedback.customer?.is_current_user && (
-                                                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                                            You
-                                                        </span>
+                                                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                                            <i className="lni lni-check text-white text-xs"></i>
+                                                        </div>
                                                     )}
                                                 </div>
-                                                {feedback.variant && (
-                                                    <div className="text-sm text-gray-600 mt-1">
-                                                        {feedback.variant.color} • {feedback.variant.size}
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="font-semibold text-gray-900 text-sm sm:text-base">
+                                                            {feedback.customer?.username || "Anonymous"}
+                                                        </div>
+                                                        {feedback.customer?.is_current_user && (
+                                                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                                                You
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-sm text-gray-500">
-                                                {feedback.feedback?.createdAt
-                                                    ? formatDate(feedback.feedback.createdAt)
-                                                    : feedback.order_date
-                                                        ? formatDate(feedback.order_date)
-                                                        : 'Unknown Date'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {feedback.feedback?.has_rating && feedback.feedback?.rating && (
-                                        <div className="flex items-center mb-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <svg
-                                                            key={i}
-                                                            className={`w-5 h-5 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                                            fill="currentColor"
-                                                            viewBox="0 0 20 20"
-                                                        >
-                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                        </svg>
-                                                    ))}
+                                                    {feedback.variant && (
+                                                        <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                                                            {feedback.variant.color} • {feedback.variant.size}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <span className="text-sm text-gray-600 ml-1">
-                                                    ({feedback.feedback.rating}/5)
-                                                </span>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xs sm:text-sm text-gray-500">
+                                                    {feedback.feedback?.createdAt
+                                                        ? formatDate(feedback.feedback.createdAt)
+                                                        : feedback.order_date
+                                                            ? formatDate(feedback.order_date)
+                                                            : 'Unknown Date'}
+                                                </div>
                                             </div>
                                         </div>
-                                    )}
-                                    {feedback.feedback?.has_content && feedback.feedback?.content && (
-                                        <div className="mb-4">
-                                            <p 
-                                                className={`text-base leading-relaxed p-4 rounded-xl border-l-4 break-words whitespace-pre-wrap max-w-full ${
-                                                    feedback.feedback?.isDeleted 
-                                                        ? 'text-gray-500 italic bg-gray-100 border-gray-400' 
-                                                        : 'text-gray-700 bg-gray-50 border-yellow-400'
-                                                }`}
-                                                style={{ 
-                                                    wordBreak: 'break-word',
-                                                    overflowWrap: 'anywhere',
-                                                    wordWrap: 'break-word'
-                                                }}
-                                            >
-                                                {feedback.feedback.content}
-                                            </p>
-                                        </div>
-                                    )}
+                                        {feedback.feedback?.has_rating && feedback.feedback?.rating && (
+                                            <div className="flex items-center mb-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <svg
+                                                                key={i}
+                                                                className={`w-5 h-5 ${i < feedback.feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                            </svg>
+                                                        ))}
+                                                    </div>
+                                                    <span className="text-xs sm:text-sm text-gray-600 ml-1">
+                                                        ({feedback.feedback.rating}/5)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {feedback.feedback?.has_content && feedback.feedback?.content && (
+                                            <div className="mb-4">
+                                                <p
+                                                    className={`text-sm sm:text-base leading-relaxed p-4 rounded-xl border-l-4 break-words whitespace-pre-wrap max-w-full ${feedback.feedback?.isDeleted
+                                                            ? 'text-gray-500 italic bg-gray-100 border-gray-400'
+                                                            : 'text-gray-700 bg-gray-50 border-yellow-400'
+                                                        }`}
+                                                    style={{
+                                                        wordBreak: 'break-word',
+                                                        overflowWrap: 'anywhere',
+                                                        wordWrap: 'break-word'
+                                                    }}
+                                                >
+                                                    {feedback.feedback.content}
+                                                </p>
+                                            </div>
+                                        )}
 
                                         {!feedback.feedback?.has_content && !feedback.feedback?.has_rating && (
                                             <p className="text-gray-500 text-sm italic">

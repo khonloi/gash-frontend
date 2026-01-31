@@ -269,7 +269,7 @@ const Home = () => {
         </div>
       </div>
       {/* Main Home Content */}
-      <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+      <div className="page-container page-container-centered">
         {error && (
           <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
             <span className="text-lg" aria-hidden="true">⚠</span>

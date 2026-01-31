@@ -58,7 +58,7 @@ const Contact = () => {
   );
 
   return (
-    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container page-container-centered">
       {/* Header */}
       <header className="text-center mb-6 sm:mb-8 md:mb-10 w-full">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">

@@ -97,12 +97,12 @@ const ForgotPassword = () => {
   );
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
         <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
           Reset Your Password
         </h1>
-        
+
         <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
           Enter your email address to receive a password reset OTP.
         </p>
@@ -146,8 +146,8 @@ const ForgotPassword = () => {
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Remember your password?{' '}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
           >
             Sign In

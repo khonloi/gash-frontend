@@ -456,21 +456,25 @@ const Profile = () => {
 
   const ProfileSkeleton = () => (
     <div className="animate-pulse space-y-6">
-      <div className="h-8 bg-gray-200 rounded-lg w-48 mb-6"></div>
+      <div className="h-6 sm:h-8 bg-gray-200 rounded-lg w-48 mb-6"></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 bg-white rounded-xl border-2 border-gray-300 p-8 flex flex-col items-center">
-          <div className="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
-          <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-24 mb-6"></div>
-          <div className="w-full space-y-3">
-            <div className="h-10 bg-gray-200 rounded-lg w-full"></div>
-            <div className="h-10 bg-gray-200 rounded-lg w-full"></div>
-            <div className="h-10 bg-gray-200 rounded-lg w-full"></div>
+        <div className="lg:col-span-1 bg-white rounded-xl border-2 border-gray-300 overflow-hidden h-fit">
+          <div className="p-6 sm:p-8 flex items-center gap-4 border-b-2 border-gray-100 bg-gray-50/30">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full flex-shrink-0"></div>
+            <div className="flex-1 space-y-2">
+              <div className="h-5 sm:h-6 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          </div>
+          <div className="p-6 space-y-3">
+            <div className="h-12 bg-gray-200 rounded-xl w-full"></div>
+            <div className="h-12 bg-gray-200 rounded-xl w-full"></div>
+            <div className="h-12 bg-gray-200 rounded-xl w-full"></div>
           </div>
         </div>
         <div className="lg:col-span-2 bg-white rounded-xl border-2 border-gray-300 overflow-hidden">
           <div className="h-14 bg-gray-50 border-b-2 border-gray-300 px-6 flex items-center">
-            <div className="h-5 bg-gray-200 rounded w-40"></div>
+            <div className="h-4 sm:h-5 bg-gray-200 rounded w-40"></div>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(6)].map((_, i) => (
@@ -490,8 +494,8 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="page-container">
+      <div>
         {loading || !profile ? (
           <ProfileSkeleton />
         ) : error ? (
@@ -510,28 +514,28 @@ const Profile = () => {
         ) : (
           <React.Fragment>
             <div className="flex items-center justify-between mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Profile</h1>
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-900">My Profile</h1>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Profile Card */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-xl border-2 border-gray-300 shadow-sm overflow-hidden sticky top-24">
-                  <div className="bg-gray-50 p-8 border-b-2 border-gray-300">
-                    <div className="relative w-32 h-32 mx-auto mb-6">
+                  <div className="bg-gray-50 p-6 sm:p-8 border-b-2 border-gray-300 flex items-center gap-4 sm:gap-6">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
                       <img
                         src={profile.image || "https://via.placeholder.com/128x128?text=User"}
                         alt={profile.username}
-                        className="w-full h-full rounded-full object-cover border-4 border-white shadow-md"
+                        className="w-full h-full rounded-full object-cover border-4 border-white shadow-sm"
                         onError={(e) => { e.target.src = "https://via.placeholder.com/128x128?text=User"; }}
                       />
-                      <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></div>
+                      <div className="absolute bottom-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 border-[3px] sm:border-4 border-white rounded-full"></div>
                     </div>
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold text-gray-900 leading-tight">
+                    <div className="text-left flex-1 min-w-0">
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight truncate">
                         {profile.name || profile.username}
                       </h2>
-                      <p className="text-amber-600 font-medium mt-1">@{profile.username}</p>
+                      <p className="text-amber-600 font-medium mt-0.5 sm:mt-1 truncate">@{profile.username}</p>
                     </div>
                   </div>
 
@@ -589,7 +593,7 @@ const Profile = () => {
                 {/* Personal Information */}
                 <div className="bg-white rounded-xl border-2 border-gray-300 shadow-sm overflow-hidden">
                   <div className="px-6 py-4 bg-gray-50 border-b-2 border-gray-300">
-                    <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">Personal Information</h3>
                   </div>
                   <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     {[
@@ -602,12 +606,12 @@ const Profile = () => {
                       { label: "Address", value: profile.address || "Not set", icon: MapPin, colSpan: true },
                     ].map((item, i) => (
                       <div key={i} className={`${item.colSpan ? 'md:col-span-2' : ''} group`}>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{item.label}</p>
+                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{item.label}</p>
                         <div className="flex items-center p-3.5 bg-gray-50 rounded-xl border-2 border-gray-300 group-hover:border-amber-400 transition-colors">
                           <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center mr-3 shrink-0">
                             <item.icon className="w-4 h-4 text-amber-600" />
                           </div>
-                          <span className={`text-gray-900 font-medium ${item.capitalize ? 'capitalize' : ''}`}>
+                          <span className={`text-sm sm:text-base text-gray-900 font-medium ${item.capitalize ? 'capitalize' : ''}`}>
                             {item.value}
                           </span>
                         </div>
@@ -619,13 +623,13 @@ const Profile = () => {
                 {/* Security Settings */}
                 <div className="bg-white rounded-xl border-2 border-gray-300 shadow-sm overflow-hidden">
                   <div className="px-6 py-4 bg-gray-50 border-b-2 border-gray-300">
-                    <h3 className="text-lg font-semibold text-gray-900">Authentication & Security</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">Authentication & Security</h3>
                   </div>
                   <div className="p-6 space-y-8">
                     {/* Checkout Auth Toggle */}
                     <div className="flex items-start justify-between p-4 bg-gray-50 rounded-xl border-2 border-gray-300">
                       <div className="mr-4">
-                        <h4 className="font-bold text-gray-900 mb-1">Require Authentication for Checkout</h4>
+                        <h4 className="text-sm sm:text-base font-bold text-gray-900 mb-1">Require Authentication for Checkout</h4>
                         <p className="text-sm text-gray-500 leading-relaxed">
                           For extra security, you'll be asked to authenticate via password, Google, or Passkey before placing any order.
                         </p>
@@ -643,7 +647,7 @@ const Profile = () => {
 
                     {/* Passkeys */}
                     <div className="space-y-4">
-                      <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Passkeys</h4>
+                      <h4 className="text-[10px] sm:text-sm font-bold text-gray-400 uppercase tracking-wider">Passkeys</h4>
                       {passkeys.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {passkeys.map((pk) => (
@@ -653,7 +657,7 @@ const Profile = () => {
                                   <Key className="w-5 h-5 text-amber-600" />
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold text-gray-900 capitalize">{pk.deviceType || 'Device'}</p>
+                                  <p className="text-xs sm:text-sm font-bold text-gray-900 capitalize">{pk.deviceType || 'Device'}</p>
                                   <p className="text-[10px] text-gray-400 uppercase font-bold mt-0.5">
                                     Added {new Date(pk.createdAt).toLocaleDateString()}
                                   </p>

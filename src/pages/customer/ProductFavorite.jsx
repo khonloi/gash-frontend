@@ -55,7 +55,7 @@ const ProductFavorite = () => {
       }
       const response = await fetchWithRetry(() => Api.favorites.fetch(token));
       const favoritesData = response?.favorites || response?.data || response || [];
-      
+
       if (!Array.isArray(favoritesData)) {
         setError("No favorite products found");
         setFavorites([]);
@@ -95,7 +95,7 @@ const ProductFavorite = () => {
 
     const { favoriteId } = favoriteToDelete;
     setShowDeleteConfirm(false);
-    
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -160,7 +160,7 @@ const ProductFavorite = () => {
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container page-container-centered">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">Your Favorite Products</h1>
@@ -220,11 +220,11 @@ const ProductFavorite = () => {
         )}
 
         {error && (
-          <div 
+          <div
             ref={errorRef}
-            className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" 
-            role="alert" 
-            tabIndex={0} 
+            className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap"
+            role="alert"
+            tabIndex={0}
             aria-live="polite"
           >
             <span className="text-lg" aria-hidden="true">⚠</span>

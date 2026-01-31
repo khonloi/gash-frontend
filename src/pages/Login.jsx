@@ -120,7 +120,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
       <section className="bg-white rounded-xl w-full max-w-sm md:max-w-4xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Part 1: Sign In Heading and Forms */}

@@ -54,7 +54,7 @@ const StatusBadge = ({ status }) => {
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium ${config.bg} ${config.text}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] sm:text-xs font-medium ${config.bg} ${config.text}`}
     >
       {config.label}
     </span>
@@ -67,7 +67,7 @@ const ProductCard = ({ product, handleProductClick, handleKeyDown }) => {
 
   return (
     <article
-      className="flex flex-col h-[19em] w-[12em] sm:h-[22em] sm:w-[14em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-lg focus:shadow-lg focus:outline-none cursor-pointer transition-all duration-300 ease-in-out bg-white"
+      className="flex flex-col h-[17em] w-[11em] sm:h-[20em] sm:w-[13em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-lg focus:shadow-lg focus:outline-none cursor-pointer transition-all duration-300 ease-in-out bg-white"
       onClick={() => handleProductClick(product._id)}
       onKeyDown={(e) => handleKeyDown(e, product._id)}
       role="gridcell"
@@ -86,23 +86,23 @@ const ProductCard = ({ product, handleProductClick, handleKeyDown }) => {
           }}
         />
       </div>
-      <div className="h-1/2 p-4 flex flex-col justify-between bg-white">
-        <div className="space-y-1.5">
+      <div className="h-1/2 p-3 sm:p-4 flex flex-col justify-between bg-white">
+        <div className="space-y-1 sm:space-y-1.5">
           <h2
             title={product.productName}
-            className="text-black line-clamp-2 leading-tight text-base font-medium"
+            className="text-black line-clamp-2 leading-tight text-sm sm:text-base font-medium"
           >
             {product.productName || "Unnamed Product"}
           </h2>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-xs sm:text-sm">
             {product.categoryId?.categoryName || "Uncategorized"}
           </p>
-          <div className="pt-1">
+          <div className="pt-0.5 sm:pt-1">
             <StatusBadge status={product.productStatus} />
           </div>
         </div>
         <p
-          className="text-red-600 text-lg font-semibold mt-2"
+          className="text-red-600 text-base sm:text-lg font-semibold mt-1 sm:mt-2"
           aria-label={`Price: ${formatPrice(minPrice)}`}
         >
           {formatPrice(minPrice)}

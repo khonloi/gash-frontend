@@ -152,25 +152,25 @@ const Orders = () => {
       // Only update if this order belongs to the current user
       if (orderUserId && orderUserId.toString() === user._id.toString()) {
         console.log("📦 Order updated via Socket.IO:", updatedOrder._id);
-        
+
         setOrders((prevOrders) => {
           const existingIndex = prevOrders.findIndex((o) => o._id === updatedOrder._id);
-          
+
           if (existingIndex !== -1) {
             // Update existing order while preserving populated orderDetails
             const existingOrder = prevOrders[existingIndex];
             const updated = [...prevOrders];
-            
+
             // Check if updated order has properly populated orderDetails
             const hasPopulatedDetails = updatedOrder.orderDetails?.some(
               (detail) => detail?.variantId?.productId?.productName
             );
-            
+
             // Preserve existing orderDetails if updated order doesn't have populated ones
-            const preservedOrderDetails = hasPopulatedDetails 
-              ? updatedOrder.orderDetails 
+            const preservedOrderDetails = hasPopulatedDetails
+              ? updatedOrder.orderDetails
               : existingOrder.orderDetails;
-            
+
             updated[existingIndex] = {
               ...existingOrder,
               ...updatedOrder,
@@ -193,21 +193,21 @@ const Orders = () => {
         // Also update filtered orders if applicable
         setFilteredOrders((prevFiltered) => {
           const existingIndex = prevFiltered.findIndex((o) => o._id === updatedOrder._id);
-          
+
           if (existingIndex !== -1) {
             const existingOrder = prevFiltered[existingIndex];
             const updated = [...prevFiltered];
-            
+
             // Check if updated order has properly populated orderDetails
             const hasPopulatedDetails = updatedOrder.orderDetails?.some(
               (detail) => detail?.variantId?.productId?.productName
             );
-            
+
             // Preserve existing orderDetails if updated order doesn't have populated ones
-            const preservedOrderDetails = hasPopulatedDetails 
-              ? updatedOrder.orderDetails 
+            const preservedOrderDetails = hasPopulatedDetails
+              ? updatedOrder.orderDetails
               : existingOrder.orderDetails;
-            
+
             updated[existingIndex] = {
               ...existingOrder,
               ...updatedOrder,
@@ -421,7 +421,7 @@ const Orders = () => {
   }
 
   return (
-    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container page-container-centered">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Orders</h1>
@@ -546,74 +546,96 @@ const Orders = () => {
               const productName = firstProduct?.variantId?.productId?.productName || "Product (Variant not available)";
 
               return (
-              <article
-                key={order._id}
-                className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
-                tabIndex={0}
-                aria-label={`Order: ${order._id}`}
-              >
-                <div className="flex items-stretch gap-6 flex-1">
-                  {/* Product Image */}
-                  {firstProduct && (
-                    <img
-                      src={productImage}
-                      alt={productName}
-                      className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
-                      onError={(e) => {
-                        e.target.src = "/placeholder.png";
-                      }}
-                    />
-                  )}
-                  
-                  {/* Order Details */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
-                        {productName || "Order"}
-                      </p>
-                      {order.orderDetails?.length > 1 && (
-                        <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                          +{order.orderDetails.length - 1} more
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm text-gray-600 m-0">
-                        Order #{order._id.slice(-8).toUpperCase()}
-                      </p>
-                      <span className="text-gray-400">•</span>
-                      <p className="text-sm text-gray-600 m-0">
-                        {formatDate(order.orderDate)}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 flex-wrap mt-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Status:</span>
-                        {getStatusBadge(order.orderStatus, "order")}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Payment:</span>
-                        {getStatusBadge(order.payStatus, "pay")}
-                      </div>
-                    </div>
-                    
-                    <p className="text-base font-semibold text-red-600 m-0 mt-1">
-                      Total: {formatPrice(order.finalPrice)}
-                    </p>
-                  </div>
-                </div>
+                <article
+                  key={order._id}
+                  className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
+                  tabIndex={0}
+                  aria-label={`Order: ${order._id}`}
+                >
+                  <div className="flex items-stretch gap-6 flex-1">
+                    {/* Product Image */}
+                    {firstProduct && (
+                      <img
+                        src={productImage}
+                        alt={productName}
+                        className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
+                        onError={(e) => {
+                          e.target.src = "/placeholder.png";
+                        }}
+                      />
+                    )}
 
-                {/* Action Buttons */}
-                <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
-                  {order.payStatus?.toLowerCase() === "paid" && (
+                    {/* Order Details */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
+                          {productName || "Order"}
+                        </p>
+                        {order.orderDetails?.length > 1 && (
+                          <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                            +{order.orderDetails.length - 1} more
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm text-gray-600 m-0">
+                          Order #{order._id.slice(-8).toUpperCase()}
+                        </p>
+                        <span className="text-gray-400">•</span>
+                        <p className="text-sm text-gray-600 m-0">
+                          {formatDate(order.orderDate)}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3 flex-wrap mt-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">Status:</span>
+                          {getStatusBadge(order.orderStatus, "order")}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">Payment:</span>
+                          {getStatusBadge(order.payStatus, "pay")}
+                        </div>
+                      </div>
+
+                      <p className="text-base font-semibold text-red-600 m-0 mt-1">
+                        Total: {formatPrice(order.finalPrice)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
+                    {order.payStatus?.toLowerCase() === "paid" && (
+                      <ProductButton
+                        variant="default"
+                        size="sm"
+                        onClick={() => navigate(`/bills/${order._id}`)}
+                        className="text-green-600"
+                        title="View Bill"
+                      >
+                        <svg
+                          className="w-4 h-4 inline mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                        View Bill
+                      </ProductButton>
+                    )}
                     <ProductButton
-                      variant="default"
+                      variant="primary"
                       size="sm"
-                      onClick={() => navigate(`/bills/${order._id}`)}
-                      className="text-green-600"
-                      title="View Bill"
+                      onClick={() => setSelectedOrderId(order._id)}
+                      title="View Details"
                     >
                       <svg
                         className="w-4 h-4 inline mr-2"
@@ -625,42 +647,20 @@ const Orders = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                         />
                       </svg>
-                      View Bill
+                      View Details
                     </ProductButton>
-                  )}
-                  <ProductButton
-                    variant="primary"
-                    size="sm"
-                    onClick={() => setSelectedOrderId(order._id)}
-                    title="View Details"
-                  >
-                    <svg
-                      className="w-4 h-4 inline mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                    View Details
-                  </ProductButton>
-                </div>
-              </article>
-            );
+                  </div>
+                </article>
+              );
             })}
           </div>
         )}

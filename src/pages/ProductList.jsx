@@ -130,7 +130,7 @@ const ProductList = () => {
   // Data fetching - use refs to prevent unnecessary re-renders
   const hasFetchedProductsRef = useRef(false);
   const hasFetchedVariantsRef = useRef(false);
-  
+
   const fetchProducts = useCallback(async () => {
     if (hasFetchedProductsRef.current) return;
     hasFetchedProductsRef.current = true;
@@ -239,21 +239,21 @@ const ProductList = () => {
       maxPrice: debouncedMaxPrice,
       sortBy: sortBy,
     };
-    
+
     // Only update if filters actually changed (skip initial render if no change)
     if (prevFiltersRef.current === null) {
       prevFiltersRef.current = currentFilters;
       return; // Skip on initial mount
     }
-    
-    const hasChanged = 
+
+    const hasChanged =
       prevFiltersRef.current.category !== currentFilters.category ||
       prevFiltersRef.current.color !== currentFilters.color ||
       prevFiltersRef.current.size !== currentFilters.size ||
       prevFiltersRef.current.minPrice !== currentFilters.minPrice ||
       prevFiltersRef.current.maxPrice !== currentFilters.maxPrice ||
       prevFiltersRef.current.sortBy !== currentFilters.sortBy;
-    
+
     if (hasChanged) {
       prevFiltersRef.current = currentFilters;
       setStoredFilters(currentFilters);
@@ -336,13 +336,13 @@ const ProductList = () => {
       active = active.filter((product) => {
         const productMinPrice = getMinPrice(product);
         if (productMinPrice === 0) return false;
-        
+
         const min = debouncedMinPrice ? parseFloat(debouncedMinPrice) : 0;
         const max = debouncedMaxPrice ? parseFloat(debouncedMaxPrice) : Infinity;
-        
+
         // Validate that min is not greater than max
         if (min > max) return false;
-        
+
         return productMinPrice >= min && productMinPrice <= max;
       });
     }
@@ -498,7 +498,7 @@ const ProductList = () => {
   }, [debouncedCategory, debouncedColor, debouncedSize, debouncedMinPrice, debouncedMaxPrice, sortBy]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container flex flex-col md:flex-row">
       <aside className="w-full md:w-60 lg:w-64 px-0 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
         <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 w-full">
           <div className="flex justify-between items-center mb-4 h-8">
@@ -612,11 +612,11 @@ const ProductList = () => {
           </header>
 
           {error && (
-            <div 
+            <div
               ref={errorRef}
-              className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" 
-              role="alert" 
-              tabIndex={0} 
+              className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap"
+              role="alert"
+              tabIndex={0}
               aria-live="polite"
             >
               <span className="text-lg" aria-hidden="true">⚠</span>

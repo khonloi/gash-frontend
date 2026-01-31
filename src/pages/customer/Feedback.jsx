@@ -36,11 +36,11 @@ const Feedback = () => {
         order.orderDetails.forEach((detail, index) => {
           // Check for feedback in multiple possible locations
           const feedback = detail.feedback || detail.feedbackId || null;
-          
+
           if (feedback) {
             // Handle both object and ID reference
             const feedbackObj = typeof feedback === 'object' ? feedback : null;
-            
+
             if (feedbackObj) {
               // Check for actual content/rating
               const hasContent = feedbackObj.content && feedbackObj.content.trim() !== '';
@@ -68,37 +68,37 @@ const Feedback = () => {
                 // But getOrder returns variant, so we need to handle both
                 const variantId = detail.variantId?._id || detail.variant?._id || detail.variantId || detail.variant || null;
                 const variantKey = variantId || `item_${index}`;
-                
+
                 // Try multiple paths for product information
-                const productName = 
-                  detail.variantId?.productId?.productName || 
+                const productName =
+                  detail.variantId?.productId?.productName ||
                   detail.variantId?.productId?.name ||
                   detail.variant?.productId?.productName ||
-                  detail.variant?.product?.name || 
+                  detail.variant?.product?.name ||
                   detail.variant?.productId?.name ||
                   "Product (Variant not available)";
-                
-                const productImage = 
-                  detail.variantId?.variantImage || 
+
+                const productImage =
+                  detail.variantId?.variantImage ||
                   detail.variantId?.image ||
-                  detail.variant?.variantImage || 
-                  detail.variant?.image || 
+                  detail.variant?.variantImage ||
+                  detail.variant?.image ||
                   "/placeholder.png";
-                
-                const color = 
-                  detail.variantId?.productColorId?.productColorName || 
+
+                const color =
+                  detail.variantId?.productColorId?.productColorName ||
                   detail.variantId?.color?.name ||
-                  detail.variant?.productColorId?.productColorName || 
-                  detail.variant?.color?.name || 
+                  detail.variant?.productColorId?.productColorName ||
+                  detail.variant?.color?.name ||
                   "N/A";
-                
-                const size = 
-                  detail.variantId?.productSizeId?.productSizeName || 
+
+                const size =
+                  detail.variantId?.productSizeId?.productSizeName ||
                   detail.variantId?.size?.name ||
-                  detail.variant?.productSizeId?.productSizeName || 
-                  detail.variant?.size?.name || 
+                  detail.variant?.productSizeId?.productSizeName ||
+                  detail.variant?.size?.name ||
                   "N/A";
-                
+
                 feedbackList.push({
                   _id: `${order._id}_${variantKey}`,
                   orderId: order._id,
@@ -142,7 +142,7 @@ const Feedback = () => {
           // Check if feedback exists
           const feedback = detail.feedback || detail.feedbackId || null;
           const feedbackObj = typeof feedback === 'object' ? feedback : null;
-          
+
           // Check if feedback exists and is valid (must have rating or content)
           let hasValidFeedback = false;
           if (feedbackObj) {
@@ -150,7 +150,7 @@ const Feedback = () => {
             const hasRating = feedbackObj.rating !== null && feedbackObj.rating !== undefined && feedbackObj.rating >= 1 && feedbackObj.rating <= 5;
             const hasContentFlag = feedbackObj.has_content === true;
             const hasRatingFlag = feedbackObj.has_rating === true;
-            
+
             // Only consider valid if it has rating OR content
             hasValidFeedback = (hasContent || hasRating || hasContentFlag || hasRatingFlag);
           }
@@ -159,37 +159,37 @@ const Feedback = () => {
           if (!hasValidFeedback) {
             const variantId = detail.variantId?._id || detail.variant?._id || detail.variantId || detail.variant || null;
             const variantKey = variantId || `item_${index}`;
-            
+
             // Try multiple paths for product information
-            const productName = 
-              detail.variantId?.productId?.productName || 
+            const productName =
+              detail.variantId?.productId?.productName ||
               detail.variantId?.productId?.name ||
               detail.variant?.productId?.productName ||
-              detail.variant?.product?.name || 
+              detail.variant?.product?.name ||
               detail.variant?.productId?.name ||
               "Product (Variant not available)";
-            
-            const productImage = 
-              detail.variantId?.variantImage || 
+
+            const productImage =
+              detail.variantId?.variantImage ||
               detail.variantId?.image ||
-              detail.variant?.variantImage || 
-              detail.variant?.image || 
+              detail.variant?.variantImage ||
+              detail.variant?.image ||
               "/placeholder.png";
-            
-            const color = 
-              detail.variantId?.productColorId?.productColorName || 
+
+            const color =
+              detail.variantId?.productColorId?.productColorName ||
               detail.variantId?.color?.name ||
-              detail.variant?.productColorId?.productColorName || 
-              detail.variant?.color?.name || 
+              detail.variant?.productColorId?.productColorName ||
+              detail.variant?.color?.name ||
               "N/A";
-            
-            const size = 
-              detail.variantId?.productSizeId?.productSizeName || 
+
+            const size =
+              detail.variantId?.productSizeId?.productSizeName ||
               detail.variantId?.size?.name ||
-              detail.variant?.productSizeId?.productSizeName || 
-              detail.variant?.size?.name || 
+              detail.variant?.productSizeId?.productSizeName ||
+              detail.variant?.size?.name ||
               "N/A";
-            
+
             eligibleList.push({
               _id: `${order._id}_${variantKey}`,
               orderId: order._id,
@@ -264,12 +264,12 @@ const Feedback = () => {
         const feedbackList = extractFeedbacksFromOrders(data);
         console.log("Extracted feedback list:", feedbackList);
         console.log("Number of feedbacks extracted:", feedbackList.length);
-        
+
         // Extract eligible items (delivered orders without feedback)
         const eligibleList = extractEligibleItems(data);
         console.log("Extracted eligible items:", eligibleList);
         console.log("Number of eligible items:", eligibleList.length);
-        
+
         setFeedbacks(feedbackList);
         setFilteredFeedbacks(feedbackList);
         setEligibleItems(eligibleList);
@@ -398,7 +398,7 @@ const Feedback = () => {
   }
 
   return (
-    <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container page-container-centered">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">My Feedback</h1>

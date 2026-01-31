@@ -96,22 +96,22 @@ const Register = () => {
     if (!/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email address';
     if (!/^\d{10}$/.test(phone)) return 'Phone must be exactly 10 digits';
     if (address.length > 200) return 'Address must be at most 200 characters';
-    
+
     // Password validation: at least 8 characters, at least 3 of 4 character types
     if (password.length < 8) {
       return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';
     }
-    
+
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
     const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
     const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
-    
+
     if (characterTypesMet < 3) {
       return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';
     }
-    
+
     if (password !== repeatPassword) return 'Repeat password does not match';
     if (invalidFile) return 'Profile Image must be a PNG or JPG image URL';
     return '';
@@ -143,7 +143,7 @@ const Register = () => {
 
         // Filter out fields that backend doesn't expect
         const { repeatPassword, role, accountStatus, ...filteredFormData } = formData;
-        
+
         const signupData = {
           ...filteredFormData,
           image: imageUrl,
@@ -152,7 +152,7 @@ const Register = () => {
         console.log('📝 Signup data being sent:', signupData);
         await signup(signupData);
         showToast('Register successfully', 'success', 2000);
-        
+
         navigate('/');
       } catch (err) {
         console.error('Register error details:', {
@@ -161,7 +161,7 @@ const Register = () => {
           data: err.response?.data,
           config: err.config
         });
-        
+
         let errorMessage = 'Failed to create account. Please try again.';
         if (err.response?.status === 400) {
           errorMessage = err.response.data.message || 'Invalid input data';
@@ -184,7 +184,7 @@ const Register = () => {
   );
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
+    <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
         <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
           Complete Your Registration
@@ -384,7 +384,7 @@ const Register = () => {
               </fieldset>
             </div>
           </div>
-          
+
           <div className="mt-6 sm:mt-8">
             <ProductButton
               type="submit"
@@ -401,8 +401,8 @@ const Register = () => {
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Already have an account?{' '}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
           >
             Sign In
