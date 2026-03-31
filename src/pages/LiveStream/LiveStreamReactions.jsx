@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Favorite } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
 import io from 'socket.io-client';
 import { SOCKET_URL } from '../../common/axiosClient';
@@ -24,9 +23,6 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
     // Track recent local reactions to avoid duplicate display when WebSocket broadcasts them back
     // Map structure: Map<reactionType, Set<timestamps>>
     const recentLocalReactionsRef = useRef(new Map());
-    // Track server reaction IDs that we've sent and are waiting for WebSocket confirmation
-    // Map<serverReactionId, {reactionType, timestamp}>
-    const pendingServerReactionsRef = useRef(new Map());
     // Track displayed reactions by user+type+timeWindow to avoid duplicates
     // Key format: `${userId}_${reactionType}_${timeWindow}` where timeWindow = Math.floor(timestamp/1000)
     const displayedReactionsRef = useRef(new Map()); // Map<key, true>
@@ -219,7 +215,7 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
                         pendingServerReactionsRef.current.delete(serverReactionId);
                     }, 5000);
                 } else {
-                    console.log('Reaction sent to server, but no ID returned');
+
                 }
                 // WebSocket will handle the real-time update, no need to fetch
             }

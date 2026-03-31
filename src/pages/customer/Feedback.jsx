@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
@@ -17,7 +17,6 @@ const Feedback = () => {
   const [eligibleItems, setEligibleItems] = useState([]);
   const [filteredEligibleItems, setFilteredEligibleItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -48,17 +47,6 @@ const Feedback = () => {
               // Also check has_* flags if they exist
               const hasContentFlag = feedbackObj.has_content === true;
               const hasRatingFlag = feedbackObj.has_rating === true;
-              const isDeleted = feedbackObj.isDeleted === true;
-
-              console.log(`Processing feedback for order ${order._id}, detail ${index}:`, {
-                hasContent,
-                hasRating,
-                hasContentFlag,
-                hasRatingFlag,
-                isDeleted,
-                feedback: feedbackObj,
-                detail: detail
-              });
 
               // Include feedback ONLY if it has content OR rating (checking both direct values and flags)
               // Filter out feedbacks with no rating and no content
@@ -222,15 +210,12 @@ const Feedback = () => {
         return;
       }
       setLoading(true);
-      setError("");
       try {
         const token = localStorage.getItem("token");
         const response = await Api.order.getOrders(user._id, token);
         const data = response.data.data || [];
 
-        console.log("Full orders response:", response);
-        console.log("Orders data:", data);
-        console.log("Number of orders:", data.length);
+
 
         if (!Array.isArray(data)) {
           showToast("Invalid API response format", "error");
@@ -241,34 +226,24 @@ const Feedback = () => {
         }
 
         // Debug: Check if any order has feedbacks
-        let totalFeedbacksFound = 0;
-        data.forEach((order, orderIndex) => {
+        data.forEach((order) => {
           if (order.orderDetails && Array.isArray(order.orderDetails)) {
-            order.orderDetails.forEach((detail, detailIndex) => {
+            order.orderDetails.forEach((detail) => {
               if (detail.feedback) {
-                totalFeedbacksFound++;
-                console.log(`Order ${orderIndex}, Detail ${detailIndex} has feedback:`, {
-                  orderId: order._id,
-                  detailId: detail._id,
-                  feedback: detail.feedback,
-                  variantId: detail.variantId,
-                  variant: detail.variant
-                });
+                // noop
+
               }
             });
           }
         });
-        console.log(`Total feedbacks found in orders: ${totalFeedbacksFound}`);
 
         // Extract feedbacks from all orders
         const feedbackList = extractFeedbacksFromOrders(data);
-        console.log("Extracted feedback list:", feedbackList);
-        console.log("Number of feedbacks extracted:", feedbackList.length);
+
 
         // Extract eligible items (delivered orders without feedback)
         const eligibleList = extractEligibleItems(data);
-        console.log("Extracted eligible items:", eligibleList);
-        console.log("Number of eligible items:", eligibleList.length);
+
 
         setFeedbacks(feedbackList);
         setFilteredFeedbacks(feedbackList);
@@ -276,7 +251,6 @@ const Feedback = () => {
         setFilteredEligibleItems(eligibleList);
       } catch (err) {
         console.error("Error fetching feedbacks:", err);
-        setError(err.message || "Failed to load feedbacks");
         showToast("Failed to load feedbacks", "error");
         setFeedbacks([]);
         setFilteredFeedbacks([]);
@@ -360,14 +334,6 @@ const Feedback = () => {
       day: "numeric",
     });
 
-  // Format price helper
-  const formatPrice = useCallback((price) => {
-    if (typeof price !== "number" || isNaN(price)) return "N/A";
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-  }, []);
 
   // Render star rating
   const renderStars = (rating) => {

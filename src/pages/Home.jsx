@@ -163,10 +163,6 @@ const Home = () => {
     [handleProductClick]
   );
 
-  const handleViewAll = () => {
-    navigate("/products");
-  };
-
   const handleCategoryClick = (category) => {
     if (!category) return;
     navigate(`/products?category=${encodeURIComponent(category)}`);

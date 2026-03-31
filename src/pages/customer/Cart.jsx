@@ -71,7 +71,7 @@ const Cart = () => {
   const fetchCartItems = useCallback(
     async (showLoading = true) => {
       if (!user?._id) {
-        console.log("No user ID, skipping fetch");
+
         return;
       }
 
@@ -84,7 +84,7 @@ const Cart = () => {
         cacheAge < 30000 &&
         !showLoading
       ) {
-        console.log("Using cached cart items");
+
         setCartItems(cartCache.current.items);
         return;
       }
@@ -96,12 +96,10 @@ const Cart = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
 
-        console.log("Fetching cart for user:", user._id);
         const response = await fetchWithRetry(() =>
           Api.newCart.getByAccount(user._id, token)
         );
 
-        console.log("Cart fetch response:", response);
         const data = response?.data || response;
         const items = Array.isArray(data)
           ? data
@@ -115,7 +113,6 @@ const Cart = () => {
             .filter((item) => item !== null)
           : [];
 
-        console.log("Processed cart items:", items);
         setCartItems(items);
         cartCache.current = { items, timestamp: now };
 
@@ -152,7 +149,6 @@ const Cart = () => {
 
   // Initial fetch
   useEffect(() => {
-    console.log("User:", user, "Token:", localStorage.getItem("token"));
     if (!user && !localStorage.getItem("token")) {
       navigate("/login", { replace: true });
     } else if (user) {
@@ -214,7 +210,7 @@ const Cart = () => {
         // Perform API updates
         Promise.all(
           updates.map(async ({ cartId, newQuantity }) => {
-            console.log("Updating cart item:", cartId, "to quantity:", newQuantity);
+
             try {
               const response = await Api.newCart.update(
                 cartId,
@@ -229,7 +225,6 @@ const Cart = () => {
           })
         )
           .then((results) => {
-            console.log("Update results:", results);
 
             // Check if all updates succeeded
             const allSucceeded = results.every(r => r.success);
@@ -247,7 +242,7 @@ const Cart = () => {
                       const responseData = result.response.data?.data || result.response.data;
                       if (responseData?.productQuantity !== undefined) {
                         updatedQuantity = parseInt(responseData.productQuantity, 10);
-                        console.log("Using API response quantity:", updatedQuantity);
+
                       }
                     }
 
@@ -255,7 +250,7 @@ const Cart = () => {
                       ...item,
                       productQuantity: updatedQuantity.toString()
                     };
-                    console.log("Updated item:", updatedItem);
+
                     return updatedItem;
                   }
                   return item;
@@ -365,7 +360,6 @@ const Cart = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
 
-        console.log("Removing cart item:", cartId);
         await Api.newCart.delete(cartId, token);
 
         cartCache.current = {

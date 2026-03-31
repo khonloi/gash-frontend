@@ -12,7 +12,7 @@ if (!publicKey) {
   console.error('EmailJS Public Key is missing. Please check .env file.');
 } else {
   emailjs.init(publicKey);
-  console.log('EmailJS initialized with Public Key:', publicKey);
+
 }
 
 const ForgotPassword = () => {
@@ -64,12 +64,12 @@ const ForgotPassword = () => {
           throw new Error('OTP is missing');
         }
 
-        const emailjsResponse = await emailjs.send(
+        await emailjs.send(
           import.meta.env.VITE_EMAILJS_SERVICE_ID,
           import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
           templateParams
         );
-        console.log('EmailJS Success:', emailjsResponse);
+
         showToast('OTP sent successfully', 'success', 3000);
 
         navigate('/otp-verification', {

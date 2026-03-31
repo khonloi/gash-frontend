@@ -71,17 +71,6 @@ const Register = () => {
     const password = formData.password.trim();
     const repeatPassword = formData.repeatPassword.trim();
 
-    console.log('🔍 Form validation:', {
-      username: username.length,
-      name: name.length,
-      email: email,
-      phone: phone,
-      address: address.length,
-      password: password.length,
-      repeatPassword: repeatPassword.length,
-      invalidFile
-    });
-
     // Check required fields
     if (!username) return 'Please fill in all required fields';
     if (!name) return 'Please fill in all required fields';
@@ -105,7 +94,7 @@ const Register = () => {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
     const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
 
     if (characterTypesMet < 3) {
@@ -115,7 +104,7 @@ const Register = () => {
     if (password !== repeatPassword) return 'Repeat password does not match';
     if (invalidFile) return 'Profile Image must be a PNG or JPG image URL';
     return '';
-  }, [formData, invalidFile]);
+  }, [formData]);
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -132,7 +121,7 @@ const Register = () => {
         // Skip image upload for now to debug register issue
         let imageUrl = '';
         if (selectedFile) {
-          console.log('⚠️ Skipping image upload for debugging');
+
           // const uploadResponse = await Api.upload.image(selectedFile);
           // imageUrl = uploadResponse.data?.url;
           // if (!imageUrl) {
@@ -142,14 +131,13 @@ const Register = () => {
         }
 
         // Filter out fields that backend doesn't expect
-        const { repeatPassword, role, accountStatus, ...filteredFormData } = formData;
+        const { ...filteredFormData } = formData;
 
         const signupData = {
           ...filteredFormData,
           image: imageUrl,
         };
 
-        console.log('📝 Signup data being sent:', signupData);
         await signup(signupData);
         showToast('Register successfully', 'success', 2000);
 

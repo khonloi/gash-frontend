@@ -74,15 +74,6 @@ const getMinPrice = (product) => {
   return prices.length > 0 ? Math.min(...prices) : 0;
 };
 
-// Helper function to get main image URL
-const getMainImageUrl = (product) => {
-  if (!product.productImageIds || product.productImageIds.length === 0) {
-    return "/placeholder-image.png";
-  }
-  const mainImage = product.productImageIds.find(img => img.isMain);
-  return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-};
-
 const ProductList = () => {
   // State management
   const [products, setProducts] = useState([]);
@@ -356,16 +347,18 @@ const ProductList = () => {
           return getMinPrice(a) - getMinPrice(b);
         case "price-high":
           return getMinPrice(b) - getMinPrice(a);
-        case "new":
+        case "new": {
           const dateA = new Date(a.createdAt || 0).getTime();
           const dateB = new Date(b.createdAt || 0).getTime();
           return dateB - dateA; // Newest first
-        case "popularity":
+        }
+        case "popularity": {
           // Since there's no popularity field, we'll use createdAt as a proxy (newer = more popular)
           // Or we could sort by name as fallback
           const popDateA = new Date(a.createdAt || 0).getTime();
           const popDateB = new Date(b.createdAt || 0).getTime();
           return popDateB - popDateA;
+        }
         case "name":
         default:
           return (a.productName || "").localeCompare(b.productName || "");
@@ -416,7 +409,7 @@ const ProductList = () => {
       default:
         console.warn(`Unknown filter type: ${filterType}`);
     }
-  }, []);
+  }, [maxPrice, minPrice]);
 
   const handleProductClick = useCallback(
     (id) => {
@@ -426,7 +419,7 @@ const ProductList = () => {
       }
       navigate(`/product/${id}`);
     },
-    [navigate, setError]
+    [navigate]
   );
 
   const handleKeyDown = useCallback(

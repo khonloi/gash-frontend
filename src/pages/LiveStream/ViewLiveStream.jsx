@@ -25,7 +25,7 @@ const LiveStreamDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
     // const [isFullscreen, setIsFullscreen] = useState(false); // Removed - no longer needed after removing toggle buttons
     const [showComments, setShowComments] = useState(true);
-    const [showProducts, setShowProducts] = useState(true);
+    const [showProducts] = useState(true);
     const [showInfo, setShowInfo] = useState(true);
     const [connectionState, setConnectionState] = useState('disconnected');
     const [streamEnded, setStreamEnded] = useState(false);
@@ -85,7 +85,7 @@ const LiveStreamDetail = () => {
 
         try {
             isReconnectingRef.current = true;
-            console.log('🔗 Connecting to LiveKit room:', roomName);
+
             setConnectionState('connecting');
 
             const existingRoom = roomRef.current;
@@ -116,7 +116,7 @@ const LiveStreamDetail = () => {
             const newRoom = new Room(roomOptions);
 
             newRoom.on(RoomEvent.Connected, () => {
-                console.log('Connected to LiveKit room');
+
                 setConnectionState('connected');
 
                 // Initialize remote participants list (exclude local participant)
@@ -155,11 +155,6 @@ const LiveStreamDetail = () => {
                                     videoRef.current.muted = false;
                                 }
 
-                                console.log('Audio track attached on connect', {
-                                    trackId: publication.track.id,
-                                    enabled: publication.track.enabled,
-                                    muted: videoRef.current?.muted
-                                });
                             }
                         }
                     });
@@ -174,7 +169,7 @@ const LiveStreamDetail = () => {
             });
 
             newRoom.on(RoomEvent.Disconnected, async (reason) => {
-                console.log('Disconnected from LiveKit:', reason);
+
                 setConnectionState('disconnected');
                 setRoom(null);
 
@@ -188,7 +183,7 @@ const LiveStreamDetail = () => {
                         if (token) {
                             await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
                             hasJoinedRef.current = false;
-                            console.log('Left livestream via API');
+
                         }
                     } catch (error) {
                         console.error('Error leaving livestream:', error);
@@ -248,7 +243,6 @@ const LiveStreamDetail = () => {
 
             // Handle participant connected - subscribe to their tracks
             newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
-                console.log('👤 Participant connected:', participant.identity);
 
                 // Add participant to remote participants list
                 setRemoteParticipants(prev => {
@@ -288,7 +282,7 @@ const LiveStreamDetail = () => {
 
             // Handle participant disconnected - remove from list
             newRoom.on(RoomEvent.ParticipantDisconnected, (participant) => {
-                console.log('👤 Participant disconnected:', participant.identity);
+
                 setRemoteParticipants(prev => prev.filter(p => p.identity !== participant.identity));
             });
 

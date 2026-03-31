@@ -63,176 +63,21 @@ const Bill = () => {
     };
 
     const handleExportPDF = async () => {
-        if (!billData) {
+        if (!billData || !billRef.current) {
             showToast('Unable to export PDF', 'error');
             return;
         }
 
         setIsExporting(true);
         try {
-            // Create a simplified PDF version of the bill
-            const pdfContent = document.createElement('div');
-            pdfContent.style.cssText = `
-                width: 800px;
-                background: white;
-                font-family: Arial, sans-serif;
-                color: #000;
-                padding: 20px;
-                box-sizing: border-box;
-            `;
-
-            // Create the PDF content HTML
-            pdfContent.innerHTML = `
-                <div style="background: linear-gradient(to right, #7B542F, #B6771D); padding: 32px; border-bottom: 4px solid #FF9D00; color: white;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div style="display: flex; align-items: center;">
-                            <div style="width: 200px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 16px; padding: 8px;">
-                                <img src="${gashLogo}" alt="GASH Logo" style="height: 48px; width: auto;" />
-                            </div>
-                            <div>
-                                <p style="color: rgba(255,255,255,0.9); font-size: 14px; margin: 0;">Modern fashion for everyone</p>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <h2 style="font-size: 30px; font-weight: bold; color: white; margin: 0 0 8px 0;">INVOICE</h2>
-                            <p style="color: rgba(255,255,255,0.9); margin: 0;">Date: ${formatDate(billData.order?.orderDate || new Date())}</p>
-                            <p style="color: rgba(255,255,255,0.9); font-size: 14px; margin: 0;">Order ID: #${billData.order?.orderId || 'N/A'}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="padding: 32px; border-bottom: 1px solid #e5e7eb;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
-                        <div style="background: #FFCF71; padding: 24px; border-radius: 8px; border-left: 4px solid #B6771D;">
-                            <h3 style="font-size: 18px; font-weight: bold; color: #7B542F; margin: 0 0 16px 0;">BILL TO:</h3>
-                            <div style="color: #374151;">
-                                <p style="color: #4b5563; margin: 0 0 4px 0;">Email: ${billData.customer?.email || 'N/A'}</p>
-                                <p style="color: #4b5563; margin: 0 0 4px 0;">Phone: ${billData.customer?.phone || 'N/A'}</p>
-                                <p style="color: #4b5563; margin: 0;">Address: ${billData.customer?.address || 'N/A'}</p>
-                            </div>
-                        </div>
-                        <div style="background: #FFCF71; padding: 24px; border-radius: 8px; border-left: 4px solid #B6771D;">
-                            <h3 style="font-size: 18px; font-weight: bold; color: #7B542F; margin: 0 0 16px 0;">PAY TO:</h3>
-                            <div style="color: #374151;">
-                                <p style="font-weight: 600; color: #111827; margin: 0 0 4px 0;">GASH Company</p>
-                                <p style="color: #4b5563; margin: 0 0 4px 0;">support@gash.com</p>
-                                <p style="color: #4b5563; margin: 0 0 4px 0;">123 ABC Street, District 1</p>
-                                <p style="color: #4b5563; margin: 0;">Ho Chi Minh City, Vietnam</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="padding: 24px;">
-                    <h3 style="font-size: 18px; font-weight: bold; color: #1f2937; margin: 0 0 16px 0;">ORDER ITEMS</h3>
-                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #d1d5db;">
-                        <thead>
-                            <tr style="background-color: #f9fafb;">
-                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; font-weight: 600; color: #374151;">Product</th>
-                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 600; color: #374151;">Color</th>
-                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 600; color: #374151;">Size</th>
-                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 600; color: #374151;">Quantity</th>
-                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: right; font-weight: 600; color: #374151;">Unit Price</th>
-                                <th style="border: 1px solid #d1d5db; padding: 12px; text-align: right; font-weight: 600; color: #374151;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${billData.items?.map(item => `
-                                <tr>
-                                    <td style="border: 1px solid #d1d5db; padding: 12px;">
-                                        <p style="font-weight: 600; color: #1f2937; margin: 0;">${item.productName || 'Product'}</p>
-                                    </td>
-                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: center; color: #6b7280;">
-                                        ${item.color || 'N/A'}
-                                    </td>
-                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: center; color: #6b7280;">
-                                        ${item.size || 'N/A'}
-                                    </td>
-                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: center; font-weight: 500;">
-                                        ${item.quantity || 0}
-                                    </td>
-                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: right; color: #6b7280;">
-                                        ${formatPrice(item.unitPrice || 0)}
-                                    </td>
-                                    <td style="border: 1px solid #d1d5db; padding: 12px; text-align: right; font-weight: 600; color: #1f2937;">
-                                        ${formatPrice(item.totalPrice || 0)}
-                                    </td>
-                                </tr>
-                            `).join('') || '<tr><td colspan="6" style="border: 1px solid #d1d5db; padding: 12px; text-align: center; color: #6b7280;">No items available</td></tr>'}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div style="padding: 32px; background: #FFCF71; border-top: 1px solid #e5e7eb;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
-                        <div style="background: white; padding: 24px; border-radius: 8px; border: 1px solid #e5e7eb;">
-                            <h3 style="font-size: 18px; font-weight: bold; color: #7B542F; margin: 0 0 16px 0;">PAYMENT INFORMATION</h3>
-                            <div style="color: #374151;">
-                                <p style="margin: 0 0 8px 0;"><span style="font-weight: 600;">Method:</span> ${billData.order?.paymentMethod || 'N/A'}</p>
-                                <p style="margin: 0 0 8px 0;"><span style="font-weight: 600;">Payment Status:</span>
-                                    <span style="margin-left: 8px; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 500; 
-                                        ${billData.order?.paymentStatus === 'paid' ? 'background: #dcfce7; color: #065f46;' :
-                    billData.order?.paymentStatus === 'unpaid' ? 'background: #fef3c7; color: #92400e;' :
-                        billData.order?.paymentStatus === 'refunded' ? 'background: #fee2e2; color: #991b1b;' :
-                            'background: #f3f4f6; color: #1f2937;'}">
-                                        ${billData.order?.paymentStatus === 'paid' ? 'Paid' :
-                    billData.order?.paymentStatus === 'unpaid' ? 'Unpaid' :
-                        billData.order?.paymentStatus === 'refunded' ? 'Refunded' :
-                            billData.order?.paymentStatus || 'N/A'}
-                                    </span>
-                                </p>
-                                ${billData.discount?.voucher ? `
-                                    <p style="margin: 0;"><span style="font-weight: 600;">Voucher:</span> ${billData.discount.voucher.code} (${billData.discount.voucher.discountValue}% off)</p>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
-                            <h3 style="font-size: 18px; font-weight: bold; color: #7B542F; margin: 0 0 12px 0;">PRICE SUMMARY</h3>
-                            <div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <span>Subtotal:</span>
-                                    <span>${formatPrice(billData.summary?.subtotal || 0)}</span>
-                                </div>
-                                ${billData.summary?.discount > 0 ? `
-                                    <div style="display: flex; justify-content: space-between; color: #B6771D; margin-bottom: 8px;">
-                                        <span>Discount:</span>
-                                        <span>-${formatPrice(billData.summary.discount)}</span>
-                                    </div>
-                                ` : ''}
-                                <hr style="border: none; border-top: 1px solid #d1d5db; margin: 8px 0;" />
-                                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px;">
-                                    <span>Total:</span>
-                                    <span style="color: #B6771D;">${formatPrice(billData.summary?.totalAmount || 0)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="padding: 24px; background: #FFCF71; border-top: 1px solid #e5e7eb;">
-                    <div style="text-align: center; color: #4b5563;">
-                        <p style="margin: 0 0 8px 0;">Thank you for your purchase!</p>
-                        <p style="font-size: 14px; margin: 0;">For support, contact: support@gash.com</p>
-                    </div>
-                </div>
-            `;
-
-            // Temporarily add to DOM for html2canvas
-            document.body.appendChild(pdfContent);
-
-            // Create canvas from the simplified content
-            const canvas = await html2canvas(pdfContent, {
+            // Create canvas from the existing UI ref
+            const canvas = await html2canvas(billRef.current, {
                 scale: 2,
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#ffffff',
-                width: 800,
-                height: pdfContent.scrollHeight,
                 logging: false
             });
-
-            // Remove from DOM
-            document.body.removeChild(pdfContent);
 
             // Create PDF
             const imgData = canvas.toDataURL('image/png');

@@ -33,7 +33,7 @@ export default function VNPayReturn() {
             paymentMethod: 'VNPay',
           });
         }
-      } catch (err) {
+      } catch {
         setStatus('failed');
         setSuccessInfo({
           status: 'failed',
@@ -47,7 +47,6 @@ export default function VNPayReturn() {
     fetchPaymentResult();
   }, []);
 
-  const isSuccess = status === 'success';
   const handleCloseModal = () => {
     setSuccessInfo(null);
     setStatus('pending');

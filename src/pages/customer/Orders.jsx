@@ -18,10 +18,8 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [vnpayStatus, setVnpayStatus] = useState('pending');
   const [vnpaySuccessInfo, setVnpaySuccessInfo] = useState(null);
   const socketRef = useRef(null);
 
@@ -54,8 +52,7 @@ const Orders = () => {
         );
         setOrders(sorted);
         setFilteredOrders(sorted);
-      } catch (err) {
-        setError(err.message);
+      } catch {
         showToast("Failed to load orders", "error");
         setOrders([]);
         setFilteredOrders([]);
@@ -81,7 +78,6 @@ const Orders = () => {
           const response = await Api.order.vnpayReturn(params);
           const data = response.data;
           if (data.success && data.data && data.data.code === '00') {
-            setVnpayStatus('success');
             setVnpaySuccessInfo({
               status: 'success',
               message: data.message || 'Your order will be promptly prepared and sent to you.!',
@@ -90,7 +86,6 @@ const Orders = () => {
               paymentMethod: data.data?.paymentMethod || 'VNPay',
             });
           } else {
-            setVnpayStatus('failed');
             setVnpaySuccessInfo({
               status: 'failed',
               message: data.message || 'Payment failed. Please try again.',
@@ -99,8 +94,7 @@ const Orders = () => {
               paymentMethod: 'VNPay',
             });
           }
-        } catch (err) {
-          setVnpayStatus('failed');
+        } catch {
           setVnpaySuccessInfo({
             status: 'failed',
             message: 'Payment verification failed. Please check your order status.',
@@ -111,10 +105,10 @@ const Orders = () => {
         }
       };
       fetchPaymentResult();
-      // Clear the URL params
-      window.history.replaceState({}, document.title, window.location.pathname);
+      // Clear the URL params using React Router
+      navigate(window.location.pathname, { replace: true });
     }
-  }, [isAuthLoading, user]);
+  }, [isAuthLoading, user, navigate]);
 
   // Setup Socket.IO for real-time order updates
   useEffect(() => {
@@ -134,7 +128,7 @@ const Orders = () => {
 
     // Connect and authenticate
     socket.on("connect", () => {
-      console.log("Orders Socket connected:", socket.id);
+
       // Emit user connection
       socket.emit("userConnected", user._id);
       // Also try authentication if token available
@@ -151,7 +145,6 @@ const Orders = () => {
 
       // Only update if this order belongs to the current user
       if (orderUserId && orderUserId.toString() === user._id.toString()) {
-        console.log("📦 Order updated via Socket.IO:", updatedOrder._id);
 
         setOrders((prevOrders) => {
           const existingIndex = prevOrders.findIndex((o) => o._id === updatedOrder._id);
@@ -317,7 +310,6 @@ const Orders = () => {
 
   const handleCloseVNPayModal = () => {
     setVnpaySuccessInfo(null);
-    setVnpayStatus('pending');
     // Force fetch orders to update the list
     if (user?._id) {
       fetchOrders();

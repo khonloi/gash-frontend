@@ -149,12 +149,9 @@ const Profile = () => {
       const regResponse = await Api.passkeys.generateRegistrationOptions(token);
       const { options, challenge } = regResponse.data; // Get both options and challenge
 
-      console.log('Registration options received:', options);
-      console.log('Challenge:', challenge);
 
       // Start registration - pass the options object directly
       const registrationResponse = await startRegistration(options);
-      console.log('Registration response from browser:', registrationResponse);
 
       // Detect device type
       const deviceType = navigator.userAgent.includes('Mobile') ? 'mobile' :
@@ -171,16 +168,6 @@ const Profile = () => {
         challenge: challenge, // Server needs this to verify
         deviceType,
       };
-
-      console.log('Sending verification data:', {
-        id: verifyData.id,
-        hasRawId: !!verifyData.rawId,
-        hasResponse: !!verifyData.response,
-        hasClientDataJSON: !!verifyData.response?.clientDataJSON,
-        hasAttestationObject: !!verifyData.response?.attestationObject,
-        challenge: verifyData.challenge,
-        deviceType: verifyData.deviceType
-      });
 
       await Api.passkeys.verifyRegistration(verifyData, token);
 
@@ -348,7 +335,7 @@ const Profile = () => {
       };
       Api.accounts
         .updateProfile(user._id, updateData)
-        .then(async (response) => {
+        .then(async () => {
           await fetchProfile();
           setEditMode(false);
           showToast("Profile edited successfully", "success", 2000);

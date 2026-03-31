@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { Chat, Close, PushPin, Send, MoreVert } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import io from 'socket.io-client';
 import { SOCKET_URL } from '../../common/axiosClient';
@@ -190,7 +191,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
 
 // ============= Main LiveStreamComments Component =============
 
-const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
+const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
     const { user } = useContext(AuthContext);
     const [comments, setComments] = useState([]);
     const [isSending, setIsSending] = useState(false);
@@ -263,7 +264,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             if (response.data?.success) {
                 // Comment will be added automatically via WebSocket in real-time
                 // No need to fetch again - WebSocket handles it
-                console.log('Comment sent, waiting for WebSocket update...');
+
                 // Auto-scroll to bottom after sending comment
                 setTimeout(() => {
                     if (commentsContainerRef.current) {
@@ -311,7 +312,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
 
             if (response.data?.success) {
                 // Comment will be deleted automatically via WebSocket in real-time
-                console.log('Comment deleted, waiting for WebSocket update...');
+
             } else {
                 setError(response.data?.message || 'Unable to delete comment');
             }
@@ -355,7 +356,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                     // Check if comment already exists (prevent duplicates)
                     const exists = prev.some(c => c._id === newComment._id);
                     if (exists) {
-                        console.log('⚠️ Duplicate comment ignored:', newComment._id);
+
                         // Update existing comment to preserve isPinned if it was already set
                         return prev.map(c =>
                             c._id === newComment._id
@@ -373,7 +374,6 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
                         if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
                         return new Date(a.createdAt) - new Date(b.createdAt); // Oldest to newest
                     });
-                    console.log('📝 Real-time comment added via WebSocket:', newComment.commentText?.substring(0, 50));
                     return updated;
                 });
 
@@ -398,7 +398,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             const currentLiveId = liveId?.toString?.() || liveId;
             if (data?.commentId && dataLiveId === currentLiveId) {
                 setComments(prev => prev.filter(c => c._id !== data.commentId));
-                console.log('🗑️ Comment deleted via WebSocket');
+
             }
         });
 
@@ -616,9 +616,9 @@ const LiveStreamComments = ({ liveId, hostId, isVisible, onToggle }) => {
             ) : (
                 <div className="bg-gray-900/70 backdrop-blur-sm border-t border-gray-700/50 p-5 text-center">
                     <p className="text-gray-300 text-sm">
-                        <a href="/login" className="text-red-400 hover:text-red-500 font-medium transition-colors underline underline-offset-2">
+                        <Link to="/login" className="text-red-400 hover:text-red-500 font-medium transition-colors underline underline-offset-2">
                             Login
-                        </a>{' '}
+                        </Link>{' '}
                         <span className="text-gray-400">to comment</span>
                     </p>
                 </div>

@@ -22,6 +22,18 @@ const ConfirmationModal = ({
   onConfirm,
   onCancel,
 }) => {
+  // Hooks
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        onCancel();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onCancel]);
+
   if (!isOpen) return null;
 
   // Handle backdrop click
@@ -30,17 +42,6 @@ const ConfirmationModal = ({
       onCancel();
     }
   };
-
-  // Handle escape key
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === "Escape" && isOpen) {
-        onCancel();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onCancel]);
 
   return (
     <div

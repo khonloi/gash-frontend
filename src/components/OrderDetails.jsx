@@ -81,7 +81,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             feedbackMap[key] = {
                 rating: isDeleted ? null : detail.feedback.rating,
-                content: isDeleted 
+                content: isDeleted
                     ? 'This feedback has been deleted by staff/admin'
                     : detail.feedback.content || '',
                 has_rating: !isDeleted && hasOriginalRating,
@@ -159,7 +159,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
         // Connect and authenticate
         socket.on("connect", () => {
-            console.log("OrderDetails Socket connected:", socket.id);
+
             // Emit user connection
             socket.emit("userConnected", user._id);
             // Also try authentication if token available
@@ -176,7 +176,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             // Only update if this order belongs to the current user and matches the current orderId
             if (orderUserId && orderUserId.toString() === user._id.toString() && updatedOrder._id === orderId) {
-                console.log("📦 Order updated via Socket.IO in OrderDetails:", updatedOrder._id);
 
                 // Update the order state while preserving populated orderDetails structure
                 setOrder((prevOrder) => {
@@ -583,7 +582,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             const reason = cancelFormData.cancelReason === "other"
                 ? cancelFormData.customReason
                 : cancelFormData.cancelReason;
-            console.log("Sending cancel request with reason:", reason); // Debug log
+            // Sending cancel request
+
             await Api.order.cancel(orderId, reason, token);
             showToast("Order cancelled successfully", "success");
             fetchOrderDetails();

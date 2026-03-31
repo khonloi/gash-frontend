@@ -10,10 +10,7 @@ if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
   console.error("EmailJS Public Key is missing. Please check .env file.");
 } else {
   emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
-  console.log(
-    "EmailJS initialized with Public Key:",
-    import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-  );
+
 }
 
 
@@ -96,7 +93,7 @@ const OTPVerification = () => {
 
         // For development: Skip EmailJS and show OTP in console
         if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY || import.meta.env.VITE_EMAILJS_PUBLIC_KEY === 'your_emailjs_public_key_here') {
-          console.log('📧 New OTP for development:', otp);
+
           showToast(
             type === 'forgot-password'
               ? `New OTP for password reset: ${otp} (Check console)`
@@ -105,12 +102,11 @@ const OTPVerification = () => {
             5000
           );
         } else {
-          const emailjsResponse = await emailjs.send(
+          await emailjs.send(
             import.meta.env.VITE_EMAILJS_SERVICE_ID,
             import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
             templateParams
           );
-          console.log('EmailJS Success (Resend):', emailjsResponse);
 
           showToast(
             type === 'forgot-password'
@@ -138,7 +134,7 @@ const OTPVerification = () => {
         <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
           Verify OTP
         </h1>
-        
+
         <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
           Enter the 6-digit OTP sent to {email} to{' '}
           {type === 'forgot-password' ? 'reset your password' : 'verify your email'}.

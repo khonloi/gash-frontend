@@ -10,11 +10,8 @@ const emailJsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const emailJsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const emailJsTemplateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 
-if (!emailJsPublicKey) {
-  console.error('EmailJS Public Key is missing. Please check .env file.');
-} else {
+if (emailJsPublicKey && emailJsPublicKey !== 'your_emailjs_public_key_here') {
   emailjs.init(emailJsPublicKey);
-  console.log('EmailJS initialized with Public Key:', emailJsPublicKey);
 }
 
 const Signup = () => {
@@ -44,7 +41,6 @@ const Signup = () => {
   // Handle input changes
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    console.log('Input Change:', { name, value });
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
@@ -69,23 +65,15 @@ const Signup = () => {
 
       setIsLoading(true);
       try {
-        // Log EmailJS configuration
-        console.log('Public Key:', emailJsPublicKey);
-        console.log('Service ID:', emailJsServiceId);
-        console.log('Template ID:', emailJsTemplateId);
-        console.log('formData.email:', formData.email);
-
         // Request OTP from backend
         const response = await requestSignupOTP(formData.email);
         const { otp } = response.data;
-        console.log('Backend OTP Response:', response.data);
 
         // Validate and prepare template parameters
         const templateParams = {
           to_email: formData.email.trim(),
           otp: otp,
         };
-        console.log('Template Params:', templateParams);
 
         if (!templateParams.to_email) {
           throw new Error('Recipient email is empty');
@@ -96,16 +84,14 @@ const Signup = () => {
 
         // For development: Skip EmailJS and show OTP in console
         if (!emailJsPublicKey || emailJsPublicKey === 'your_emailjs_public_key_here') {
-          console.log('📧 OTP for development:', otp);
           showToast(`OTP sent successfully`, 'success', 5000);
         } else {
           // Send OTP email via EmailJS
-          const emailjsResponse = await emailjs.send(
+          await emailjs.send(
             emailJsServiceId,
             emailJsTemplateId,
             templateParams
           );
-          console.log('EmailJS Success:', emailjsResponse);
           showToast('OTP sent successfully', 'success', 3000);
         }
 
@@ -128,7 +114,7 @@ const Signup = () => {
         setIsLoading(false);
       }
     },
-    [formData, requestSignupOTP, navigate, validateEmail]
+    [formData, requestSignupOTP, navigate, validateEmail, showToast]
   );
 
   return (

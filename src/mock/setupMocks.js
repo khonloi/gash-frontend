@@ -9,8 +9,7 @@ const getID = (obj) => {
 };
 
 export const setupMocks = () => {
-  console.log("%c [GASH Demo] Initializing API Mocks... ", "background: #333; color: #ffcc00; font-weight: bold;");
-  
+
   // Force baseURL to something predictable for mocking
   axiosClient.defaults.baseURL = 'http://gash-demo-mock';
   
@@ -475,10 +474,10 @@ export const setupMocks = () => {
 
   // Diagnostic tool
   window.GASH_DEMO_TEST = async () => {
-      console.log("[GASH Demo] Running internal API test...");
+
       try {
           const res = await axiosClient.get('/new-products');
-          console.log("[GASH Demo] Test Success!", res.data);
+
           return res.data;
       } catch (e) {
           console.error("[GASH Demo] Test Failed!", e);

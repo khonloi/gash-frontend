@@ -60,7 +60,7 @@ const Login = () => {
         setIsLoading(false);
       }
     },
-    [formData, login, navigate, from]
+    [formData, login, navigate, from, showToast]
   );
 
   const handleGoogleSuccess = useCallback(
@@ -75,7 +75,7 @@ const Login = () => {
         await googleLogin(credentialResponse.credential);
         showToast('Logged in successfully', 'success', ERROR_TIMEOUT);
         navigate(from, { replace: true });
-      } catch (err) {
+      } catch {
         showToast(LOGIN_ERROR_MESSAGES.GOOGLE_FAILED, "error", ERROR_TIMEOUT);
       } finally {
         setIsLoading(false);
@@ -107,7 +107,7 @@ const Login = () => {
     try {
       await passkeyLogin(trimmedUsername);
       navigate(from, { replace: true });
-    } catch (err) {
+    } catch {
       // Error message is already shown in passkeyLogin
     } finally {
       setIsLoading(false);

@@ -72,7 +72,7 @@ export default function Header() {
                 : 0;
 
             setCartItemCount(itemCount);
-        } catch (error) {
+        } catch {
             setCartItemCount(0);
         }
     }, [user]);
@@ -91,7 +91,7 @@ export default function Header() {
                 ? notificationData.data.filter(item => !item.isRead).length
                 : 0;
             setNotificationCount(unreadCount);
-        } catch (error) {
+        } catch {
             setNotificationCount(0);
         }
     }, [user]);
@@ -108,7 +108,7 @@ export default function Header() {
             );
             const activeCount = livestreamData.data?.count || 0;
             setLivestreamCount(activeCount);
-        } catch (error) {
+        } catch {
             setLivestreamCount(0);
         }
     }, [user]);
@@ -154,7 +154,7 @@ export default function Header() {
             );
             const itemCount = Array.isArray(favoritesData) ? favoritesData.length : 0;
             setFavoriteCount(itemCount);
-        } catch (error) {
+        } catch {
             setFavoriteCount(0);
         }
     }, [user]);
@@ -207,21 +207,21 @@ export default function Header() {
 
         // Join user's room for targeted updates
         socket.on("connect", () => {
-            console.log("Header Socket connected:", socket.id);
+
             socket.emit("userConnected", user._id);
             socket.emit("joinRoom", user._id);
         });
 
         // Listen for cart updates
-        socket.on("cartUpdated", (data) => {
-            console.log("🛒 Cart updated via Socket.IO:", data);
+        socket.on("cartUpdated", () => {
+
             // Immediately fetch updated cart count
             debouncedFetchCartItemCount();
         });
 
         // Listen for livestream count changes
         socket.on("livestreamCountChanged", (data) => {
-            console.log("📺 Livestream count changed via Socket.IO:", data);
+
             // Update livestream count directly if count is provided, otherwise fetch
             if (typeof data.count === 'number') {
                 setLivestreamCount(data.count);
@@ -232,13 +232,13 @@ export default function Header() {
 
         // Listen for notification updates (already handled by NotificationsDropdown, but keep for consistency)
         socket.on("newNotification", () => {
-            console.log("🔔 New notification via Socket.IO");
+
             debouncedFetchNotificationCount();
         });
 
         // Listen for notification badge updates (when notifications are marked as read/deleted)
         socket.on("notificationBadgeUpdate", (data) => {
-            console.log("🔔 Notification badge update via Socket.IO:", data);
+
             // Only update if it's for this user or global
             if (!data.userId || data.userId === user._id) {
                 debouncedFetchNotificationCount();
@@ -246,8 +246,8 @@ export default function Header() {
         });
 
         // Listen for favorite updates
-        socket.on("favoriteUpdated", (data) => {
-            console.log("❤️ Favorite updated via Socket.IO:", data);
+        socket.on("favoriteUpdated", () => {
+
             // Immediately fetch updated favorite count
             debouncedFetchFavoriteCount();
         });
@@ -300,13 +300,15 @@ export default function Header() {
         const handleFavoriteUpdate = () => debouncedFetchFavoriteCount();
         window.addEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
 
+        const currentTimeouts = fetchTimeoutRef.current;
+
         return () => {
             window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
             window.removeEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
             window.removeEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
             window.removeEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
             clearInterval(pollInterval);
-            Object.values(fetchTimeoutRef.current).forEach(t => t && clearTimeout(t));
+            Object.values(currentTimeouts).forEach(t => t && clearTimeout(t));
         };
     }, [
         fetchCartItemCount,
@@ -317,6 +319,7 @@ export default function Header() {
         debouncedFetchNotificationCount,
         debouncedFetchLivestreamCount,
         debouncedFetchFavoriteCount,
+        fetchCategories,
         location,
         user
     ]);
@@ -334,6 +337,7 @@ export default function Header() {
             await logout();
             navigate("/");
         } catch (err) {
+            console.error("Logout error:", err);
         }
     };
 
@@ -374,7 +378,7 @@ export default function Header() {
             );
             setSearchResults(filteredProducts);
             setShowDropdown(true);
-        } catch (err) {
+        } catch {
             setSearchResults([]);
             setShowDropdown(true);
         } finally {
@@ -384,12 +388,12 @@ export default function Header() {
 
     useEffect(() => {
         if (!search.trim()) {
-            console.log("Search input empty, clearing results");
+
             setSearchResults([]);
             setShowDropdown(false);
             return;
         }
-        console.log("Debouncing search for:", search);
+
         const debounce = setTimeout(() => fetchSearchResults(search), SEARCH_DEBOUNCE_DELAY);
         return () => clearTimeout(debounce);
     }, [search, fetchSearchResults]);
@@ -461,7 +465,7 @@ export default function Header() {
                                     type="text"
                                     value={search}
                                     onChange={(e) => {
-                                        console.log("Search input changed:", e.target.value);
+
                                         setSearch(e.target.value);
                                     }}
                                     placeholder="Search..."
@@ -472,7 +476,7 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log("Clearing search input");
+
                                             setSearch("");
                                         }}
                                         className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
@@ -483,7 +487,7 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log("Closing mobile search");
+
                                             setMobileSearchOpen(false);
                                         }}
                                         className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
@@ -506,14 +510,14 @@ export default function Header() {
                                             {searchResults.map((item) => {
                                                 const minPrice = getMinPrice(item);
                                                 const imageUrl = getMainImageUrl(item);
-                                                console.log(`Rendering product ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
+
                                                 return (
                                                     <Link
                                                         key={item._id}
                                                         to={`/product/${item._id}`}
                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                         onClick={() => {
-                                                            console.log(`Navigating to product ${item._id}`);
+
                                                             setShowDropdown(false);
                                                         }}
                                                     >
@@ -535,7 +539,7 @@ export default function Header() {
                                             })}
                                             <button
                                                 onClick={() => {
-                                                    console.log("Navigating to full search results:", search);
+
                                                     navigate(`/search?q=${encodeURIComponent(search)}`);
                                                     setShowDropdown(false);
                                                 }}
@@ -554,7 +558,7 @@ export default function Header() {
                         <>
                             <button
                                 onClick={() => {
-                                    console.log("Opening mobile search");
+
                                     setMobileSearchOpen(true);
                                 }}
                                 title="Search"
@@ -569,10 +573,10 @@ export default function Header() {
                                 <button
                                     onClick={() => {
                                         if (!user) {
-                                            console.log("Navigating to login");
+
                                             navigate("/login");
                                         } else {
-                                            console.log("Toggling user menu");
+
                                             setShowUserMenu((prev) => !prev);
                                         }
                                     }}
@@ -589,7 +593,7 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Navigating to cart");
+
                                                 navigate('/cart');
                                                 setShowUserMenu(false);
                                             }}
@@ -606,7 +610,7 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Navigating to notifications");
+
                                                 navigate('/notifications');
                                                 setShowUserMenu(false);
                                             }}
@@ -627,7 +631,7 @@ export default function Header() {
                                             <button
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation();
-                                                    console.log("Navigating to profile");
+
                                                     navigate('/profile');
                                                     setShowUserMenu(false);
                                                 }}
@@ -639,7 +643,6 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Navigating to orders (mobile)");
                                                 navigate('/orders');
                                                 setShowUserMenu(false);
                                             }}
@@ -650,7 +653,6 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Navigating to favorites (mobile)");
                                                 navigate('/favorites');
                                                 setShowUserMenu(false);
                                             }}
@@ -666,7 +668,7 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
-                                                console.log("Logging out");
+
                                                 handleLogout();
                                                 setShowUserMenu(false);
                                             }}
@@ -695,7 +697,6 @@ export default function Header() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => {
-                                    console.log("Search input changed (desktop):", e.target.value);
                                     setSearch(e.target.value);
                                 }}
                                 placeholder="Search products..."
@@ -717,14 +718,12 @@ export default function Header() {
                                         {searchResults.map((item) => {
                                             const minPrice = getMinPrice(item);
                                             const imageUrl = getMainImageUrl(item);
-                                            console.log(`Rendering product (desktop) ${item._id}:`, { name: item.productName, price: minPrice, image: imageUrl });
                                             return (
                                                 <Link
                                                     key={item._id}
                                                     to={`/product/${item._id}`}
                                                     className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                     onClick={() => {
-                                                        console.log(`Navigating to product (desktop) ${item._id}`);
                                                         setShowDropdown(false);
                                                     }}
                                                 >
@@ -746,7 +745,6 @@ export default function Header() {
                                         })}
                                         <button
                                             onClick={() => {
-                                                console.log("Navigating to full search results (desktop):", search);
                                                 navigate(`/search?q=${encodeURIComponent(search)}`);
                                                 setShowDropdown(false);
                                             }}
@@ -765,7 +763,7 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={async () => {
-                                    console.log("Live Stream clicked");
+
                                     try {
                                         const token = localStorage.getItem('token');
                                         if (!token) {
@@ -818,7 +816,7 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={() => {
-                                    console.log("Cart clicked, user:", !!user);
+
                                     user ? navigate("/cart") : navigate("/login");
                                 }}
                                 title="Cart"
@@ -845,7 +843,7 @@ export default function Header() {
                             <div className="relative">
                                 <button
                                     onClick={() => {
-                                        console.log("Notifications clicked, navigating to login");
+
                                         navigate("/login");
                                     }}
                                     title="Notifications"
@@ -856,7 +854,7 @@ export default function Header() {
                             </div>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
-                            console.log("Account menu clicked, user:", !!user);
+
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
                             <button
@@ -875,7 +873,6 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to profile (desktop)");
                                             navigate("/profile");
                                             setShowUserMenu(false);
                                         }}
@@ -886,7 +883,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to orders");
+
                                             navigate("/orders");
                                             setShowUserMenu(false);
                                         }}
@@ -897,7 +894,7 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Navigating to favorites");
+
                                             navigate("/favorites");
                                             setShowUserMenu(false);
                                         }}
@@ -913,7 +910,7 @@ export default function Header() {
                                     {/* <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("My Feedback clicked");
+
                                             navigate("/feedback");
                                             setShowUserMenu(false);
                                         }}
@@ -924,7 +921,6 @@ export default function Header() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            console.log("Logging out (desktop)");
                                             handleLogout();
                                             setShowUserMenu(false);
                                         }}

@@ -56,7 +56,7 @@ const Checkout = () => {
       return fromLocation;
     }
     return persistentData?.selectedItems || [];
-  }, [location.state?.selectedItems, persistentData?.selectedItems]);
+  }, [location.state?.selectedItems, persistentData]);
 
   const buyNowState = useMemo(() => {
     const fromLocation = location.state && location.state.product && location.state.variant && location.state.quantity
@@ -73,7 +73,7 @@ const Checkout = () => {
     }
 
     return persistentData?.buyNowState || null;
-  }, [location.state, persistentData?.buyNowState]);
+  }, [location.state, persistentData]);
 
   // === Form State with persistence ===
   const [formData, setFormData] = useState({
@@ -268,7 +268,7 @@ const Checkout = () => {
     const trimmed = address.trim();
     if (!trimmed) return 'Please fill in all required fields';
     if (trimmed.length < 5 || trimmed.length > 150) return 'Address must be between 5 and 150 characters.';
-    if (!/^[\p{L}\p{N}\s,/\-]+$/u.test(trimmed)) return 'Address must only contain letters, numbers, commas and slashes';
+    if (!/^[\p{L}\p{N}\s,/-]+$/u.test(trimmed)) return 'Address must only contain letters, numbers, commas and slashes';
     return null;
   }, []);
 
@@ -488,7 +488,7 @@ const Checkout = () => {
             showToast("Could not get VNPay payment link!", "error");
             setLoading(false);
           }
-        } catch (error) {
+        } catch {
           showToast("Error getting VNPay payment link!", "error");
           setLoading(false);
         }
