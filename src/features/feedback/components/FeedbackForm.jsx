@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
-import ProductButton from "./ui/ProductButton";
-import LoadingSpinner from "./ui/LoadingSpinner";
-import ConfirmationModal from "./ui/ConfirmationModal";
+import ProductButton from "../../../components/ui/ProductButton";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import ConfirmationModal from "../../../components/ui/ConfirmationModal";
 
 const FeedbackForm = ({
     variantId,

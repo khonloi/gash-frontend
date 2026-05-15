@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
-import FeedbackDetailsModal from "../../components/FeedbackDetailsModal";
+import FeedbackDetailsModal from "../../features/feedback/components/FeedbackDetailsModal";
 import LoadingSpinner, { LoadingSkeleton } from "../../components/ui/LoadingSpinner";
 import ProductButton from "../../components/ui/ProductButton";
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
-import { AuthContext } from "../context/AuthContext";
-import Api from "../common/SummaryAPI";
-import gashLogo from "../assets/image/gash-logo.svg";
-import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../constants/constants";
+import { AuthContext } from "../../context/AuthContext";
+import Api from "../../common/SummaryAPI";
+import gashLogo from "../../assets/image/gash-logo.svg";
+import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../../constants/constants";
 
 // Material UI Icons
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
@@ -14,8 +14,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
-import NotificationsDropdown from "./NotificationsDropdown";
-import IconButton from "./ui/IconButton";
+import NotificationsDropdown from "../../features/notifications/components/NotificationsDropdown";
+import IconButton from "../ui/IconButton";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
     for (let i = 0; i < retries; i++) {

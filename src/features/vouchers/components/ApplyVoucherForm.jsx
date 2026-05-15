@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Api from "../common/SummaryAPI";
-import ProductButton from "./ui/ProductButton";
+import Api from "../../../common/SummaryAPI";
+import ProductButton from "../../../components/ui/ProductButton";
 
 
 export default function ApplyVoucherForm() {

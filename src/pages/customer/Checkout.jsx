@@ -1,6 +1,6 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect } from 'react';
-import OrderSuccessModal from '../../components/OrderSuccessModal';
-import CheckoutAuthModal from '../../components/CheckoutAuthModal';
+import OrderSuccessModal from '../../features/orders/components/OrderSuccessModal';
+import CheckoutAuthModal from '../../features/auth/components/CheckoutAuthModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../hooks/useToast';

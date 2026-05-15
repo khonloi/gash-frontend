@@ -1,10 +1,10 @@
 import React, { useState, useContext, useCallback } from "react";
 import { motion } from "framer-motion";
-import Api from "../common/SummaryAPI";
-import { useToast } from "../hooks/useToast";
-import { AuthContext } from "../context/AuthContext";
+import Api from "../../../common/SummaryAPI";
+import { useToast } from "../../../hooks/useToast";
+import { AuthContext } from "../../../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
-import ProductButton from "./ui/ProductButton";
+import ProductButton from "../../../components/ui/ProductButton";
 
 const ChangePasswordModal = ({ handleCancel }) => {
     const [form, setForm] = useState({

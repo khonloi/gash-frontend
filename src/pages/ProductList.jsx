@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../features/products/components/ProductCard";
 import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
 import ProductButton from "../components/ui/ProductButton";
 import {

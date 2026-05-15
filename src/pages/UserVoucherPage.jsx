@@ -1,6 +1,6 @@
 import React from "react";
-import MyVoucherList from "../components/MyVoucherList";
-import ApplyVoucherForm from "../components/ApplyVoucherForm";
+import MyVoucherList from "../features/vouchers/components/MyVoucherList";
+import ApplyVoucherForm from "../features/vouchers/components/ApplyVoucherForm";
 
 export default function UserVoucherPage() {
   return (

@@ -17,7 +17,7 @@ import Profile from "./pages/customer/Profile";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
 import Orders from "./pages/customer/Orders";
-import OrderDetails from "./components/OrderDetails";
+import OrderDetails from "./features/orders/components/OrderDetails";
 import ProductFavorite from "./pages/customer/ProductFavorite";
 import Feedback from "./pages/customer/Feedback";
 import Search from "./pages/Search";
@@ -35,7 +35,7 @@ import ViewLiveStream from "./pages/LiveStream/ViewLiveStream";
 import VNPayReturn from "./pages/VNPayReturn";
 
 // ==== Components ====
-import UserChat from "./components/UserChat";
+import UserChat from "./features/chat/components/UserChat";
 
 // Component: chỉ hiển thị chat nếu user đã đăng nhập
 function ChatIfLoggedIn() {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../features/products/components/ProductCard";
 import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
 import ProductButton from "../components/ui/ProductButton";
 import {

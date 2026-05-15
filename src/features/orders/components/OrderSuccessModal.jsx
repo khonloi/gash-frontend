@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle, XCircle, Home, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import ProductButton from './ui/ProductButton';
+import ProductButton from '../../../components/ui/ProductButton';
 
 export default function OrderSuccessModal({ open, info, onClose }) {
     const navigate = useNavigate();

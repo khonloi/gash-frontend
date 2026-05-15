@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useCallback, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext";
 import { io } from "socket.io-client";
-import { SOCKET_URL } from "../common/axiosClient";
-import Api from "../common/SummaryAPI";
-import { useToast } from "../hooks/useToast";
-import FeedbackForm from "./FeedbackForm";
-import LoadingSpinner, { LoadingForm, LoadingButton } from "./ui/LoadingSpinner";
-import ImageModal from "./ui/ImageModal";
-import ProductButton from "./ui/ProductButton";
-import ConfirmationModal from "./ui/ConfirmationModal";
+import { SOCKET_URL } from "../../../common/axiosClient";
+import Api from "../../../common/SummaryAPI";
+import { useToast } from "../../../hooks/useToast";
+import FeedbackForm from "../../feedback/components/FeedbackForm";
+import LoadingSpinner, { LoadingForm, LoadingButton } from "../../../components/ui/LoadingSpinner";
+import ImageModal from "../../../components/ui/ImageModal";
+import ProductButton from "../../../components/ui/ProductButton";
+import ConfirmationModal from "../../../components/ui/ConfirmationModal";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();

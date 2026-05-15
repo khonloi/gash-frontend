@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Api from "../common/SummaryAPI";
+import Api from "../../../common/SummaryAPI";
 
 
 export default function MyVoucherList() {

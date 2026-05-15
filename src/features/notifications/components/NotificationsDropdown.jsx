@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { Bell, Trash2, Settings, X } from "lucide-react";
-import LoadingSpinner from "./ui/LoadingSpinner";
-import IconButton from "./ui/IconButton";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import IconButton from "../../../components/ui/IconButton";
 import { useNavigate } from "react-router-dom";
-import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../utils/orderEmailNotification";
-import Api from "../common/SummaryAPI";
+import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../../../utils/orderEmailNotification";
+import Api from "../../../common/SummaryAPI";
 
 const MAX_ORDER_CACHE = 20;
 

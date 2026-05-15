@@ -1,8 +1,8 @@
 import React, { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../../../hooks/useToast";
 import { Camera, User, Tag, Phone, MapPin, Users, Calendar } from "lucide-react";
-import ProductButton from "./ui/ProductButton";
+import ProductButton from "../../../components/ui/ProductButton";
 
 const EditProfileModal = ({
   formData,

@@ -3,7 +3,7 @@ import { useToast } from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import Api from "../../common/SummaryAPI";
-import FavoriteProductCard from "../../components/FavoriteProductCard";
+import FavoriteProductCard from "../../features/products/components/FavoriteProductCard";
 import ProductCardSkeleton from "../../components/ui/ProductCardSkeleton";
 import ProductButton from "../../components/ui/ProductButton";
 import ConfirmationModal from "../../components/ui/ConfirmationModal";

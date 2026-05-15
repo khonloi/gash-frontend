@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
-import { SOCKET_URL } from "../common/axiosClient";
+import { SOCKET_URL } from "../../../common/axiosClient";
 import EmojiPicker from "emoji-picker-react";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../../../hooks/useToast";
 import { motion, AnimatePresence } from "framer-motion";
 
 const MAX_MESSAGE_LENGTH = 500;

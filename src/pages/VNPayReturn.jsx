@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Api from '../common/SummaryAPI';
-import OrderSuccessModal from '../components/OrderSuccessModal';
+import OrderSuccessModal from '../features/orders/components/OrderSuccessModal';
 
 export default function VNPayReturn() {
   const [status, setStatus] = useState('pending');

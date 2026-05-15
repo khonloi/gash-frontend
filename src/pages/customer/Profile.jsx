@@ -11,8 +11,8 @@ import Api from "../../common/SummaryAPI";
 import { useToast } from "../../hooks/useToast";
 import { startRegistration } from "@simplewebauthn/browser";
 
-import EditProfileModal from "../../components/EditProfileModal";
-import ChangePasswordModal from "../../components/ChangePasswordModal";
+import EditProfileModal from "../../features/auth/components/EditProfileModal";
+import ChangePasswordModal from "../../features/auth/components/ChangePasswordModal";
 import ProductButton from "../../components/ui/ProductButton";
 import { User, Tag, Mail, Phone, Users, Calendar, MapPin, Key } from "lucide-react";
 
