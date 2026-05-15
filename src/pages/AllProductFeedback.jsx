@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Api from '../common/SummaryAPI';
 import { useToast } from '../hooks/useToast';
-import LoadingSpinner, { LoadingSkeleton } from '../components/LoadingSpinner';
-import ProductButton from '../components/ProductButton';
+import LoadingSpinner, { LoadingSkeleton } from '../components/ui/LoadingSpinner';
+import ProductButton from '../components/ui/ProductButton';
 
 const AllProductFeedback = () => {
   const { id } = useParams();

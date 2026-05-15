@@ -4,7 +4,7 @@ import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { GoogleLogin } from '@react-oauth/google';
-import ProductButton from './ProductButton';
+import ProductButton from './ui/ProductButton';
 
 const CheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys = [] }) => {
   const [password, setPassword] = useState('');

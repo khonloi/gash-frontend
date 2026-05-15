@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../constants/constants";
-import ProductButton from "../components/ProductButton";
+import ProductButton from "../components/ui/ProductButton";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });

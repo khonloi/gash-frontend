@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../components/ProductCard";
-import ProductCardSkeleton from "../components/ProductCardSkeleton";
-import ProductButton from "../components/ProductButton";
+import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
+import ProductButton from "../components/ui/ProductButton";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,

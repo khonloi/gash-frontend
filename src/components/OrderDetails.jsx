@@ -6,10 +6,10 @@ import { SOCKET_URL } from "../common/axiosClient";
 import Api from "../common/SummaryAPI";
 import { useToast } from "../hooks/useToast";
 import FeedbackForm from "./FeedbackForm";
-import LoadingSpinner, { LoadingForm, LoadingButton } from "./LoadingSpinner";
-import ImageModal from "./ImageModal";
-import ProductButton from "./ProductButton";
-import ConfirmationModal from "./ConfirmationModal";
+import LoadingSpinner, { LoadingForm, LoadingButton } from "./ui/LoadingSpinner";
+import ImageModal from "./ui/ImageModal";
+import ProductButton from "./ui/ProductButton";
+import ConfirmationModal from "./ui/ConfirmationModal";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();

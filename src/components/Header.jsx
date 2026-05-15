@@ -15,7 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import NotificationsDropdown from "./NotificationsDropdown";
-import IconButton from "./IconButton";
+import IconButton from "./ui/IconButton";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
     for (let i = 0; i < retries; i++) {

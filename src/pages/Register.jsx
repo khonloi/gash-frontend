@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
-import ProductButton from '../components/ProductButton';
+import ProductButton from '../components/ui/ProductButton';
 
 const Register = () => {
   const location = useLocation();

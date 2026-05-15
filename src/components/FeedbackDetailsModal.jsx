@@ -2,9 +2,9 @@ import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import { useToast } from "../hooks/useToast";
-import LoadingSpinner from "./LoadingSpinner";
-import ProductButton from "./ProductButton";
-import ConfirmationModal from "./ConfirmationModal";
+import LoadingSpinner from "./ui/LoadingSpinner";
+import ProductButton from "./ui/ProductButton";
+import ConfirmationModal from "./ui/ConfirmationModal";
 
 const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
   const { showToast } = useToast();

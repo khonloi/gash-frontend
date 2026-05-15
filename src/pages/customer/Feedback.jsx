@@ -4,8 +4,8 @@ import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import FeedbackDetailsModal from "../../components/FeedbackDetailsModal";
-import LoadingSpinner, { LoadingSkeleton } from "../../components/LoadingSpinner";
-import ProductButton from "../../components/ProductButton";
+import LoadingSpinner, { LoadingSkeleton } from "../../components/ui/LoadingSpinner";
+import ProductButton from "../../components/ui/ProductButton";
 
 const Feedback = () => {
   const { user, isAuthLoading } = useContext(AuthContext);

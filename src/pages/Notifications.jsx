@@ -4,7 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { Bell, Mail, Globe, Save } from "lucide-react";
-import ProductButton from "../components/ProductButton";
+import ProductButton from "../components/ui/ProductButton";
 
 export default function Notifications() {
   const { user } = useContext(AuthContext);

@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import Api from "../../common/SummaryAPI";
 import FavoriteProductCard from "../../components/FavoriteProductCard";
-import ProductCardSkeleton from "../../components/ProductCardSkeleton";
-import ProductButton from "../../components/ProductButton";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import ProductCardSkeleton from "../../components/ui/ProductCardSkeleton";
+import ProductButton from "../../components/ui/ProductButton";
+import ConfirmationModal from "../../components/ui/ConfirmationModal";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,

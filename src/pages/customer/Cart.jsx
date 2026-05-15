@@ -10,9 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import ProductButton from "../../components/ProductButton";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
+import ProductButton from "../../components/ui/ProductButton";
+import ConfirmationModal from "../../components/ui/ConfirmationModal";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,

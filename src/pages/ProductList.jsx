@@ -3,8 +3,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../components/ProductCard";
-import ProductCardSkeleton from "../components/ProductCardSkeleton";
-import ProductButton from "../components/ProductButton";
+import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
+import ProductButton from "../components/ui/ProductButton";
 import {
   FILTER_STORAGE_KEY,
   DEFAULT_FILTERS,

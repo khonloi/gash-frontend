@@ -1,7 +1,7 @@
 // src/pages/Contact.jsx
 import React, { useState, useCallback } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
-import ProductButton from "../components/ProductButton";
+import ProductButton from "../components/ui/ProductButton";
 
 const Contact = () => {
   const [formData, setFormData] = useState({

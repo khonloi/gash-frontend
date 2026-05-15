@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../hooks/useToast";
 import { Camera, User, Tag, Phone, MapPin, Users, Calendar } from "lucide-react";
-import ProductButton from "./ProductButton";
+import ProductButton from "./ui/ProductButton";
 
 const EditProfileModal = ({
   formData,

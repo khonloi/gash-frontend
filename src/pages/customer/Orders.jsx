@@ -5,8 +5,8 @@ import { useToast } from "../../hooks/useToast";
 import Api from "../../common/SummaryAPI";
 import OrderDetailsModal from "../../components/OrderDetails";
 import OrderSuccessModal from "../../components/OrderSuccessModal";
-import LoadingSpinner, { LoadingSkeleton } from "../../components/LoadingSpinner";
-import ProductButton from "../../components/ProductButton";
+import LoadingSpinner, { LoadingSkeleton } from "../../components/ui/LoadingSpinner";
+import ProductButton from "../../components/ui/ProductButton";
 import { io } from "socket.io-client";
 import { SOCKET_URL } from "../../common/axiosClient";
 

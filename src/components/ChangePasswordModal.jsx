@@ -4,7 +4,7 @@ import Api from "../common/SummaryAPI";
 import { useToast } from "../hooks/useToast";
 import { AuthContext } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
-import ProductButton from "./ProductButton";
+import ProductButton from "./ui/ProductButton";
 
 const ChangePasswordModal = ({ handleCancel }) => {
     const [form, setForm] = useState({

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { ToastContext } from "../context/ToastContext";
+import { ToastContext } from "../../context/ToastContext";
 
 export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState({
@@ -111,10 +111,10 @@ export const ToastProvider = ({ children }) => {
             rounded-xl p-4 border-l-4
             shadow-xl bg-white backdrop-blur-sm
             ${toastStyles[toast.type] || toastStyles.info}
-            ${toast.isClosing 
-              ? "opacity-0 translate-y-4" 
-              : toast.isEntering 
-                ? "opacity-0 translate-y-4" 
+            ${toast.isClosing
+              ? "opacity-0 translate-y-4"
+              : toast.isEntering
+                ? "opacity-0 translate-y-4"
                 : "opacity-100 translate-y-0"}
           `}
           style={{

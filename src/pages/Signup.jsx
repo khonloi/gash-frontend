@@ -3,7 +3,7 @@ import { useToast } from '../hooks/useToast';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
-import ProductButton from '../components/ProductButton';
+import ProductButton from '../components/ui/ProductButton';
 
 // Initialize EmailJS with Public API Key
 const emailJsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;

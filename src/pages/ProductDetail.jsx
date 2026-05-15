@@ -13,11 +13,11 @@ import Api from '../common/SummaryAPI';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 import ProductFeedback from "../components/ProductFeedback";
-import ProductButton from "../components/ProductButton";
+import ProductButton from "../components/ui/ProductButton";
 import ProductCard from "../components/ProductCard";
-import ProductCardSkeleton from "../components/ProductCardSkeleton";
+import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {

@@ -6,8 +6,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../hooks/useToast';
 // import '../../styles/Checkout.css';
 import Api from "../../common/SummaryAPI";
-import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/LoadingSpinner';
-import ProductButton from '../../components/ProductButton';
+import LoadingSpinner, { LoadingForm, LoadingButton } from '../../components/ui/LoadingSpinner';
+import ProductButton from '../../components/ui/ProductButton';
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 

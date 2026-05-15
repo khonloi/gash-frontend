@@ -13,7 +13,7 @@ import { startRegistration } from "@simplewebauthn/browser";
 
 import EditProfileModal from "../../components/EditProfileModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
-import ProductButton from "../../components/ProductButton";
+import ProductButton from "../../components/ui/ProductButton";
 import { User, Tag, Mail, Phone, Users, Calendar, MapPin, Key } from "lucide-react";
 
 const Profile = () => {

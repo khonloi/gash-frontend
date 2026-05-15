@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import Api from '../common/SummaryAPI';
-import LoadingForm from './LoadingSpinner';
-import ProductButton from './ProductButton';
+import LoadingForm from './ui/LoadingSpinner';
+import ProductButton from './ui/ProductButton';
 
 const ProductFeedback = ({ productId }) => {
     const { showToast } = useToast();
