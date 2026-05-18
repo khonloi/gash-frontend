@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { io } from "socket.io-client";
-import { AuthContext } from "../../context/AuthContext";
-import Api from "../../common/SummaryAPI";
+import React from "react";
+import { Link } from "react-router-dom";
 import gashLogo from "../../assets/image/gash-logo.svg";
-import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../../constants/constants";
+import { useHeader } from "./hooks/useHeader";
 
 // Material UI Icons
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
@@ -17,420 +14,38 @@ import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import NotificationsDropdown from "../../features/notifications/components/NotificationsDropdown";
 import IconButton from "../ui/IconButton";
 
-const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await apiCall();
-            return response.data;
-        } catch (error) {
-            if (i === retries - 1) throw error;
-            await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-        }
-    }
-};
 
-// Custom events for updates
-const CART_UPDATE_EVENT = 'cartUpdated';
-const NOTIFICATION_UPDATE_EVENT = 'notificationUpdated';
-const LIVESTREAM_UPDATE_EVENT = 'livestreamUpdated';
 
 export default function Header() {
-    const { user, logout } = useContext(AuthContext);
-    const [search, setSearch] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [showUserMenu, setShowUserMenu] = useState(false);
-    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-    const [cartItemCount, setCartItemCount] = useState(0);
-    const [notificationCount, setNotificationCount] = useState(0);
-    const [livestreamCount, setLivestreamCount] = useState(0);
-    const [favoriteCount, setFavoriteCount] = useState(0);
-    const [randomCategories, setRandomCategories] = useState([]);
+    const {
+        user,
+        search,
+        setSearch,
+        searchResults,
+        showDropdown,
+        setShowDropdown,
+        loading,
+        showUserMenu,
+        setShowUserMenu,
+        mobileSearchOpen,
+        setMobileSearchOpen,
+        cartItemCount,
+        notificationCount,
+        livestreamCount,
+        favoriteCount,
+        randomCategories,
+        navigate,
+        dropdownRef,
+        userMenuRef,
+        handleLogout,
+        getMinPrice,
+        getMainImageUrl,
+        handleSearchSubmit,
+        handleLiveStreamClick,
+        formatPrice,
+        getFirstName
+    } = useHeader();
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const dropdownRef = useRef(null);
-    const userMenuRef = useRef(null);
-    const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null, favorite: null });
-    const socketRef = useRef(null);
-
-    // Fetch cart item count
-    const fetchCartItemCount = useCallback(async () => {
-        if (!user) {
-            setCartItemCount(0);
-            return;
-        }
-        try {
-            const cartData = await fetchWithRetry(() =>
-                Api.newCart.getByAccount(user._id, user.token)
-            );
-
-            // NEW: count *different* products only
-            const itemCount = Array.isArray(cartData.data)
-                ? cartData.data.filter(item => (item.productQuantity ?? 0) > 0).length
-                : 0;
-
-            setCartItemCount(itemCount);
-        } catch {
-            setCartItemCount(0);
-        }
-    }, [user]);
-
-    // Fetch notification count
-    const fetchNotificationCount = useCallback(async () => {
-        if (!user) {
-            setNotificationCount(0);
-            return;
-        }
-        try {
-            const notificationData = await fetchWithRetry(() =>
-                Api.newNotifications.getByAccount(user._id, user.token)
-            );
-            const unreadCount = Array.isArray(notificationData.data)
-                ? notificationData.data.filter(item => !item.isRead).length
-                : 0;
-            setNotificationCount(unreadCount);
-        } catch {
-            setNotificationCount(0);
-        }
-    }, [user]);
-
-    // Fetch livestream count
-    const fetchLivestreamCount = useCallback(async () => {
-        if (!user) {
-            setLivestreamCount(0);
-            return;
-        }
-        try {
-            const livestreamData = await fetchWithRetry(() =>
-                Api.livestream.getLive(user.token)
-            );
-            const activeCount = livestreamData.data?.count || 0;
-            setLivestreamCount(activeCount);
-        } catch {
-            setLivestreamCount(0);
-        }
-    }, [user]);
-
-    // Fetch random categories
-    const fetchCategories = useCallback(async () => {
-        try {
-            // Check if we already have random categories in sessionStorage
-            const cached = sessionStorage.getItem('header_random_categories');
-            if (cached) {
-                setRandomCategories(JSON.parse(cached));
-                return;
-            }
-
-            const response = await fetchWithRetry(() => Api.categories.getAll());
-            const categories = response?.data || [];
-
-            // Filter only active categories (not deleted)
-            const activeCategories = categories.filter(cat => !cat.isDeleted);
-
-            if (activeCategories.length > 0) {
-                // Shuffle and pick 5
-                const shuffled = [...activeCategories].sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, 5);
-                setRandomCategories(selected);
-                // Store in sessionStorage to persist across page transitions
-                sessionStorage.setItem('header_random_categories', JSON.stringify(selected));
-            }
-        } catch (error) {
-            console.error("Error fetching categories for header:", error);
-        }
-    }, []);
-
-    // Fetch favorite count
-    const fetchFavoriteCount = useCallback(async () => {
-        if (!user) {
-            setFavoriteCount(0);
-            return;
-        }
-        try {
-            const favoritesData = await fetchWithRetry(() =>
-                Api.favorites.fetch(user.token)
-            );
-            const itemCount = Array.isArray(favoritesData) ? favoritesData.length : 0;
-            setFavoriteCount(itemCount);
-        } catch {
-            setFavoriteCount(0);
-        }
-    }, [user]);
-
-    // Debounced fetch functions
-    const debouncedFetchCartItemCount = useCallback(() => {
-        if (fetchTimeoutRef.current.cart) clearTimeout(fetchTimeoutRef.current.cart);
-        fetchTimeoutRef.current.cart = setTimeout(fetchCartItemCount, 10);
-    }, [fetchCartItemCount]);
-
-    const debouncedFetchNotificationCount = useCallback(() => {
-        if (fetchTimeoutRef.current.notification) clearTimeout(fetchTimeoutRef.current.notification);
-        fetchTimeoutRef.current.notification = setTimeout(fetchNotificationCount, 10);
-    }, [fetchNotificationCount]);
-
-    const debouncedFetchLivestreamCount = useCallback(() => {
-        if (fetchTimeoutRef.current.livestream) clearTimeout(fetchTimeoutRef.current.livestream);
-        fetchTimeoutRef.current.livestream = setTimeout(fetchLivestreamCount, 10);
-    }, [fetchLivestreamCount]);
-
-    const debouncedFetchFavoriteCount = useCallback(() => {
-        if (fetchTimeoutRef.current.favorite) clearTimeout(fetchTimeoutRef.current.favorite);
-        fetchTimeoutRef.current.favorite = setTimeout(fetchFavoriteCount, 10);
-    }, [fetchFavoriteCount]);
-
-    // 🔔 Socket.IO: Setup real-time updates for badges
-    useEffect(() => {
-        if (!user?._id) {
-            // Disconnect socket if user logs out
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
-            return;
-        }
-
-        // Get backend URL
-        const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
-
-        // Connect to Socket.IO
-        const socket = io(baseURL, {
-            transports: ["websocket", "polling"],
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 2000,
-            withCredentials: true,
-        });
-
-        socketRef.current = socket;
-
-        // Join user's room for targeted updates
-        socket.on("connect", () => {
-
-            socket.emit("userConnected", user._id);
-            socket.emit("joinRoom", user._id);
-        });
-
-        // Listen for cart updates
-        socket.on("cartUpdated", () => {
-
-            // Immediately fetch updated cart count
-            debouncedFetchCartItemCount();
-        });
-
-        // Listen for livestream count changes
-        socket.on("livestreamCountChanged", (data) => {
-
-            // Update livestream count directly if count is provided, otherwise fetch
-            if (typeof data.count === 'number') {
-                setLivestreamCount(data.count);
-            } else {
-                debouncedFetchLivestreamCount();
-            }
-        });
-
-        // Listen for notification updates (already handled by NotificationsDropdown, but keep for consistency)
-        socket.on("newNotification", () => {
-
-            debouncedFetchNotificationCount();
-        });
-
-        // Listen for notification badge updates (when notifications are marked as read/deleted)
-        socket.on("notificationBadgeUpdate", (data) => {
-
-            // Only update if it's for this user or global
-            if (!data.userId || data.userId === user._id) {
-                debouncedFetchNotificationCount();
-            }
-        });
-
-        // Listen for favorite updates
-        socket.on("favoriteUpdated", () => {
-
-            // Immediately fetch updated favorite count
-            debouncedFetchFavoriteCount();
-        });
-
-        socket.on("connect_error", (err) => {
-            console.error("Header Socket connection error:", err.message);
-        });
-
-        socket.on("disconnect", (reason) => {
-            console.warn("⚠️ Header Socket disconnected:", reason);
-        });
-
-        return () => {
-            socket.disconnect();
-            socketRef.current = null;
-        };
-    }, [user, debouncedFetchCartItemCount, debouncedFetchNotificationCount, debouncedFetchLivestreamCount, debouncedFetchFavoriteCount]);
-
-    // Fetch counts on mount, location change, or update events
-    useEffect(() => {
-
-        fetchCartItemCount();
-        fetchNotificationCount();   // guaranteed to run
-        fetchLivestreamCount();
-        fetchFavoriteCount();
-        fetchCategories();
-
-        // ---- 2. EVENT LISTENERS (debounced) - Keep for backward compatibility ----
-        const handleCartUpdate = () => debouncedFetchCartItemCount();
-        const handleNotificationUpdate = () => debouncedFetchNotificationCount();
-        const handleLivestreamUpdate = () => debouncedFetchLivestreamCount();
-
-        window.addEventListener(CART_UPDATE_EVENT, handleCartUpdate);
-        window.addEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
-        window.addEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
-
-        // ---- 3. POLLING (fallback, reduced frequency - every 30s instead of 3s) ----
-        let pollInterval;
-        if (user) {
-            pollInterval = setInterval(() => {
-                fetchCartItemCount();        // raw
-                fetchNotificationCount();    // raw
-                fetchLivestreamCount();      // raw
-                fetchFavoriteCount();        // raw
-            }, 30000); // Increased from 3000 to 30000 (30 seconds) as fallback
-        }
-
-        // Also listen for custom events for backward compatibility
-        const FAVORITE_UPDATE_EVENT = 'favoriteUpdated';
-        const handleFavoriteUpdate = () => debouncedFetchFavoriteCount();
-        window.addEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
-
-        const currentTimeouts = fetchTimeoutRef.current;
-
-        return () => {
-            window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
-            window.removeEventListener(NOTIFICATION_UPDATE_EVENT, handleNotificationUpdate);
-            window.removeEventListener(LIVESTREAM_UPDATE_EVENT, handleLivestreamUpdate);
-            window.removeEventListener(FAVORITE_UPDATE_EVENT, handleFavoriteUpdate);
-            clearInterval(pollInterval);
-            Object.values(currentTimeouts).forEach(t => t && clearTimeout(t));
-        };
-    }, [
-        fetchCartItemCount,
-        fetchNotificationCount,
-        fetchLivestreamCount,
-        fetchFavoriteCount,
-        debouncedFetchCartItemCount,
-        debouncedFetchNotificationCount,
-        debouncedFetchLivestreamCount,
-        debouncedFetchFavoriteCount,
-        fetchCategories,
-        location,
-        user
-    ]);
-
-    useEffect(() => {
-        setSearch("");
-        setSearchResults([]);
-        setShowDropdown(false);
-        setShowUserMenu(false);
-        setMobileSearchOpen(false);
-    }, [location]);
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate("/");
-        } catch (err) {
-            console.error("Logout error:", err);
-        }
-    };
-
-    const getMinPrice = (product) => {
-        if (!product.productVariantIds || product.productVariantIds.length === 0) {
-            return 0;
-        }
-        const prices = product.productVariantIds
-            .filter(v => v.variantStatus !== 'discontinued' && v.variantPrice > 0)
-            .map(v => v.variantPrice);
-        return prices.length > 0 ? Math.min(...prices) : 0;
-    };
-
-    const getMainImageUrl = (product) => {
-        if (!product.productImageIds || product.productImageIds.length === 0) {
-            return "/placeholder-image.png";
-        }
-        const mainImage = product.productImageIds.find(img => img.isMain);
-        const imageUrl = mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-        return imageUrl;
-    };
-
-    const fetchSearchResults = useCallback(async (query) => {
-        if (!query.trim()) {
-            setSearchResults([]);
-            setShowDropdown(false);
-            return;
-        }
-        const sanitizedQuery = query.trim().replace(/[<>]/g, "");
-        try {
-            setLoading(true);
-            const productsData = await fetchWithRetry(() =>
-                Api.newProducts.search({ name: sanitizedQuery, status: "active" })
-            );
-            const productsArray = Array.isArray(productsData.data) ? productsData.data : [];
-            const filteredProducts = productsArray.filter(
-                (product) => product.productVariantIds?.length > 0
-            );
-            setSearchResults(filteredProducts);
-            setShowDropdown(true);
-        } catch {
-            setSearchResults([]);
-            setShowDropdown(true);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!search.trim()) {
-
-            setSearchResults([]);
-            setShowDropdown(false);
-            return;
-        }
-
-        const debounce = setTimeout(() => fetchSearchResults(search), SEARCH_DEBOUNCE_DELAY);
-        return () => clearTimeout(debounce);
-    }, [search, fetchSearchResults]);
-
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        if (search.trim()) {
-            navigate(`/search?q=${encodeURIComponent(search)}`);
-            setShowDropdown(false);
-            setMobileSearchOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
-                setShowUserMenu(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const formatPrice = (price) => {
-        if (!price) {
-            return "";
-        }
-        return `${price.toLocaleString()} ₫`;
-    };
-
-    const getFirstName = (name) => {
-        if (!name) return "User";
-        const firstWord = name.trim().split(" ")[0];
-        return firstWord || "User";
-    };
-
-    // Reusable badge class
     const badgeClass = "absolute bg-amber-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center";
 
     return (
@@ -762,46 +377,7 @@ export default function Header() {
                     <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
                             <button
-                                onClick={async () => {
-
-                                    try {
-                                        const token = localStorage.getItem('token');
-                                        if (!token) {
-                                            navigate("/login");
-                                            return;
-                                        }
-
-                                        const response = await Api.livestream.getLiveNow(token);
-
-                                        if (response.data?.success) {
-                                            let streams = [];
-
-                                            if (response.data?.data?.livestreams && Array.isArray(response.data.data.livestreams)) {
-                                                streams = response.data.data.livestreams.filter(s => s && s.status === 'live');
-                                            } else if (response.data?.data?.livestream) {
-                                                const livestream = response.data.data.livestream;
-                                                if (livestream && livestream.status === 'live') {
-                                                    streams = [livestream];
-                                                }
-                                            }
-
-                                            if (streams.length > 0) {
-                                                // Navigate to the first live stream
-                                                navigate(`/live/${streams[0]._id}`);
-                                            } else {
-                                                // No live streams available, navigate to list page
-                                                navigate("/live");
-                                            }
-                                        } else {
-                                            // Fallback to list page if API fails
-                                            navigate("/live");
-                                        }
-                                    } catch (error) {
-                                        console.error("Error fetching live streams:", error);
-                                        // Fallback to list page on error
-                                        navigate("/live");
-                                    }
-                                }}
+                                onClick={handleLiveStreamClick}
                                 title="Live Stream"
                                 className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
