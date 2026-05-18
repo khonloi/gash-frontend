@@ -1,397 +1,57 @@
 import React, { useEffect, useState, useCallback, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../context/AuthContext";
-import { io } from "socket.io-client";
-import { SOCKET_URL } from "../../../common/axiosClient";
-import Api from "../../../common/SummaryAPI";
+import { useOrderDetails } from "../hooks/useOrderDetails";
 import { useToast } from "../../../hooks/useToast";
 import FeedbackForm from "../../feedback/components/FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "../../../components/ui/LoadingSpinner";
 import ImageModal from "../../../components/ui/ImageModal";
 import ProductButton from "../../../components/ui/ProductButton";
 import ConfirmationModal from "../../../components/ui/ConfirmationModal";
-
+import OrderStatusCard from "./OrderStatusCard";
+import VNPayCountdown from "./VNPayCountdown";
+import OrderCustomerInfo from "./OrderCustomerInfo";
+import OrderSummary from "./OrderSummary";
+import OrderItemsList from "./OrderItemsList";
+import { getStatusBadge } from "../utils/orderUtils";
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
     const navigate = useNavigate();
-    const { user } = useContext(AuthContext);
+    const {
+        order,
+        loading,
+        existingFeedbacks,
+        loadingStates,
+        timeLeft,
+        isVNPayExpired,
+        cancelOrder,
+        submitFeedback,
+        editFeedback,
+        deleteFeedback
+    } = useOrderDetails(orderId);
 
-    const [order, setOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [existingFeedbacks, setExistingFeedbacks] = useState({});
     const [selectedImage, setSelectedImage] = useState(null);
-    const [loadingStates, setLoadingStates] = useState({
-        submitting: {},
-        editing: {},
-        deleting: {}
-    });
     const [showViewFeedbackModal, setShowViewFeedbackModal] = useState(false);
     const [showEditFeedbackModal, setShowEditFeedbackModal] = useState(false);
     const [showDeleteFeedbackConfirm, setShowDeleteFeedbackConfirm] = useState(false);
     const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState('');
 
-    // VNPay countdown timer state
-    const [timeLeft, setTimeLeft] = useState(null);
-    const [isVNPayExpired, setIsVNPayExpired] = useState(false);
-
-    const socketRef = useRef(null);
-
-    // 🧭 Fetch order with all details
-    const fetchOrderDetails = useCallback(async () => {
-        try {
-            const token = localStorage.getItem("token");
-
-            const response = await Api.order.getOrder(orderId, token);
-
-            // The API returns the complete order data in response.data.data
-            const orderData = response.data.data;
-
-            setOrder(orderData);
-        } catch (err) {
-            showToast(err.message || "Failed to load order details", "error");
-        } finally {
-            setLoading(false);
-        }
-    }, [orderId, showToast]);
-
-    // 🔍 Extract feedbacks from order data (READ-ONLY operation - only affects display)
-    const extractFeedbacksFromOrder = useCallback(() => {
-        if (!order?.orderDetails?.length) {
-            setExistingFeedbacks({});
-            return;
-        }
-
-        const feedbackMap = {};
-
-        order.orderDetails.forEach((detail, index) => {
-            const key = detail.variant?._id || `item_${index}`;
-
-            if (!detail.feedback) {
-                return; // No feedback object at all
-            }
-
-            const isDeleted = detail.feedback.isDeleted === true;
-
-            // Always include if there's any feedback record (even deleted)
-            // We want to block re-submission and show deletion message
-            const hasOriginalRating = detail.feedback.rating !== null && detail.feedback.rating !== undefined && detail.feedback.rating >= 1 && detail.feedback.rating <= 5;
-            const hasOriginalContent = detail.feedback.content && detail.feedback.content.trim() !== '' && detail.feedback.content !== 'This feedback has been deleted by staff/admin';
-
-            feedbackMap[key] = {
-                rating: isDeleted ? null : detail.feedback.rating,
-                content: isDeleted
-                    ? 'This feedback has been deleted by staff/admin'
-                    : detail.feedback.content || '',
-                has_rating: !isDeleted && hasOriginalRating,
-                has_content: !isDeleted ? hasOriginalContent : true, // deleted feedback "has content" (the message)
-                isDeleted: isDeleted,
-                createdAt: detail.feedback.createdAt,
-                updatedAt: detail.feedback.updatedAt
-            };
-        });
-
-        setExistingFeedbacks(feedbackMap);
-    }, [order?.orderDetails]);
-
-    useEffect(() => {
-        if (orderId) fetchOrderDetails();
-    }, [orderId, fetchOrderDetails]);
-
-    // Extract feedbacks when order data is loaded or updated
-    useEffect(() => {
-        if (order?.orderDetails) {
-            extractFeedbacksFromOrder();
-        }
-    }, [order?.orderDetails, extractFeedbacksFromOrder]);
-
-    useEffect(() => {
-        if (order?.paymentMethod === 'VNPAY' && order?.payStatus === 'unpaid' && order?.vnpay_expiry_time) {
-            const expiryTime = new Date(order.vnpay_expiry_time);
-            const now = new Date();
-
-            if (expiryTime > now) {
-                // Calculate initial time left in seconds
-                const initialTimeLeft = Math.floor((expiryTime - now) / 1000);
-                setTimeLeft(initialTimeLeft);
-                setIsVNPayExpired(false);
-
-                // Start countdown timer
-                const timer = setInterval(() => {
-                    setTimeLeft(prev => {
-                        if (prev <= 1) {
-                            setIsVNPayExpired(true);
-                            clearInterval(timer);
-                            return 0;
-                        }
-                        return prev - 1;
-                    });
-                }, 1000);
-
-                return () => clearInterval(timer);
-            } else {
-                // Already expired
-                setTimeLeft(0);
-                setIsVNPayExpired(true);
-            }
-        } else {
-            setTimeLeft(null);
-            setIsVNPayExpired(false);
-        }
-    }, [order]);
-
-    // Setup Socket.IO for real-time order updates
-    useEffect(() => {
-        if (!user?._id || !orderId) return;
-
-        // Initialize socket if not already created
-        if (!socketRef.current) {
-            const token = localStorage.getItem("token");
-            socketRef.current = io(SOCKET_URL, {
-                transports: ["websocket", "polling"],
-                auth: { token },
-                withCredentials: true,
-            });
-        }
-
-        const socket = socketRef.current;
-
-        // Connect and authenticate
-        socket.on("connect", () => {
-
-            // Emit user connection
-            socket.emit("userConnected", user._id);
-            // Also try authentication if token available
-            const token = localStorage.getItem("token");
-            if (token) {
-                socket.emit("authenticate", token);
-            }
-        });
-
-        // Listen for order updates
-        socket.on("orderUpdated", (payload) => {
-            const updatedOrder = payload.order || payload;
-            const orderUserId = payload.userId || updatedOrder.accountId?._id || updatedOrder.accountId;
-
-            // Only update if this order belongs to the current user and matches the current orderId
-            if (orderUserId && orderUserId.toString() === user._id.toString() && updatedOrder._id === orderId) {
-
-                // Update the order state while preserving populated orderDetails structure
-                setOrder((prevOrder) => {
-                    if (!prevOrder) return updatedOrder;
-
-                    // Check if updated order has properly populated orderDetails
-                    const hasPopulatedDetails = updatedOrder.orderDetails?.some(
-                        (detail) => detail?.variantId?.productId?.productName
-                    );
-
-                    // Preserve existing orderDetails if updated order doesn't have populated ones
-                    const preservedOrderDetails = hasPopulatedDetails
-                        ? updatedOrder.orderDetails
-                        : prevOrder.orderDetails;
-
-                    return {
-                        ...prevOrder,
-                        ...updatedOrder,
-                        // Preserve populated orderDetails structure
-                        orderDetails: preservedOrderDetails || updatedOrder.orderDetails || prevOrder.orderDetails,
-                    };
-                });
-            }
-        });
-
-        // Cleanup on unmount
-        return () => {
-            socket.off("connect");
-            socket.off("orderUpdated");
-        };
-    }, [user?._id, orderId]);
-
-    useEffect(() => {
-        extractFeedbacksFromOrder();
-    }, [order, extractFeedbacksFromOrder]);
-
     const formatPrice = (p) =>
         p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
-    // Cancel order
     const handleCancelOrder = async () => {
         setShowConfirmModal(true);
     };
 
-    // 📝 Send feedback
     const handleFeedback = async (variantId, comment, rating) => {
-        setLoadingStates(prev => ({
-            ...prev,
-            submitting: { ...prev.submitting, [variantId]: true }
-        }));
-
-        // Add timeout to prevent infinite loading
-        const timeoutId = setTimeout(() => {
-            setLoadingStates(prev => ({
-                ...prev,
-                submitting: { ...prev.submitting, [variantId]: false }
-            }));
-        }, 10000); // 10 second timeout
-
-        try {
-            const token = localStorage.getItem("token");
-
-            // Validate parameters before making API call
-            if (!orderId) {
-                throw new Error("Order ID is missing");
-            }
-            if (!variantId) {
-                throw new Error("Variant ID is missing");
-            }
-            if (!token) {
-                throw new Error("Authentication token is missing");
-            }
-            // Backend now requires rating to be mandatory
-            if (!rating) {
-                throw new Error("Rating is required");
-            }
-            if (rating < 1 || rating > 5) {
-                throw new Error("Rating must be between 1 and 5");
-            }
-            if (comment && comment.length > 500) {
-                throw new Error("Comment cannot exceed 500 characters");
-            }
-
-            const feedbackData = {
-                rating: parseInt(rating),
-                content: comment ? comment.trim() : null
-            };
-
-            // For items without variant, use the orderDetail index
-            const actualVariantId = variantId.startsWith('item_') ? null : variantId;
-
-            await Api.feedback.addFeedback(
-                orderId,
-                actualVariantId,
-                feedbackData,
-                token
-            );
-
-            // Show success message after API call succeeds
-            showToast("Feedback created successfully", "success");
-
-            // Refresh order data to get updated feedback
-            await fetchOrderDetails();
-
-            setShowEditFeedbackModal(false);
-        } catch (err) {
-            // Show more specific error message
-            let errorMessage = "Failed to create feedback";
-
-            if (err.response?.data?.message) {
-                errorMessage = err.response.data.message;
-            } else if (err.response?.status === 500) {
-                errorMessage = "Server error - please try again later";
-            } else if (err.response?.status === 400) {
-                errorMessage = "Invalid request - please check your input";
-            } else if (err.response?.status === 404) {
-                errorMessage = "Order or product not found";
-            } else if (err.message) {
-                errorMessage = err.message;
-            }
-
-            showToast(errorMessage, "error");
-        } finally {
-            clearTimeout(timeoutId);
-            setLoadingStates(prev => ({
-                ...prev,
-                submitting: { ...prev.submitting, [variantId]: false }
-            }));
-        }
+        const result = await submitFeedback(variantId, comment, rating);
+        if (result.success) setShowEditFeedbackModal(false);
     };
 
-    // Edit feedback
     const handleEditFeedback = async (variantId, comment, rating) => {
-        setLoadingStates(prev => ({
-            ...prev,
-            editing: { ...prev.editing, [variantId]: true }
-        }));
-
-        // Add timeout to prevent infinite loading
-        const timeoutId = setTimeout(() => {
-            setLoadingStates(prev => ({
-                ...prev,
-                editing: { ...prev.editing, [variantId]: false }
-            }));
-        }, 10000); // 10 second timeout
-
-        try {
-            const token = localStorage.getItem("token");
-
-            // Validate parameters before making API call
-            if (!orderId) {
-                throw new Error("Order ID is missing");
-            }
-            if (!variantId) {
-                throw new Error("Variant ID is missing");
-            }
-            if (!token) {
-                throw new Error("Authentication token is missing");
-            }
-            // Backend now requires rating to be mandatory
-            if (!rating) {
-                throw new Error("Rating is required");
-            }
-            if (rating < 1 || rating > 5) {
-                throw new Error("Rating must be between 1 and 5");
-            }
-            if (comment && comment.length > 500) {
-                throw new Error("Comment cannot exceed 500 characters");
-            }
-
-            const feedbackData = {
-                rating: parseInt(rating),
-                content: comment ? comment.trim() : null
-            };
-
-            // For items without variant, use the orderDetail index
-            const actualVariantId = variantId.startsWith('item_') ? null : variantId;
-
-            await Api.feedback.editFeedback(
-                orderId,
-                actualVariantId,
-                feedbackData,
-                token
-            );
-
-            // Show success notification after API call succeeds
-            showToast("Feedback updated successfully", "success");
-
-            // Refresh order data to get updated feedback
-            await fetchOrderDetails();
-
-            setShowEditFeedbackModal(false);
-        } catch (err) {
-            // Show more specific error message
-            let errorMessage = "Failed to update feedback";
-
-            if (err.response?.data?.message) {
-                errorMessage = err.response.data.message;
-            } else if (err.response?.status === 500) {
-                errorMessage = "Server error - please try again later";
-            } else if (err.response?.status === 400) {
-                errorMessage = "Invalid request - please check your input";
-            } else if (err.response?.status === 404) {
-                errorMessage = "Order or product not found";
-            } else if (err.message) {
-                errorMessage = err.message;
-            }
-
-            showToast(errorMessage, "error");
-        } finally {
-            clearTimeout(timeoutId);
-            setLoadingStates(prev => ({
-                ...prev,
-                submitting: { ...prev.submitting, [variantId]: false }
-            }));
-        }
+        const result = await editFeedback(variantId, comment, rating);
+        if (result.success) setShowEditFeedbackModal(false);
     };
 
     const handleViewFeedback = (variantId, productName) => {
@@ -406,157 +66,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
         setShowEditFeedbackModal(true);
     };
 
-    // Delete feedback
     const handleDeleteFeedback = useCallback(async () => {
         setShowDeleteFeedbackConfirm(false);
-        setLoadingStates(prev => ({
-            ...prev,
-            deleting: { ...prev.deleting, [selectedVariantId]: true }
-        }));
+        const result = await deleteFeedback(selectedVariantId);
+        if (result.success) setShowEditFeedbackModal(false);
+    }, [deleteFeedback, selectedVariantId]);
 
-        try {
-            const token = localStorage.getItem("token");
-
-            if (!orderId) {
-                throw new Error("Order ID is missing");
-            }
-            if (!selectedVariantId) {
-                throw new Error("Variant ID is missing");
-            }
-            if (!token) {
-                throw new Error("Authentication token is missing");
-            }
-
-            const actualVariantId = selectedVariantId.startsWith('item_') ? null : selectedVariantId;
-
-            await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
-
-            showToast("Feedback deleted successfully", "success");
-
-            // Refresh order data to get updated feedback
-            await fetchOrderDetails();
-
-            setShowEditFeedbackModal(false);
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || "Failed to delete feedback";
-            showToast(errorMessage, "error");
-        } finally {
-            setLoadingStates(prev => ({
-                ...prev,
-                deleting: { ...prev.deleting, [selectedVariantId]: false }
-            }));
-        }
-    }, [orderId, selectedVariantId, showToast, fetchOrderDetails]);
-
-    const getStatusBadge = (status, type = "order") => {
-        const base =
-            "inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium";
-
-        // Debug logging
-
-        if (type === "order") {
-            // Clean the status string
-            const cleanStatus = status?.toString().trim().toLowerCase();
-            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-            switch (cleanStatus) {
-                case "pending":
-                    return (
-                        <span className={`${base} bg-yellow-100 text-yellow-800`}>
-                            Pending
-                        </span>
-                    );
-                case "confirmed":
-                    return (
-                        <span className={`${base} bg-blue-100 text-blue-800`}>
-                            Confirmed
-                        </span>
-                    );
-                case "shipping":
-                    return (
-                        <span className={`${base} bg-indigo-100 text-indigo-800`}>
-                            Shipping
-                        </span>
-                    );
-                case "delivered":
-                    return (
-                        <span className={`${base} bg-green-100 text-green-800`}>
-                            Delivered
-                        </span>
-                    );
-                case "cancelled":
-                    return (
-                        <span className={`${base} bg-red-100 text-red-800`}>
-                            Cancelled
-                        </span>
-                    );
-                default:
-                    return (
-                        <span className={`${base} bg-gray-100 text-gray-800`}>
-                            {capitalizeFirst(status || 'Unknown')}
-                        </span>
-                    );
-            }
-        } else if (type === "pay") {
-            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-            switch (status?.toLowerCase()) {
-                case "unpaid":
-                    return (
-                        <span className={`${base} bg-orange-100 text-orange-800`}>
-                            Unpaid
-                        </span>
-                    );
-                case "paid":
-                    return (
-                        <span className={`${base} bg-green-100 text-green-800`}>
-                            Paid
-                        </span>
-                    );
-                case "refunded":
-                    return (
-                        <span className={`${base} bg-purple-100 text-purple-800`}>
-                            Refunded
-                        </span>
-                    );
-                default:
-                    return (
-                        <span className={`${base} bg-gray-100 text-gray-800`}>
-                            {capitalizeFirst(status || 'Unknown')}
-                        </span>
-                    );
-            }
-        } else if (type === "refund") {
-            const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-            switch (status?.toLowerCase()) {
-                case "pending_refund":
-                    return (
-                        <span className={`${base} bg-yellow-100 text-yellow-800`}>
-                            Pending Refund
-                        </span>
-                    );
-                case "refunded":
-                    return (
-                        <span className={`${base} bg-green-100 text-green-800`}>
-                            Refunded
-                        </span>
-                    );
-                case "not_applicable":
-                    return (
-                        <span className={`${base} bg-gray-100 text-gray-800`}>
-                            Not Applicable
-                        </span>
-                    );
-                default:
-                    return (
-                        <span className={`${base} bg-gray-100 text-gray-800`}>
-                            {capitalizeFirst(status || '')}
-                        </span>
-                    );
-            }
-        }
-    };
 
     const [cancelFormData, setCancelFormData] = useState({
         cancelReason: "",
@@ -577,20 +92,16 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             setError("Custom reason cannot exceed 500 characters");
             return;
         }
-        try {
-            const token = localStorage.getItem("token");
-            const reason = cancelFormData.cancelReason === "other"
-                ? cancelFormData.customReason
-                : cancelFormData.cancelReason;
-            // Sending cancel request
-
-            await Api.order.cancel(orderId, reason, token);
-            showToast("Order cancelled successfully", "success");
-            fetchOrderDetails();
+        
+        const reason = cancelFormData.cancelReason === "other"
+            ? cancelFormData.customReason
+            : cancelFormData.cancelReason;
+            
+        const result = await cancelOrder(reason);
+        if (result.success) {
             setShowConfirmModal(false);
-        } catch (err) {
-            console.error("Cancel error:", err.response?.data); // Log error details
-            setError(err.message || "Failed to cancel order");
+        } else {
+            setError(result.error);
         }
     };
 
@@ -649,239 +160,26 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         </div>
 
                         {/* Order Status Card */}
-                        <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="flex flex-wrap items-center gap-3 text-sm">
-                                    <span className="text-gray-600 font-medium">Order Status:</span>
-                                    {getStatusBadge(order.orderStatus, "order")}
-                                    <span className="text-gray-600 font-medium">Payment:</span>
-                                    {getStatusBadge(order.payStatus, "pay")}
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                    Placed on {new Date(order.orderDate || order.createdAt).toLocaleDateString('vi-VN')}
-                                </span>
-                            </div>
-
-                            {/* Cancel Reason (if cancelled) */}
-                            {order.orderStatus?.toLowerCase() === "cancelled" && order.cancelReason && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                    <span className="text-gray-600 font-medium">Cancellation Reason:</span>
-                                    <p className="mt-1 text-gray-700">{order.cancelReason}</p>
-                                </div>
-                            )}
-                        </div>
+                        <OrderStatusCard order={order} />
 
                         {/* VNPay Payment Countdown */}
-                        {order?.paymentMethod === 'VNPAY' && order?.payStatus === 'unpaid' && order?.orderStatus !== 'cancelled' && (
-                            <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div className="flex flex-col gap-2">
-                                        <h3 className="text-lg font-semibold text-gray-900">VNPay Payment</h3>
-                                        {timeLeft !== null && !isVNPayExpired && (
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-gray-600">Time remaining:</span>
-                                                <span className={`text-lg font-mono font-bold ${timeLeft < 300 ? 'text-red-600' : timeLeft < 600 ? 'text-orange-600' : 'text-green-600'
-                                                    }`}>
-                                                    {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {isVNPayExpired && (
-                                            <div className="text-red-600 font-medium">
-                                                Payment time expired. Order will be cancelled automatically.
-                                            </div>
-                                        )}
-                                    </div>
-                                    {!isVNPayExpired && order?.vnpay_payment_url && (
-                                        <ProductButton
-                                            variant="primary"
-                                            size="md"
-                                            onClick={() => window.open(order.vnpay_payment_url, '_blank')}
-                                            className="flex items-center gap-2"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                            Continue VNPay Payment
-                                        </ProductButton>
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        <VNPayCountdown order={order} timeLeft={timeLeft} isVNPayExpired={isVNPayExpired} />
 
                         {/* Customer & Payment Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm focus-within:shadow-sm">
-                                <h4 className="text-lg font-semibold text-gray-900 mb-3">Customer Information</h4>
-                                <div className="space-y-2 text-sm">
-                                    <p className="text-gray-700">
-                                        <span className="font-medium">Name:</span> {order.customer?.name || order.customer?.username}
-                                    </p>
-                                    <p className="text-gray-600">
-                                        <span className="font-medium">Phone:</span> {order.phone}
-                                    </p>
-                                    <p className="text-gray-600">
-                                        <span className="font-medium">Address:</span> {order.addressReceive}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 transition-shadow hover:shadow-sm focus-within:shadow-sm">
-                                <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">Payment Information</h4>
-                                <div className="space-y-2 text-sm">
-                                    <p className="text-gray-700">
-                                        <span className="font-medium">Method:</span> {order.paymentMethod}
-                                    </p>
-                                    {order.voucher && (
-                                        <p className="text-blue-600 font-medium">
-                                            <span className="font-medium">Voucher Applied:</span> {order.voucher.code}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        <OrderCustomerInfo order={order} />
 
                         {/* Price Summary */}
-                        <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm focus-within:shadow-sm">
-                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h4>
-                            <div className="space-y-3">
-                                {order.summary && (
-                                    <div className="flex justify-between text-sm text-gray-600">
-                                        <span className="font-medium">Items:</span>
-                                        <span>{order.summary.totalItems} item(s) - {order.summary.totalQuantity} quantity</span>
-                                    </div>
-                                )}
-                                <div className="flex justify-between text-gray-700">
-                                    <span>Subtotal:</span>
-                                    <span className="font-medium">{formatPrice(order.totalPrice)}</span>
-                                </div>
-                                {order.discountAmount > 0 && (
-                                    <div className="flex justify-between text-green-600 font-medium">
-                                        <span>Discount:</span>
-                                        <span>-{formatPrice(order.discountAmount)}</span>
-                                    </div>
-                                )}
-                                <hr className="border-gray-200" />
-                                <div className="flex justify-between items-center text-lg">
-                                    <span className="font-bold text-gray-900">Total Amount:</span>
-                                    <span className="font-bold text-xl text-red-600">{formatPrice(order.finalPrice)}</span>
-                                </div>
-                            </div>
-                        </div>
+                        <OrderSummary order={order} formatPrice={formatPrice} />
 
                         {/* Products */}
-                        <div className="space-y-3">
-                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h4>
-                            {order.orderDetails && order.orderDetails.length > 0 ? (
-                                order.orderDetails.map((d, index) => {
-                                    const feedbackKey = d.variant?._id || `item_${index}`;
-                                    const stockQuantity = d.variant?.stockQuantity ?? 0;
-                                    const isOutOfStock = stockQuantity <= 0;
-                                    const isDiscontinued =
-                                        d.variant?.variantStatus === "discontinued" ||
-                                        d.variant?.product?.productStatus === "discontinued";
-                                    return (
-                                        <article
-                                            key={d._id}
-                                            className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
-                                            tabIndex={0}
-                                            aria-label={`Order Item: ${d.variant?.product?.name || "Product"}`}
-                                        >
-                                            <div className="flex items-stretch gap-6 flex-1">
-                                                {/* Image */}
-                                                <img
-                                                    src={d.variant?.image || "/placeholder.png"}
-                                                    alt={d.variant?.product?.name || "Product"}
-                                                    className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
-                                                    onClick={() =>
-                                                        setSelectedImage({
-                                                            src: d.variant?.image || "/placeholder.png",
-                                                            alt: d.variant?.product?.name || "Product",
-                                                        })
-                                                    }
-                                                />
-                                                {/* Product Info */}
-                                                <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
-                                                            {d.variant?.product?.name || "Product"}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <p className="text-sm text-gray-600 m-0">
-                                                            Color: {d.variant?.color?.name || "N/A"}  -  Size: {d.variant?.size?.name || "N/A"}
-                                                        </p>
-                                                    </div>
-                                                    <p className="text-sm text-gray-600 m-0">Unit Price: {formatPrice(d.unitPrice)}</p>
-                                                    {/* {(isOutOfStock || isDiscontinued) && (
-                                                        <p className="text-sm font-semibold text-red-600">
-                                                            {isDiscontinued ? "Discontinued" : "Out of Stock"}
-                                                        </p>
-                                                    )} */}
-                                                    <p className="text-base font-semibold text-red-600 m-0 mt-1">Total: {formatPrice(d.totalPrice)}</p>
-                                                </div>
-                                            </div>
-                                            {/* Quantity and Feedback Buttons */}
-                                            <div className="flex flex-col sm:flex-row items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
-                                                <div className="flex items-center justify-center">
-                                                    <div className="px-4 py-2 bg-gray-100 rounded-lg text-center min-w-20">
-                                                        <span className="text-sm text-gray-600">Quantity</span>
-                                                        <p className="text-lg font-semibold text-gray-900">{d.quantity}</p>
-                                                    </div>
-                                                </div>
-                                                {/* Feedback Buttons – Only if Delivered */}
-                                                {order.orderStatus?.toLowerCase() === "delivered" && (
-                                                    <div className="flex flex-col gap-2">
-                                                        <ProductButton
-                                                            variant="secondary"
-                                                            size="sm"
-                                                            onClick={() => handleViewFeedback(feedbackKey, d.variant?.product?.name || "Product")}
-                                                            className="flex items-center gap-2 text-green-600"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    strokeWidth={2}
-                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                />
-                                                                <path
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    strokeWidth={2}
-                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                />
-                                                            </svg>
-                                                            View Feedback
-                                                        </ProductButton>
-                                                        <ProductButton
-                                                            variant="primary"
-                                                            size="sm"
-                                                            onClick={() => handleEditFeedbackClick(feedbackKey, d.variant?.product?.name || "Product")}
-                                                            className="flex items-center gap-2"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    strokeWidth={2}
-                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                                                />
-                                                            </svg>
-                                                            {existingFeedbacks[feedbackKey] ? "Edit Feedback" : "Add Feedback"}
-                                                        </ProductButton>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </article>
-                                    );
-                                })
-                            ) : (
-                                <div className="text-center py-12 text-gray-500">
-                                    <p>No items in this order</p>
-                                </div>
-                            )}
-                        </div>
+                        <OrderItemsList 
+                            order={order} 
+                            formatPrice={formatPrice} 
+                            setSelectedImage={setSelectedImage} 
+                            existingFeedbacks={existingFeedbacks} 
+                            handleViewFeedback={handleViewFeedback} 
+                            handleEditFeedbackClick={handleEditFeedbackClick} 
+                        />
 
                         {/* Refund Card */}
                         {order.refundStatus && order.refundStatus !== "not_applicable" && (
