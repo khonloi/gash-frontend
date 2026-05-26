@@ -31,7 +31,8 @@ const Feedback = () => {
     totalPages,
     startIndex,
     endIndex,
-    currentItems
+    currentItems,
+    itemsPerPage
   } = useFeedback();
 
   // Render star rating

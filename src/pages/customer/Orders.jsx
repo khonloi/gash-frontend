@@ -27,7 +27,8 @@ const Orders = () => {
     handlePageChange,
     handleCloseVNPayModal,
     formatDate,
-    formatPrice
+    formatPrice,
+    itemsPerPage
   } = useOrders();
 
   const getStatusBadge = (status, type = "order") => {

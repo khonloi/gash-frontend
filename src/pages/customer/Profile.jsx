@@ -571,10 +571,10 @@ const LocalEditProfileModal = ({
   }, [validateForm, handleSubmit, showToast]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleCancel} maxWidth="max-w-lg">
+    <Modal isOpen={isOpen} onClose={handleCancel} maxWidth="max-w-3xl">
       <Modal.Header>Update Profile</Modal.Header>
-      <Modal.Body>
-        <div className="flex flex-col items-center mb-8">
+      <Modal.Body className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1 flex flex-col items-center justify-start pt-4">
           <div className="relative group">
             <div className={`w-28 h-28 rounded-full p-1 bg-white border-2 ${validationErrors.image ? 'border-red-500' : 'border-gray-300 shadow-sm'}`}>
               <img
@@ -610,11 +610,11 @@ const LocalEditProfileModal = ({
             }}
           />
           {validationErrors.image && (
-            <p className="mt-2 text-xs font-bold text-red-500 uppercase tracking-wider">{validationErrors.image}</p>
+            <p className="mt-2 text-xs font-bold text-red-500 uppercase tracking-wider text-center">{validationErrors.image}</p>
           )}
         </div>
 
-        <form onSubmit={handleSubmitWithValidation} className="space-y-6">
+        <form onSubmit={handleSubmitWithValidation} className="md:col-span-2 space-y-6">
           <div className="grid grid-cols-1 gap-6">
             {[
               { label: "Full Name", type: "text", key: "name", required: true, icon: Tag },

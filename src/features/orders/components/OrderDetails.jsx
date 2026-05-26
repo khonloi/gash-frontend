@@ -109,7 +109,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     };
 
     return (
-        <Modal isOpen={true} onClose={onClose} maxWidth="max-w-3xl" zIndex="z-50">
+        <Modal isOpen={true} onClose={onClose} maxWidth="max-w-5xl" zIndex="z-50">
             <Modal.Header>
                 <div className="flex justify-between items-center w-full pr-6">
                     <h2 className="text-xl sm:text-2xl font-normal text-gray-900">
@@ -150,67 +150,73 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         <p className="text-gray-400 text-sm mt-2">The order you're looking for doesn't exist or has been removed</p>
                     </div>
                 ) : (
-                    <div className="space-y-6">
-                        {/* Order Status Card */}
-                        <OrderStatusCard order={order} />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        {/* Left column: Summary & Details (col-span-5) */}
+                        <div className="lg:col-span-5 space-y-6">
+                            {/* Order Status Card */}
+                            <OrderStatusCard order={order} />
 
-                        {/* VNPay Payment Countdown */}
-                        <VNPayCountdown order={order} timeLeft={timeLeft} isVNPayExpired={isVNPayExpired} />
+                            {/* VNPay Payment Countdown */}
+                            <VNPayCountdown order={order} timeLeft={timeLeft} isVNPayExpired={isVNPayExpired} />
 
-                        {/* Customer & Payment Info */}
-                        <OrderCustomerInfo order={order} />
+                            {/* Customer & Payment Info */}
+                            <OrderCustomerInfo order={order} />
 
-                        {/* Price Summary */}
-                        <OrderSummary order={order} formatPrice={formatPrice} />
+                            {/* Price Summary */}
+                            <OrderSummary order={order} formatPrice={formatPrice} />
 
-                        {/* Products */}
-                        <OrderItemsList 
-                            order={order} 
-                            formatPrice={formatPrice} 
-                            setSelectedImage={setSelectedImage} 
-                            existingFeedbacks={existingFeedbacks} 
-                            handleViewFeedback={handleViewFeedback} 
-                            handleEditFeedbackClick={handleEditFeedbackClick} 
-                        />
-
-                        {/* Refund Card */}
-                        {order.refundStatus && order.refundStatus !== "not_applicable" && (
-                            <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm">
-                                <h4 className="font-semibold text-gray-700 mb-3">Refund Information</h4>
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-gray-600 font-medium">Status:</span>
-                                    {getStatusBadge(order.refundStatus, "refund")}
+                            {/* Refund Card */}
+                            {order.refundStatus && order.refundStatus !== "not_applicable" && (
+                                <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm">
+                                    <h4 className="font-semibold text-gray-700 mb-3">Refund Information</h4>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className="text-gray-600 font-medium">Status:</span>
+                                        {getStatusBadge(order.refundStatus, "refund")}
+                                    </div>
+                                    {order.refundProof && (
+                                        <img
+                                            src={order.refundProof}
+                                            alt="Refund Proof"
+                                            className="w-32 h-32 object-cover rounded border cursor-pointer hover:opacity-80"
+                                            onClick={() => setSelectedImage({ src: order.refundProof, alt: "Refund Proof" })}
+                                        />
+                                    )}
                                 </div>
-                                {order.refundProof && (
-                                    <img
-                                        src={order.refundProof}
-                                        alt="Refund Proof"
-                                        className="w-32 h-32 object-cover rounded border cursor-pointer hover:opacity-80"
-                                        onClick={() => setSelectedImage({ src: order.refundProof, alt: "Refund Proof" })}
-                                    />
-                                )}
-                            </div>
-                        )}
-
-                        {/* Order Feedback */}
-                        {order.feedback_order && (
-                            <div className="p-4 sm:p-5 bg-blue-50 rounded-xl border border-blue-200">
-                                <h4 className="font-semibold text-blue-700 mb-2">Order Feedback</h4>
-                                <p className="text-gray-700">{order.feedback_order}</p>
-                            </div>
-                        )}
-
-                        {(order.orderStatus?.toLowerCase() === "pending" ||
-                            order.orderStatus?.toLowerCase() === "confirmed") && (
-                                <Button
-                                    variant="danger"
-                                    size="md"
-                                    onClick={handleCancelOrder}
-                                    className="mt-6"
-                                >
-                                    Cancel Order
-                                </Button>
                             )}
+
+                            {/* Order Feedback */}
+                            {order.feedback_order && (
+                                <div className="p-4 sm:p-5 bg-blue-50 rounded-xl border border-blue-200">
+                                    <h4 className="font-semibold text-blue-700 mb-2">Order Feedback</h4>
+                                    <p className="text-gray-700">{order.feedback_order}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right column: Products list & Cancel action (col-span-7) */}
+                        <div className="lg:col-span-7 space-y-6">
+                            {/* Products */}
+                            <OrderItemsList 
+                                order={order} 
+                                formatPrice={formatPrice} 
+                                setSelectedImage={setSelectedImage} 
+                                existingFeedbacks={existingFeedbacks} 
+                                handleViewFeedback={handleViewFeedback} 
+                                handleEditFeedbackClick={handleEditFeedbackClick} 
+                            />
+
+                            {(order.orderStatus?.toLowerCase() === "pending" ||
+                                order.orderStatus?.toLowerCase() === "confirmed") && (
+                                    <Button
+                                        variant="danger"
+                                        size="md"
+                                        onClick={handleCancelOrder}
+                                        className="w-full justify-center"
+                                    >
+                                        Cancel Order
+                                    </Button>
+                                )}
+                        </div>
                     </div>
                 )}
             </Modal.Body>

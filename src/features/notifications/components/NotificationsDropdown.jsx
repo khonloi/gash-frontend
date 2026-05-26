@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { Bell, Trash2, Settings, X } from "lucide-react";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
-import IconButton from "../../../components/ui/IconButton";
 import Dropdown from "../../../components/ui/Dropdown";
 import { useNavigate } from "react-router-dom";
 import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../../../utils/orderEmailNotification";
@@ -380,12 +379,17 @@ export default function NotificationsDropdown({ user }) {
   return (
     <Dropdown
       trigger={
-        <IconButton
+        <button
           title="Notifications"
-          badge={unreadCount > 0 ? unreadCount : undefined}
+          className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
         >
           <Bell className="w-5 h-5" />
-        </IconButton>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
+        </button>
       }
     >
       {({ close }) => (

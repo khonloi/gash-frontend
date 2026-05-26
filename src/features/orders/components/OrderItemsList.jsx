@@ -10,8 +10,8 @@ const OrderItemsList = ({
     handleEditFeedbackClick 
 }) => {
     return (
-        <div className="space-y-3">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h4>
+        <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-gray-900">Order Items</h4>
             {order.orderDetails && order.orderDetails.length > 0 ? (
                 order.orderDetails.map((d, index) => {
                     const feedbackKey = d.variant?._id || `item_${index}`;
@@ -24,7 +24,7 @@ const OrderItemsList = ({
                     return (
                         <article
                             key={d._id}
-                            className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
+                            className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
                             tabIndex={0}
                             aria-label={`Order Item: ${d.variant?.product?.name || "Product"}`}
                         >
@@ -54,7 +54,7 @@ const OrderItemsList = ({
                                         </p>
                                     </div>
                                     <p className="text-sm text-gray-600 m-0">Unit Price: {formatPrice(d.unitPrice)}</p>
-                                    <p className="text-base font-semibold text-red-600 m-0 mt-1">Total: {formatPrice(d.totalPrice)}</p>
+                                    <p className="text-base font-semibold text-red-600 m-0 mt-1">Total: {formatPrice(d.totalPrice || (d.quantity * d.unitPrice))}</p>
                                 </div>
                             </div>
                             {/* Quantity and Feedback Buttons */}

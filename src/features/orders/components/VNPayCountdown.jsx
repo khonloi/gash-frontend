@@ -7,7 +7,7 @@ const VNPayCountdown = ({ order, timeLeft, isVNPayExpired }) => {
     }
 
     return (
-        <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm">
+        <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex flex-col gap-2">
                     <h3 className="text-lg font-semibold text-gray-900">VNPay Payment</h3>

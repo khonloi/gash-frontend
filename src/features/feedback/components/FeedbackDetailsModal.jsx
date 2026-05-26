@@ -251,14 +251,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       <Modal
         isOpen={true}
         onClose={onClose}
-        maxWidth="max-w-3xl"
+        maxWidth="max-w-4xl"
         zIndex="z-50"
       >
         <Modal.Header>
           {hasFeedback ? "Feedback Details" : "Create Feedback"}
         </Modal.Header>
 
-        <Modal.Body className="space-y-6">
+        <Modal.Body className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Product & Order Information */}
           <div className="bg-gray-50 p-4 sm:p-5 rounded-xl border border-gray-200">
             <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">Product & Order Information</h4>

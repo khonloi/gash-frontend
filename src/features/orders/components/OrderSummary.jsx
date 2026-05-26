@@ -2,7 +2,7 @@ import React from 'react';
 
 const OrderSummary = ({ order, formatPrice }) => {
     return (
-        <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-6 transition-shadow hover:shadow-sm focus-within:shadow-sm">
+        <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm focus-within:shadow-sm">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h4>
             <div className="space-y-3">
                 {order.summary && (
@@ -19,6 +19,12 @@ const OrderSummary = ({ order, formatPrice }) => {
                     <div className="flex justify-between text-green-600 font-medium">
                         <span>Discount:</span>
                         <span>-{formatPrice(order.discountAmount)}</span>
+                    </div>
+                )}
+                {order.voucher && (
+                    <div className="flex justify-between text-blue-600 font-medium text-sm">
+                        <span>Voucher Applied:</span>
+                        <span>{order.voucher.code}</span>
                     </div>
                 )}
                 <hr className="border-gray-200" />
