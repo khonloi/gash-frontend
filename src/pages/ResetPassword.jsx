@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import Button from '../components/ui/Button';
+import Form from '../components/ui/Form';
+
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -91,6 +93,30 @@ const ResetPassword = () => {
     [formData, resetPassword, navigate, validateForm, showToast]
   );
 
+  const fields = [
+    {
+      name: 'newPassword',
+      label: 'New Password',
+      type: 'password',
+      required: true,
+      value: formData.newPassword,
+      onChange: handleChange,
+      placeholder: 'Enter new password',
+      inputProps: {
+        ref: passwordRef
+      }
+    },
+    {
+      name: 'repeatPassword',
+      label: 'Repeat Password',
+      type: 'password',
+      required: true,
+      value: formData.repeatPassword,
+      onChange: handleChange,
+      placeholder: 'Enter repeat password'
+    }
+  ];
+
   return (
     <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
@@ -102,43 +128,12 @@ const ResetPassword = () => {
           Enter a new password for {formData.email}
         </p>
 
-        <form
+        <Form
           onSubmit={handleSubmit}
-          className="space-y-4 sm:space-y-5"
-        >
-          {[
-            { id: 'newPassword', label: 'New Password', type: 'password', required: true },
-            { id: 'repeatPassword', label: 'Repeat Password', type: 'password', required: true },
-          ].map(({ id, label, type, required }) => (
-            <fieldset key={id} className="flex flex-col">
-              <label htmlFor={id} className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-                {label} <span className="text-red-600">*</span>
-              </label>
-              <input
-                id={id}
-                type={type}
-                name={id}
-                value={formData[id]}
-                onChange={handleChange}
-                ref={id === 'newPassword' ? passwordRef : null}
-                required={required}
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                aria-required={required}
-              />
-            </fieldset>
-          ))}
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            disabled={isLoading}
-            aria-busy={isLoading}
-            className="w-full"
-          >
-            {isLoading ? 'Resetting Password...' : 'Reset Password'}
-          </Button>
-        </form>
+          fields={fields}
+          submitText={isLoading ? 'Resetting Password...' : 'Reset Password'}
+          isLoading={isLoading}
+        />
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Remember your password?{' '}

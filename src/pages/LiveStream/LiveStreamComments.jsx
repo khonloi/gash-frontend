@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback, useContext } from 'rea
 import { Chat, Close, PushPin, Send, MoreVert } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import Form from '../../components/ui/Form';
+
 import io from 'socket.io-client';
 import { SOCKET_URL } from '../../common/axiosClient';
 import Api from '../../common/SummaryAPI';
@@ -32,17 +34,30 @@ const CommentInput = ({ onSendComment, isSending }) => {
 
     return (
         <div className="bg-gray-900/70 backdrop-blur-sm border-t border-gray-700/50 p-3">
-            <form onSubmit={handleSubmit} className="flex gap-2">
-                <input
-                    type="text"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Write a comment..."
-                    maxLength={maxLength}
-                    className="flex-1 bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-lg px-3 py-2 text-white text-xs placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 transition-all duration-300"
-                    disabled={isSending}
-                />
+            <Form
+                onSubmit={handleSubmit}
+                fields={[
+                    {
+                        name: 'commentText',
+                        render: () => (
+                            <input
+                                key="comment-input"
+                                type="text"
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="Write a comment..."
+                                maxLength={maxLength}
+                                className="flex-1 bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-lg px-3 py-2 text-white text-xs placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 transition-all duration-300"
+                                disabled={isSending}
+                            />
+                        )
+                    }
+                ]}
+                className="flex gap-2"
+                fieldsClassName="flex-1 flex gap-2"
+                showSubmitButton={false}
+            >
                 <button
                     type="submit"
                     disabled={!commentText.trim() || isSending}
@@ -54,7 +69,7 @@ const CommentInput = ({ onSendComment, isSending }) => {
                         <Send className="w-4 h-4" />
                     )}
                 </button>
-            </form>
+            </Form>
             <div className="flex justify-between items-center mt-2 text-[10px] text-gray-400">
                 <span className="text-gray-500">Press Enter to send</span>
                 <span className={`font-medium ${commentText.length > maxLength * 0.9 ? 'text-yellow-400' : 'text-gray-400'}`}>

@@ -2,6 +2,8 @@
 import React, { useState, useCallback } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import Button from "../components/ui/Button";
+import Form from "../components/ui/Form";
+
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -55,6 +57,53 @@ const Contact = () => {
     },
     [formData]
   );
+
+  const fields = [
+    {
+      name: 'name',
+      placeholder: 'Your Name',
+      type: 'text',
+      required: true,
+      value: formData.name,
+      onChange: handleInputChange,
+      inputProps: {
+        className: 'p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none'
+      }
+    },
+    {
+      name: 'email',
+      placeholder: 'Your Email',
+      type: 'email',
+      required: true,
+      value: formData.email,
+      onChange: handleInputChange,
+      inputProps: {
+        className: 'p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none'
+      }
+    },
+    {
+      name: 'phone',
+      placeholder: 'Your Phone (optional)',
+      type: 'tel',
+      value: formData.phone,
+      onChange: handleInputChange,
+      inputProps: {
+        className: 'p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none'
+      }
+    },
+    {
+      name: 'message',
+      placeholder: 'Your Message',
+      type: 'textarea',
+      required: true,
+      value: formData.message,
+      onChange: handleInputChange,
+      inputProps: {
+        rows: 6,
+        className: 'p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none resize-none'
+      }
+    }
+  ];
 
   return (
     <div className="page-container page-container-centered">
@@ -136,51 +185,18 @@ const Contact = () => {
             </h2>
             <div className="w-15 h-0.5 bg-amber-400 rounded mb-6"></div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Form
+              onSubmit={handleSubmit}
+              fields={fields}
+              className="flex flex-col gap-4"
+              fieldsClassName="flex flex-col gap-4"
+              showSubmitButton={false}
+            >
               {error && (
                 <div className="text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-3 sm:p-4 text-xs sm:text-sm">
                   {error}
                 </div>
               )}
-
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Your Email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-              />
-
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Your Phone (optional)"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-              />
-
-              <textarea
-                name="message"
-                placeholder="Your Message"
-                value={formData.message}
-                onChange={handleInputChange}
-                rows={6}
-                required
-                className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed resize-none"
-              ></textarea>
 
               <Button
                 type="submit"
@@ -191,7 +207,7 @@ const Contact = () => {
                 <Send size={18} />
                 Send Message
               </Button>
-            </form>
+            </Form>
           </main>
         </div>
       </section>

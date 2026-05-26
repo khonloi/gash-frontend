@@ -142,12 +142,12 @@ const ProductCard = ({
         </button>
       )}
 
-      <div className="h-1/2 overflow-hidden bg-gray-50 transition-transform duration-300 ease-in-out hover:scale-105">
+      <div className="h-1/2 overflow-hidden bg-gray-50">
         <img
           src={imageUrl}
           alt={product.productName || "Product image"}
           loading="lazy"
-          className="w-full h-full object-cover rounded-t-xl transition-transform duration-300 ease-in-out"
+          className="w-full h-full object-cover rounded-t-xl"
           onError={(e) => {
             e.target.src = "/placeholder-image.png";
             e.target.alt = `Image not available for ${product.productName || "product"}`;

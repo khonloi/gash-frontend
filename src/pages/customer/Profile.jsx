@@ -18,6 +18,8 @@ import Modal from "../../components/ui/Modal";
 import Input from "../../components/ui/Input";
 import PasswordInput from "../../components/ui/PasswordInput";
 import { useChangePassword } from "../../features/auth/hooks/useChangePassword";
+import Form from "../../components/ui/Form";
+
 
 
 const Profile = () => {
@@ -402,27 +404,49 @@ const LocalChangePasswordModal = ({ isOpen, handleCancel }) => {
     handleSubmit
   } = useChangePassword(handleCancel);
 
+  const changePasswordFields = [
+    {
+      name: "oldPassword",
+      label: "Current Password",
+      type: "password",
+      required: true,
+      value: form.oldPassword,
+      onChange: (e) => handleFieldChange("oldPassword", e.target.value),
+      error: validationErrors.oldPassword,
+      placeholder: "Enter current password",
+    },
+    {
+      name: "newPassword",
+      label: "New Password",
+      type: "password",
+      required: true,
+      value: form.newPassword,
+      onChange: (e) => handleFieldChange("newPassword", e.target.value),
+      error: validationErrors.newPassword,
+      placeholder: "Enter new password",
+    },
+    {
+      name: "repeatPassword",
+      label: "Confirm New Password",
+      type: "password",
+      required: true,
+      value: form.repeatPassword,
+      onChange: (e) => handleFieldChange("repeatPassword", e.target.value),
+      error: validationErrors.repeatPassword,
+      placeholder: "Enter confirm new password",
+    },
+  ];
+
   return (
     <Modal isOpen={isOpen} onClose={handleCancel}>
       <Modal.Header>Change Password</Modal.Header>
       <Modal.Body>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {[
-            { label: "Current Password", key: "oldPassword" },
-            { label: "New Password", key: "newPassword" },
-            { label: "Confirm New Password", key: "repeatPassword" },
-          ].map((field) => (
-            <PasswordInput
-              key={field.key}
-              label={field.label}
-              required
-              value={form[field.key]}
-              onChange={(e) => handleFieldChange(field.key, e.target.value)}
-              error={validationErrors[field.key]}
-              placeholder={`Enter ${field.label.toLowerCase()}`}
-            />
-          ))}
-        </form>
+        <Form
+          onSubmit={handleSubmit}
+          fields={changePasswordFields}
+          fieldsClassName="space-y-6"
+          showSubmitButton={false}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button
@@ -570,93 +594,124 @@ const LocalEditProfileModal = ({
     handleSubmit(e);
   }, [validateForm, handleSubmit, showToast]);
 
+  const editProfileColumns = [
+    {
+      className: "md:col-span-1 flex flex-col items-center justify-start pt-4",
+      fields: [
+        {
+          name: "image",
+          render: () => (
+            <React.Fragment key="profile-image-upload">
+              <div className="relative group">
+                <div className={`w-28 h-28 rounded-full p-1 bg-white border-2 ${validationErrors.image ? 'border-red-500' : 'border-gray-300 shadow-sm'}`}>
+                  <img
+                    src={previewUrl || formData.image || "https://via.placeholder.com/128x128?text=User"}
+                    alt="Preview"
+                    className="w-full h-full rounded-full object-cover"
+                    onError={(e) => { e.target.src = "https://via.placeholder.com/128x128?text=User"; }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="absolute bottom-0 right-0 w-9 h-9 bg-amber-500 text-white rounded-full flex items-center justify-center border-4 border-white shadow-lg hover:bg-amber-600 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Change Photo"
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg"
+                className="hidden"
+                onChange={(e) => {
+                  handleFileChange(e);
+                  if (e.target.files?.length > 0) {
+                    setValidationErrors(prev => {
+                      const next = { ...prev };
+                      delete next.image;
+                      return next;
+                    });
+                  }
+                }}
+              />
+              {validationErrors.image && (
+                <p className="mt-2 text-xs font-bold text-red-500 uppercase tracking-wider text-center">{validationErrors.image}</p>
+              )}
+            </React.Fragment>
+          )
+        }
+      ]
+    },
+    {
+      className: "md:col-span-2 space-y-6",
+      fields: [
+        {
+          name: "name",
+          label: "Full Name",
+          type: "text",
+          required: true,
+          value: formData.name ?? "",
+          onChange: (e) => handleFieldChange("name", e.target.value),
+          error: validationErrors.name,
+          leftIcon: <Tag className="w-5 h-5" />
+        },
+        {
+          name: "phone",
+          label: "Phone Number",
+          type: "text",
+          required: true,
+          value: formData.phone ?? "",
+          onChange: (e) => handleFieldChange("phone", e.target.value),
+          error: validationErrors.phone,
+          leftIcon: <Phone className="w-5 h-5" />
+        },
+        {
+          name: "address",
+          label: "Address",
+          type: "text",
+          required: true,
+          value: formData.address ?? "",
+          onChange: (e) => handleFieldChange("address", e.target.value),
+          error: validationErrors.address,
+          leftIcon: <MapPin className="w-5 h-5" />
+        },
+        {
+          name: "gender",
+          label: "Gender",
+          type: "select",
+          value: formData.gender ?? "",
+          onChange: (e) => handleFieldChange("gender", e.target.value),
+          error: validationErrors.gender,
+          placeholder: "Select Gender",
+          options: ["Male", "Female", "Other"],
+          leftIcon: <Users className="w-5 h-5" />
+        },
+        {
+          name: "dob",
+          label: "Date of Birth",
+          type: "date",
+          required: true,
+          value: formData.dob ?? "",
+          onChange: (e) => handleFieldChange("dob", e.target.value),
+          error: validationErrors.dob,
+          leftIcon: <Calendar className="w-5 h-5" />
+        }
+      ]
+    }
+  ];
+
   return (
     <Modal isOpen={isOpen} onClose={handleCancel} maxWidth="max-w-3xl">
       <Modal.Header>Update Profile</Modal.Header>
-      <Modal.Body className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 flex flex-col items-center justify-start pt-4">
-          <div className="relative group">
-            <div className={`w-28 h-28 rounded-full p-1 bg-white border-2 ${validationErrors.image ? 'border-red-500' : 'border-gray-300 shadow-sm'}`}>
-              <img
-                src={previewUrl || formData.image || "https://via.placeholder.com/128x128?text=User"}
-                alt="Preview"
-                className="w-full h-full rounded-full object-cover"
-                onError={(e) => { e.target.src = "https://via.placeholder.com/128x128?text=User"; }}
-              />
-            </div>
-            <button
-              type="button"
-              className="absolute bottom-0 right-0 w-9 h-9 bg-amber-500 text-white rounded-full flex items-center justify-center border-4 border-white shadow-lg hover:bg-amber-600 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-              title="Change Photo"
-            >
-              <Camera className="w-4 h-4" />
-            </button>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/jpg"
-            className="hidden"
-            onChange={(e) => {
-              handleFileChange(e);
-              if (e.target.files?.length > 0) {
-                setValidationErrors(prev => {
-                  const next = { ...prev };
-                  delete next.image;
-                  return next;
-                });
-              }
-            }}
-          />
-          {validationErrors.image && (
-            <p className="mt-2 text-xs font-bold text-red-500 uppercase tracking-wider text-center">{validationErrors.image}</p>
-          )}
-        </div>
-
-        <form onSubmit={handleSubmitWithValidation} className="md:col-span-2 space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            {[
-              { label: "Full Name", type: "text", key: "name", required: true, icon: Tag },
-              { label: "Phone Number", type: "text", key: "phone", required: true, icon: Phone },
-              { label: "Address", type: "text", key: "address", required: true, icon: MapPin },
-              { label: "Gender", type: "select", key: "gender", options: ["Male", "Female", "Other"], icon: Users },
-              { label: "Date of Birth", type: "date", key: "dob", required: true, icon: Calendar },
-            ].map((field) => (
-              <div key={field.key}>
-                {field.type === "select" ? (
-                  <div className="w-full relative">
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-                      {field.label}
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                        <field.icon className="w-5 h-5" />
-                      </div>
-                      <select
-                        value={formData[field.key] ?? ""}
-                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                        className={`w-full pl-11 pr-4 py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none appearance-none ${validationErrors[field.key] ? 'border-red-500 bg-red-50/30' : 'border-gray-300 focus:border-amber-400 focus:bg-white'}`}
-                      >
-                        {field.options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                ) : (
-                  <Input
-                    label={field.label}
-                    type={field.type}
-                    required={field.required}
-                    value={formData[field.key] ?? ""}
-                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                    error={validationErrors[field.key]}
-                    leftIcon={<field.icon className="w-5 h-5" />}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </form>
+      <Modal.Body>
+        <Form
+          onSubmit={handleSubmitWithValidation}
+          columns={editProfileColumns}
+          gridClassName="grid grid-cols-1 md:grid-cols-3 gap-6"
+          showSubmitButton={false}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button

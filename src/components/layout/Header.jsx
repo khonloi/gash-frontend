@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import NotificationsDropdown from "../../features/notifications/components/NotificationsDropdown";
+import Form from "../ui/Form";
 
 
 
@@ -71,9 +72,10 @@ export default function Header() {
                 <div className="flex w-full items-center justify-between sm:hidden">
                     {mobileSearchOpen ? (
                         <div className="relative w-full">
-                            <form
+                            <Form
                                 onSubmit={handleSearchSubmit}
                                 className="flex items-center w-full bg-white rounded-full shadow-sm border border-gray-200 overflow-hidden relative"
+                                showSubmitButton={false}
                             >
                                 <input
                                     type="text"
@@ -109,7 +111,7 @@ export default function Header() {
                                         <CloseIcon fontSize="small" />
                                     </button>
                                 )}
-                            </form>
+                            </Form>
                             {showDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
                                 border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
@@ -300,9 +302,10 @@ export default function Header() {
                         <img src={gashLogo} alt="GASH Logo" className="h-6 md:h-7" />
                     </Link>
                     <div className="relative flex-1 mx-4 sm:mx-6 md:mx-8 lg:mx-12 max-w-2xl" ref={dropdownRef}>
-                        <form
+                        <Form
                             onSubmit={handleSearchSubmit}
                             className="flex items-center w-full bg-white rounded-full shadow-sm border border-gray-200 overflow-hidden"
+                            showSubmitButton={false}
                         >
                             <input
                                 type="text"
@@ -316,7 +319,7 @@ export default function Header() {
                             <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500 transition-colors duration-200 ease-in-out">
                                 <SearchIcon fontSize="small" />
                             </button>
-                        </form>
+                        </Form>
                         {showDropdown && (
                             <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out] max-h-96 overflow-y-auto">
                                 {loading ? (
@@ -373,33 +376,33 @@ export default function Header() {
                     <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
                             <button
-                                    onClick={handleLiveStreamClick}
-                                    title="Live Stream"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
-                                >
-                                    <TvOutlinedIcon />
-                                    {livestreamCount > 0 && (
-                                        <span className={`${badgeClass} -top-1 -right-1`}>
-                                            {livestreamCount}
-                                        </span>
-                                    )}
-                                </button>
+                                onClick={handleLiveStreamClick}
+                                title="Live Stream"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
+                            >
+                                <TvOutlinedIcon />
+                                {livestreamCount > 0 && (
+                                    <span className={`${badgeClass} -top-1 -right-1`}>
+                                        {livestreamCount}
+                                    </span>
+                                )}
+                            </button>
                         </div>
                         <div className="relative">
                             <button
-                                    onClick={() => {
-                                        user ? navigate("/cart") : navigate("/login");
-                                    }}
-                                    title="Cart"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
-                                >
-                                    <ShoppingBagOutlinedIcon />
-                                    {cartItemCount > 0 && (
-                                        <span className={`${badgeClass} -top-1 -right-1`}>
-                                            {cartItemCount}
-                                        </span>
-                                    )}
-                                </button>
+                                onClick={() => {
+                                    user ? navigate("/cart") : navigate("/login");
+                                }}
+                                title="Cart"
+                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
+                            >
+                                <ShoppingBagOutlinedIcon />
+                                {cartItemCount > 0 && (
+                                    <span className={`${badgeClass} -top-1 -right-1`}>
+                                        {cartItemCount}
+                                    </span>
+                                )}
+                            </button>
                         </div>
                         {user ? (
                             <div className="relative">

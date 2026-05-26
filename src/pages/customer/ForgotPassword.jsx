@@ -4,6 +4,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../hooks/useToast';
 import emailjs from '@emailjs/browser';
 import Button from '../../components/ui/Button';
+import Form from '../../components/ui/Form';
+
 
 // Initialize EmailJS with Public API Key
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -96,6 +98,21 @@ const ForgotPassword = () => {
     [email, requestSignupOTP, navigate, validateEmail, showToast]
   );
 
+  const fields = [
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+      required: true,
+      value: email,
+      onChange: handleChange,
+      placeholder: 'Enter your email',
+      inputProps: {
+        ref: emailRef
+      }
+    }
+  ];
+
   return (
     <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
@@ -107,42 +124,13 @@ const ForgotPassword = () => {
           Enter your email address to receive a password reset OTP.
         </p>
 
-        <form
+        <Form
           onSubmit={handleSubmit}
+          fields={fields}
+          submitText={isLoading ? 'Sending OTP...' : 'Continue'}
+          isLoading={isLoading}
           aria-label="Forgot Password form"
-          className="space-y-4 sm:space-y-5"
-        >
-          <fieldset className="flex flex-col">
-            <label htmlFor="email" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-              Email <span className="text-red-600">*</span>
-            </label>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              ref={emailRef}
-              required
-              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-              aria-required="true"
-              placeholder="Enter your email"
-            />
-          </fieldset>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            disabled={isLoading}
-            aria-busy={isLoading}
-            className="w-full"
-          >
-            <span aria-live="polite">
-              {isLoading ? 'Sending OTP...' : 'Continue'}
-            </span>
-          </Button>
-        </form>
+        />
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Remember your password?{' '}

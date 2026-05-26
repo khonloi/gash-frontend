@@ -2,6 +2,8 @@ import React, { useState, useCallback, useContext } from 'react';
 import OrderSuccessModal from '../../features/orders/components/OrderSuccessModal';
 import LoadingSpinner, { LoadingButton } from '../../components/ui/LoadingSpinner';
 import Button from '../../components/ui/Button';
+import Form from '../../components/ui/Form';
+
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import { useCheckout } from '../../features/orders/hooks/useCheckout';
@@ -42,6 +44,108 @@ const Checkout = () => {
     clearCheckoutData,
     setIsAuthenticated
   } = useCheckout();
+
+  const checkoutFields = [
+    {
+      type: 'fieldset',
+      legend: 'Shipping Information',
+      className: 'border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-4',
+      fields: [
+        {
+          name: 'name',
+          label: 'Recipient Name',
+          type: 'text',
+          required: true,
+          value: formData.name,
+          onChange: handleInputChange,
+          inputProps: {
+            onBlur: handleFieldBlur,
+            disabled: loading,
+            placeholder: 'Your recipient name',
+            className: 'w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50'
+          }
+        },
+        {
+          name: 'addressReceive',
+          label: 'Delivery Address',
+          type: 'text',
+          required: true,
+          value: formData.addressReceive,
+          onChange: handleInputChange,
+          inputProps: {
+            onBlur: handleFieldBlur,
+            disabled: loading,
+            placeholder: 'Your delivery address',
+            className: 'w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50'
+          }
+        },
+        {
+          name: 'phone',
+          label: 'Phone Number',
+          type: 'tel',
+          required: true,
+          value: formData.phone,
+          onChange: handleInputChange,
+          inputProps: {
+            onBlur: handleFieldBlur,
+            disabled: loading,
+            placeholder: 'Your phone number',
+            className: 'w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50'
+          }
+        }
+      ]
+    },
+    {
+      type: 'fieldset',
+      legend: 'Payment Method',
+      className: 'border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-3',
+      renderBody: () => (
+        <div key="payment-methods" className="space-y-3">
+          <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="COD"
+              checked={paymentMethod === 'COD'}
+              onChange={handlePaymentMethodChange}
+              className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
+              disabled={loading}
+            />
+            <div className="ml-3 flex items-center gap-3 flex-1">
+              <div className="p-2 bg-blue-100 text-blue-600 rounded-lg flex-shrink-0">
+                <LocalAtmOutlinedIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
+                <p className="text-xs text-gray-500">Pay when you receive the order</p>
+              </div>
+            </div>
+          </label>
+
+          <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="VNPAY"
+              checked={paymentMethod === 'VNPAY'}
+              onChange={handlePaymentMethodChange}
+              className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
+              disabled={loading}
+            />
+            <div className="ml-3 flex items-center gap-3 flex-1">
+              <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg flex-shrink-0">
+                <AccountBalanceOutlinedIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-900">VNPay (Bank Transfer)</span>
+                <p className="text-xs text-gray-500">Pay online with VNPay</p>
+              </div>
+            </div>
+          </label>
+        </div>
+      )
+    }
+  ];
 
   return (
     <div className="flex flex-col items-center w-full max-w-7xl mx-auto my-3 sm:my-4 md:my-5 p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
@@ -195,111 +299,12 @@ const Checkout = () => {
                 </div>
               </div>
             )}
-            <form onSubmit={handlePlaceOrder} className="space-y-6">
-              {/* Shipping Information */}
-              <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-4">
-                <legend className="text-sm sm:text-base font-semibold m-0">Shipping Information</legend>
-
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Recipient Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    onBlur={handleFieldBlur}
-                    placeholder="Your recipient name"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="addressReceive" className="block text-sm font-medium text-gray-700 mb-2">
-                    Delivery Address
-                  </label>
-                  <input
-                    type="text"
-                    id="addressReceive"
-                    name="addressReceive"
-                    value={formData.addressReceive}
-                    onChange={handleInputChange}
-                    onBlur={handleFieldBlur}
-                    placeholder="Your delivery address"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    onBlur={handleFieldBlur}
-                    placeholder="Your phone number"
-                    className="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={loading}
-                  />
-                </div>
-              </fieldset>
-
-              {/* Payment Method */}
-              <fieldset className="border-2 border-gray-300 rounded-xl p-3 sm:p-4 space-y-3">
-                <legend className="text-sm sm:text-base font-semibold m-0">Payment Method</legend>
-                <div className="space-y-3">
-                  <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="COD"
-                      checked={paymentMethod === 'COD'}
-                      onChange={handlePaymentMethodChange}
-                      className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
-                      disabled={loading}
-                    />
-                    <div className="ml-3 flex items-center gap-3 flex-1">
-                      <div className="p-2 bg-blue-100 text-blue-600 rounded-lg flex-shrink-0">
-                        <LocalAtmOutlinedIcon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
-                        <p className="text-xs text-gray-500">Pay when you receive the order</p>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label className={`flex items-center p-3 sm:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="VNPAY"
-                      checked={paymentMethod === 'VNPAY'}
-                      onChange={handlePaymentMethodChange}
-                      className="w-4 h-4 accent-amber-400 border-gray-300 focus:ring-blue-600"
-                      disabled={loading}
-                    />
-                    <div className="ml-3 flex items-center gap-3 flex-1">
-                      <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg flex-shrink-0">
-                        <AccountBalanceOutlinedIcon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-900">VNPay (Bank Transfer)</span>
-                        <p className="text-xs text-gray-500">Pay online with VNPay</p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </fieldset>
-
+            <Form
+              onSubmit={handlePlaceOrder}
+              fields={checkoutFields}
+              fieldsClassName="space-y-6"
+              showSubmitButton={false}
+            >
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">
                 <Button
@@ -330,7 +335,7 @@ const Checkout = () => {
                   </Button>
                 )}
               </div>
-            </form>
+            </Form>
           </section>
         )}
       </div>

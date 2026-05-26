@@ -5,6 +5,8 @@ import { AuthContext } from "../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../constants/constants";
 import Button from "../components/ui/Button";
+import Form from "../components/ui/Form";
+
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -119,6 +121,30 @@ const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
+  const fields = [
+    {
+      name: 'username',
+      label: 'Username',
+      type: 'text',
+      required: true,
+      value: formData.username,
+      onChange: handleInputChange,
+      placeholder: 'Enter your username',
+      inputProps: {
+        ref: usernameRef
+      }
+    },
+    {
+      name: 'password',
+      label: 'Password',
+      type: 'password',
+      required: true,
+      value: formData.password,
+      onChange: handleInputChange,
+      placeholder: 'Enter your password'
+    }
+  ];
+
   return (
     <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
       <section className="bg-white rounded-xl w-full max-w-sm md:max-w-4xl shadow-sm border border-gray-200 overflow-hidden">
@@ -129,47 +155,14 @@ const Login = () => {
               Sign In
             </h1>
 
-            <form
+            <Form
               onSubmit={handleSubmit}
+              fields={fields}
+              submitText={isLoading ? "Signing In..." : "Sign In"}
+              isLoading={isLoading}
               role="form"
               aria-label="Sign in form"
-              className="space-y-4 sm:space-y-5"
             >
-              <fieldset className="flex flex-col">
-                <label htmlFor="username" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-                  Username <span className="text-red-600">*</span>
-                </label>
-                <input
-                  id="username"
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  ref={usernameRef}
-                  required
-                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  aria-required="true"
-                  placeholder="Enter your username"
-                />
-              </fieldset>
-
-              <fieldset className="flex flex-col">
-                <label htmlFor="password" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-                  Password <span className="text-red-600">*</span>
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  className="p-3 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  aria-required="true"
-                  placeholder="Enter your password"
-                />
-              </fieldset>
-
               <div className="text-right">
                 <Link
                   to="/forgot-password"
@@ -178,20 +171,7 @@ const Login = () => {
                   Forgot Password?
                 </Link>
               </div>
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                disabled={isLoading}
-                aria-busy={isLoading}
-                className="w-full py-3.5"
-              >
-                <span aria-live="polite">
-                  {isLoading ? "Signing In..." : "Sign In"}
-                </span>
-              </Button>
-            </form>
+            </Form>
           </div>
 
           {/* Part 2: Login Options */}

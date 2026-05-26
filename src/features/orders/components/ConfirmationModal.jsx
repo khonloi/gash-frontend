@@ -1,4 +1,5 @@
 import React from "react";
+import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 
 /**
@@ -22,66 +23,35 @@ const ConfirmationModal = ({
   onConfirm,
   onCancel,
 }) => {
-  // Hooks
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handleEscape = (e) => {
-      if (e.key === "Escape") {
-        onCancel();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
-  // Handle backdrop click
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onCancel();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-[70] p-4"
-      onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
-      <div 
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 max-w-md w-full"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 id="modal-title" className="text-lg font-semibold text-gray-900 mb-4">
-          {title}
-        </h3>
-        <p id="modal-description" className="text-gray-600 mb-6">
+    <Modal isOpen={isOpen} onClose={onCancel} maxWidth="max-w-md" zIndex="z-[120]">
+      <Modal.Header showClose={true}>
+        {title}
+      </Modal.Header>
+      <Modal.Body>
+        <p className="text-gray-600 leading-relaxed text-sm sm:text-base m-0">
           {message}
         </p>
-        <div className="flex gap-3 justify-end">
-          <Button
-            variant="secondary"
-            size="md"
-            onClick={onCancel}
-            aria-label={cancelText}
-          >
-            {cancelText}
-          </Button>
-          <Button
-            variant={variant}
-            size="md"
-            onClick={onConfirm}
-            aria-label={confirmText}
-          >
-            {confirmText}
-          </Button>
-        </div>
-      </div>
-    </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="secondary"
+          size="md"
+          onClick={onCancel}
+          aria-label={cancelText}
+        >
+          {cancelText}
+        </Button>
+        <Button
+          variant={variant}
+          size="md"
+          onClick={onConfirm}
+          aria-label={confirmText}
+        >
+          {confirmText}
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

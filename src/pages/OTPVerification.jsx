@@ -4,6 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import emailjs from '@emailjs/browser';
 import Button from '../components/ui/Button';
+import Form from '../components/ui/Form';
+
 
 // Initialize EmailJS with Public API Key
 if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
@@ -128,6 +130,23 @@ const OTPVerification = () => {
     [email, formData, type, verifyOTP, showToast]
   );
 
+  const fields = [
+    {
+      name: 'otp',
+      label: 'OTP',
+      type: 'text',
+      required: true,
+      value: otp,
+      onChange: handleInputChange,
+      placeholder: '000000',
+      inputProps: {
+        ref: otpRef,
+        maxLength: 6,
+        className: 'text-center text-2xl tracking-widest'
+      }
+    }
+  ];
+
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto min-h-[calc(100vh-6rem)] p-3 sm:p-4 md:p-5 lg:p-6 text-gray-900">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
@@ -140,40 +159,12 @@ const OTPVerification = () => {
           {type === 'forgot-password' ? 'reset your password' : 'verify your email'}.
         </p>
 
-        <form
+        <Form
           onSubmit={handleSubmit}
-          className="space-y-4 sm:space-y-5"
-        >
-          <fieldset className="flex flex-col">
-            <label htmlFor="otp" className="text-sm sm:text-base font-semibold mb-2 text-gray-900">
-              OTP <span className="text-red-600">*</span>
-            </label>
-            <input
-              id="otp"
-              type="text"
-              name="otp"
-              value={otp}
-              onChange={handleInputChange}
-              ref={otpRef}
-              required
-              maxLength={6}
-              className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-center text-2xl tracking-widest"
-              aria-required="true"
-              placeholder="000000"
-            />
-          </fieldset>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            disabled={isLoading}
-            aria-busy={isLoading}
-            className="w-full"
-          >
-            {isLoading ? 'Verifying...' : 'Verify OTP'}
-          </Button>
-        </form>
+          fields={fields}
+          submitText={isLoading ? 'Verifying...' : 'Verify OTP'}
+          isLoading={isLoading}
+        />
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Didn't receive an OTP?{' '}
