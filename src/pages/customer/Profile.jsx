@@ -12,10 +12,13 @@ import { useToast } from "../../hooks/useToast";
 import { startRegistration } from "@simplewebauthn/browser";
 
 import { useProfile } from "../../features/auth/hooks/useProfile";
-import EditProfileModal from "../../features/auth/components/EditProfileModal";
-import ChangePasswordModal from "../../features/auth/components/ChangePasswordModal";
 import ProductButton from "../../components/ui/ProductButton";
-import { User, Tag, Mail, Phone, Users, Calendar, MapPin, Key } from "lucide-react";
+import { User, Tag, Mail, Phone, Users, Calendar, MapPin, Key, Camera } from "lucide-react";
+import Modal from "../../components/ui/Modal";
+import Input from "../../components/ui/Input";
+import PasswordInput from "../../components/ui/PasswordInput";
+import { useChangePassword } from "../../features/auth/hooks/useChangePassword";
+
 
 const Profile = () => {
     const {
@@ -306,24 +309,24 @@ const Profile = () => {
         )}
 
         {/* Modal Update Profile */}
-        {editMode && (
-          <EditProfileModal
-            formData={formData}
-            setFormData={setFormData}
-            previewUrl={previewUrl}
-            handleFileChange={handleFileChange}
-            handleSubmit={handleSubmit}
-            handleCancel={handleCancel}
-            selectedFile={selectedFile}
-            profile={profile}
-            loading={loading}
-          />
-        )}
+        <LocalEditProfileModal
+          isOpen={editMode}
+          formData={formData}
+          setFormData={setFormData}
+          previewUrl={previewUrl}
+          handleFileChange={handleFileChange}
+          handleSubmit={handleSubmit}
+          handleCancel={handleCancel}
+          selectedFile={selectedFile}
+          profile={profile}
+          loading={loading}
+        />
 
         {/* Modal Change Password */}
-        {showChangePassword && (
-          <ChangePasswordModal handleCancel={() => setShowChangePassword(false)} />
-        )}
+        <LocalChangePasswordModal
+          isOpen={showChangePassword}
+          handleCancel={() => setShowChangePassword(false)}
+        />
 
         {/* Modal Delete Confirmation */}
         {showDeleteConfirm && (
@@ -387,6 +390,300 @@ const Profile = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const LocalChangePasswordModal = ({ isOpen, handleCancel }) => {
+  const {
+    form,
+    loading,
+    validationErrors,
+    handleFieldChange,
+    handleSubmit
+  } = useChangePassword(handleCancel);
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleCancel}>
+      <Modal.Header>Change Password</Modal.Header>
+      <Modal.Body>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {[
+            { label: "Current Password", key: "oldPassword" },
+            { label: "New Password", key: "newPassword" },
+            { label: "Confirm New Password", key: "repeatPassword" },
+          ].map((field) => (
+            <PasswordInput
+              key={field.key}
+              label={field.label}
+              required
+              value={form[field.key]}
+              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              error={validationErrors[field.key]}
+              placeholder={`Enter ${field.label.toLowerCase()}`}
+            />
+          ))}
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
+        <ProductButton
+          variant="secondary"
+          onClick={handleCancel}
+          disabled={loading}
+          className="px-6 py-2.5"
+        >
+          Cancel
+        </ProductButton>
+        <ProductButton
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={loading}
+          className="px-8 py-2.5 min-w-[120px] justify-center"
+        >
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Updating...</span>
+            </div>
+          ) : (
+            'Update Password'
+          )}
+        </ProductButton>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+const LocalEditProfileModal = ({
+  isOpen,
+  formData,
+  setFormData,
+  previewUrl,
+  handleFileChange,
+  handleSubmit,
+  handleCancel,
+  selectedFile,
+  profile,
+  loading,
+}) => {
+  const { showToast } = useToast();
+  const fileInputRef = useRef(null);
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const validateField = useCallback((name, value, currentFormData = formData) => {
+    switch (name) {
+      case 'name': {
+        if (!value || value.trim() === '') return 'Please fill in all required fields';
+        const trimmedName = value.trim();
+        if (trimmedName.length > 50) {
+          return 'Name must be at most 50 characters';
+        }
+        if (!/^[\p{L}\s]+$/u.test(trimmedName)) {
+          return 'Name must contain only letters and spaces';
+        }
+        return null;
+      }
+      case 'phone': {
+        if (!value || value.trim() === '') return 'Please fill in all required fields';
+        if (!/^\d{10}$/.test(value.trim())) {
+          return 'Phone must be exactly 10 digits';
+        }
+        return null;
+      }
+      case 'address': {
+        if (!value || value.trim() === '') return 'Please fill in all required fields';
+        const trimmedAddress = value.trim();
+        if (trimmedAddress.length > 200) {
+          return 'Address must be at most 200 characters';
+        }
+        return null;
+      }
+      case 'dob': {
+        if (!value || value.trim() === '') return 'Please fill in all required fields';
+        return null;
+      }
+      case 'image': {
+        const hasImage = Boolean(currentFormData.image?.trim() || selectedFile || profile?.image);
+        if (!hasImage) return 'Please fill in all required fields';
+        if (currentFormData.image?.trim() && !selectedFile) {
+          const imageUrl = currentFormData.image.trim().toLowerCase();
+          if (!imageUrl.match(/\.(png|jpg|jpeg)$/i) && !imageUrl.startsWith('data:image/')) {
+            return 'Please select a valid image type';
+          }
+        }
+        if (selectedFile) {
+          const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+          if (!validTypes.includes(selectedFile.type.toLowerCase())) {
+            return 'Please select a valid image type';
+          }
+        }
+        return null;
+      }
+      default:
+        return null;
+    }
+  }, [formData, selectedFile, profile]);
+
+  const validateForm = useCallback(() => {
+    const errors = {};
+    const nameError = validateField('name', formData.name);
+    if (nameError) errors.name = nameError;
+
+    const phoneError = validateField('phone', formData.phone);
+    if (phoneError) errors.phone = phoneError;
+
+    const addressError = validateField('address', formData.address);
+    if (addressError) errors.address = addressError;
+
+    const dobError = validateField('dob', formData.dob);
+    if (dobError) errors.dob = dobError;
+
+    const imageError = validateField('image', formData.image);
+    if (imageError) errors.image = imageError;
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [formData, validateField]);
+
+  const handleFieldChange = useCallback((field, value) => {
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      const error = validateField(field, value, updated);
+      setValidationErrors(prevErrors => {
+        const newErrors = { ...prevErrors };
+        if (error) {
+          newErrors[field] = error;
+        } else {
+          delete newErrors[field];
+        }
+        return newErrors;
+      });
+      return updated;
+    });
+  }, [validateField, setFormData]);
+
+  const handleSubmitWithValidation = useCallback((e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      showToast('Please check the input fields again', 'error');
+      return;
+    }
+    handleSubmit(e);
+  }, [validateForm, handleSubmit, showToast]);
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleCancel} maxWidth="max-w-lg">
+      <Modal.Header>Update Profile</Modal.Header>
+      <Modal.Body>
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative group">
+            <div className={`w-28 h-28 rounded-full p-1 bg-white border-2 ${validationErrors.image ? 'border-red-500' : 'border-gray-300 shadow-sm'}`}>
+              <img
+                src={previewUrl || formData.image || "https://via.placeholder.com/128x128?text=User"}
+                alt="Preview"
+                className="w-full h-full rounded-full object-cover"
+                onError={(e) => { e.target.src = "https://via.placeholder.com/128x128?text=User"; }}
+              />
+            </div>
+            <button
+              type="button"
+              className="absolute bottom-0 right-0 w-9 h-9 bg-amber-500 text-white rounded-full flex items-center justify-center border-4 border-white shadow-lg hover:bg-amber-600 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+              title="Change Photo"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg"
+            className="hidden"
+            onChange={(e) => {
+              handleFileChange(e);
+              if (e.target.files?.length > 0) {
+                setValidationErrors(prev => {
+                  const next = { ...prev };
+                  delete next.image;
+                  return next;
+                });
+              }
+            }}
+          />
+          {validationErrors.image && (
+            <p className="mt-2 text-xs font-bold text-red-500 uppercase tracking-wider">{validationErrors.image}</p>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmitWithValidation} className="space-y-6">
+          <div className="grid grid-cols-1 gap-6">
+            {[
+              { label: "Full Name", type: "text", key: "name", required: true, icon: Tag },
+              { label: "Phone Number", type: "text", key: "phone", required: true, icon: Phone },
+              { label: "Address", type: "text", key: "address", required: true, icon: MapPin },
+              { label: "Gender", type: "select", key: "gender", options: ["Male", "Female", "Other"], icon: Users },
+              { label: "Date of Birth", type: "date", key: "dob", required: true, icon: Calendar },
+            ].map((field) => (
+              <div key={field.key}>
+                {field.type === "select" ? (
+                  <div className="w-full relative">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                      {field.label}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        <field.icon className="w-5 h-5" />
+                      </div>
+                      <select
+                        value={formData[field.key] ?? ""}
+                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        className={`w-full pl-11 pr-4 py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none appearance-none ${validationErrors[field.key] ? 'border-red-500 bg-red-50/30' : 'border-gray-300 focus:border-amber-400 focus:bg-white'}`}
+                      >
+                        {field.options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <Input
+                    label={field.label}
+                    type={field.type}
+                    required={field.required}
+                    value={formData[field.key] ?? ""}
+                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                    error={validationErrors[field.key]}
+                    leftIcon={<field.icon className="w-5 h-5" />}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
+        <ProductButton
+          variant="secondary"
+          onClick={handleCancel}
+          disabled={loading}
+          className="px-6 py-2.5"
+        >
+          Cancel
+        </ProductButton>
+        <ProductButton
+          variant="primary"
+          onClick={handleSubmitWithValidation}
+          disabled={loading}
+          className="px-8 py-2.5 min-w-[120px] justify-center"
+        >
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Saving...</span>
+            </div>
+          ) : (
+            'Save Changes'
+          )}
+        </ProductButton>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Api from "../../../common/SummaryAPI";
 import ProductButton from "../../../components/ui/ProductButton";
+import Input from "../../../components/ui/Input";
 
 
 export default function ApplyVoucherForm() {
@@ -25,17 +26,18 @@ export default function ApplyVoucherForm() {
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-xl p-5 mt-8">
       <h3 className="text-lg font-semibold mb-3">Nhập mã giảm giá</h3>
-      <div className="flex gap-2">
-        <input
+      <div className="flex gap-2 items-end">
+        <Input
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Nhập mã voucher..."
-          className="flex-grow border p-2 rounded-lg"
+          className="flex-grow"
         />
         <ProductButton
           variant="primary"
           size="md"
           onClick={handleApply}
+          className="h-[52px] shrink-0"
         >
           Áp dụng
         </ProductButton>

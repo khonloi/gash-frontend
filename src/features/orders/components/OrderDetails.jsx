@@ -13,6 +13,9 @@ import OrderCustomerInfo from "./OrderCustomerInfo";
 import OrderSummary from "./OrderSummary";
 import OrderItemsList from "./OrderItemsList";
 import { getStatusBadge } from "../utils/orderUtils";
+import Modal from "../../../components/ui/Modal";
+import TextArea from "../../../components/ui/TextArea";
+
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
     const navigate = useNavigate();
@@ -106,21 +109,34 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     };
 
     return (
-        <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={onClose}
-        >
-            <div
-                className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-3xl max-h-[85vh] overflow-y-auto relative"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors focus:outline-none rounded"
-                >
-                    ×
-                </button>
+        <Modal isOpen={true} onClose={onClose} maxWidth="max-w-3xl" zIndex="z-50">
+            <Modal.Header>
+                <div className="flex justify-between items-center w-full pr-6">
+                    <h2 className="text-xl sm:text-2xl font-normal text-gray-900">
+                        {loading ? "Loading..." : order ? `Order #${order._id}` : "Order Details"}
+                    </h2>
+                    {/* View Bill button in header - only show if order is paid */}
+                    {!loading && order?.payStatus?.toLowerCase() === 'paid' && (
+                        <ProductButton
+                            variant="default"
+                            size="md"
+                            onClick={() => {
+                                onClose(); // Close the modal first
+                                navigate(`/bills/${orderId}`); // Then navigate to bill
+                            }}
+                            title="View Bill"
+                            className="text-green-600 flex items-center gap-2"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            View Bill
+                        </ProductButton>
+                    )}
+                </div>
+            </Modal.Header>
 
+            <Modal.Body>
                 {loading ? (
                     <LoadingForm text="Loading order details..." height="h-64" size="lg" />
                 ) : !order ? (
@@ -134,31 +150,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         <p className="text-gray-400 text-sm mt-2">The order you're looking for doesn't exist or has been removed</p>
                     </div>
                 ) : (
-                    <div className="p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl sm:text-2xl font-normal text-gray-900">
-                                Order #{order._id}
-                            </h2>
-                            {/* View Bill button in header - only show if order is paid */}
-                            {order.payStatus?.toLowerCase() === 'paid' && (
-                                <ProductButton
-                                    variant="default"
-                                    size="md"
-                                    onClick={() => {
-                                        onClose(); // Close the modal first
-                                        navigate(`/bills/${orderId}`); // Then navigate to bill
-                                    }}
-                                    title="View Bill"
-                                    className="text-green-600 flex items-center gap-2"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    View Bill
-                                </ProductButton>
-                            )}
-                        </div>
-
+                    <div className="space-y-6">
                         {/* Order Status Card */}
                         <OrderStatusCard order={order} />
 
@@ -183,7 +175,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
                         {/* Refund Card */}
                         {order.refundStatus && order.refundStatus !== "not_applicable" && (
-                            <div className="mt-6 bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm">
+                            <div className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 transition-shadow hover:shadow-sm">
                                 <h4 className="font-semibold text-gray-700 mb-3">Refund Information</h4>
                                 <div className="flex items-center gap-3 mb-3">
                                     <span className="text-gray-600 font-medium">Status:</span>
@@ -202,7 +194,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
                         {/* Order Feedback */}
                         {order.feedback_order && (
-                            <div className="mt-4 p-4 sm:p-5 bg-blue-50 rounded-xl border border-blue-200">
+                            <div className="p-4 sm:p-5 bg-blue-50 rounded-xl border border-blue-200">
                                 <h4 className="font-semibold text-blue-700 mb-2">Order Feedback</h4>
                                 <p className="text-gray-700">{order.feedback_order}</p>
                             </div>
@@ -221,7 +213,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                             )}
                     </div>
                 )}
-            </div>
+            </Modal.Body>
 
             {/* Image Modal */}
             <ImageModal
@@ -231,21 +223,11 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             {/* View Feedback Modal */}
             {showViewFeedbackModal && (
-                <div
-                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4"
-                    onClick={() => setShowViewFeedbackModal(false)}
-                >
-                    <div
-                        className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-6 relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setShowViewFeedbackModal(false)}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
-                        >
-                            ×
-                        </button>
-                        <h3 className="text-xl font-semibold mb-4">Feedback for {selectedProductName}</h3>
+                <Modal isOpen={true} onClose={() => setShowViewFeedbackModal(false)} zIndex="z-[60]" maxWidth="max-w-md">
+                    <Modal.Header>
+                        Feedback for {selectedProductName}
+                    </Modal.Header>
+                    <Modal.Body>
                         {existingFeedbacks[selectedVariantId] ? (
                             <div className="space-y-3">
                                 {existingFeedbacks[selectedVariantId].has_rating && existingFeedbacks[selectedVariantId].rating > 0 && (
@@ -269,8 +251,8 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                         ) : (
                             <p className="text-gray-600">No feedback provided yet.</p>
                         )}
-                    </div>
-                </div>
+                    </Modal.Body>
+                </Modal>
             )}
 
             {/* Edit Feedback Modal */}
@@ -293,24 +275,12 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             {/* Confirmation Modal */}
             {showConfirmModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-                    <div
-                        className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-4 sm:p-5 md:p-6"
-                        onClick={(e) => e.stopPropagation()} // Prevent clicks from closing the modal
-                    >
+                <Modal isOpen={true} onClose={() => setShowConfirmModal(false)} zIndex="z-[60]" maxWidth="max-w-md">
+                    <Modal.Header>
+                        Cancel Order #{orderId}
+                    </Modal.Header>
+                    <Modal.Body>
                         <div className="bg-gray-50 p-4 sm:p-5 rounded-xl border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-medium text-gray-900">Cancel Order #{orderId}</h3>
-                                <button
-                                    onClick={() => setShowConfirmModal(false)}
-                                    className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-md focus:outline-none"
-                                    aria-label="Close cancel modal"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
                             <div className="space-y-4">
                                 <p className="text-sm font-medium text-gray-600">Select a reason for cancelling order:</p>
                                 {['address', 'voucher', 'product', 'demand'].map((reason) => (
@@ -342,11 +312,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                     <label htmlFor="other" className="ml-2 text-sm text-gray-900">Other</label>
                                 </div>
                                 {cancelFormData.cancelReason === "other" && (
-                                    <textarea
+                                    <TextArea
                                         value={cancelFormData.customReason}
                                         onChange={(e) => setCancelFormData({ ...cancelFormData, customReason: e.target.value })}
                                         placeholder="Enter custom reason"
-                                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
                                         rows={3}
                                     />
                                 )}
@@ -383,10 +352,10 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 </ProductButton>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </Modal.Body>
+                </Modal>
             )}
-        </div>
+        </Modal>
     );
 };
 

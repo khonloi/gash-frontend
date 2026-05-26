@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle, XCircle, Home, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProductButton from '../../../components/ui/ProductButton';
+import Modal from '../../../components/ui/Modal';
 
 export default function OrderSuccessModal({ open, info, onClose }) {
     const navigate = useNavigate();
@@ -10,8 +11,8 @@ export default function OrderSuccessModal({ open, info, onClose }) {
     const isSuccess = info.status === 'success';
     
     return (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-[9999] p-4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 text-center max-w-md w-full">
+        <Modal isOpen={open} onClose={onClose} zIndex="z-[9999]" maxWidth="max-w-md">
+            <Modal.Body className="text-center p-4 sm:p-5 md:p-6">
                 <div className="mb-4 flex justify-center">
                     {isSuccess ? (
                         <CheckCircle size={64} className="text-green-600" />
@@ -67,7 +68,7 @@ export default function OrderSuccessModal({ open, info, onClose }) {
                         Back to Home
                     </ProductButton>
                 </div>
-            </div>
-        </div>
+            </Modal.Body>
+        </Modal>
     );
 }
