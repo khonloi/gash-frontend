@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
-import ProductCard from "../features/products/components/ProductCard";
-import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
+import ProductCard, { ProductCardSkeleton } from "../features/products/components/ProductCard";
 import Button from "../components/ui/Button";
 import {
   API_RETRY_COUNT,

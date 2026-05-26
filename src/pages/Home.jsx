@@ -6,8 +6,7 @@ import {
   API_RETRY_COUNT,
   API_RETRY_DELAY
 } from "../constants/constants";
-import ProductCard from "../features/products/components/ProductCard";
-import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
+import ProductCard, { ProductCardSkeleton } from "../features/products/components/ProductCard";
 import Button from "../components/ui/Button";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";

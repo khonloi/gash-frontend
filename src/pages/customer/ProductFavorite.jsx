@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import FavoriteProductCard from "../../features/products/components/FavoriteProductCard";
-import ProductCardSkeleton from "../../components/ui/ProductCardSkeleton";
+import ProductCard, { ProductCardSkeleton } from "../../features/products/components/ProductCard";
 import Button from "../../components/ui/Button";
 import ConfirmationModal from "../../features/orders/components/ConfirmationModal";
 import { useFavorites } from "../../features/products/hooks/useFavorites";
@@ -161,13 +160,14 @@ const ProductFavorite = () => {
               }
               const product = favorite.productId;
               return (
-                <FavoriteProductCard
+                <ProductCard
                   key={favorite._id}
                   product={product}
+                  isFavorite={true}
                   favoriteId={favorite._id}
                   handleProductClick={handleProductClick}
                   handleKeyDown={handleKeyDown}
-                  handleRemove={handleDeleteFavoriteClick}
+                  handleRemoveFavorite={handleDeleteFavoriteClick}
                 />
               );
             })
