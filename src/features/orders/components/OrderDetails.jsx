@@ -5,8 +5,8 @@ import { useToast } from "../../../hooks/useToast";
 import FeedbackForm from "../../feedback/components/FeedbackForm";
 import LoadingSpinner, { LoadingForm, LoadingButton } from "../../../components/ui/LoadingSpinner";
 import ImageModal from "../../../components/ui/ImageModal";
-import ProductButton from "../../../components/ui/ProductButton";
-import ConfirmationModal from "../../../components/ui/ConfirmationModal";
+import Button from "../../../components/ui/Button";
+import ConfirmationModal from "./ConfirmationModal";
 import OrderStatusCard from "./OrderStatusCard";
 import VNPayCountdown from "./VNPayCountdown";
 import OrderCustomerInfo from "./OrderCustomerInfo";
@@ -117,7 +117,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </h2>
                     {/* View Bill button in header - only show if order is paid */}
                     {!loading && order?.payStatus?.toLowerCase() === 'paid' && (
-                        <ProductButton
+                        <Button
                             variant="default"
                             size="md"
                             onClick={() => {
@@ -131,7 +131,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             View Bill
-                        </ProductButton>
+                        </Button>
                     )}
                 </div>
             </Modal.Header>
@@ -202,14 +202,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
                         {(order.orderStatus?.toLowerCase() === "pending" ||
                             order.orderStatus?.toLowerCase() === "confirmed") && (
-                                <ProductButton
+                                <Button
                                     variant="danger"
                                     size="md"
                                     onClick={handleCancelOrder}
                                     className="mt-6"
                                 >
                                     Cancel Order
-                                </ProductButton>
+                                </Button>
                             )}
                     </div>
                 )}
@@ -331,14 +331,14 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                 )}
                             </div>
                             <div className="flex gap-3 justify-end mt-6">
-                                <ProductButton
+                                <Button
                                     variant="secondary"
                                     size="md"
                                     onClick={() => setShowConfirmModal(false)}
                                 >
                                     Cancel
-                                </ProductButton>
-                                <ProductButton
+                                </Button>
+                                <Button
                                     variant="danger"
                                     size="md"
                                     onClick={handleSubmitCancel}
@@ -349,7 +349,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <span>Confirm Cancel</span>
-                                </ProductButton>
+                                </Button>
                             </div>
                         </div>
                     </Modal.Body>

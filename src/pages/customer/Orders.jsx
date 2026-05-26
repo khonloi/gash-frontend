@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import OrderDetailsModal from "../../features/orders/components/OrderDetails";
 import OrderSuccessModal from "../../features/orders/components/OrderSuccessModal";
 import LoadingSpinner, { LoadingSkeleton } from "../../components/ui/LoadingSpinner";
-import ProductButton from "../../components/ui/ProductButton";
+import Button from "../../components/ui/Button";
 import { useOrders } from "../../features/orders/hooks/useOrders";
 
 const Orders = () => {
@@ -153,7 +153,7 @@ const Orders = () => {
 
               {searchQuery && (
                 <div className="flex items-end">
-                  <ProductButton
+                  <Button
                     variant="default"
                     size="md"
                     onClick={() => {
@@ -161,7 +161,7 @@ const Orders = () => {
                     }}
                   >
                     Clear
-                  </ProductButton>
+                  </Button>
                 </div>
               )}
             </div>
@@ -210,7 +210,7 @@ const Orders = () => {
                 <p className="text-gray-400 text-xs sm:text-sm mt-2">
                   Try adjusting your search criteria or filters
                 </p>
-                <ProductButton
+                <Button
                   variant="default"
                   size="sm"
                   onClick={() => {
@@ -219,7 +219,7 @@ const Orders = () => {
                   className="text-blue-600"
                 >
                   Clear Search
-                </ProductButton>
+                </Button>
               </>
             )}
           </div>
@@ -295,7 +295,7 @@ const Orders = () => {
                   {/* Action Buttons */}
                   <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
                     {order.payStatus?.toLowerCase() === "paid" && (
-                      <ProductButton
+                      <Button
                         variant="default"
                         size="sm"
                         onClick={() => navigate(`/bills/${order._id}`)}
@@ -303,16 +303,16 @@ const Orders = () => {
                         title="View Bill"
                       >
                         View Bill
-                      </ProductButton>
+                      </Button>
                     )}
-                    <ProductButton
+                    <Button
                       variant="primary"
                       size="sm"
                       onClick={() => setSelectedOrderId(order._id)}
                       title="View Details"
                     >
                       View Details
-                    </ProductButton>
+                    </Button>
                   </div>
                 </article>
               );
@@ -327,7 +327,7 @@ const Orders = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <ProductButton
+              <Button
                 variant="default"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -342,7 +342,7 @@ const Orders = () => {
                   />
                 </svg>
                 Previous
-              </ProductButton>
+              </Button>
 
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
@@ -363,19 +363,19 @@ const Orders = () => {
                   }
 
                   return (
-                    <ProductButton
+                    <Button
                       key={page}
                       variant={page === currentPage ? "primary" : "default"}
                       size="sm"
                       onClick={() => handlePageChange(page)}
                     >
                       {page}
-                    </ProductButton>
+                    </Button>
                   );
                 })}
               </div>
 
-              <ProductButton
+              <Button
                 variant="default"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
@@ -390,7 +390,7 @@ const Orders = () => {
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </ProductButton>
+              </Button>
             </div>
           </div>
         )}

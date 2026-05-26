@@ -3,7 +3,7 @@ import { useToast } from '../hooks/useToast';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
-import ProductButton from '../components/ui/ProductButton';
+import Button from '../components/ui/Button';
 
 // Initialize EmailJS with Public API Key
 const emailJsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -147,7 +147,7 @@ const Signup = () => {
             />
           </fieldset>
 
-          <ProductButton
+          <Button
             type="submit"
             variant="primary"
             size="lg"
@@ -158,7 +158,7 @@ const Signup = () => {
             <span aria-live="polite">
               {isLoading ? 'Sending OTP...' : 'Continue'}
             </span>
-          </ProductButton>
+          </Button>
         </form>
 
         <p className="text-center text-xs sm:text-sm text-gray-600 mt-4 sm:mt-5">

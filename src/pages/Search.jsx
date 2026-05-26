@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../features/products/components/ProductCard";
 import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 import {
   API_RETRY_COUNT,
   API_RETRY_DELAY,
@@ -133,7 +133,7 @@ const Search = () => {
             <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
             {query && (
-              <ProductButton
+              <Button
                 variant="default"
                 size="sm"
                 onClick={handleRetry}
@@ -142,7 +142,7 @@ const Search = () => {
                 aria-label="Retry search"
               >
                 Retry
-              </ProductButton>
+              </Button>
             )}
           </div>
         )}
@@ -180,3 +180,4 @@ const Search = () => {
 };
 
 export default Search;
+

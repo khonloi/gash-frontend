@@ -1,5 +1,5 @@
 import React from "react";
-import ProductButton from "./ProductButton";
+import Button from "../../../components/ui/Button";
 
 /**
  * ConfirmationModal - Reusable confirmation modal component
@@ -63,22 +63,22 @@ const ConfirmationModal = ({
           {message}
         </p>
         <div className="flex gap-3 justify-end">
-          <ProductButton
+          <Button
             variant="secondary"
             size="md"
             onClick={onCancel}
             aria-label={cancelText}
           >
             {cancelText}
-          </ProductButton>
-          <ProductButton
+          </Button>
+          <Button
             variant={variant}
             size="md"
             onClick={onConfirm}
             aria-label={confirmText}
           >
             {confirmText}
-          </ProductButton>
+          </Button>
         </div>
       </div>
     </div>
@@ -86,4 +86,3 @@ const ConfirmationModal = ({
 };
 
 export default ConfirmationModal;
-

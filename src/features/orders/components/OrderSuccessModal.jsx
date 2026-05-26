@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle, XCircle, Home, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import ProductButton from '../../../components/ui/ProductButton';
+import Button from '../../../components/ui/Button';
 import Modal from '../../../components/ui/Modal';
 
 export default function OrderSuccessModal({ open, info, onClose }) {
@@ -43,7 +43,7 @@ export default function OrderSuccessModal({ open, info, onClose }) {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row justify-center gap-3">
-                    <ProductButton
+                    <Button
                         variant="primary"
                         size="md"
                         onClick={() => { 
@@ -54,8 +54,8 @@ export default function OrderSuccessModal({ open, info, onClose }) {
                     >
                         <Clock size={20} />
                         View My Orders
-                    </ProductButton>
-                    <ProductButton
+                    </Button>
+                    <Button
                         variant="secondary"
                         size="md"
                         onClick={() => { 
@@ -66,9 +66,10 @@ export default function OrderSuccessModal({ open, info, onClose }) {
                     >
                         <Home size={20} />
                         Back to Home
-                    </ProductButton>
+                    </Button>
                 </div>
             </Modal.Body>
         </Modal>
     );
 }
+

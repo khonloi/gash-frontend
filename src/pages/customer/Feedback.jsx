@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDetailsModal from "../../features/feedback/components/FeedbackDetailsModal";
 import LoadingSpinner, { LoadingSkeleton } from "../../components/ui/LoadingSpinner";
-import ProductButton from "../../components/ui/ProductButton";
+import Button from "../../components/ui/Button";
 import { useFeedback } from "../../features/feedback/hooks/useFeedback";
 
 const Feedback = () => {
@@ -77,20 +77,20 @@ const Feedback = () => {
           </p>
           {eligibleItems.length > 0 && (
             <div className="flex gap-2 mb-4">
-              <ProductButton
+              <Button
                 variant={!showEligibleOnly ? "primary" : "default"}
                 size="sm"
                 onClick={() => setShowEligibleOnly(false)}
               >
                 My Feedbacks ({feedbacks.length})
-              </ProductButton>
-              <ProductButton
+              </Button>
+              <Button
                 variant={showEligibleOnly ? "primary" : "default"}
                 size="sm"
                 onClick={() => setShowEligibleOnly(true)}
               >
                 Pending Feedback ({eligibleItems.length})
-              </ProductButton>
+              </Button>
             </div>
           )}
         </header>
@@ -131,7 +131,7 @@ const Feedback = () => {
 
               {searchQuery && (
                 <div className="flex items-end">
-                  <ProductButton
+                  <Button
                     variant="default"
                     size="md"
                     onClick={() => {
@@ -139,7 +139,7 @@ const Feedback = () => {
                     }}
                   >
                     Clear
-                  </ProductButton>
+                  </Button>
                 </div>
               )}
             </div>
@@ -199,7 +199,7 @@ const Feedback = () => {
                   <p className="text-gray-400 text-sm mt-2">
                     Try adjusting your search criteria
                   </p>
-                  <ProductButton
+                  <Button
                     variant="default"
                     size="sm"
                     onClick={() => {
@@ -208,7 +208,7 @@ const Feedback = () => {
                     className="text-blue-600"
                   >
                     Clear Search
-                  </ProductButton>
+                  </Button>
                 </>
               )
             ) : (
@@ -218,14 +218,14 @@ const Feedback = () => {
                   <p className="text-gray-400 text-sm mt-2">
                     Your feedbacks will appear here once you review products from your orders
                   </p>
-                  <ProductButton
+                  <Button
                     variant="default"
                     size="sm"
                     onClick={() => navigate("/orders")}
                     className="text-blue-600"
                   >
                     View Orders
-                  </ProductButton>
+                  </Button>
                 </>
               ) : (
                 <>
@@ -235,7 +235,7 @@ const Feedback = () => {
                   <p className="text-gray-400 text-sm mt-2">
                     Try adjusting your search criteria
                   </p>
-                  <ProductButton
+                  <Button
                     variant="default"
                     size="sm"
                     onClick={() => {
@@ -244,7 +244,7 @@ const Feedback = () => {
                     className="text-blue-600"
                   >
                     Clear Search
-                  </ProductButton>
+                  </Button>
                 </>
               )
             )}
@@ -316,7 +316,7 @@ const Feedback = () => {
 
                   {/* Action Buttons */}
                   <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
-                    <ProductButton
+                    <Button
                       variant="primary"
                       size="sm"
                       onClick={() => {
@@ -366,7 +366,7 @@ const Feedback = () => {
                           View Details
                         </>
                       )}
-                    </ProductButton>
+                    </Button>
                   </div>
                 </article>
               );
@@ -381,7 +381,7 @@ const Feedback = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <ProductButton
+              <Button
                 variant="default"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -396,7 +396,7 @@ const Feedback = () => {
                   />
                 </svg>
                 Previous
-              </ProductButton>
+              </Button>
 
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
@@ -417,19 +417,19 @@ const Feedback = () => {
                   }
 
                   return (
-                    <ProductButton
+                    <Button
                       key={page}
                       variant={page === currentPage ? "primary" : "default"}
                       size="sm"
                       onClick={() => handlePageChange(page)}
                     >
                       {page}
-                    </ProductButton>
+                    </Button>
                   );
                 })}
               </div>
 
-              <ProductButton
+              <Button
                 variant="default"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
@@ -444,7 +444,7 @@ const Feedback = () => {
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </ProductButton>
+              </Button>
             </div>
           </div>
         )}
@@ -466,4 +466,5 @@ const Feedback = () => {
 };
 
 export default Feedback;
+
 

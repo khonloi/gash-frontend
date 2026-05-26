@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LoadingForm from '../../../components/ui/LoadingSpinner';
-import ProductButton from '../../../components/ui/ProductButton';
+import Button from '../../../components/ui/Button';
 import { useProductFeedback } from '../hooks/useProductFeedback';
 
 const ProductFeedback = ({ productId }) => {
@@ -44,14 +44,14 @@ const ProductFeedback = ({ productId }) => {
                 <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
                     <span className="text-lg" aria-hidden="true">⚠</span>
                     {feedbackError}
-                    <ProductButton
+                    <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => fetchFeedbacks(productId)}
                         aria-label="Retry loading reviews"
                     >
                         Retry
-                    </ProductButton>
+                    </Button>
                 </div>
             </div>
         );
@@ -277,3 +277,4 @@ const ProductFeedback = ({ productId }) => {
 };
 
 export default ProductFeedback;
+

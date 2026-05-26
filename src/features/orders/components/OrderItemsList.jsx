@@ -1,5 +1,5 @@
 import React from 'react';
-import ProductButton from '../../../components/ui/ProductButton';
+import Button from '../../../components/ui/Button';
 
 const OrderItemsList = ({ 
     order, 
@@ -68,7 +68,7 @@ const OrderItemsList = ({
                                 {/* Feedback Buttons – Only if Delivered */}
                                 {order.orderStatus?.toLowerCase() === "delivered" && (
                                     <div className="flex flex-col gap-2">
-                                        <ProductButton
+                                        <Button
                                             variant="secondary"
                                             size="sm"
                                             onClick={() => handleViewFeedback(feedbackKey, d.variant?.product?.name || "Product")}
@@ -89,8 +89,8 @@ const OrderItemsList = ({
                                                 />
                                             </svg>
                                             View Feedback
-                                        </ProductButton>
-                                        <ProductButton
+                                        </Button>
+                                        <Button
                                             variant="primary"
                                             size="sm"
                                             onClick={() => handleEditFeedbackClick(feedbackKey, d.variant?.product?.name || "Product")}
@@ -105,7 +105,7 @@ const OrderItemsList = ({
                                                 />
                                             </svg>
                                             {existingFeedbacks[feedbackKey] ? "Edit Feedback" : "Add Feedback"}
-                                        </ProductButton>
+                                        </Button>
                                     </div>
                                 )}
                             </div>
@@ -122,3 +122,4 @@ const OrderItemsList = ({
 };
 
 export default OrderItemsList;
+

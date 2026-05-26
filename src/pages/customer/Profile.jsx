@@ -12,7 +12,7 @@ import { useToast } from "../../hooks/useToast";
 import { startRegistration } from "@simplewebauthn/browser";
 
 import { useProfile } from "../../features/auth/hooks/useProfile";
-import ProductButton from "../../components/ui/ProductButton";
+import Button from "../../components/ui/Button";
 import { User, Tag, Mail, Phone, Users, Calendar, MapPin, Key, Camera } from "lucide-react";
 import Modal from "../../components/ui/Modal";
 import Input from "../../components/ui/Input";
@@ -115,9 +115,9 @@ const Profile = () => {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Failed to Load Profile</h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">{error}</p>
-            <ProductButton variant="primary" onClick={fetchProfile} className="px-8">
+            <Button variant="primary" onClick={fetchProfile} className="px-8">
               Retry
-            </ProductButton>
+            </Button>
           </div>
         ) : (
           <React.Fragment>
@@ -150,36 +150,36 @@ const Profile = () => {
                   <div className="p-6 space-y-3">
                     {!isDeleted ? (
                       <>
-                        <ProductButton
+                        <Button
                           variant="primary"
                           onClick={() => isDemoMode ? showDemoNotice() : setEditMode(true)}
                           className="w-full justify-center py-3"
                         >
                           Update Profile
-                        </ProductButton>
-                        <ProductButton
+                        </Button>
+                        <Button
                           variant="secondary"
                           onClick={() => isDemoMode ? showDemoNotice() : setShowChangePassword(true)}
                           className="w-full justify-center py-3"
                         >
                           Change Password
-                        </ProductButton>
-                        <ProductButton
+                        </Button>
+                        <Button
                           variant="secondary"
                           onClick={() => isDemoMode ? showDemoNotice() : handleSetupPasskey()}
                           disabled={!isDemoMode && (isSettingUpPasskey || passkeys.length > 0)}
                           className="w-full justify-center py-3"
                         >
                           {isSettingUpPasskey ? 'Setting up...' : passkeys.length > 0 ? 'Passkey Enabled ✓' : 'Setup Passkey'}
-                        </ProductButton>
+                        </Button>
                         <div className="pt-4 border-t-2 border-gray-300">
-                          <ProductButton
+                          <Button
                             variant="danger"
                             onClick={() => isDemoMode ? showDemoNotice() : setShowDeleteConfirm(true)}
                             className="w-full justify-center py-3"
                           >
                             Close Account
-                          </ProductButton>
+                          </Button>
                         </div>
                       </>
                     ) : (
@@ -187,9 +187,9 @@ const Profile = () => {
                         <div className="bg-red-50 text-red-600 p-4 rounded-xl border-2 border-red-200 text-sm font-medium mb-4">
                           This account has been deactivated.
                         </div>
-                        <ProductButton variant="primary" onClick={logout} className="w-full justify-center">
+                        <Button variant="primary" onClick={logout} className="w-full justify-center">
                           Return to Login
-                        </ProductButton>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -342,20 +342,20 @@ const Profile = () => {
                 This will deactivate your account. You won't be able to log in or access your orders until it's reactivated by support.
               </p>
               <div className="flex gap-3">
-                <ProductButton
+                <Button
                   variant="secondary"
                   onClick={() => setShowDeleteConfirm(false)}
                   className="flex-1 justify-center py-3"
                 >
                   Keep Account
-                </ProductButton>
-                <ProductButton
+                </Button>
+                <Button
                   variant="danger"
                   onClick={handleDeleteConfirm}
                   className="flex-1 justify-center py-3"
                 >
                   Yes, Close It
-                </ProductButton>
+                </Button>
               </div>
             </div>
           </div>
@@ -370,20 +370,20 @@ const Profile = () => {
                 You won't be able to use this device for biometric login. You can set it up again at any time.
               </p>
               <div className="flex gap-3">
-                <ProductButton
+                <Button
                   variant="secondary"
                   onClick={() => setPasskeyToDelete(null)}
                   className="flex-1 justify-center py-3"
                 >
                   Cancel
-                </ProductButton>
-                <ProductButton
+                </Button>
+                <Button
                   variant="danger"
                   onClick={confirmDeletePasskey}
                   className="flex-1 justify-center py-3"
                 >
                   Remove Device
-                </ProductButton>
+                </Button>
               </div>
             </div>
           </div>
@@ -425,15 +425,15 @@ const LocalChangePasswordModal = ({ isOpen, handleCancel }) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <ProductButton
+        <Button
           variant="secondary"
           onClick={handleCancel}
           disabled={loading}
           className="px-6 py-2.5"
         >
           Cancel
-        </ProductButton>
-        <ProductButton
+        </Button>
+        <Button
           variant="primary"
           onClick={handleSubmit}
           disabled={loading}
@@ -447,7 +447,7 @@ const LocalChangePasswordModal = ({ isOpen, handleCancel }) => {
           ) : (
             'Update Password'
           )}
-        </ProductButton>
+        </Button>
       </Modal.Footer>
     </Modal>
   );
@@ -659,15 +659,15 @@ const LocalEditProfileModal = ({
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <ProductButton
+        <Button
           variant="secondary"
           onClick={handleCancel}
           disabled={loading}
           className="px-6 py-2.5"
         >
           Cancel
-        </ProductButton>
-        <ProductButton
+        </Button>
+        <Button
           variant="primary"
           onClick={handleSubmitWithValidation}
           disabled={loading}
@@ -681,10 +681,11 @@ const LocalEditProfileModal = ({
           ) : (
             'Save Changes'
           )}
-        </ProductButton>
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
 export default Profile;
+

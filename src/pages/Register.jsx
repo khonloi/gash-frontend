@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ProductButton from '../components/ui/ProductButton';
+import Button from '../components/ui/Button';
 import { useRegister } from '../features/auth/hooks/useRegister';
 
 const Register = () => {
@@ -218,7 +218,7 @@ const Register = () => {
           </div>
 
           <div className="mt-6 sm:mt-8">
-            <ProductButton
+            <Button
               type="submit"
               variant="primary"
               size="lg"
@@ -227,7 +227,7 @@ const Register = () => {
               className="w-full"
             >
               {isLoading ? 'Creating Account...' : 'Create your GASH account'}
-            </ProductButton>
+            </Button>
           </div>
         </form>
 

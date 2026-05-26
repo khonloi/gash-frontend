@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Api from "../../../common/SummaryAPI";
-import ProductButton from "../../../components/ui/ProductButton";
+import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 
 
@@ -33,14 +33,14 @@ export default function ApplyVoucherForm() {
           placeholder="Nhập mã voucher..."
           className="flex-grow"
         />
-        <ProductButton
+        <Button
           variant="primary"
           size="md"
           onClick={handleApply}
           className="h-[52px] shrink-0"
         >
           Áp dụng
-        </ProductButton>
+        </Button>
       </div>
       {message && (
         <p
@@ -54,3 +54,4 @@ export default function ApplyVoucherForm() {
     </div>
   );
 }
+

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
 import emailjs from '@emailjs/browser';
-import ProductButton from '../components/ui/ProductButton';
+import Button from '../components/ui/Button';
 
 // Initialize EmailJS with Public API Key
 if (!import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
@@ -163,7 +163,7 @@ const OTPVerification = () => {
             />
           </fieldset>
 
-          <ProductButton
+          <Button
             type="submit"
             variant="primary"
             size="lg"
@@ -172,12 +172,12 @@ const OTPVerification = () => {
             className="w-full"
           >
             {isLoading ? 'Verifying...' : 'Verify OTP'}
-          </ProductButton>
+          </Button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
           Didn't receive an OTP?{' '}
-          <ProductButton
+          <Button
             type="button"
             variant="secondary"
             size="sm"
@@ -186,7 +186,7 @@ const OTPVerification = () => {
             className="inline"
           >
             Resend OTP
-          </ProductButton>
+          </Button>
         </p>
       </section>
     </div>

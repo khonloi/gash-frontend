@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
-import ProductButton from '../components/ui/ProductButton';
+import Button from '../components/ui/Button';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -128,7 +128,7 @@ const ResetPassword = () => {
             </fieldset>
           ))}
 
-          <ProductButton
+          <Button
             type="submit"
             variant="primary"
             size="lg"
@@ -137,7 +137,7 @@ const ResetPassword = () => {
             className="w-full"
           >
             {isLoading ? 'Resetting Password...' : 'Reset Password'}
-          </ProductButton>
+          </Button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">

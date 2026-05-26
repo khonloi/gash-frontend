@@ -1,5 +1,5 @@
 import React from 'react';
-import ProductButton from '../../../components/ui/ProductButton';
+import Button from '../../../components/ui/Button';
 
 const VNPayCountdown = ({ order, timeLeft, isVNPayExpired }) => {
     if (order?.paymentMethod !== 'VNPAY' || order?.payStatus !== 'unpaid' || order?.orderStatus === 'cancelled') {
@@ -26,7 +26,7 @@ const VNPayCountdown = ({ order, timeLeft, isVNPayExpired }) => {
                     )}
                 </div>
                 {!isVNPayExpired && order?.vnpay_payment_url && (
-                    <ProductButton
+                    <Button
                         variant="primary"
                         size="md"
                         onClick={() => window.open(order.vnpay_payment_url, '_blank')}
@@ -36,7 +36,7 @@ const VNPayCountdown = ({ order, timeLeft, isVNPayExpired }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                         Continue VNPay Payment
-                    </ProductButton>
+                    </Button>
                 )}
             </div>
         </div>
@@ -44,3 +44,4 @@ const VNPayCountdown = ({ order, timeLeft, isVNPayExpired }) => {
 };
 
 export default VNPayCountdown;
+

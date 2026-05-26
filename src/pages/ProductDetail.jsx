@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import ProductFeedback from "../features/feedback/components/ProductFeedback";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 import ProductCard from "../features/products/components/ProductCard";
 import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -462,7 +462,7 @@ const ProductDetail = () => {
           </div>
 
           <div className="flex-1 min-w-[200px] max-w-full sm:max-w-[320px] p-4 sm:p-5 border-2 border-gray-300 rounded-xl bg-gray-50 flex flex-col gap-2">
-            <ProductButton
+            <Button
               variant="secondary"
               onClick={handleAddToFavorites}
               disabled={isAddingToFavorites}
@@ -476,8 +476,8 @@ const ProductDetail = () => {
                 : isFavorited
                   ? "Remove from Favorites"
                   : "Add to Favorites"}
-            </ProductButton>
-            <ProductButton
+            </Button>
+            <Button
               variant="primary"
               onClick={handleAddToCart}
               disabled={!selectedVariant || !isInStock || isAddingToCart || isProductInactive || isProductDiscontinued}
@@ -485,8 +485,8 @@ const ProductDetail = () => {
               aria-label="Add to cart"
             >
               {isAddingToCart ? "Adding..." : "Add to Cart"}
-            </ProductButton>
-            <ProductButton
+            </Button>
+            <Button
               variant="default"
               onClick={handleBuyNow}
               disabled={!selectedVariant || !isInStock || isProductInactive || isProductDiscontinued}
@@ -494,7 +494,7 @@ const ProductDetail = () => {
               aria-label="Buy now"
             >
               Buy Now
-            </ProductButton>
+            </Button>
             <div className="text-xs sm:text-sm text-gray-600 text-center mt-3 space-y-2">
               <div className="leading-relaxed">
                 <strong className="text-green-700">FREE delivery</strong> by tomorrow

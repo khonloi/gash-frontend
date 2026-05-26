@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../constants/constants";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -179,7 +179,7 @@ const Login = () => {
                 </Link>
               </div>
 
-              <ProductButton
+              <Button
                 type="submit"
                 variant="primary"
                 size="lg"
@@ -190,7 +190,7 @@ const Login = () => {
                 <span aria-live="polite">
                   {isLoading ? "Signing In..." : "Sign In"}
                 </span>
-              </ProductButton>
+              </Button>
             </form>
           </div>
 
@@ -221,7 +221,7 @@ const Login = () => {
                 </div>
               </div>
 
-              <ProductButton
+              <Button
                 type="button"
                 variant="secondary"
                 size="lg"
@@ -236,7 +236,7 @@ const Login = () => {
                   </svg>
                   Sign in with Passkey
                 </span>
-              </ProductButton>
+              </Button>
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-10">

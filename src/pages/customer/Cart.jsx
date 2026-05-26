@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductButton from "../../components/ui/ProductButton";
-import ConfirmationModal from "../../components/ui/ConfirmationModal";
+import Button from "../../components/ui/Button";
+import ConfirmationModal from "../../features/orders/components/ConfirmationModal";
 import { useCart } from "../../features/cart/hooks/useCart";
 
 const Cart = () => {
@@ -111,14 +111,14 @@ const Cart = () => {
                 </div>
                 {searchQuery && (
                   <div className="flex items-end">
-                    <ProductButton
+                    <Button
                       variant="default"
                       size="md"
                       onClick={() => setSearchQuery("")}
                       aria-label="Clear search"
                     >
                       Clear
-                    </ProductButton>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -138,7 +138,7 @@ const Cart = () => {
               ⚠
             </span>
             {error}
-            <ProductButton
+            <Button
               variant="secondary"
               size="sm"
               onClick={handleRetry}
@@ -146,7 +146,7 @@ const Cart = () => {
               aria-label="Retry loading cart items"
             >
               Retry
-            </ProductButton>
+            </Button>
           </div>
         )}
 
@@ -158,14 +158,14 @@ const Cart = () => {
             <h3 className="text-base sm:text-xl font-semibold text-gray-900 m-0">
               Your cart is empty.
             </h3>
-            <ProductButton
+            <Button
               variant="primary"
               size="md"
               onClick={() => navigate("/products")}
               aria-label="Continue shopping"
             >
               Continue Shopping
-            </ProductButton>
+            </Button>
           </div>
         ) : (
           <main className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8" role="main">
@@ -182,14 +182,14 @@ const Cart = () => {
                   <p className="text-gray-400 text-xs sm:text-sm mt-2">
                     Try adjusting your search criteria
                   </p>
-                  <ProductButton
+                  <Button
                     variant="default"
                     size="sm"
                     onClick={() => setSearchQuery("")}
                     className="text-blue-600"
                   >
                     Clear Search
-                  </ProductButton>
+                  </Button>
                 </div>
               ) : (
                 filteredCartItems.map((item) => {
@@ -213,7 +213,7 @@ const Cart = () => {
                   return (
                     <article
                       key={item._id}
-                      className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm border border-gray-200 ${isInactive ? "opacity-60 grayscale" : ""}`}
+                      className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm ${isInactive ? "opacity-60 grayscale" : ""}`}
                       tabIndex={0}
                       aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
                     >
@@ -282,7 +282,7 @@ const Cart = () => {
                           aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
                           disabled={isUpdating || actionInProgress || isInactive}
                         />
-                        <ProductButton
+                        <Button
                           variant="danger"
                           size="sm"
                           onClick={() => handleRemoveItemClick(item._id)}
@@ -290,7 +290,7 @@ const Cart = () => {
                           disabled={isUpdating || actionInProgress}
                         >
                           Remove
-                        </ProductButton>
+                        </Button>
                       </div>
                     </article>
                   );
@@ -306,7 +306,7 @@ const Cart = () => {
                 <p className="text-lg sm:text-xl font-bold text-red-600 mb-4 m-0">
                   Total: {formatPrice(totalPrice)}
                 </p>
-                <ProductButton
+                <Button
                   variant="primary"
                   size="lg"
                   onClick={() => {
@@ -323,7 +323,7 @@ const Cart = () => {
                   className="w-full"
                 >
                   Proceed to Checkout
-                </ProductButton>
+                </Button>
               </aside>
             )}
           </main>

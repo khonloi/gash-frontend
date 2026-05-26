@@ -1,9 +1,9 @@
 // src/components/FeedbackForm.jsx
 import React, { useState, useEffect } from "react";
 import { Star } from "lucide-react";
-import ProductButton from "../../../components/ui/ProductButton";
+import Button from "../../../components/ui/Button";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
-import ConfirmationModal from "../../../components/ui/ConfirmationModal";
+import ConfirmationModal from "../../orders/components/ConfirmationModal";
 import Modal from "../../../components/ui/Modal";
 import TextArea from "../../../components/ui/TextArea";
 
@@ -50,14 +50,14 @@ const FeedbackForm = ({
     return (
         <>
             {!showForm && (
-                <ProductButton
+                <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => setOpen(true)}
                     className="mt-2"
                 >
                     Write a Review
-                </ProductButton>
+                </Button>
             )}
 
             <Modal
@@ -143,7 +143,7 @@ const FeedbackForm = ({
 
                     {!existingFeedback?.isDeleted && initialComment !== 'This feedback has been deleted by staff/admin' && (
                         <Modal.Footer>
-                            <ProductButton
+                            <Button
                                 type="button"
                                 variant="secondary"
                                 size="md"
@@ -153,16 +153,16 @@ const FeedbackForm = ({
                                 }}
                             >
                                 Cancel
-                            </ProductButton>
+                            </Button>
 
-                            <ProductButton
+                            <Button
                                 type="submit"
                                 variant="primary"
                                 size="md"
                                 disabled={!rating || rating < 1}
                             >
                                 {submitText}
-                            </ProductButton>
+                            </Button>
                         </Modal.Footer>
                     )}
                 </form>
@@ -189,3 +189,4 @@ const FeedbackForm = ({
 };
 
 export default FeedbackForm;
+

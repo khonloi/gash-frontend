@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import FavoriteProductCard from "../../features/products/components/FavoriteProductCard";
 import ProductCardSkeleton from "../../components/ui/ProductCardSkeleton";
-import ProductButton from "../../components/ui/ProductButton";
-import ConfirmationModal from "../../components/ui/ConfirmationModal";
+import Button from "../../components/ui/Button";
+import ConfirmationModal from "../../features/orders/components/ConfirmationModal";
 import { useFavorites } from "../../features/products/hooks/useFavorites";
 
 const ProductFavorite = () => {
@@ -75,14 +75,14 @@ const ProductFavorite = () => {
                 </div>
                 {searchQuery && (
                   <div className="flex items-end">
-                    <ProductButton
+                    <Button
                       variant="default"
                       size="md"
                       onClick={() => setSearchQuery("")}
                       aria-label="Clear search"
                     >
                       Clear
-                    </ProductButton>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -100,7 +100,7 @@ const ProductFavorite = () => {
           >
             <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
-            <ProductButton
+            <Button
               variant="default"
               size="sm"
               onClick={handleRetry}
@@ -109,7 +109,7 @@ const ProductFavorite = () => {
               aria-label="Retry loading favorites"
             >
               Retry
-            </ProductButton>
+            </Button>
           </div>
         )}
 
@@ -117,14 +117,14 @@ const ProductFavorite = () => {
         {!loading && favorites.length === 0 && !error && !searchQuery && (
           <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
             <p>No favorite products found.</p>
-            <ProductButton
+            <Button
               variant="default"
               size="sm"
               onClick={() => navigate("/products")}
               className="text-blue-600"
             >
               Browse Products
-            </ProductButton>
+            </Button>
           </div>
         )}
 
@@ -134,14 +134,14 @@ const ProductFavorite = () => {
             <p className="text-gray-400 text-sm mt-2">
               Try adjusting your search criteria
             </p>
-            <ProductButton
+            <Button
               variant="default"
               size="sm"
               onClick={() => setSearchQuery("")}
               className="text-blue-600"
             >
               Clear Search
-            </ProductButton>
+            </Button>
           </div>
         )}
 

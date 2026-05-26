@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../hooks/useToast';
 import emailjs from '@emailjs/browser';
-import ProductButton from '../../components/ui/ProductButton';
+import Button from '../../components/ui/Button';
 
 // Initialize EmailJS with Public API Key
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -130,7 +130,7 @@ const ForgotPassword = () => {
             />
           </fieldset>
 
-          <ProductButton
+          <Button
             type="submit"
             variant="primary"
             size="lg"
@@ -141,7 +141,7 @@ const ForgotPassword = () => {
             <span aria-live="polite">
               {isLoading ? 'Sending OTP...' : 'Continue'}
             </span>
-          </ProductButton>
+          </Button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">

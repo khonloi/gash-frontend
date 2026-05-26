@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard from "../features/products/components/ProductCard";
 import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 import {
   FILTER_STORAGE_KEY,
   DEFAULT_FILTERS,
@@ -510,7 +510,7 @@ const ProductList = () => {
             </h1>
             <div className="flex items-center gap-2">
               {hasActiveFilters && (
-                <ProductButton
+                <Button
                   variant="default"
                   size="sm"
                   onClick={(e) => {
@@ -521,7 +521,7 @@ const ProductList = () => {
                   aria-label="Clear all filters"
                 >
                   Clear All
-                </ProductButton>
+                </Button>
               )}
             </div>
           </button>
@@ -633,7 +633,7 @@ const ProductList = () => {
             >
               <span className="text-lg" aria-hidden="true">⚠</span>
               {error}
-              <ProductButton
+              <Button
                 variant="default"
                 size="sm"
                 onClick={handleRetry}
@@ -642,7 +642,7 @@ const ProductList = () => {
                 aria-label="Retry loading products"
               >
                 Retry
-              </ProductButton>
+              </Button>
             </div>
           )}
 
@@ -651,14 +651,14 @@ const ProductList = () => {
             <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
               <p>No active products found for selected filters</p>
               {hasActiveFilters && (
-                <ProductButton
+                <Button
                   variant="default"
                   size="sm"
                   onClick={clearAllFilters}
                   className="text-blue-600"
                 >
                   Clear Filters
-                </ProductButton>
+                </Button>
               )}
             </div>
           )}

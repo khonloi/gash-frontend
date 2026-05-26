@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Api from '../common/SummaryAPI';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner, { LoadingSkeleton } from '../components/ui/LoadingSpinner';
-import ProductButton from '../components/ui/ProductButton';
+import Button from '../components/ui/Button';
 
 const AllProductFeedback = () => {
   const { id } = useParams();
@@ -182,7 +182,7 @@ const AllProductFeedback = () => {
         {feedbackError && (
           <div className="text-center text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-4 flex flex-col items-center gap-3">
             <span className="text-lg">Warning</span> {feedbackError}
-            <ProductButton variant="secondary" size="sm" onClick={() => fetchFeedbacks(id)}>Retry</ProductButton>
+            <Button variant="secondary" size="sm" onClick={() => fetchFeedbacks(id)}>Retry</Button>
           </div>
         )}
         {!feedbackLoading && !feedbackError && filteredFeedbacks.length === 0 && (
@@ -314,12 +314,12 @@ const AllProductFeedback = () => {
             {/* Show More */}
             {filteredFeedbacks.length > feedbacksToShow && (
               <div className="text-center mt-8">
-                <ProductButton variant="default" size="md" onClick={handleShowMore}>
+                <Button variant="default" size="md" onClick={handleShowMore}>
                   Show More Reviews
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </ProductButton>
+                </Button>
               </div>
             )}
           </>

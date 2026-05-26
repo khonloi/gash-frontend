@@ -8,7 +8,7 @@ import {
 } from "../constants/constants";
 import ProductCard from "../features/products/components/ProductCard";
 import ProductCardSkeleton from "../components/ui/ProductCardSkeleton";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
@@ -270,7 +270,7 @@ const Home = () => {
           <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
             <span className="text-lg" aria-hidden="true">⚠</span>
             {error}
-            <ProductButton
+            <Button
               onClick={fetchProducts}
               variant="secondary"
               size="sm"
@@ -278,7 +278,7 @@ const Home = () => {
               aria-label="Retry loading products"
             >
               Retry
-            </ProductButton>
+            </Button>
           </div>
         )}
 
@@ -406,14 +406,14 @@ const Home = () => {
             </div>
             {/* {!loading && (
               <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
-                <ProductButton
+                <Button
                   variant="primary"
                   size="lg"
                   onClick={handleViewAll}
                   className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px]"
                 >
                   View All
-                </ProductButton>
+                </Button>
               </div>
             )} */}
           </section>

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useContext } from 'react';
 import OrderSuccessModal from '../../features/orders/components/OrderSuccessModal';
 import LoadingSpinner, { LoadingButton } from '../../components/ui/LoadingSpinner';
-import ProductButton from '../../components/ui/ProductButton';
+import Button from '../../components/ui/Button';
 import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import { useCheckout } from '../../features/orders/hooks/useCheckout';
@@ -139,26 +139,26 @@ const Checkout = () => {
                   className="flex-1 p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading}
                 />
-                <ProductButton
+                <Button
                   variant="primary"
                   size="sm"
                   onClick={handleApplyVoucher}
                   disabled={loading}
                 >
                   Apply
-                </ProductButton>
+                </Button>
               </div>
               {appliedVoucher && (
                 <div className="mt-2 flex justify-between items-center text-green-600">
                   <span className="text-sm">Applied: {appliedVoucher.code}</span>
-                  <ProductButton
+                  <Button
                     variant="danger"
                     size="xs"
                     onClick={handleRemoveVoucher}
                     className="text-sm"
                   >
                     Remove
-                  </ProductButton>
+                  </Button>
                 </div>
               )}
             </fieldset>
@@ -302,7 +302,7 @@ const Checkout = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">
-                <ProductButton
+                <Button
                   type="button"
                   variant="default"
                   onClick={() => navigate(-1)}
@@ -310,7 +310,7 @@ const Checkout = () => {
                   className="flex-1"
                 >
                   Back
-                </ProductButton>
+                </Button>
                 {loading ? (
                   <LoadingButton
                     type="submit"
@@ -320,14 +320,14 @@ const Checkout = () => {
                     {paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
                   </LoadingButton>
                 ) : (
-                  <ProductButton
+                  <Button
                     type="submit"
                     variant="primary"
                     disabled={loading}
                     className="flex-1"
                   >
                     {paymentMethod === 'COD' ? 'Place Order' : 'Pay with VNPay'}
-                  </ProductButton>
+                  </Button>
                 )}
               </div>
             </form>
@@ -470,14 +470,14 @@ const LocalCheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys
                 placeholder="Enter your password"
                 disabled={isAuthenticating}
               />
-              <ProductButton
+              <Button
                 variant="primary"
                 onClick={handlePasswordAuth}
                 disabled={isAuthenticating || !password.trim()}
                 className="w-full justify-center py-3"
               >
                 {isAuthenticating && authMethod === 'password' ? 'Verifying...' : 'Authenticate with Password'}
-              </ProductButton>
+              </Button>
             </div>
           )}
 
@@ -498,26 +498,26 @@ const LocalCheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys
 
           {/* Passkey/Passkey Authentication */}
           {hasPasskeys && (
-            <ProductButton
+            <Button
               variant="secondary"
               onClick={handlePasskeyAuth}
               disabled={isAuthenticating}
               className="w-full justify-center py-3"
             >
               {isAuthenticating && authMethod === 'passkey' ? 'Authenticating...' : 'Authenticate with Passkeys'}
-            </ProductButton>
+            </Button>
           )}
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <ProductButton
+        <Button
           variant="secondary"
           onClick={onClose}
           disabled={isAuthenticating}
           className="px-6"
         >
           Cancel
-        </ProductButton>
+        </Button>
       </Modal.Footer>
     </Modal>
   );

@@ -1,7 +1,7 @@
 // src/pages/Contact.jsx
 import React, { useState, useCallback } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -182,7 +182,7 @@ const Contact = () => {
                 className="p-3 border-2 border-gray-300 rounded-md bg-white text-sm transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed resize-none"
               ></textarea>
 
-              <ProductButton
+              <Button
                 type="submit"
                 variant="primary"
                 size="lg"
@@ -190,7 +190,7 @@ const Contact = () => {
               >
                 <Send size={18} />
                 Send Message
-              </ProductButton>
+              </Button>
             </form>
           </main>
         </div>
@@ -200,3 +200,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

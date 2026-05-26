@@ -4,7 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { Bell, Mail, Globe, Save } from "lucide-react";
-import ProductButton from "../components/ui/ProductButton";
+import Button from "../components/ui/Button";
 
 export default function Notifications() {
   const { user } = useContext(AuthContext);
@@ -67,13 +67,13 @@ export default function Notifications() {
             <p className="text-sm sm:text-base text-gray-600 mb-4">
               Please log in to manage your notification preferences.
             </p>
-            <ProductButton
+            <Button
               variant="primary"
               size="md"
               onClick={() => navigate("/login")}
             >
               Go to Login
-            </ProductButton>
+            </Button>
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-5">
@@ -145,7 +145,7 @@ export default function Notifications() {
 
             {/* Save button */}
             <div className="pt-4 sm:pt-6">
-              <ProductButton
+              <Button
                 type="button"
                 variant="primary"
                 size="lg"
@@ -164,7 +164,7 @@ export default function Notifications() {
                     Save Changes
                   </>
                 )}
-              </ProductButton>
+              </Button>
             </div>
           </div>
         )}
@@ -172,3 +172,4 @@ export default function Notifications() {
     </div>
   );
 }
+

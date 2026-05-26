@@ -1,7 +1,7 @@
 import React from "react";
 
 /**
- * ProductButton - Reusable button component for Product pages
+ * Button - Reusable button component
  * @param {string} variant - Button variant: 'primary', 'secondary', 'danger', 'default'
  * @param {string} size - Button size: 'sm', 'md', 'lg'
  * @param {boolean} disabled - Disabled state
@@ -9,7 +9,7 @@ import React from "react";
  * @param {React.ReactNode} children - Button content
  * @param {object} props - Other button props
  */
-const ProductButton = ({
+const Button = ({
   variant = "default",
   size = "md",
   disabled = false,
@@ -76,5 +76,6 @@ const ProductButton = ({
   );
 };
 
-export default ProductButton;
+Button.displayName = "Button";
 
+export default Button;

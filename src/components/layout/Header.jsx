@@ -171,35 +171,30 @@ export default function Header() {
                         </div>
                     ) : (
                         <>
-                            <button
+                            <IconButton
                                 onClick={() => {
-
                                     setMobileSearchOpen(true);
                                 }}
                                 title="Search"
-                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
                                 <SearchIcon />
-                            </button>
+                            </IconButton>
                             <Link to="/" className="flex items-center justify-center">
                                 <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
                             </Link>
                             <div className="relative" ref={userMenuRef}>
-                                <button
+                                <IconButton
                                     onClick={() => {
                                         if (!user) {
-
                                             navigate("/login");
                                         } else {
-
                                             setShowUserMenu((prev) => !prev);
                                         }
                                     }}
                                     title="My Account"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                                 >
                                     <PermIdentityOutlinedIcon />
-                                </button>
+                                </IconButton>
                                 {user && showUserMenu && (
                                     <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
                                         <div className="px-4 py-2 hover:bg-[#ffb300]/20">
@@ -376,35 +371,24 @@ export default function Header() {
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
-                            <button
-                                onClick={handleLiveStreamClick}
-                                title="Live Stream"
-                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
-                            >
-                                <TvOutlinedIcon />
-                                {livestreamCount > 0 && (
-                                    <span className={`${badgeClass} -top-1 -right-1`}>
-                                        {livestreamCount}
-                                    </span>
-                                )}
-                            </button>
+                            <IconButton
+                                    onClick={handleLiveStreamClick}
+                                    title="Live Stream"
+                                    badge={livestreamCount > 0 ? livestreamCount : undefined}
+                                >
+                                    <TvOutlinedIcon />
+                                </IconButton>
                         </div>
                         <div className="relative">
-                            <button
-                                onClick={() => {
-
-                                    user ? navigate("/cart") : navigate("/login");
-                                }}
-                                title="Cart"
-                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
-                            >
-                                <ShoppingBagOutlinedIcon />
-                                {cartItemCount > 0 && (
-                                    <span className={`${badgeClass} -top-1 -right-1`}>
-                                        {cartItemCount}
-                                    </span>
-                                )}
-                            </button>
+                            <IconButton
+                                    onClick={() => {
+                                        user ? navigate("/cart") : navigate("/login");
+                                    }}
+                                    title="Cart"
+                                    badge={cartItemCount > 0 ? cartItemCount : undefined}
+                                >
+                                    <ShoppingBagOutlinedIcon />
+                                </IconButton>
                         </div>
                         {user ? (
                             <div className="relative">
@@ -417,28 +401,25 @@ export default function Header() {
                             </div>
                         ) : (
                             <div className="relative">
-                                <button
+                                <IconButton
                                     onClick={() => {
-
                                         navigate("/login");
                                     }}
                                     title="Notifications"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                                 >
                                     <NotificationsOutlinedIcon />
-                                </button>
+                                </IconButton>
                             </div>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
 
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
-                            <button
+                            <IconButton
                                 title="My Account"
-                                className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out"
                             >
                                 <PermIdentityOutlinedIcon />
-                            </button>
+                            </IconButton>
                             {user && (
                                 <span className="hidden md:block text-xs md:text-sm text-gray-200">
                                     <span className="font-semibold text-white">{getFirstName(user?.name)}</span>

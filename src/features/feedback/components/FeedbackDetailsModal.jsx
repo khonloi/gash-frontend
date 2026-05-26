@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Api from "../../../common/SummaryAPI";
 import { useToast } from "../../../hooks/useToast";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
-import ProductButton from "../../../components/ui/ProductButton";
-import ConfirmationModal from "../../../components/ui/ConfirmationModal";
+import Button from "../../../components/ui/Button";
+import ConfirmationModal from "../../orders/components/ConfirmationModal";
 import Modal from "../../../components/ui/Modal";
 import TextArea from "../../../components/ui/TextArea";
 
@@ -449,7 +449,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                 />
 
                 <div className="flex justify-end space-x-3">
-                  <ProductButton
+                  <Button
                     type="button"
                     variant="secondary"
                     size="md"
@@ -462,9 +462,9 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                     }}
                   >
                     Cancel
-                  </ProductButton>
+                  </Button>
 
-                  <ProductButton
+                  <Button
                     type="button"
                     variant="primary"
                     size="md"
@@ -496,7 +496,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
                       ? (loadingStates.editing ? "Updating..." : "Update Feedback")
                       : (loadingStates.creating ? "Creating..." : "Create Feedback")
                     }
-                  </ProductButton>
+                  </Button>
                 </div>
               </div>
             )}
@@ -504,14 +504,14 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <ProductButton
+          <Button
             variant="secondary"
             size="md"
             onClick={onClose}
           >
             Close
-          </ProductButton>
-          <ProductButton
+          </Button>
+          <Button
             variant="primary"
             size="md"
             onClick={() => {
@@ -520,7 +520,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
             }}
           >
             View Order
-          </ProductButton>
+          </Button>
         </Modal.Footer>
       </Modal>
 
@@ -542,4 +542,5 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
 };
 
 export default FeedbackDetailsModal;
+
 
