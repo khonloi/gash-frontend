@@ -23,46 +23,46 @@ import Form from "../../components/ui/Form";
 
 
 const Profile = () => {
-    const {
-        user,
-        profile,
-        editMode,
-        setEditMode,
-        loading,
-        error,
-        selectedFile,
-        previewUrl,
-        passkeys,
-        isSettingUpPasskey,
-        passkeyToDelete,
-        setPasskeyToDelete,
-        requireAuthForCheckout,
-        isDeleted,
-        showDeleteConfirm,
-        setShowDeleteConfirm,
-        showChangePassword,
-        setShowChangePassword,
-        formData,
-        setFormData,
-        isDemoMode,
-        showDemoNotice,
-        handleFileChange,
-        handleSetupPasskey,
-        handleDeletePasskey,
-        confirmDeletePasskey,
-        handleToggleCheckoutAuth,
-        handleSubmit,
-        handleCancel,
-        handleDeleteConfirm
-    } = useProfile();
-    
-    const firstInputRef = useRef(null);
+  const {
+    user,
+    profile,
+    editMode,
+    setEditMode,
+    loading,
+    error,
+    selectedFile,
+    previewUrl,
+    passkeys,
+    isSettingUpPasskey,
+    passkeyToDelete,
+    setPasskeyToDelete,
+    requireAuthForCheckout,
+    isDeleted,
+    showDeleteConfirm,
+    setShowDeleteConfirm,
+    showChangePassword,
+    setShowChangePassword,
+    formData,
+    setFormData,
+    isDemoMode,
+    showDemoNotice,
+    handleFileChange,
+    handleSetupPasskey,
+    handleDeletePasskey,
+    confirmDeletePasskey,
+    handleToggleCheckoutAuth,
+    handleSubmit,
+    handleCancel,
+    handleDeleteConfirm
+  } = useProfile();
 
-    useEffect(() => {
-        if (editMode) {
-            firstInputRef.current?.focus();
-        }
-    }, [editMode]);
+  const firstInputRef = useRef(null);
+
+  useEffect(() => {
+    if (editMode) {
+      firstInputRef.current?.focus();
+    }
+  }, [editMode]);
 
   const ProfileSkeleton = () => (
     <div className="animate-pulse space-y-6">
@@ -172,7 +172,7 @@ const Profile = () => {
                           disabled={!isDemoMode && (isSettingUpPasskey || passkeys.length > 0)}
                           className="w-full justify-center py-3"
                         >
-                          {isSettingUpPasskey ? 'Setting up...' : passkeys.length > 0 ? 'Passkey Enabled ✓' : 'Setup Passkey'}
+                          {isSettingUpPasskey ? 'Setting up...' : passkeys.length > 0 ? 'Passkey Enabled' : 'Setup Passkey'}
                         </Button>
                         <div className="pt-4 border-t-2 border-gray-300">
                           <Button

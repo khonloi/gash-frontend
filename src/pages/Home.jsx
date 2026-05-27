@@ -24,11 +24,11 @@ const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RE
 };
 
 const carouselMessages = [
-  "Welcome to GASH! Discover the latest trends.",
-  "Enjoy exclusive deals and recommendations.",
-  "Shop by category and find your perfect fit.",
-  "Fast delivery and easy returns on all orders.",
-  "Sign up for an account to save your favorites!"
+  "New Season Arrivals: Explore the Latest Streetwear Trends at GASH",
+  "Exclusive Member Offer: Enjoy Special Deals and Recommendations",
+  "Shop by Category: Find Your Perfect Shoes, Shirts, and Jackets",
+  "Fast Delivery & Easy Returns on All Orders",
+  "Join GASH Club: Save Your Favorites and Track Your Orders"
 ];
 
 const Home = () => {
@@ -104,7 +104,6 @@ const Home = () => {
     return shuffled.slice(0, count);
   };
 
-
   // State for randomized sections
   const [forYouProducts, setForYouProducts] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -125,7 +124,7 @@ const Home = () => {
 
   useEffect(() => {
     if (categories.length > 0 && products.length > 0) {
-      setRandomCategories(categories); // Now using full list and slider handles visibility
+      setRandomCategories(categories);
 
       // Pick 2 random categories for specific home sections
       const shuffledCategories = [...categories].sort(() => 0.5 - Math.random());
@@ -170,9 +169,9 @@ const Home = () => {
   // Category slider navigation
   const handleCategoryPrev = () => {
     if (categorySliderRef.current) {
-      const cardWidth = 160; // Increased width for 7 items
+      const cardWidth = 160;
       const gap = 20;
-      const scrollAmount = (cardWidth + gap) * 1;
+      const scrollAmount = (cardWidth + gap) * 2;
       const newPosition = Math.max(0, categoryScrollPosition - scrollAmount);
       categorySliderRef.current.scrollTo({
         left: newPosition,
@@ -186,7 +185,7 @@ const Home = () => {
     if (categorySliderRef.current) {
       const cardWidth = 160;
       const gap = 20;
-      const scrollAmount = (cardWidth + gap) * 1;
+      const scrollAmount = (cardWidth + gap) * 2;
       const maxScroll = categorySliderRef.current.scrollWidth - categorySliderRef.current.clientWidth;
       const newPosition = Math.min(maxScroll, categoryScrollPosition + scrollAmount);
       categorySliderRef.current.scrollTo({
@@ -197,7 +196,6 @@ const Home = () => {
     }
   };
 
-  // Update scroll position on scroll
   const handleCategoryScroll = () => {
     if (categorySliderRef.current) {
       const scrollLeft = categorySliderRef.current.scrollLeft;
@@ -208,7 +206,6 @@ const Home = () => {
     }
   };
 
-  // Check scroll position on mount and when categories change
   useEffect(() => {
     if (categorySliderRef.current && randomCategories.length > 0) {
       const checkScroll = () => {
@@ -218,9 +215,7 @@ const Home = () => {
           setCanScrollNext(scrollWidth > clientWidth);
         }
       };
-      // Check after a short delay to ensure DOM is updated
       const timer = setTimeout(checkScroll, 100);
-      // Also check on window resize
       window.addEventListener('resize', checkScroll);
       return () => {
         clearTimeout(timer);
@@ -229,7 +224,6 @@ const Home = () => {
     }
   }, [randomCategories]);
 
-  // Carousel controls
   const handlePrevCarousel = () => {
     setCarouselIndex((prev) => (prev === 0 ? carouselMessages.length - 1 : prev - 1));
     setIsManuallyNavigated(true);
@@ -241,7 +235,7 @@ const Home = () => {
 
   return (
     <div>
-      {/* Carousel Section - full viewport width */}
+      {/* 1. Hero Carousel Section */}
       <div className="w-full overflow-x-hidden">
         <div className="relative w-full min-h-[200px] sm:min-h-[280px] md:min-h-[340px] h-[40vw] sm:h-[38vw] md:h-[36vw] lg:h-[calc(100vh-128px)] max-h-[300px] sm:max-h-[350px] md:max-h-[400px] lg:max-h-none flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 overflow-hidden box-border">
           <button
@@ -263,7 +257,8 @@ const Home = () => {
           </button>
         </div>
       </div>
-      {/* Main Home Content */}
+
+      {/* Main Home Content Layout */}
       <div className="page-container page-container-centered">
         {error && (
           <div className="text-center text-xs sm:text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap" role="alert" tabIndex={0} aria-live="polite">
@@ -281,10 +276,10 @@ const Home = () => {
           </div>
         )}
 
-        {/* Category Section */}
+        {/* 2. Categories Navigation */}
         {!error && (
           <section className="w-full mt-0 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
-            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Categories</h2>
+            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Shop By Category</h2>
             {loading ? (
               <div className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {[...Array(7)].map((_, index) => (
@@ -307,27 +302,25 @@ const Home = () => {
                   role="list"
                   aria-label={`${randomCategories.length} categories`}
                 >
-                  {randomCategories.map((category) => {
-                    return (
-                      <div
-                        key={category}
-                        className="w-[10em] flex-shrink-0 border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
-                        tabIndex={0}
-                        role="listitem"
-                        aria-label={`View products in ${category}`}
-                        onClick={() => handleCategoryClick(category)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
-                        }}
-                      >
-                        <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
-                          <span className="font-semibold text-sm sm:text-base text-center line-clamp-2">
-                            {category}
-                          </span>
-                        </div>
+                  {randomCategories.map((category) => (
+                    <div
+                      key={category}
+                      className="w-[10em] flex-shrink-0 border-2 border-gray-300 rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-300 ease-in-out bg-white"
+                      tabIndex={0}
+                      role="listitem"
+                      aria-label={`View products in ${category}`}
+                      onClick={() => handleCategoryClick(category)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") handleCategoryClick(category);
+                      }}
+                    >
+                      <div className="flex items-center justify-center bg-white px-2 py-3 min-h-[3em]">
+                        <span className="font-semibold text-sm sm:text-base text-center line-clamp-2 text-gray-900">
+                          {category}
+                        </span>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
                 {categoryScrollPosition > 0 && (
                   <button
@@ -352,10 +345,10 @@ const Home = () => {
           </section>
         )}
 
-        {/* For You Section */}
+        {/* 3. For You / Spotlight Section */}
         {!error && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
-            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">For You</h2>
+          <section className="w-full mt-6 sm:mt-8 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
+            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Products For You</h2>
             <div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
               role="grid"
@@ -379,65 +372,34 @@ const Home = () => {
           </section>
         )}
 
-        {/* Recommendations Section */}
-        {!error && (
-          <section className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
-            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommendations</h2>
-            <div
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
-              role="grid"
-              aria-label={loading ? "Loading products" : `${recommendedProducts.length} recommended products`}
-            >
-              {loading ? (
-                [...Array(5)].map((_, index) => (
-                  <ProductCardSkeleton key={index} />
-                ))
-              ) : (
-                recommendedProducts.map((product) => (
-                  <ProductCard
-                    key={product._id}
-                    product={product}
-                    handleProductClick={handleProductClick}
-                    handleKeyDown={handleKeyDown}
-                  />
-                ))
-              )}
-            </div>
-            {/* {!loading && (
-              <div className="flex justify-center mt-6 sm:mt-7 md:mt-8">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={handleViewAll}
-                  className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px]"
-                >
-                  View All
-                </Button>
-              </div>
-            )} */}
-          </section>
-        )}
-
-        {/* Dynamic Category Sections */}
+        {/* 4. Promotional Style Banner */}
         {!error && !loading && randomCategorySections.length > 0 && (
-          <div className="w-full mt-8 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
-            <div className="relative w-full min-h-[160px] sm:min-h-[220px] md:min-h-[260px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 py-12 px-6">
-              <div className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 tracking-wide leading-tight max-w-4xl select-none">
+          <div className="w-full mt-6 sm:mt-8 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <div className="relative w-full min-h-[160px] sm:min-h-[200px] md:min-h-[240px] flex flex-col items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 py-10 px-6 text-center">
+              <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 tracking-wide leading-tight max-w-4xl select-none mb-4">
                 Explore our curated categories and find your signature style.
               </div>
+              <Button
+                onClick={() => navigate("/products")}
+                variant="primary"
+                size="md"
+              >
+                Shop New Season
+              </Button>
             </div>
           </div>
         )}
 
+        {/* 5. Dynamic Category Sections */}
         {!error && !loading && randomCategorySections.map((section, idx) => (
-          <section key={idx} className="w-full mt-6 sm:mt-8 md:mt-10 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
+          <section key={idx} className="w-full mt-6 sm:mt-8 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-4 sm:mb-5 md:mb-6">
               <h2 className="text-left text-lg sm:text-xl md:text-xl font-semibold">
-                {section.categoryName}
+                Trending in {section.categoryName}
               </h2>
               <button
                 onClick={() => handleCategoryClick(section.categoryName)}
-                className="text-amber-600 text-xs sm:text-sm font-medium hover:underline"
+                className="text-amber-600 text-xs sm:text-sm font-semibold hover:underline bg-transparent border-none cursor-pointer"
               >
                 Explore More
               </button>
@@ -460,14 +422,31 @@ const Home = () => {
           </section>
         ))}
 
-        {!error && !loading && randomCategorySections.length > 0 && (
-          <div className="w-full mt-8 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
-            <div className="relative w-full min-h-[160px] sm:min-h-[220px] md:min-h-[260px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-amber-50 py-12 px-6">
-              <div className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 tracking-wide leading-tight max-w-4xl select-none">
-                Elevate your wardrobe with GASH's exclusive seasonal picks.
-              </div>
+        {/* 6. Recommendations Section */}
+        {!error && (
+          <section className="w-full mt-6 sm:mt-8 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
+            <h2 className="text-left mb-4 sm:mb-5 md:mb-6 text-lg sm:text-xl md:text-xl font-semibold">Recommended for You</h2>
+            <div
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 justify-center justify-items-center"
+              role="grid"
+              aria-label={loading ? "Loading products" : `${recommendedProducts.length} recommended products`}
+            >
+              {loading ? (
+                [...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))
+              ) : (
+                recommendedProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    handleProductClick={handleProductClick}
+                    handleKeyDown={handleKeyDown}
+                  />
+                ))
+              )}
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>

@@ -146,11 +146,11 @@ const Login = () => {
   ];
 
   return (
-    <div className="page-container flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
+    <div className="page-container flex flex-col items-center justify-center w-full">
       <section className="bg-white rounded-xl w-full max-w-sm md:max-w-4xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Part 1: Sign In Heading and Forms */}
-          <div className="flex-1 p-4 sm:p-5 md:p-8 lg:p-10">
+          <div className="flex-1 p-4 sm:p-5 md:p-8">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
               Sign In
             </h1>
@@ -163,7 +163,7 @@ const Login = () => {
               role="form"
               aria-label="Sign in form"
             >
-              <div className="text-right">
+              <div className="text-right my-6">
                 <Link
                   to="/forgot-password"
                   className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
@@ -175,7 +175,7 @@ const Login = () => {
           </div>
 
           {/* Part 2: Login Options */}
-          <div className="flex-1 p-4 sm:p-5 md:p-8 lg:p-10 bg-gray-50/50 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
+          <div className="flex-1 p-4 sm:p-5 md:p-8 bg-gray-50/50 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
               Other Login Options
             </h2>
@@ -219,7 +219,7 @@ const Login = () => {
               </Button>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-10">
+            <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-8">
               <p className="text-center text-xs sm:text-sm text-gray-600">
                 New to GASH?{" "}
                 <Link

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * Dropdown - Reusable dropdown component with click-outside detection
@@ -46,17 +47,23 @@ export default function Dropdown({
           })
         : trigger}
 
-      {isOpen && (
-        <div
-          className={`absolute ${
-            align === "right" ? "right-0" : "left-0"
-          } mt-2 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200 ${contentClassName}`}
-        >
-          {typeof children === "function"
-            ? children({ close })
-            : children}
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -8 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className={`absolute ${
+              align === "right" ? "right-0" : "left-0"
+            } mt-2 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200 ${contentClassName}`}
+          >
+            {typeof children === "function"
+              ? children({ close })
+              : children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

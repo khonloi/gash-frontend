@@ -8,6 +8,7 @@ import ProductCard, { ProductCardSkeleton } from "../features/products/component
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useProductDetail } from "../features/products/hooks/useProductDetail";
+import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 
 const THUMBNAILS_PER_PAGE = 4;
 
@@ -515,25 +516,25 @@ const ProductDetail = () => {
           <div className="absolute top-0 left-0 w-full h-full bg-black/80 cursor-pointer" onClick={handleCloseLightbox}></div>
           <div className="relative max-w-[90%] max-h-[90%] bg-white rounded-xl p-4 sm:p-5 flex items-center justify-center shadow-sm border border-gray-200">
             <button
-              className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none"
+              className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10 bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-amber-500 focus:outline-none"
               onClick={handleCloseLightbox}
               aria-label="Close lightbox"
             >
-              <i className="lni lni-close text-sm sm:text-base text-gray-900"></i>
+              <X className="w-4 h-4 text-gray-900" />
             </button>
             <button
-              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-amber-500 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
               onClick={handlePrevImage}
               aria-label="Previous image"
             >
-              <i className="lni lni-chevron-left text-base sm:text-lg text-gray-900"></i>
+              <ChevronLeft className="w-5 h-5 text-gray-900" />
             </button>
             <button
-              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-gray-300 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-amber-500 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
               onClick={handleNextImage}
               aria-label="Next image"
             >
-              <i className="lni lni-chevron-right text-base sm:text-lg text-gray-900"></i>
+              <ChevronRight className="w-5 h-5 text-gray-900" />
             </button>
             <div className="max-w-[800px] max-h-[600px] overflow-hidden flex items-center justify-center">
               <img
@@ -549,22 +550,22 @@ const ProductDetail = () => {
             </div>
             <div className="absolute bottom-2 sm:bottom-3 flex items-center gap-3">
               <button
-                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-amber-500 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 3}
                 aria-label="Zoom in"
               >
-                <i className="lni lni-zoom-in text-sm sm:text-base text-gray-900"></i>
+                <ZoomIn className="w-4 h-4 text-gray-900" />
               </button>
               <button
-                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
+                className="bg-white border-2 border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-50 hover:border-amber-500 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:cursor-not-allowed"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 1}
                 aria-label="Zoom out"
               >
-                <i className="lni lni-zoom-out text-sm sm:text-base text-gray-900"></i>
+                <ZoomOut className="w-4 h-4 text-gray-900" />
               </button>
-              <span className="text-gray-900 text-xs sm:text-sm bg-white px-2 py-1 rounded">
+              <span className="text-gray-900 text-xs sm:text-sm bg-white border border-gray-300 px-2.5 py-1 rounded-md shadow-sm">
                 {lightboxIndex + 1} / {allThumbnails.length}
               </span>
             </div>

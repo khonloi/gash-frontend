@@ -3,7 +3,7 @@ import React from "react";
 // Reusable loading spinner component with different variants
 const LoadingSpinner = ({
     size = "md",
-    color = "blue",
+    color = "amber",
     text = "",
     fullScreen = false,
     className = ""
@@ -19,6 +19,7 @@ const LoadingSpinner = ({
 
     // Color variants
     const colorClasses = {
+        amber: "border-amber-500",
         blue: "border-blue-500",
         green: "border-green-500",
         red: "border-red-500",
@@ -98,7 +99,7 @@ export const LoadingSkeleton = ({ count = 3, className = "" }) => {
             {[...Array(count)].map((_, index) => (
                 <article
                     key={index}
-                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm animate-pulse"
+                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm focus-within:shadow-sm animate-pulse"
                     aria-label="Loading order"
                 >
                     <div className="flex items-stretch gap-6 flex-1">
@@ -171,9 +172,9 @@ export const LoadingButton = ({
 export const LoadingDots = ({ className = "" }) => {
     return (
         <div className={`flex items-center gap-1 ${className}`}>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
         </div>
     );
 };

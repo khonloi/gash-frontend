@@ -36,8 +36,8 @@ const Input = React.forwardRef(({
           className={`w-full py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none 
             ${leftIcon ? "pl-11" : "pl-4"} 
             ${rightIcon ? "pr-11" : "pr-4"} 
-            ${error 
-              ? "border-red-500 bg-red-50/30 focus:border-red-500" 
+            ${error
+              ? "border-red-500 bg-red-50/30 focus:border-red-500"
               : "border-gray-300 focus:border-amber-400 focus:bg-white"
             } 
             ${className}`}

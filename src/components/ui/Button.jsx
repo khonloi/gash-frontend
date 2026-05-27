@@ -29,27 +29,19 @@ const Button = ({
   // Variant classes
   const variantClasses = {
     primary: {
-      base: "border-2 rounded-lg cursor-pointer font-semibold transition-colors text-gray-900 hover:opacity-90",
-      style: { backgroundColor: "#E9A319", borderColor: "#A86523" },
-      disabledStyle: { backgroundColor: "#C88A15", borderColor: "#8B5420" },
-      disabled: "disabled:text-gray-700 disabled:cursor-not-allowed disabled:opacity-70",
+      base: "border-2 border-[#A86523] bg-[#E9A319] rounded-xl cursor-pointer font-semibold transition-colors text-gray-900 hover:opacity-90",
+      disabled: "disabled:bg-[#C88A15] disabled:border-[#8B5420] disabled:text-gray-700 disabled:cursor-not-allowed disabled:opacity-70",
     },
     secondary: {
-      base: "border-2 border-gray-300 rounded-lg cursor-pointer font-semibold transition-colors bg-gray-50 text-gray-900 hover:bg-gray-100 hover:border-blue-600",
-      style: {},
-      disabledStyle: {},
+      base: "border-2 border-gray-300 rounded-xl cursor-pointer font-semibold transition-colors bg-gray-50 text-gray-900 hover:bg-gray-100 hover:border-amber-500",
       disabled: "disabled:bg-gray-400 disabled:border-gray-500 disabled:text-gray-600 disabled:cursor-not-allowed",
     },
     danger: {
-      base: "border-2 border-gray-300 rounded-lg cursor-pointer font-semibold transition-colors text-red-600 hover:bg-gray-50 hover:border-red-600",
-      style: {},
-      disabledStyle: {},
+      base: "border-2 border-gray-300 rounded-xl cursor-pointer font-semibold transition-colors text-red-600 hover:bg-gray-50 hover:border-red-600",
       disabled: "disabled:bg-gray-400 disabled:border-gray-500 disabled:text-red-800 disabled:cursor-not-allowed",
     },
     default: {
-      base: "border-2 border-gray-300 rounded-lg cursor-pointer font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-50 hover:border-blue-600",
-      style: {},
-      disabledStyle: {},
+      base: "border-2 border-gray-300 rounded-xl cursor-pointer font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-50 hover:border-amber-500",
       disabled: "disabled:bg-gray-400 disabled:border-gray-500 disabled:text-gray-600 disabled:cursor-not-allowed",
     },
   };
@@ -59,15 +51,9 @@ const Button = ({
 
   const baseClasses = "focus:outline-none";
 
-  // Combine styles - use disabled style when disabled
-  const buttonStyle = disabled && variantConfig.disabledStyle
-    ? { ...variantConfig.style, ...variantConfig.disabledStyle }
-    : variantConfig.style;
-
   return (
     <button
       className={`${sizeClass} ${variantConfig.base} ${variantConfig.disabled} ${baseClasses} ${className}`}
-      style={buttonStyle}
       disabled={disabled}
       {...props}
     >
