@@ -11,6 +11,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
+import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined';
 import NotificationsDropdown from "../../features/notifications/components/NotificationsDropdown";
 import Form from "../ui/Form";
 
@@ -266,6 +267,16 @@ export default function Header() {
                                         <button
                                             onMouseDown={(e) => {
                                                 e.stopPropagation();
+                                                navigate('/vouchers');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                        >
+                                            <ConfirmationNumberOutlinedIcon fontSize="small" /> My Vouchers
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => {
+                                                e.stopPropagation();
                                                 navigate('/favorites');
                                                 setShowUserMenu(false);
                                             }}
@@ -463,6 +474,17 @@ export default function Header() {
                                         className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
                                     >
                                         My Orders
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+
+                                            navigate("/vouchers");
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                    >
+                                        My Vouchers
                                     </button>
                                     <button
                                         onClick={(e) => {

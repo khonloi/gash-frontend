@@ -314,6 +314,8 @@ const Api = {
       axiosClient.post("/vouchers/apply-voucher", data, {
         headers: { Authorization: `Bearer ${token}` },
       }),
+    getAll: () =>
+      axiosClient.get("/vouchers/get-all"),
   },
 
   // ==== Bills ====
