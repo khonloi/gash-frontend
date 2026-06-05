@@ -1,2159 +1,4286 @@
-[{
-  "_id": {
-    "$oid": "6916b62104b0d55b6a46d275"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mekz6izfludic4.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631ed"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/ggwtrabkcv5lc42vqpmt.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.398Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.401Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631ef"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099888/gash_app/arzeqnvvdmr6una9eiav.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.406Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.407Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631f3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/culfszoorld7dkwxg70t.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.412Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.413Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631f9"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/s2i6uxybyacmajbdgnwe.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.423Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.424Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13ee9"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/sjdh7lkwgdecctl6rukg.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.028Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.028Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13eed"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/vdyvi4jrhn4dnw7uw4at.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.035Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.035Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea1425e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/ajxgmic18z8qqmc1w2dm.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.526Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.526Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea14266"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/gxh1oxbdmpvpcfct2nnw.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.529Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.529Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d091b2cfc385e1bda1b8"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102858/gash_app/j11cvt2irb8wegr9535n.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:47:45.185Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:47:45.185Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d091b2cfc385e1bda1c2"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d091b2cfc385e1bda1ba"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102858/gash_app/k1vt5ly6yn5nxqnbo19y.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:47:45.187Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:47:45.187Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d091b2cfc385e1bda1c2"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d091b2cfc385e1bda1c0"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102859/gash_app/cugpnhbmhzmhmopt4hfo.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:47:45.192Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:47:45.193Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d091b2cfc385e1bda1c2"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d65d31f17b1aa4db52c8"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104347/gash_app/kx7nbpjwu2vhtkqfulcs.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-14T07:12:29.280Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:12:29.280Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d65d31f17b1aa4db52ce"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c004"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/uxrkuomzs9pub3rh56kp.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.368Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.368Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c008"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105721/gash_app/hlbzbixejepxdsit3xvl.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.371Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.371Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c00c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105719/gash_app/pwc2lups49z1yqf4duyy.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.375Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.375Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183730bc4af928d63213bb"
-  },
-  "productId": {
-    "$oid": "691836f7bc4af928d6320cb3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/ounbyarovrgavupmhew8.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:17:52.953Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:17:52.953Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2f2"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/aoz5szphumocnmalx04i.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.181Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.181Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2fa"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/velswah3easqvx7njc9e.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.198Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.199Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e119"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201946/gash_app/p5icv17lq3axr4fi2q2y.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.742Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.743Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e11b"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/jmqslojcechc3sfvbxml.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.746Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.746Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a10"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202379/gash_app/zxpwvvo91ohl8kay3ce6.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.432Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.433Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a12"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202379/gash_app/a0yrvmfjprl234687xxt.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.435Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.435Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d27b"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef83w5m7biaf2.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d27c"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef82h8c9jpc10.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631f1"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099888/gash_app/e0j11ovbbsljkmzsvral.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.410Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.410Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631f5"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/wvgek5xnmsaq5qkpynvg.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.416Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.418Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c4f34945cd9a5d8631f7"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099889/gash_app/nrjrfdyis7ecxtqm2txk.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T05:58:11.420Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T05:58:11.421Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c4f34945cd9a5d8631fb"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13ef3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/rxslxhgbkqvy1mlhhzw1.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.044Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.044Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea14264"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/yjcor0wylvtirtwtferw.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.529Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.529Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d091b2cfc385e1bda1be"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102860/gash_app/lrhb1xjb89rcspw8akoy.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-14T06:47:45.190Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:47:45.190Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d091b2cfc385e1bda1c2"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d65d31f17b1aa4db52c4"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104346/gash_app/iyblsw7zpiq2pcfwdgxp.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:12:29.275Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:12:29.276Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d65d31f17b1aa4db52ce"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d65d31f17b1aa4db52ca"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104348/gash_app/uif9aisgpsvs5ewwcgjx.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:12:29.282Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:12:29.282Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d65d31f17b1aa4db52ce"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d65d31f17b1aa4db52cc"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104346/gash_app/eli2rwqovmrn3qscdkpm.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:12:29.284Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:12:29.284Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d65d31f17b1aa4db52ce"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd59659"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/xitm5hi6jze9h4gcnr7x.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.290Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.291Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd5965f"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/ssbz5fksiexxjj7z4jbu.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.304Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.305Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd59661"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/v9pmvfbuhaiqyqq0olta.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.309Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.310Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "691836f7bc4af928d6320cb1"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194614/gash_app/d1zhg92jpvilo5rrbl1p.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T08:16:55.513Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:16:55.515Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691836f7bc4af928d6320cb3"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183730bc4af928d63213b9"
-  },
-  "productId": {
-    "$oid": "691836f7bc4af928d6320cb3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/tce7tgyysuewlcmxmhwy.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:17:52.952Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:17:52.953Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "6918385dbc4af928d63222ac"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194970/gash_app/xuv9inreqzcauiuvj7x1.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T08:22:53.812Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:22:53.813Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918385dbc4af928d63222b8"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918385dbc4af928d63222ae"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194970/gash_app/xki116x9x3speib8iv88.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:22:53.818Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:22:53.819Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918385dbc4af928d63222b8"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2fc"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196136/gash_app/qbyugao7jp11pqchl9ik.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.202Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.202Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183e7bef9cc2d8dc359408"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196532/gash_app/q7dfrfjrqqxqwvcagava.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:48:59.433Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:48:59.434Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183e7bef9cc2d8dc359410"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183e7bef9cc2d8dc35940a"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196537/gash_app/hcptqrhlddejuzznxnkr.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T08:48:59.439Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:48:59.439Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183e7bef9cc2d8dc359410"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183e7bef9cc2d8dc35940e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196537/gash_app/sgihonpiehnmhyohottr.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:48:59.446Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:48:59.447Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183e7bef9cc2d8dc359410"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918433419aab47cf7f5514c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/vzuzkz0wnxhv4by3xm3z.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T09:09:08.414Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T09:09:08.415Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918433419aab47cf7f55152"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e121"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201945/gash_app/bv7cd5h7vi0731dllsxm.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.757Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.757Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a08"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/uticebawrrafppxznkvi.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.421Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.422Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d277"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef82h9fva4ide.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d27a"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef83w5pips579.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13eeb"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100755/gash_app/fldfqtmynk5ftsstuxct.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.032Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.033Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea1425a"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/no6havd8l0tig3iozg59.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.523Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.524Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d091b2cfc385e1bda1bc"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102862/gash_app/gqmfnsg3yativib2tmw8.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:47:45.188Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:47:45.188Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d091b2cfc385e1bda1c2"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c000"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105719/gash_app/wipvjwdr7pxjvennqfll.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.365Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.366Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c00a"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105721/gash_app/yfznull38ymirwlnhwuq.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.373Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.374Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c00e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/jqjtdolrtkoupvudyhvh.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.376Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.377Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd59657"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191039/gash_app/dlunmd3jopg3eqtjgwwb.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.258Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.269Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd5965d"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191039/gash_app/eedxvoxoll2peayarann.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.301Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.301Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd59663"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/l0mpd6soumb2y1iozdwf.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.313Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.313Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183730bc4af928d63213b7"
-  },
-  "productId": {
-    "$oid": "691836f7bc4af928d6320cb3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/dygcqpfsdu9tm9bffr9z.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:17:52.951Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:17:52.952Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "69183730bc4af928d63213bd"
-  },
-  "productId": {
-    "$oid": "691836f7bc4af928d6320cb3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194672/gash_app/cntr83upyikwbd0vmefv.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:17:52.954Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:17:52.954Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "6918385dbc4af928d63222b2"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194972/gash_app/ewzgo0gxwuvtzt3ytavr.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:22:53.825Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:22:53.826Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918385dbc4af928d63222b8"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2ee"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196136/gash_app/c7bxztdovvyrybt303pq.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.171Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.172Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2f4"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196139/gash_app/kgjovy8i1azwgljevcw9.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.186Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.186Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2f6"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196136/gash_app/saqbu96fgcorlrumjbrf.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.190Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.191Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e115"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/ya6j3dpcm8terf0etgi1.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.729Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.732Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e123"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201945/gash_app/xtzwjcnkhxv7tc52quuq.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.759Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.760Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a02"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202377/gash_app/ygjgxbebtp3g8bsg67oh.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.412Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.413Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a06"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/ged8y6xsznl89bdigqsn.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.419Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.419Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a0c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/lgs4mpsgewyuw1x2fipf.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.426Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.426Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a0e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/s4vpu3vuboog7g80tfrf.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.429Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.430Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d276"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef82h8dfoqr57.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d278"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mekz6iz2nhtxa0.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916b6cd04b0d55b6a46d279"
-  },
-  "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mekz6iz5kufa77.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-09-11T08:46:00.000Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916b4b404b0d55b6a46d26e"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13eef"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/xmab0a2hi5l8akgbypwa.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.037Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.038Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13ef1"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100757/gash_app/hsvi4la2tpxnzyux3lyd.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.041Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.042Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916c85682ece642cea13ef5"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/pvxuqejfivwdhaiagl6b.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:12:38.045Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:12:38.046Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916c85682ece642cea13ef7"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea1425c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101351/gash_app/k56k9jp8zbp9iaesspcc.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.525Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.525Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea14260"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/mqjzm8vqdbzuduqnwemg.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.526Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.527Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916caa882ece642cea14262"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101351/gash_app/hcbstwbtppbikqxwjiui.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T06:22:32.528Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T06:22:32.528Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916caa882ece642cea14268"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916d65d31f17b1aa4db52c6"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104346/gash_app/hv1zptu6hqquryjxjlvv.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:12:29.279Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:12:29.279Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916d65d31f17b1aa4db52ce"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8bffe"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/mhtfuqzl8qqvr1uyxf6w.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.361Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.362Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c002"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/z6nl2xrwyef7matf6ctk.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.367Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.367Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "6916dbba65fb7e564ad8c006"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/vmop1ojc6jcdagp876k6.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-14T07:35:22.370Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-14T07:35:22.370Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6916dbba65fb7e564ad8c010"
-  }
-},
-{
-  "_id": {
-    "$oid": "691829005d2c4dddbdd5965b"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/xdeyuwdevdw3gdizkywn.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T07:17:20.297Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T07:17:20.297Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691829005d2c4dddbdd59665"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183730bc4af928d63213b5"
-  },
-  "productId": {
-    "$oid": "691836f7bc4af928d6320cb3"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/ck0yvspjl4wnwyrxdtqk.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:17:52.950Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:17:52.950Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "6918385dbc4af928d63222b0"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194971/gash_app/h3pzzax6osfe01wxkcfy.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:22:53.821Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:22:53.822Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918385dbc4af928d63222b8"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918385dbc4af928d63222b4"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194972/gash_app/wzeh4jqcw5lsgdesttv4.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:22:53.829Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:22:53.830Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918385dbc4af928d63222b8"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918385dbc4af928d63222b6"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194973/gash_app/iowitipi6kqjgv8hqzps.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:22:53.834Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:22:53.834Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918385dbc4af928d63222b8"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2f0"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/xzguq3ivxcxbu8ewt8dh.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.178Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.179Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2f8"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/cjpwn9ptqu1xb9jya6lx.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.193Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.194Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183cedef9cc2d8dc34e2fe"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/kgriceetgoks4ag8wj5y.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:42:21.206Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:42:21.207Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183cedef9cc2d8dc34e300"
-  }
-},
-{
-  "_id": {
-    "$oid": "69183e7bef9cc2d8dc35940c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196536/gash_app/dwmnfzjmz8lzowbo0kev.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T08:48:59.443Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T08:48:59.443Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69183e7bef9cc2d8dc359410"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918433419aab47cf7f5514a"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/xxa6iou9wzcrw0vz7ziv.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T09:09:08.410Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T09:09:08.411Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918433419aab47cf7f55152"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918433419aab47cf7f5514e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/n7jf8jeiztoeuvdly8de.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-15T09:09:08.420Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T09:09:08.421Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918433419aab47cf7f55152"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918433419aab47cf7f55150"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/zk4zfqggk4potabfmnph.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T09:09:08.424Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T09:09:08.424Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918433419aab47cf7f55152"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e117"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/peshyastlt3ddpeifqpa.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.739Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.739Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e11d"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/pzptpjbsc5wflt9yoipc.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.750Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.750Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918539aa17ac3f26c21e11f"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201945/gash_app/fdchlezfcfjqcltoklau.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:19:06.753Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:19:06.754Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918539aa17ac3f26c21e125"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a04"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202377/gash_app/iganndvhepqsxlzgqpzy.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.417Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.417Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "6918554ca17ac3f26c226a0a"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202379/gash_app/bqu9ljj3y1qjnwszomxy.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-15T10:26:20.424Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-15T10:26:20.424Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "6918554ca17ac3f26c226a14"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a4031a"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463699/gash_app/wsu0xqjyry7rkafndwoj.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.563Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.565Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a4031c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463698/gash_app/emqbuefpxstveh6ffubq.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.620Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.621Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a4031e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463699/gash_app/j2ellsaxeiion9iqmjdo.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.675Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.676Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a40320"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/ybfcvezdhc7zknsgvovs.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.726Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.726Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a40322"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/xj7ipsnqjjnj1tqqcd2p.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.776Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.776Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a40324"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/ve2v9hpyk43v7dvgossv.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.825Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.825Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a40326"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/d3gqkxktl0unl6qgcgrn.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.876Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.876Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691c52188e87687df7a40328"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463701/gash_app/immvrbbxjfshlpycozcj.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-18T11:01:44.926Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-18T11:01:44.927Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691c52188e87687df7a4032a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d83bd1830b2aeb5f8fa08"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763541948/gash_app/b8h6dy91iymr66px2oie.png",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-19T08:45:49.870Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T08:45:49.871Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d83bd1830b2aeb5f8fa0a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e2991d5b3083237c191"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/ahziqjip11k6ptktuk6g.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:30:17.866Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:30:17.867Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e2a91d5b3083237c199"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e2991d5b3083237c193"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/goh1ksttyjggo6wpi4af.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:30:17.931Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:30:17.932Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e2a91d5b3083237c199"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e2991d5b3083237c195"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/qy2wlj8ltl9acbbmwxir.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:30:17.993Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:30:17.993Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e2a91d5b3083237c199"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e2a91d5b3083237c197"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/pezdyog9obc8j6pdq4nn.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-19T09:30:18.054Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:30:18.055Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e2a91d5b3083237c199"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e8e91d5b3083237c911"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544715/gash_app/hq0l1dcw8gl1oyhdhmq4.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:31:58.973Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:31:58.973Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e8f91d5b3083237c919"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e8f91d5b3083237c913"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544716/gash_app/zwkvus000chb8ltgwd3l.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:31:59.035Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:31:59.035Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e8f91d5b3083237c919"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e8f91d5b3083237c915"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544716/gash_app/ayghad5xh12kabbv576l.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:31:59.095Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:31:59.095Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e8f91d5b3083237c919"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8e8f91d5b3083237c917"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544716/gash_app/sayyphvel61j7taw3yp2.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-19T09:31:59.156Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:31:59.156Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8e8f91d5b3083237c919"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8f6f91d5b3083237d252"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544939/gash_app/xudcn2a72jcwjreqciis.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:35:43.598Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:35:43.599Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8f6f91d5b3083237d25a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8f6f91d5b3083237d254"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544940/gash_app/pk8snbtcafvxgnipjija.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:35:43.659Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:35:43.659Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8f6f91d5b3083237d25a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8f6f91d5b3083237d256"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544939/gash_app/chdbxny9einoa6wmlkp2.webp",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-11-19T09:35:43.713Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:35:43.713Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8f6f91d5b3083237d25a"
-  }
-},
-{
-  "_id": {
-    "$oid": "691d8f6f91d5b3083237d258"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544939/gash_app/jpjgbtfbwtqbg40iegjk.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-19T09:35:43.767Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-19T09:35:43.767Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "691d8f6f91d5b3083237d25a"
-  }
-},
-{
-  "_id": {
-    "$oid": "692034eda95dfcdb10d1bc09"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763718379/gash_app/jgwkhte3ow0ouxftqamz.png",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-11-21T09:46:21.772Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-21T09:46:21.773Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "692034eda95dfcdb10d1bc0f"
-  }
-},
-{
-  "_id": {
-    "$oid": "69355df6fd1d089af43a5e15"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765105141/gash_app/fdzpaaqbtuwrlji9nlqm.webp",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-12-07T10:59:02.210Z"
-  },
-  "updatedAt": {
-    "$date": "2025-12-07T10:59:02.210Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69355df6fd1d089af43a5e17"
-  }
-},
-{
-  "_id": {
-    "$oid": "69366e3b412dba60fcd6f04c"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765174837/gash_app/enpo8auqtrovs2fwa5sn.jpg",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-12-08T06:20:43.311Z"
-  },
-  "updatedAt": {
-    "$date": "2025-12-08T06:20:43.311Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69366e3b412dba60fcd6f052"
-  }
-},
-{
-  "_id": {
-    "$oid": "69366e3b412dba60fcd6f04e"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765174837/gash_app/zcyzmnfqbemyurlxd8hn.jpg",
-  "isMain": true,
-  "createdAt": {
-    "$date": "2025-12-08T06:20:43.365Z"
-  },
-  "updatedAt": {
-    "$date": "2025-12-08T06:20:43.365Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69366e3b412dba60fcd6f052"
-  }
-},
-{
-  "_id": {
-    "$oid": "69366e3b412dba60fcd6f050"
-  },
-  "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765174840/gash_app/w0kr1ustuwanoico2fhg.jpg",
-  "isMain": false,
-  "createdAt": {
-    "$date": "2025-12-08T06:20:43.415Z"
-  },
-  "updatedAt": {
-    "$date": "2025-12-08T06:20:43.415Z"
-  },
-  "__v": 0,
-  "productId": {
-    "$oid": "69366e3b412dba60fcd6f052"
-  }
-}]
+[
+  {
+    "_id": {
+      "$oid": "6916b62104b0d55b6a46d275"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mekz6izfludic4.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631ed"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/ggwtrabkcv5lc42vqpmt.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.398Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.401Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631ef"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099888/gash_app/arzeqnvvdmr6una9eiav.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.406Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.407Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631f3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/culfszoorld7dkwxg70t.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.412Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.413Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631f9"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/s2i6uxybyacmajbdgnwe.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.423Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.424Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13ee9"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/sjdh7lkwgdecctl6rukg.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.028Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.028Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13eed"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/vdyvi4jrhn4dnw7uw4at.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.035Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.035Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea1425e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/ajxgmic18z8qqmc1w2dm.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.526Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.526Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea14266"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/gxh1oxbdmpvpcfct2nnw.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.529Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.529Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d091b2cfc385e1bda1b8"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102858/gash_app/j11cvt2irb8wegr9535n.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:47:45.185Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:47:45.185Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d091b2cfc385e1bda1c2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d091b2cfc385e1bda1ba"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102858/gash_app/k1vt5ly6yn5nxqnbo19y.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:47:45.187Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:47:45.187Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d091b2cfc385e1bda1c2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d091b2cfc385e1bda1c0"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102859/gash_app/cugpnhbmhzmhmopt4hfo.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:47:45.192Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:47:45.193Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d091b2cfc385e1bda1c2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d65d31f17b1aa4db52c8"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104347/gash_app/kx7nbpjwu2vhtkqfulcs.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-14T07:12:29.280Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:12:29.280Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d65d31f17b1aa4db52ce"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c004"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/uxrkuomzs9pub3rh56kp.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.368Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.368Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c008"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105721/gash_app/hlbzbixejepxdsit3xvl.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.371Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.371Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c00c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105719/gash_app/pwc2lups49z1yqf4duyy.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.375Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.375Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183730bc4af928d63213bb"
+    },
+    "productId": {
+      "$oid": "691836f7bc4af928d6320cb3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/ounbyarovrgavupmhew8.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:17:52.953Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:17:52.953Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2f2"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/aoz5szphumocnmalx04i.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.181Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.181Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2fa"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/velswah3easqvx7njc9e.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.198Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.199Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e119"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201946/gash_app/p5icv17lq3axr4fi2q2y.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.742Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.743Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e11b"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/jmqslojcechc3sfvbxml.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.746Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.746Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a10"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202379/gash_app/zxpwvvo91ohl8kay3ce6.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.432Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.433Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a12"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202379/gash_app/a0yrvmfjprl234687xxt.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.435Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.435Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d27b"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef83w5m7biaf2.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d27c"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef82h8c9jpc10.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631f1"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099888/gash_app/e0j11ovbbsljkmzsvral.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.410Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.410Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631f5"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099890/gash_app/wvgek5xnmsaq5qkpynvg.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.416Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.418Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c4f34945cd9a5d8631f7"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763099889/gash_app/nrjrfdyis7ecxtqm2txk.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T05:58:11.420Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T05:58:11.421Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c4f34945cd9a5d8631fb"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13ef3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/rxslxhgbkqvy1mlhhzw1.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.044Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.044Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea14264"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/yjcor0wylvtirtwtferw.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.529Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.529Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d091b2cfc385e1bda1be"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102860/gash_app/lrhb1xjb89rcspw8akoy.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-14T06:47:45.190Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:47:45.190Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d091b2cfc385e1bda1c2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d65d31f17b1aa4db52c4"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104346/gash_app/iyblsw7zpiq2pcfwdgxp.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:12:29.275Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:12:29.276Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d65d31f17b1aa4db52ce"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d65d31f17b1aa4db52ca"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104348/gash_app/uif9aisgpsvs5ewwcgjx.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:12:29.282Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:12:29.282Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d65d31f17b1aa4db52ce"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d65d31f17b1aa4db52cc"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104346/gash_app/eli2rwqovmrn3qscdkpm.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:12:29.284Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:12:29.284Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d65d31f17b1aa4db52ce"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd59659"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/xitm5hi6jze9h4gcnr7x.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.290Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.291Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd5965f"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/ssbz5fksiexxjj7z4jbu.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.304Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.305Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd59661"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/v9pmvfbuhaiqyqq0olta.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.309Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.310Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691836f7bc4af928d6320cb1"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194614/gash_app/d1zhg92jpvilo5rrbl1p.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T08:16:55.513Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:16:55.515Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691836f7bc4af928d6320cb3"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183730bc4af928d63213b9"
+    },
+    "productId": {
+      "$oid": "691836f7bc4af928d6320cb3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/tce7tgyysuewlcmxmhwy.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:17:52.952Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:17:52.953Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6918385dbc4af928d63222ac"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194970/gash_app/xuv9inreqzcauiuvj7x1.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T08:22:53.812Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:22:53.813Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918385dbc4af928d63222b8"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918385dbc4af928d63222ae"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194970/gash_app/xki116x9x3speib8iv88.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:22:53.818Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:22:53.819Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918385dbc4af928d63222b8"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2fc"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196136/gash_app/qbyugao7jp11pqchl9ik.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.202Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.202Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183e7bef9cc2d8dc359408"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196532/gash_app/q7dfrfjrqqxqwvcagava.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:48:59.433Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:48:59.434Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183e7bef9cc2d8dc359410"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183e7bef9cc2d8dc35940a"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196537/gash_app/hcptqrhlddejuzznxnkr.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T08:48:59.439Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:48:59.439Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183e7bef9cc2d8dc359410"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183e7bef9cc2d8dc35940e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196537/gash_app/sgihonpiehnmhyohottr.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:48:59.446Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:48:59.447Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183e7bef9cc2d8dc359410"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918433419aab47cf7f5514c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/vzuzkz0wnxhv4by3xm3z.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T09:09:08.414Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T09:09:08.415Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918433419aab47cf7f55152"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e121"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201945/gash_app/bv7cd5h7vi0731dllsxm.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.757Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.757Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a08"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/uticebawrrafppxznkvi.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.421Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.422Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d277"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef82h9fva4ide.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d27a"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef83w5pips579.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13eeb"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100755/gash_app/fldfqtmynk5ftsstuxct.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.032Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.033Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea1425a"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/no6havd8l0tig3iozg59.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.523Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.524Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d091b2cfc385e1bda1bc"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763102862/gash_app/gqmfnsg3yativib2tmw8.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:47:45.188Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:47:45.188Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d091b2cfc385e1bda1c2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c000"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105719/gash_app/wipvjwdr7pxjvennqfll.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.365Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.366Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c00a"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105721/gash_app/yfznull38ymirwlnhwuq.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.373Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.374Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c00e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/jqjtdolrtkoupvudyhvh.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.376Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.377Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd59657"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191039/gash_app/dlunmd3jopg3eqtjgwwb.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.258Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.269Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd5965d"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191039/gash_app/eedxvoxoll2peayarann.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.301Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.301Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd59663"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/l0mpd6soumb2y1iozdwf.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.313Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.313Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183730bc4af928d63213b7"
+    },
+    "productId": {
+      "$oid": "691836f7bc4af928d6320cb3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/dygcqpfsdu9tm9bffr9z.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:17:52.951Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:17:52.952Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69183730bc4af928d63213bd"
+    },
+    "productId": {
+      "$oid": "691836f7bc4af928d6320cb3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194672/gash_app/cntr83upyikwbd0vmefv.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:17:52.954Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:17:52.954Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6918385dbc4af928d63222b2"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194972/gash_app/ewzgo0gxwuvtzt3ytavr.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:22:53.825Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:22:53.826Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918385dbc4af928d63222b8"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2ee"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196136/gash_app/c7bxztdovvyrybt303pq.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.171Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.172Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2f4"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196139/gash_app/kgjovy8i1azwgljevcw9.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.186Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.186Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2f6"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196136/gash_app/saqbu96fgcorlrumjbrf.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.190Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.191Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e115"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/ya6j3dpcm8terf0etgi1.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.729Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.732Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e123"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201945/gash_app/xtzwjcnkhxv7tc52quuq.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.759Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.760Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a02"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202377/gash_app/ygjgxbebtp3g8bsg67oh.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.412Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.413Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a06"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/ged8y6xsznl89bdigqsn.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.419Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.419Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a0c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/lgs4mpsgewyuw1x2fipf.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.426Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.426Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a0e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202378/gash_app/s4vpu3vuboog7g80tfrf.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.429Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.430Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d276"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mef82h8dfoqr57.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d278"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mekz6iz2nhtxa0.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916b6cd04b0d55b6a46d279"
+    },
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mekz6iz5kufa77.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-11T08:46:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916b4b404b0d55b6a46d26e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13eef"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/xmab0a2hi5l8akgbypwa.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.037Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.038Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13ef1"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100757/gash_app/hsvi4la2tpxnzyux3lyd.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.041Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.042Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916c85682ece642cea13ef5"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763100756/gash_app/pvxuqejfivwdhaiagl6b.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:12:38.045Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:12:38.046Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916c85682ece642cea13ef7"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea1425c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101351/gash_app/k56k9jp8zbp9iaesspcc.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.525Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.525Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea14260"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101350/gash_app/mqjzm8vqdbzuduqnwemg.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.526Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.527Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916caa882ece642cea14262"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763101351/gash_app/hcbstwbtppbikqxwjiui.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T06:22:32.528Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T06:22:32.528Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916caa882ece642cea14268"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916d65d31f17b1aa4db52c6"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763104346/gash_app/hv1zptu6hqquryjxjlvv.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:12:29.279Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:12:29.279Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916d65d31f17b1aa4db52ce"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8bffe"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/mhtfuqzl8qqvr1uyxf6w.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.361Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.362Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c002"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/z6nl2xrwyef7matf6ctk.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.367Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.367Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6916dbba65fb7e564ad8c006"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763105720/gash_app/vmop1ojc6jcdagp876k6.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-14T07:35:22.370Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T07:35:22.370Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6916dbba65fb7e564ad8c010"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691829005d2c4dddbdd5965b"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763191038/gash_app/xdeyuwdevdw3gdizkywn.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T07:17:20.297Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T07:17:20.297Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691829005d2c4dddbdd59665"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183730bc4af928d63213b5"
+    },
+    "productId": {
+      "$oid": "691836f7bc4af928d6320cb3"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194671/gash_app/ck0yvspjl4wnwyrxdtqk.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:17:52.950Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:17:52.950Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6918385dbc4af928d63222b0"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194971/gash_app/h3pzzax6osfe01wxkcfy.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:22:53.821Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:22:53.822Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918385dbc4af928d63222b8"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918385dbc4af928d63222b4"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194972/gash_app/wzeh4jqcw5lsgdesttv4.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:22:53.829Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:22:53.830Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918385dbc4af928d63222b8"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918385dbc4af928d63222b6"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763194973/gash_app/iowitipi6kqjgv8hqzps.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:22:53.834Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:22:53.834Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918385dbc4af928d63222b8"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2f0"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/xzguq3ivxcxbu8ewt8dh.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.178Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.179Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2f8"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/cjpwn9ptqu1xb9jya6lx.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.193Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.194Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183cedef9cc2d8dc34e2fe"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196137/gash_app/kgriceetgoks4ag8wj5y.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:42:21.206Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:42:21.207Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183cedef9cc2d8dc34e300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69183e7bef9cc2d8dc35940c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763196536/gash_app/dwmnfzjmz8lzowbo0kev.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T08:48:59.443Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T08:48:59.443Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69183e7bef9cc2d8dc359410"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918433419aab47cf7f5514a"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/xxa6iou9wzcrw0vz7ziv.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T09:09:08.410Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T09:09:08.411Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918433419aab47cf7f55152"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918433419aab47cf7f5514e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/n7jf8jeiztoeuvdly8de.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-15T09:09:08.420Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T09:09:08.421Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918433419aab47cf7f55152"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918433419aab47cf7f55150"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763197747/gash_app/zk4zfqggk4potabfmnph.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T09:09:08.424Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T09:09:08.424Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918433419aab47cf7f55152"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e117"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/peshyastlt3ddpeifqpa.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.739Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.739Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e11d"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201944/gash_app/pzptpjbsc5wflt9yoipc.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.750Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.750Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918539aa17ac3f26c21e11f"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763201945/gash_app/fdchlezfcfjqcltoklau.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:19:06.753Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:19:06.754Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918539aa17ac3f26c21e125"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a04"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202377/gash_app/iganndvhepqsxlzgqpzy.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.417Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.417Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6918554ca17ac3f26c226a0a"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763202379/gash_app/bqu9ljj3y1qjnwszomxy.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-15T10:26:20.424Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-15T10:26:20.424Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6918554ca17ac3f26c226a14"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a4031a"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463699/gash_app/wsu0xqjyry7rkafndwoj.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.563Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.565Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a4031c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463698/gash_app/emqbuefpxstveh6ffubq.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.620Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.621Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a4031e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463699/gash_app/j2ellsaxeiion9iqmjdo.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.675Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.676Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a40320"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/ybfcvezdhc7zknsgvovs.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.726Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.726Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a40322"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/xj7ipsnqjjnj1tqqcd2p.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.776Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.776Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a40324"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/ve2v9hpyk43v7dvgossv.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.825Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.825Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a40326"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463700/gash_app/d3gqkxktl0unl6qgcgrn.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.876Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.876Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691c52188e87687df7a40328"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763463701/gash_app/immvrbbxjfshlpycozcj.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-18T11:01:44.926Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-18T11:01:44.927Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691c52188e87687df7a4032a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d83bd1830b2aeb5f8fa08"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763541948/gash_app/b8h6dy91iymr66px2oie.png",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-19T08:45:49.870Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T08:45:49.871Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d83bd1830b2aeb5f8fa0a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e2991d5b3083237c191"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/ahziqjip11k6ptktuk6g.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:30:17.866Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:30:17.867Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e2a91d5b3083237c199"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e2991d5b3083237c193"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/goh1ksttyjggo6wpi4af.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:30:17.931Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:30:17.932Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e2a91d5b3083237c199"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e2991d5b3083237c195"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/qy2wlj8ltl9acbbmwxir.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:30:17.993Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:30:17.993Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e2a91d5b3083237c199"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e2a91d5b3083237c197"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544614/gash_app/pezdyog9obc8j6pdq4nn.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-19T09:30:18.054Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:30:18.055Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e2a91d5b3083237c199"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e8e91d5b3083237c911"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544715/gash_app/hq0l1dcw8gl1oyhdhmq4.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:31:58.973Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:31:58.973Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e8f91d5b3083237c919"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e8f91d5b3083237c913"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544716/gash_app/zwkvus000chb8ltgwd3l.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:31:59.035Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:31:59.035Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e8f91d5b3083237c919"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e8f91d5b3083237c915"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544716/gash_app/ayghad5xh12kabbv576l.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:31:59.095Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:31:59.095Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e8f91d5b3083237c919"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8e8f91d5b3083237c917"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544716/gash_app/sayyphvel61j7taw3yp2.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-19T09:31:59.156Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:31:59.156Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8e8f91d5b3083237c919"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8f6f91d5b3083237d252"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544939/gash_app/xudcn2a72jcwjreqciis.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:35:43.598Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:35:43.599Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8f6f91d5b3083237d25a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8f6f91d5b3083237d254"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544940/gash_app/pk8snbtcafvxgnipjija.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:35:43.659Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:35:43.659Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8f6f91d5b3083237d25a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8f6f91d5b3083237d256"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544939/gash_app/chdbxny9einoa6wmlkp2.webp",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-11-19T09:35:43.713Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:35:43.713Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8f6f91d5b3083237d25a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691d8f6f91d5b3083237d258"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763544939/gash_app/jpjgbtfbwtqbg40iegjk.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-19T09:35:43.767Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-19T09:35:43.767Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "691d8f6f91d5b3083237d25a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "692034eda95dfcdb10d1bc09"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1763718379/gash_app/jgwkhte3ow0ouxftqamz.png",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-11-21T09:46:21.772Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-21T09:46:21.773Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "692034eda95dfcdb10d1bc0f"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69355df6fd1d089af43a5e15"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765105141/gash_app/fdzpaaqbtuwrlji9nlqm.webp",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-12-07T10:59:02.210Z"
+    },
+    "updatedAt": {
+      "$date": "2025-12-07T10:59:02.210Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69355df6fd1d089af43a5e17"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69366e3b412dba60fcd6f04c"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765174837/gash_app/enpo8auqtrovs2fwa5sn.jpg",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-12-08T06:20:43.311Z"
+    },
+    "updatedAt": {
+      "$date": "2025-12-08T06:20:43.311Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69366e3b412dba60fcd6f052"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69366e3b412dba60fcd6f04e"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765174837/gash_app/zcyzmnfqbemyurlxd8hn.jpg",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2025-12-08T06:20:43.365Z"
+    },
+    "updatedAt": {
+      "$date": "2025-12-08T06:20:43.365Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69366e3b412dba60fcd6f052"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69366e3b412dba60fcd6f050"
+    },
+    "imageUrl": "https://res.cloudinary.com/dsevkup6t/image/upload/v1765174840/gash_app/w0kr1ustuwanoico2fhg.jpg",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2025-12-08T06:20:43.415Z"
+    },
+    "updatedAt": {
+      "$date": "2025-12-08T06:20:43.415Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "69366e3b412dba60fcd6f052"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "da123f2e503a4bc793148806"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "af1671c0e92849519369a687"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "ae692684559c4933a8fd21f4"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "af1671c0e92849519369a687"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "2de1d57e17334ef49ab38b0e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "af1671c0e92849519369a687"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "868e5eead161446cb32ccb36"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "af1671c0e92849519369a687"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "88148580c3664709b969be20"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "af1671c0e92849519369a687"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "998de614fcf949808b40a244"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "1f1378cb2b6040e29a33d26c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "2380b48aea234071b262a690"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "1f1378cb2b6040e29a33d26c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b694813d96de4a31ad934f28"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "1f1378cb2b6040e29a33d26c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ef43e49d5ec42e3b5534343"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "1f1378cb2b6040e29a33d26c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b9af8931ac3943418ef1e45c"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "1f1378cb2b6040e29a33d26c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "f4484f8e24924c63ad6d9291"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "4a5b8b6b4b0645a190364a8b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "3890f96b011e47d19daec40f"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "4a5b8b6b4b0645a190364a8b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a59e063d174797b111588a"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "4a5b8b6b4b0645a190364a8b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5c9acc3627dd4013ae5f2e3e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "4a5b8b6b4b0645a190364a8b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "0e4343c359d840119c1f34fa"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "4a5b8b6b4b0645a190364a8b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "2d67f539c1304d99b215bf75"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "7a130e87c2d847f59265192b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b375d87ede1a4e3c887229b5"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "7a130e87c2d847f59265192b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c85e1b1bbfed449fb9e8da7f"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "7a130e87c2d847f59265192b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "9d0291cc1284440c80e53371"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "7a130e87c2d847f59265192b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "0d268f76ddde4ddab51e1005"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "7a130e87c2d847f59265192b"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "1b88b95161944fdb9ff38beb"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "f1ee5a52a67047c681c76ed0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c98fb82223ee43fe8c322a57"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "f1ee5a52a67047c681c76ed0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "177e1218415342789e79b809"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "f1ee5a52a67047c681c76ed0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "039291f8d08d4ce2b489a30d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "f1ee5a52a67047c681c76ed0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "da216ba322f24d919c49aaa6"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "f1ee5a52a67047c681c76ed0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "2bf5c951505a44a69ccd0e1c"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "64bd136c15424ca1b615366e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d658fd718225429b84fffe63"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "64bd136c15424ca1b615366e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "0ea18ef74628459386e64ffc"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "64bd136c15424ca1b615366e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "7f7fd175a5ba4e3ab1911b49"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "64bd136c15424ca1b615366e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "90f4fa0564d44078aca6eac7"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "64bd136c15424ca1b615366e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "9960c4fb6093446381360a2f"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "79ef8cc6b77444939b883877"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e391a270c1f246f59e14861d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "79ef8cc6b77444939b883877"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e52ecbbf634249cebd1fe8ed"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "79ef8cc6b77444939b883877"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a4999624489843b9a3897576"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "79ef8cc6b77444939b883877"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "850afe457f904dbd87538aed"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "79ef8cc6b77444939b883877"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "468cef6b4f634bbaa6d2431a"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "17b71ed7d3f045af9790a97a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e3ba007228a64363b48c9226"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "17b71ed7d3f045af9790a97a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "110df55a17544f0a8fbbf8cb"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "17b71ed7d3f045af9790a97a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "70be172bfb704ea2b3508611"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "17b71ed7d3f045af9790a97a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "606da975df8442e4a228b212"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "17b71ed7d3f045af9790a97a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "7096a58efed74d56a390231f"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fd0759e01e50407f8fd2a9c1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d037952056024fb1a43d35f6"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fd0759e01e50407f8fd2a9c1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5fb4d8409c624814a341060e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fd0759e01e50407f8fd2a9c1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "ab4661fa05f1433d9096af61"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fd0759e01e50407f8fd2a9c1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "ef3c3f40996943319967d977"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fd0759e01e50407f8fd2a9c1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "8642b88d71204d20911265e9"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "b6e1e9053db8476a8cc3e821"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "306ffdd4cf8a4b479951090e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "b6e1e9053db8476a8cc3e821"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "3ac3e39f167544a1acac0396"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "b6e1e9053db8476a8cc3e821"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "06e6208886e14de78f4e48e0"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "b6e1e9053db8476a8cc3e821"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "cb0c5662d8f6456fbd96b31e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "b6e1e9053db8476a8cc3e821"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a46553df18f54996ad2a38fd"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e889d7f904954cf587c35dea"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5f052c8e5e15463c9c97e6f7"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e889d7f904954cf587c35dea"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c44f765b9aa54167977f4540"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e889d7f904954cf587c35dea"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "4c6a1141bfc5484896836652"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e889d7f904954cf587c35dea"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "7660f53139e0459fbf5c7338"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e889d7f904954cf587c35dea"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b9617d99dc2744cf9b268411"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "15bcaab5f4ea45b5ad0e7f91"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6058a38179fd4a14bec60f1b"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "15bcaab5f4ea45b5ad0e7f91"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b0de27cf17cd4273a039e771"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "15bcaab5f4ea45b5ad0e7f91"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "4e1c55551b7943a99aa994ea"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "15bcaab5f4ea45b5ad0e7f91"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "4bde94508a33481696a47f29"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "15bcaab5f4ea45b5ad0e7f91"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a9ee7be6908248b6a23a5c5d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c7e8d72766b0449e96b1b706"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e3c5686042fe41528eb86735"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c7e8d72766b0449e96b1b706"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "8330f85f746e49368ecbecf8"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c7e8d72766b0449e96b1b706"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "ecd896702dcf42acad18ab5b"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c7e8d72766b0449e96b1b706"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6d380ec2dc31439db6a8b2d1"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c7e8d72766b0449e96b1b706"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "f52d96f72e394ac89fe60e45"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6968ac35af174fe486452676"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "042fc22ccd9c42fda9f33b52"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6968ac35af174fe486452676"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "93530a148c824dd6b01b9579"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6968ac35af174fe486452676"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "f7e68d1aee4e4d0b9c4c596c"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6968ac35af174fe486452676"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "2ed9821e0a8a459b8c32d909"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "6968ac35af174fe486452676"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a9b59a8a30d64b208b765305"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "d78236a6943f44d5acfff971"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5d27a63056544a9d99ec518e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "d78236a6943f44d5acfff971"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "082c83efc34947be871fe9e2"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "d78236a6943f44d5acfff971"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "90ba25e1a51e4caa8d461563"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "d78236a6943f44d5acfff971"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "7a50bd19aaf341dfab61995d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "d78236a6943f44d5acfff971"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "168b7425ab0e4e95815cff6b"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e4ca0b5767424314a433d1d1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "34b32ed18075494eaa2989a5"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e4ca0b5767424314a433d1d1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d869fba9a1dc4e7880cc4c26"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e4ca0b5767424314a433d1d1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "9ce7fb5994be47a4a30d03c6"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e4ca0b5767424314a433d1d1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "fb1648257c944f6a84db57ae"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "e4ca0b5767424314a433d1d1"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "463565adea0447e8823aa128"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "8bcad6f5b16744ee9972d142"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "dbc59785d76445bd916c2d7e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "8bcad6f5b16744ee9972d142"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "425db7302cca4b1894b40431"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "8bcad6f5b16744ee9972d142"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e3ae50a2085e42c1bb0d8347"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "8bcad6f5b16744ee9972d142"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "66da2c365d45470983ca2a6f"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "8bcad6f5b16744ee9972d142"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "8fc73ffabd534529b2e66c7e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "44a53104fa27416198a3ab67"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d76614b50e2f4251872cd22d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "44a53104fa27416198a3ab67"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "095df5cf63bc4a57bf5dd266"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "44a53104fa27416198a3ab67"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "2ec54d6bd79140ab89582ed7"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "44a53104fa27416198a3ab67"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "f120ba066ecd421bbb8f1284"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "44a53104fa27416198a3ab67"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5c9f8f26ed1c41c3b39b960c"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c8c98038ea73432f9113a542"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "fe8386bec7504253908906a5"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c8c98038ea73432f9113a542"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "afdff107d46b4c758c895d62"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c8c98038ea73432f9113a542"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6e9a31c2fc754e3ea61ad719"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c8c98038ea73432f9113a542"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "380210b57fda44e19703ed2c"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "c8c98038ea73432f9113a542"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "08dd47ed4a584191a5bf3bff"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "50a8c78e824e48d9aca0e5b3"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5d4578b1ffd844749d3b8d37"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "50a8c78e824e48d9aca0e5b3"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d11426749db64aad9bbd90d8"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "50a8c78e824e48d9aca0e5b3"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6874d4fc88e848808c595334"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "50a8c78e824e48d9aca0e5b3"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "cb925f2349674d9495a6702d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "50a8c78e824e48d9aca0e5b3"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "9aef5706335240118a7af1d0"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "a3618501c55f44d580830f26"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a61e0435b0c8450fb765d1ec"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "a3618501c55f44d580830f26"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "4bff747e4e8f49188e73ba2e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "a3618501c55f44d580830f26"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d95168bbfab14ff990626689"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "a3618501c55f44d580830f26"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "cabfa78ca020416492fb63b9"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "a3618501c55f44d580830f26"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "de806b967b094666805727a9"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "77fd1af043374da68157930a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "bccf74b6fc0142c5a8d92553"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "77fd1af043374da68157930a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "1f1305444a2d46e8a5d63df6"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "77fd1af043374da68157930a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "754c60dda1ac4da1b6f31c18"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "77fd1af043374da68157930a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "596f38d0ff3246cba6ed37e8"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "77fd1af043374da68157930a"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c12fb996c4a94b0aa1364336"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "eed23bafe02c4fdb87921e4e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "8981c38b824948d2b4826301"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "eed23bafe02c4fdb87921e4e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e067b87360f141959afc9a5e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "eed23bafe02c4fdb87921e4e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "282b86b08356494986858e63"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "eed23bafe02c4fdb87921e4e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "e58bcf933db146dd9a813bfe"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "eed23bafe02c4fdb87921e4e"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "1756688bf76b4ab9bbb761a6"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "88e7616324b1478686734bac"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "8ea94a2a367e481db3b2f7ff"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "88e7616324b1478686734bac"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "8043090a2d104f57a26f1e7e"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "88e7616324b1478686734bac"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "7207d9b0b7cc451fb7adbade"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "88e7616324b1478686734bac"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a2f568bb710646b5afddcde3"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "88e7616324b1478686734bac"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "1518e64ef50241c9a70da191"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": true,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fe28a328c02b4fc382f23d2c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "746557ec187f427489046133"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fe28a328c02b4fc382f23d2c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "bf746bf28568443e95ee4f8c"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fe28a328c02b4fc382f23d2c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "d33a61e6267442c7bc9ba770"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fe28a328c02b4fc382f23d2c"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "f88757da76e648288b6e3f3d"
+    },
+    "imageUrl": "https://media.istockphoto.com/id/1037295016/vector/the-icon-of-gun-pistol-handgun-weapon-simple-flat-icon-illustration-vector-of-gun-pistol.jpg?s=612x612&w=0&k=20&c=Gzs7DcMzQjd7MnndMWIHBClzrpFFEXI1WBIf92nZ8Ck=",
+    "isMain": false,
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0,
+    "productId": {
+      "$oid": "fe28a328c02b4fc382f23d2c"
+    }
+  }
+]

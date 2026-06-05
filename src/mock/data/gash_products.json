@@ -29,7 +29,7 @@
         "$oid": "69183e9eef9cc2d8dc359b3e"
       }
     ],
-    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h3 data-start=\"88\" data-end=\"111\"><p data-start=\"171\" data-end=\"427\">A classic wardrobe essential, the Denim Jacket features a durable, high-quality jean fabric that delivers both comfort and longevity. Designed with a modern silhouette and clean stitching details, this jacket offers a refined take on everyday streetwear.</p>\n<p data-start=\"429\" data-end=\"750\">Versatile and easy to style, it pairs effortlessly with T-shirts, hoodies, or shirts, allowing you to create countless outfits from casual daywear to relaxed weekend looks. Whether you’re heading out for coffee, walking around the city, or meeting friends, this denim jacket brings a bold, confident edge to any outfit.</p>\n<p data-start=\"752\" data-end=\"968\">Crafted to be worn throughout the year, it provides just the right amount of layering, making it suitable for cool mornings, breezy evenings, or transitional weather. A must-have piece that never goes out of style.</p>\n</h3><h3 data-start=\"970\" data-end=\"990\"><strong data-start=\"974\" data-end=\"990\">Key Features</strong></h3><h3 data-start=\"88\" data-end=\"111\">\n<ul data-start=\"991\" data-end=\"1199\">\n<li data-start=\"991\" data-end=\"1032\">\n<p data-start=\"993\" data-end=\"1032\">Premium denim material for durability</p>\n</li>\n<li data-start=\"1033\" data-end=\"1058\">\n<p data-start=\"1035\" data-end=\"1058\">Modern, versatile fit</p>\n</li>\n<li data-start=\"1059\" data-end=\"1105\">\n<p data-start=\"1061\" data-end=\"1105\">Reinforced stitching for long-lasting wear</p>\n</li>\n<li data-start=\"1106\" data-end=\"1151\">\n<p data-start=\"1108\" data-end=\"1151\">Comfortable layering for multiple seasons</p>\n</li>\n<li data-start=\"1152\" data-end=\"1199\">\n<p data-start=\"1154\" data-end=\"1199\">Easy to pair with different clothing styles</p>\n</li>\n</ul>\n</h3><h3 data-start=\"1201\" data-end=\"1218\"><strong data-start=\"1205\" data-end=\"1218\">Ideal For</strong></h3><h3 data-start=\"88\" data-end=\"111\">\n<ul data-start=\"1219\" data-end=\"1310\">\n<li data-start=\"1219\" data-end=\"1234\">\n<p data-start=\"1221\" data-end=\"1234\">Casual wear</p>\n</li>\n<li data-start=\"1235\" data-end=\"1257\">\n<p data-start=\"1237\" data-end=\"1257\">Street style looks</p>\n</li>\n<li data-start=\"1258\" data-end=\"1278\">\n<p data-start=\"1260\" data-end=\"1278\">Daily activities</p>\n</li>\n<li data-start=\"1279\" data-end=\"1310\">\n<p data-start=\"1281\" data-end=\"1310\">Outdoor and weekend outfits</p>\n</li>\n</ul></h3></header><footer>\n  </footer>\n</article>",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Denim Jacket</h1>\n    <p class=\"tagline\">A classic denim jacket crafted for durability and effortless streetwear style.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This denim jacket offers a timeless silhouette with a modern fit, making it a versatile layer for any casual wardrobe. Built from high-quality, mid-weight cotton denim, it provides a comfortable wear that softens and gains character over time.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Classic indigo wash</li>\n      <li><strong>Closure:</strong> Button-up front with branded metal buttons</li>\n      <li><strong>Collar:</strong> Spread collar</li>\n      <li><strong>Pockets:</strong> Two buttoned chest pockets and two welt side pockets</li>\n      <li><strong>Fit:</strong> Relaxed yet structured silhouette</li>\n      <li><strong>Cuffs & Hem:</strong> Buttoned cuffs and adjustable waist tabs</li>\n      <li><strong>Seams:</strong> Reinforced double-needle stitching for lasting durability</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% cotton denim.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Machine wash cold inside out with like colors.</li>\n      <li>Tumble dry low or line dry to preserve color.</li>\n      <li>Do not bleach.</li>\n      <li>Iron on medium heat if needed.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size with a standard regular fit.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Pair with a white t-shirt and chinos for a classic look.</li>\n      <li>Go double denim with matching jeans and a casual tee.</li>\n      <li>Layer over a hoodie on cooler days.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Ideal for year-round layering and everyday casual outfits.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-15T08:48:59.450Z"
@@ -114,7 +114,7 @@
         "$oid": "691855eba17ac3f26c22aab0"
       }
     ],
-    "description": "Oxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford ShirtOxford Shirt",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Oxford Shirt</h1>\n    <p class=\"tagline\">A classic button-down Oxford shirt designed for smart-casual elegance and everyday comfort.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This Oxford shirt combines a traditional button-down collar with a modern tailored fit. Crafted from high-quality, breathable cotton Oxford fabric, it offers excellent durability and a soft texture that keeps you comfortable throughout the day, whether at the office or out on the weekend.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Available in classic white, light blue, and pastel shades</li>\n      <li><strong>Closure:</strong> Full button placket with durable resin buttons</li>\n      <li><strong>Collar:</strong> Button-down collar for a neat, classic look</li>\n      <li><strong>Pockets:</strong> Single patch pocket on the left chest</li>\n      <li><strong>Fit:</strong> Modern tailored fit, slightly tapered through the waist</li>\n      <li><strong>Cuffs & Hem:</strong> Buttoned barrel cuffs and a curved hem designed to be worn tucked or untucked</li>\n      <li><strong>Seams:</strong> Single-needle stitching for a clean, premium finish</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% premium cotton Oxford fabric.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Machine wash warm with similar colors.</li>\n      <li>Tumble dry medium or line dry.</li>\n      <li>Iron on warm setting to remove wrinkles.</li>\n      <li>Do not bleach.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size with a tailored cut.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Pair with tailored chinos and loafers for a classic office look.</li>\n      <li>Wear untucked with denim for weekend outings.</li>\n      <li>Layer under a sweater during colder seasons.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      A timeless wardrobe essential suitable for all seasons.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-15T10:26:20.438Z"
@@ -214,7 +214,7 @@
         "$oid": "6918331dbc4af928d630e7ab"
       }
     ],
-    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1><p data-start=\"176\" data-end=\"439\">A clean and timeless staple, the Cotton Polo Shirt is crafted from soft, breathable cotton for everyday comfort. Designed with a classic collar and button–placket, it delivers a smart yet relaxed look suitable for both casual occasions and semi–formal settings.</p>\n<p data-start=\"441\" data-end=\"772\">The natural cotton fabric provides excellent ventilation and moisture absorption, helping you stay cool throughout busy days or warm weather. With a modern, easy-to-wear fit, this polo layers effortlessly with jackets, chinos, or denim, making it a versatile piece you can style for the office, weekend outings, or everyday wear.</p>\n<p data-start=\"774\" data-end=\"898\">Durable stitching and quality fabric ensure long-lasting shape and color, making it an essential addition to any wardrobe.</p>\n</h1><h3 data-start=\"900\" data-end=\"920\"><strong data-start=\"904\" data-end=\"920\">Key Features</strong></h3><h1>\n<ul data-start=\"921\" data-end=\"1115\">\n<li data-start=\"921\" data-end=\"956\">\n<p data-start=\"923\" data-end=\"956\">Soft and breathable 100% cotton</p>\n</li>\n<li data-start=\"957\" data-end=\"995\">\n<p data-start=\"959\" data-end=\"995\">Classic collar with button placket</p>\n</li>\n<li data-start=\"996\" data-end=\"1023\">\n<p data-start=\"998\" data-end=\"1023\">Comfortable regular fit</p>\n</li>\n<li data-start=\"1024\" data-end=\"1068\">\n<p data-start=\"1026\" data-end=\"1068\">Durable stitching and long-lasting color</p>\n</li>\n<li data-start=\"1069\" data-end=\"1115\">\n<p data-start=\"1071\" data-end=\"1115\">Suitable for casual and smart-casual looks</p>\n</li>\n</ul>\n</h1><h3 data-start=\"1117\" data-end=\"1134\"><strong data-start=\"1121\" data-end=\"1134\">Ideal For</strong></h3><h1>\n<ul data-start=\"1135\" data-end=\"1245\">\n<li data-start=\"1135\" data-end=\"1149\">\n<p data-start=\"1137\" data-end=\"1149\">Daily wear</p>\n</li>\n<li data-start=\"1150\" data-end=\"1188\">\n<p data-start=\"1152\" data-end=\"1188\">Office and business-casual outfits</p>\n</li>\n<li data-start=\"1189\" data-end=\"1211\">\n<p data-start=\"1191\" data-end=\"1211\">Outdoor activities</p>\n</li>\n<li data-start=\"1212\" data-end=\"1245\">\n<p data-start=\"1214\" data-end=\"1245\">Weekend and social gatherings</p>\n</li>\n</ul></h1></header><footer>\n  </footer>\n</article>",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Cotton Polo Shirt</h1>\n    <p class=\"tagline\">A clean and timeless staple crafted from soft, breathable cotton for everyday comfort.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      The Cotton Polo Shirt is crafted from soft, breathable cotton pique, delivering a smart yet relaxed look. It features a classic collar and three-button placket, making it suitable for both casual outings and semi-formal settings.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Available in navy, white, heather grey, and black</li>\n      <li><strong>Closure:</strong> Three-button placket with tone-on-tone buttons</li>\n      <li><strong>Collar:</strong> Rib-knit polo collar</li>\n      <li><strong>Pockets:</strong> None for a clean, minimalist front</li>\n      <li><strong>Fit:</strong> Regular fit with comfortable ease through the chest</li>\n      <li><strong>Cuffs & Hem:</strong> Ribbed cuffs and straight hem with side vents</li>\n      <li><strong>Seams:</strong> Reinforced shoulder seams to maintain shape</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% cotton pique fabric.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Machine wash cold with like colors.</li>\n      <li>Tumble dry low or reshape and dry flat.</li>\n      <li>Iron on medium heat; do not iron decoration.</li>\n      <li>Do not bleach.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size with a comfortable regular fit.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Style with chino shorts and boat shoes for a warm-weather look.</li>\n      <li>Layer under a light jacket for cooler days.</li>\n      <li>Wear with tailored trousers for a business-casual office setting.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Breathable fabric keeps you cool and dry.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-14T05:58:11.430Z"
@@ -558,7 +558,7 @@
         "$oid": "691854d3a17ac3f26c22632b"
       }
     ],
-    "description": "A timeless pair of denim jeans made from mid-weight fabric for comfort and durability. Designed with a modern fit suitable for everyday wear, work, or outdoor activities.",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Felt Trench Coat</h1>\n    <p class=\"tagline\">A sophisticated felt trench coat offering exceptional warmth and a sleek, structured silhouette.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This Felt Trench Coat elevates cold-weather styling with its structured design and refined details. Crafted from a thick, insulating felt blend, it features double-breasted buttoning, a waist tie, and classic lapels, providing both functional warmth and a polished profile.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Charcoal, camel, or black</li>\n      <li><strong>Closure:</strong> Double-breasted front button closure</li>\n      <li><strong>Collar:</strong> Wide notch lapel collar</li>\n      <li><strong>Pockets:</strong> Two deep welt hand-warmer pockets</li>\n      <li><strong>Fit:</strong> Relaxed fit designed for layering over sweaters or suits</li>\n      <li><strong>Cuffs & Hem:</strong> Adjustable buttoned cuff straps and long straight hem with back vent</li>\n      <li><strong>Seams:</strong> Premium structured seams with full lining</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 60% wool, 40% polyester felt; 100% polyester satin lining.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Dry clean only to preserve structure and fabric quality.</li>\n      <li>Do not wash; do not bleach.</li>\n      <li>Steam on low heat if needed.</li>\n      <li>Store on a wide, padded hanger.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size. Designed with a roomy cut to accommodate layering.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Layer over a turtleneck sweater and dark denim.</li>\n      <li>Wear over a suit for a formal, professional look.</li>\n      <li>Pair with leather boots for an elevated cold-weather outfit.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Perfect for late autumn and winter seasons.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-15T10:19:06.766Z"
@@ -1030,7 +1030,7 @@
         "$oid": "6918439a19aab47cf7f55af5"
       }
     ],
-    "description": "Leather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather LoafersLeather Loafers",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Leather Loafers</h1>\n    <p class=\"tagline\">Premium leather loafers combining classic style, exceptional comfort, and slip-on convenience.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      These leather loafers are handcrafted from supple full-grain leather, offering a polished look that easily transitions from formal events to casual wear. Featuring a cushioned footbed and a flexible sole, they provide all-day comfort without sacrificing elegance.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Deep black or rich mahogany brown</li>\n      <li><strong>Closure:</strong> Slip-on design for easy wear</li>\n      <li><strong>Detail:</strong> Classic penny keeper strap across the vamp</li>\n      <li><strong>Footbed:</strong> Padded leather insole with arch support</li>\n      <li><strong>Fit:</strong> Standard width, conforms to foot with wear</li>\n      <li><strong>Sole:</strong> Durable stacked leather heel with non-slip rubber insert</li>\n      <li><strong>Construction:</strong> Moc-toe stitching and hand-linked seams</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% genuine calfskin leather upper and lining; rubber/leather hybrid sole.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Wipe clean with a damp cloth; use specialized leather cleaner.</li>\n      <li>Apply leather conditioner regularly to keep leather soft.</li>\n      <li>Buff with shoe polish to restore shine.</li>\n      <li>Air dry away from direct heat or sunlight.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size. Conforms to the shape of your foot after a brief break-in period.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Wear sockless with cropped chinos and a linen shirt.</li>\n      <li>Dress up with wool trousers and a blazer for the office.</li>\n      <li>Pair with dark denim for a refined weekend style.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Includes a protective dust bag for travel and storage.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-15T09:09:08.428Z"
@@ -1085,7 +1085,7 @@
         "$oid": "691c52418e87687df7a405b6"
       }
     ],
-    "description": "Floral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off WhiteFloral Hawaiian Shirt - Off White",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Floral Hawaiian Shirt - Off White</h1>\n    <p class=\"tagline\">A breezy, vacation-ready Hawaiian shirt featuring a vibrant floral pattern on a soft off-white base.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      Embrace the island spirit with this Floral Hawaiian Shirt. Crafted from a lightweight, drape-heavy rayon blend, it features a relaxed camp collar and a vintage floral print. Perfect for keeping cool and stylish during summer getaways or casual weekend events.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Off-white base with botanical floral print</li>\n      <li><strong>Closure:</strong> Full button placket with genuine coconut shell buttons</li>\n      <li><strong>Collar:</strong> Relaxed open camp collar</li>\n      <li><strong>Pockets:</strong> Print-matched left-chest pocket</li>\n      <li><strong>Fit:</strong> Relaxed, breezy silhouette with straight hem</li>\n      <li><strong>Cuffs & Hem:</strong> Short sleeves with clean hems; side split vents for ease</li>\n      <li><strong>Seams:</strong> Double-stitched seams for durability</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% rayon.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Machine wash cold on gentle cycle.</li>\n      <li>Line dry or tumble dry low.</li>\n      <li>Iron on low heat if needed.</li>\n      <li>Do not bleach.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Relaxed fit. Size down for a more fitted look.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Wear open over a white tee with casual shorts.</li>\n      <li>Button up and pair with linen trousers for a smart resort look.</li>\n      <li>Match with light wash denim for casual weekend wear.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Breathable fabric ideal for hot and humid climates.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-18T11:01:44.980Z"
@@ -1109,7 +1109,7 @@
       }
     ],
     "productVariantIds": [],
-    "description": "<p dir=\"auto\" style=\"white-space-collapse: preserve;\"><strong>WAG Shirt – Biểu tượng sức mạnh của những chiến binh Free Fire!</strong></p>\n<p dir=\"auto\" style=\"white-space-collapse: preserve;\">- Bạn là tuyển thủ Free Fire đam mê những trận chiến khốc liệt trên Đấu Trường Sinh Tồn? Bạn tự hào là fan hâm mộ của đội tuyển WAG – \"ông lớn\" eSports Việt Nam với lượng fan đông đảo nhất, sở hữu lối chơi mạnh mẽ, kỹ năng bắn góc hẹp đỉnh cao và vô số thành tích chói lọi tại FFWS ASIA FALL INDO 2024? Áo WAG Shirt chính là \"vũ khí\" thời trang không thể thiếu, được thiết kế dành riêng cho các tuyển thủ chuyên nghiệp và cộng đồng game thủ cuồng nhiệt!</p>\n<p dir=\"auto\" style=\"white-space-collapse: preserve;\"><strong>Thiết kế đỉnh cao, truyền cảm hứng chiến đấu:</strong></p>\n<strong>- Màu sắc chủ đạo:</strong> Trắng tinh khôi tượng trưng cho sự tinh anh, kết hợp họa tiết logo WAG sắc nét in 3D sống động ở ngực trước và lưng áo – hình ảnh gấu chiến binh hung tợn, sẵn sàng \"booyah\" mọi đối thủ. Phù hợp hoàn hảo với phong cách Free Fire: năng động, mạnh mẽ nhưng vẫn thoải mái cho những buổi stream dài hơi hay tập luyện marathon.<br><strong>- Chất liệu premium:</strong> 100% cotton cao cấp, mềm mịn, thoáng khí, hút mồ hôi nhanh chóng. Trọng lượng nhẹ chỉ 180gsm, không xù lông sau nhiều lần giặt, đảm bảo bạn luôn \"cool ngầu\" ngay cả trong những trận đấu căng thẳng kéo dài 10 phút. Cổ tròn bo sát, tay ngắn vừa vặn, size từ XS (9kg) đến XXL (99kg) – phù hợp cho cả nam và nữ tuyển thủ.<br><strong>- Chi tiết cá nhân hóa:</strong> Miễn phí in tên tuyển thủ (như WAG.ALAN hay WAG.CALM), số áo may mắn và logo đội tuyển. Hình in HD sắc nét, bền màu lên đến 50 lần giặt, không phai mờ dù bạn \"xả thân\" trên chiến trường ảo.<br>\n<p dir=\"auto\" style=\"white-space-collapse: preserve;\"><strong>Lý do WAG Shirt là \"must-have\" cho tuyển thủ Free Fire:</strong></p>\n<ul dir=\"auto\">\n<li><strong>- Tôn vinh tinh thần đội tuyển:</strong> WAG không chỉ là đội tuyển hàng đầu Việt Nam với các ngôi sao như THANHNHA (nay là HLV), Xbor hay CALM, mà còn là biểu tượng của sự kiên cường và chiến thắng. Mặc WAG Shirt, bạn như đang khoác lên mình \"bộ giáp\" của những nhà vô địch, sẵn sàng chinh phục Free Fire World Cup hay bất kỳ giải đấu nào.</li>\n<li><strong>- Đa năng cho lối sống game thủ:</strong> Thoải mái mặc khi thi đấu, tập gym, đi sự kiện eSports hay chill với bạn bè. Kết hợp với quần short FF hoặc hoodie WAG để tạo set đồ hoàn hảo.</li>\n<li><strong>- Cam kết chất lượng từ nhà sản xuất:</strong> Sản xuất tại Việt Nam với công nghệ in tiên tiến, miễn phí vận chuyển toàn quốc. Đặt từ 15 áo trở lên còn được ưu đãi thiết kế độc quyền!</li>\n</ul>\n<p dir=\"auto\" style=\"white-space-collapse: preserve;\">Hãy biến WAG Shirt thành \"báu vật\" trong tủ đồ của bạn – nơi mỗi đường may là lời nhắc nhở: \"Chơi hết mình, chiến thắng tất cả!\"</p>",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>WAG Shirt</h1>\n    <p class=\"tagline\">The official team jersey featuring premium breathable fabric and high-performance design.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      Designed for athletes and fans alike, the WAG Shirt represents high performance and pride. Crafted from lightweight, moisture-wicking polyester fabric, it keeps you cool and comfortable whether you are competing on the field or cheering from the stands.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> White and blue team colors with bold accents</li>\n      <li><strong>Closure:</strong> Pull-on crewneck style</li>\n      <li><strong>Collar:</strong> Ribbed crewneck collar</li>\n      <li><strong>Graphics:</strong> Sublimated team graphics and logos that won't fade or peel</li>\n      <li><strong>Fit:</strong> Athletic fit with flatlock seams to prevent chafing</li>\n      <li><strong>Hem:</strong> Straight athletic hem</li>\n      <li><strong>Seams:</strong> Reinforced coverstitching for durability</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% recycled polyester.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Machine wash cold with like colors.</li>\n      <li>Hang dry; do not tumble dry.</li>\n      <li>Do not iron prints or graphics.</li>\n      <li>Do not dry clean.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Athletic fit. Order one size up for a looser fit.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Pair with athletic shorts or joggers for a sporty, active look.</li>\n      <li>Layer under a hoodie for a casual game-day outfit.</li>\n      <li>Wear with sneakers and sweatpants for everyday comfort.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Official licensed merchandise of WAG eSports.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "discontinued",
     "createdAt": {
       "$date": "2025-11-19T08:45:49.928Z"
@@ -1161,7 +1161,7 @@
         "$oid": "691d8e5291d5b3083237c3b7"
       }
     ],
-    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h3 data-start=\"88\" data-end=\"111\"><p data-start=\"171\" data-end=\"427\">Designed for everyday comfort and effortless style, the Basic Sneakers feature a lightweight construction and breathable materials that keep your feet comfortable throughout the day. The clean, minimal design delivers a timeless look suitable for a wide range of outfits.</p>\n<p data-start=\"429\" data-end=\"750\">Easy to wear and simple to style, these sneakers pair seamlessly with jeans, shorts, or casual trousers. Whether you’re heading to class, running errands, or meeting friends, they provide a relaxed yet polished appearance.</p>\n<p data-start=\"752\" data-end=\"968\">Built for daily use, the cushioned sole and flexible structure support natural movement, making them ideal for long walks and extended wear. A reliable footwear essential that fits effortlessly into any casual wardrobe.</p>\n</h3><h3 data-start=\"970\" data-end=\"990\"><strong data-start=\"974\" data-end=\"990\">Key Features</strong></h3><h3 data-start=\"88\" data-end=\"111\">\n<ul data-start=\"991\" data-end=\"1199\">\n<li data-start=\"991\" data-end=\"1032\">\n<p data-start=\"993\" data-end=\"1032\">Lightweight and breathable materials</p>\n</li>\n<li data-start=\"1033\" data-end=\"1058\">\n<p data-start=\"1035\" data-end=\"1058\">Comfortable cushioned sole</p>\n</li>\n<li data-start=\"1059\" data-end=\"1105\">\n<p data-start=\"1061\" data-end=\"1105\">Durable outsole for daily wear</p>\n</li>\n<li data-start=\"1106\" data-end=\"1151\">\n<p data-start=\"1108\" data-end=\"1151\">Flexible design for natural movement</p>\n</li>\n<li data-start=\"1152\" data-end=\"1199\">\n<p data-start=\"1154\" data-end=\"1199\">Minimal style easy to match outfits</p>\n</li>\n</ul>\n</h3><h3 data-start=\"1201\" data-end=\"1218\"><strong data-start=\"1205\" data-end=\"1218\">Ideal For</strong></h3><h3 data-start=\"88\" data-end=\"111\">\n<ul data-start=\"1219\" data-end=\"1310\">\n<li data-start=\"1219\" data-end=\"1234\">\n<p data-start=\"1221\" data-end=\"1234\">Everyday casual wear</p>\n</li>\n<li data-start=\"1235\" data-end=\"1257\">\n<p data-start=\"1237\" data-end=\"1257\">Walking and commuting</p>\n</li>\n<li data-start=\"1258\" data-end=\"1278\">\n<p data-start=\"1260\" data-end=\"1278\">School or campus use</p>\n</li>\n<li data-start=\"1279\" data-end=\"1310\">\n<p data-start=\"1281\" data-end=\"1310\">Relaxed weekend activities</p>\n</li>\n</ul></h3></header><footer>\n  </footer>\n</article>",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Basic Sneakers</h1>\n    <p class=\"tagline\">Clean, versatile everyday sneakers designed for comfort, durability, and effortless casual style.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      These basic sneakers offer a timeless silhouette built for daily wear and all-day comfort. Constructed with a lightweight upper and cushioned sole, they provide reliable support while maintaining a clean, minimalist look that pairs easily with a wide range of outfits.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Available in crisp white, black, and neutral tones</li>\n      <li><strong>Closure:</strong> Classic lace-up design for adjustable fit</li>\n      <li><strong>Sole:</strong> Cushioned midsole with durable rubber outsole</li>\n      <li><strong>Design:</strong> Minimal low-profile silhouette</li>\n      <li><strong>Fit:</strong> Comfortable standard fit suitable for daily use</li>\n      <li><strong>Insole:</strong> Soft padded footbed for added comfort</li>\n      <li><strong>Outsole:</strong> Textured grip for everyday traction</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Synthetic leather or textile upper with rubber sole.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Wipe clean with a damp cloth.</li>\n      <li>Use mild soap for stubborn stains.</li>\n      <li>Avoid machine washing to preserve structure.</li>\n      <li>Air dry away from direct heat.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size with a standard everyday fit. Suitable for regular foot widths.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Pair with jeans and a T-shirt for a classic casual look.</li>\n      <li>Wear with chinos and a polo for smart-casual outfits.</li>\n      <li>Match with shorts and a hoodie for relaxed weekends.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Ideal for everyday wear, commuting, and casual outings.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-19T09:30:18.118Z"
@@ -1213,7 +1213,7 @@
         "$oid": "691d8eaf91d5b3083237cabe"
       }
     ],
-    "description": "Leather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford ShoesLeather Oxford Shoes",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Leather Oxford Shoes</h1>\n    <p class=\"tagline\">Elegant, full-grain leather Oxford shoes designed for formal events and professional business wear.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      These Leather Oxford Shoes feature a classic closed-lacing design and a polished finish. Handcrafted from premium full-grain leather, they offer a sophisticated shape and durable construction, making them the perfect choice for weddings, formal business settings, or upscale dinners.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Polished black or dark brown</li>\n      <li><strong>Closure:</strong> Classic closed-lacing system with wax-coated laces</li>\n      <li><strong>Detail:</strong> Clean cap-toe detailing</li>\n      <li><strong>Footbed:</strong> Padded leather lining and cushioned insole</li>\n      <li><strong>Fit:</strong> Structured formal fit</li>\n      <li><strong>Sole:</strong> Leather sole with a slip-resistant rubber heel tap</li>\n      <li><strong>Seams:</strong> Clean double-stitching at high-stress areas</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% full-grain calfskin leather upper and lining; leather/rubber sole.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean with a soft brush or damp cloth.</li>\n      <li>Apply leather conditioner and polish to maintain shine.</li>\n      <li>Store with shoe trees to preserve shape.</li>\n      <li>Keep away from water and direct heat.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Structured fit. True to size; may feel firm initially but softens with wear.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Wear with a tailored suit or formal trousers and a dress shirt.</li>\n      <li>Pair with clean navy suit pants for professional office settings.</li>\n      <li>Match with dark dress socks that complement your trousers.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      An essential dress shoe for any formal wardrobe.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-19T09:31:59.219Z"
@@ -1283,7 +1283,7 @@
         "$oid": "691d8fd791d5b3083237dcfa"
       }
     ],
-    "description": "<p data-start=\"187\" data-end=\"457\">Experience everyday comfort with our Cotton Boxer Underwear, designed for softness, breathability, and long-lasting wear. Made from premium cotton fabric, these boxers provide a smooth and natural feel against the skin, helping you stay comfortable throughout the day.</p>\n<p data-start=\"459\" data-end=\"772\">With a relaxed fit and flexible waistband, they offer excellent support while allowing easy movement, whether you’re at work, traveling, or relaxing at home. The lightweight material helps wick away moisture and maintain ventilation, ensuring a fresh and comfortable wearing experience in any weather condition.</p>\n<p data-start=\"774\" data-end=\"926\">Ideal for daily use, these cotton boxers are a simple yet essential choice for men looking for both comfort and quality in their underwear collection.</p>\n<h3 data-start=\"928\" data-end=\"948\"><strong data-start=\"932\" data-end=\"948\">Key Features</strong></h3>\n<ul data-start=\"949\" data-end=\"1133\">\n<li data-start=\"949\" data-end=\"978\">\n<p data-start=\"951\" data-end=\"978\">Soft 100% cotton material</p>\n</li>\n<li data-start=\"979\" data-end=\"1015\">\n<p data-start=\"981\" data-end=\"1015\">Breathable and moisture-friendly</p>\n</li>\n<li data-start=\"1016\" data-end=\"1055\">\n<p data-start=\"1018\" data-end=\"1055\">Flexible waistband for a secure fit</p>\n</li>\n<li data-start=\"1056\" data-end=\"1094\">\n<p data-start=\"1058\" data-end=\"1094\">Smooth feel and gentle on the skin</p>\n</li>\n<li data-start=\"1095\" data-end=\"1133\">\n<p data-start=\"1097\" data-end=\"1133\">Comfortable support for daily wear</p>\n</li>\n</ul>\n<h3 data-start=\"1135\" data-end=\"1154\"><strong data-start=\"1139\" data-end=\"1154\">Perfect For</strong></h3>\n<ul data-start=\"1155\" data-end=\"1248\">\n<li data-start=\"1155\" data-end=\"1171\">\n<p data-start=\"1157\" data-end=\"1171\">Everyday use</p>\n</li>\n<li data-start=\"1172\" data-end=\"1199\">\n<p data-start=\"1174\" data-end=\"1199\">Work &amp; active lifestyle</p>\n</li>\n<li data-start=\"1200\" data-end=\"1232\">\n<p data-start=\"1202\" data-end=\"1232\">Casual wear and home comfort</p>\n</li>\n<li data-start=\"1233\" data-end=\"1248\">\n<p data-start=\"1235\" data-end=\"1248\">All seasons</p></li></ul>",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Cotton Boxer Underwear</h1>\n    <p class=\"tagline\">Everyday boxers made from premium cotton for ultimate comfort, breathability, and flexibility.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      Experience everyday comfort with our Cotton Boxer Underwear. Made from exceptionally soft and breathable combed cotton, these boxers feature a relaxed fit and a flexible, tagless waistband that ensures no-dig comfort and ease of movement all day long.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Pack of assorted solid colors and classic stripes</li>\n      <li><strong>Closure:</strong> Button-fly front closure</li>\n      <li><strong>Waistband:</strong> Ultra-soft elastic waistband with tagless interior</li>\n      <li><strong>Design:</strong> Classic loose-fitting boxer silhouette</li>\n      <li><strong>Fit:</strong> Relaxed fit with room to move</li>\n      <li><strong>Hem:</strong> Smooth flat-locked leg hems</li>\n      <li><strong>Seams:</strong> Friction-free flatlock seams to prevent chafing</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% combed cotton.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Machine wash warm with like colors.</li>\n      <li>Tumble dry medium.</li>\n      <li>Warm iron if desired.</li>\n      <li>Use non-chlorine bleach when needed.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size. Elastic waistband provides comfortable stretch.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Ideal for daily wear under any trousers, jeans, or lounge shorts.</li>\n      <li>Great for relaxing at home with loungewear.</li>\n      <li>Comfortable choice for all-day travel.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Tagless design prevents skin irritation.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "active",
     "createdAt": {
       "$date": "2025-11-19T09:35:43.822Z"
@@ -1307,7 +1307,7 @@
       }
     ],
     "productVariantIds": [],
-    "description": "1234567891011asdgakldfsjaglkweoieurjfoavdlkjbm kslweiofvkladjoiwekfja",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Basic Sneaker</h1>\n    <p class=\"tagline\">Simple, comfortable sneaker designed for lightweight, everyday casual activities.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      The Basic Sneaker provides a clean look and lightweight construction, perfect for simple daily tasks and casual settings. Featuring a durable fabric upper and a flexible sole, it offers reliable value and minimalist style.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Classic grey or white</li>\n      <li><strong>Closure:</strong> Standard lace-up design</li>\n      <li><strong>Sole:</strong> Lightweight EVA midsole and rubber outsole</li>\n      <li><strong>Fit:</strong> Standard regular fit</li>\n      <li><strong>Cuffs & Hem:</strong> Padded collar and tongue for comfort</li>\n      <li><strong>Seams:</strong> Reinforced stitching at stress points</li>\n      <li><strong>Detail:</strong> Removable foam insole for customizable comfort</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Canvas upper, EVA midsole, rubber outsole.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Hand wash or spot clean with mild detergent.</li>\n      <li>Do not machine wash or dry.</li>\n      <li>Air dry in a shaded area.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size with a standard regular width.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Pair with denim jeans, joggers, or casual shorts for a simple look.</li>\n      <li>Wear with sweatpants for a relaxed, athletic look.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Great value everyday sneaker for casual wear.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "discontinued",
     "createdAt": {
       "$date": "2025-11-21T09:46:21.836Z"
@@ -1331,7 +1331,7 @@
       }
     ],
     "productVariantIds": [],
-    "description": "TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Test product</h1>\n    <p class=\"tagline\">A standard test product used for verification of descriptions and mock-up listings.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This test product serves as a placeholder to verify formatting, rendering, and responsiveness of the product detail interface. It represents a standard product layout with typical features.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Neutral test grey</li>\n      <li><strong>Closure:</strong> Non-functional decorative buttons</li>\n      <li><strong>Collar:</strong> Standard crewneck or collar template</li>\n      <li><strong>Pockets:</strong> None — clean flat layout</li>\n      <li><strong>Fit:</strong> Standard test fit</li>\n      <li><strong>Cuffs & Hem:</strong> Regular stitched borders</li>\n      <li><strong>Seams:</strong> Basic overlock seams</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% polyester mockup fiber.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Hand wash cold if required.</li>\n      <li>Do not tumble dry.</li>\n      <li>Do not iron directly on mock elements.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      True to size standard test template fit.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Used primarily for UI/UX rendering verification in development environments.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      For testing purposes only.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "discontinued",
     "createdAt": {
       "$date": "2025-12-07T10:59:02.276Z"
@@ -1368,13 +1368,1163 @@
         "$oid": "69367a4960bf2f654c963db4"
       }
     ],
-    "description": "<div>- <b>Product Type</b>: Raw Denim</div><div><br></div><div>- <b>Style/Form</b>: Regular.</div><div><br></div><div>- Characteristics: The product has a slight shrinkage and color loss after washing.</div><div><br></div><div>- Shrinkage: 1-2%</div><div><br></div><div>- Recommended:</div><div><br></div><div><i>Limit wearing and washing with light-colored clothes.</i></div><div><i>Do not use detergents with a lot of bleach, because this will speed up the fading process and cause clothes to fade quickly.</i></div><div><i>Do not wring hard, wringing hard will break the natural fade lines of the product, creating creases due to wringing.</i></div><div><i>+Note: Each version of Copper Denim will have different parameters, you can see the product parameter table in the \"Size Selection Guide\" section. If you have any questions, please message us via fanpage or instagram for more detailed advice on product details and sizes.</i></div>",
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Raw Denim Jacket</h1>\n    <p class=\"tagline\">A premium raw denim jacket that molds to your body and develops a unique wear pattern over time.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      Crafted from heavy, unwashed raw denim, this jacket is designed for the denim purist. Over time, it will shrink slightly and fade uniquely based on your movements, creating a custom fit and personal aesthetic that cannot be replicated.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Unwashed indigo raw denim</li>\n      <li><strong>Closure:</strong> Heavy-duty metal button placket</li>\n      <li><strong>Collar:</strong> Structured spread collar</li>\n      <li><strong>Pockets:</strong> Two classic buttoned chest pockets</li>\n      <li><strong>Fit:</strong> Regular straight fit</li>\n      <li><strong>Cuffs & Hem:</strong> Buttoned cuffs and adjustable waist adjusters</li>\n      <li><strong>Seams:</strong> Reinforced chain-stitching and copper rivets</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> 100% raw cotton denim.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Wear frequently and wash rarely to maximize custom fades.</li>\n      <li>Hand wash cold or soak inside out; do not wring.</li>\n      <li>Hang dry; avoid machine drying.</li>\n      <li>Warning: Indigo dye may transfer to lighter surfaces initially.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      May shrink 1-2% after the first wash; sizing up is recommended if between sizes.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Wear over a simple t-shirt with dark trousers.</li>\n      <li>Match with raw denim jeans for a full indigo look.</li>\n      <li>Layer under a wool coat for structured autumn dressing.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Expect natural color bleeding and unique creases to form with wear.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
     "productStatus": "discontinued",
     "createdAt": {
       "$date": "2025-12-08T06:20:43.467Z"
     },
     "updatedAt": {
       "$date": "2025-12-08T07:22:30.360Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "af1671c0e92849519369a687"
+    },
+    "productName": "Glock 17",
+    "categoryId": {
+      "$oid": "93bd07fa491a47efb1e30c13"
+    },
+    "productImageIds": [
+      {
+        "$oid": "da123f2e503a4bc793148806"
+      },
+      {
+        "$oid": "ae692684559c4933a8fd21f4"
+      },
+      {
+        "$oid": "2de1d57e17334ef49ab38b0e"
+      },
+      {
+        "$oid": "868e5eead161446cb32ccb36"
+      },
+      {
+        "$oid": "88148580c3664709b969be20"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "8ad17c4d27fc41e4ba622871"
+      },
+      {
+        "$oid": "d0e749ee73fc42c2bb4bdea2"
+      },
+      {
+        "$oid": "7bf75104db0c4830a12804cf"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Glock 17</h1>\n    <p class=\"tagline\">The gold standard of reliability and modern striker-fired performance.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "1f1378cb2b6040e29a33d26c"
+    },
+    "productName": "Beretta 92FS",
+    "categoryId": {
+      "$oid": "93bd07fa491a47efb1e30c13"
+    },
+    "productImageIds": [
+      {
+        "$oid": "998de614fcf949808b40a244"
+      },
+      {
+        "$oid": "2380b48aea234071b262a690"
+      },
+      {
+        "$oid": "b694813d96de4a31ad934f28"
+      },
+      {
+        "$oid": "6ef43e49d5ec42e3b5534343"
+      },
+      {
+        "$oid": "b9af8931ac3943418ef1e45c"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "d666a25a3dde4cb7b9571ea0"
+      },
+      {
+        "$oid": "41c46db890fd42da8fe4f6ab"
+      },
+      {
+        "$oid": "840a2a5a2ff445d9bcb2d4a3"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Beretta 92FS</h1>\n    <p class=\"tagline\">A classic double-action tactical icon with proven military pedigree.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "4a5b8b6b4b0645a190364a8b"
+    },
+    "productName": "Colt 1911",
+    "categoryId": {
+      "$oid": "93bd07fa491a47efb1e30c13"
+    },
+    "productImageIds": [
+      {
+        "$oid": "f4484f8e24924c63ad6d9291"
+      },
+      {
+        "$oid": "3890f96b011e47d19daec40f"
+      },
+      {
+        "$oid": "69a59e063d174797b111588a"
+      },
+      {
+        "$oid": "5c9acc3627dd4013ae5f2e3e"
+      },
+      {
+        "$oid": "0e4343c359d840119c1f34fa"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "415693696bbf4aa680ab2cf9"
+      },
+      {
+        "$oid": "4d8e7ed8675c4012bd1942e8"
+      },
+      {
+        "$oid": "42db415aa47847ed972aa810"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Colt 1911</h1>\n    <p class=\"tagline\">The legendary single-action powerhouse with timeless ergonomics.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "7a130e87c2d847f59265192b"
+    },
+    "productName": "Sig Sauer P320",
+    "categoryId": {
+      "$oid": "93bd07fa491a47efb1e30c13"
+    },
+    "productImageIds": [
+      {
+        "$oid": "2d67f539c1304d99b215bf75"
+      },
+      {
+        "$oid": "b375d87ede1a4e3c887229b5"
+      },
+      {
+        "$oid": "c85e1b1bbfed449fb9e8da7f"
+      },
+      {
+        "$oid": "9d0291cc1284440c80e53371"
+      },
+      {
+        "$oid": "0d268f76ddde4ddab51e1005"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "53154b05945f4c5e9f597165"
+      },
+      {
+        "$oid": "4e1eaaa50c374636a33e60ac"
+      },
+      {
+        "$oid": "9f6f438b78794937896ae8ba"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Sig Sauer P320</h1>\n    <p class=\"tagline\">A highly modular, striker-fired sidearm built for modern defense.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "f1ee5a52a67047c681c76ed0"
+    },
+    "productName": "Smith & Wesson M&P",
+    "categoryId": {
+      "$oid": "93bd07fa491a47efb1e30c13"
+    },
+    "productImageIds": [
+      {
+        "$oid": "1b88b95161944fdb9ff38beb"
+      },
+      {
+        "$oid": "c98fb82223ee43fe8c322a57"
+      },
+      {
+        "$oid": "177e1218415342789e79b809"
+      },
+      {
+        "$oid": "039291f8d08d4ce2b489a30d"
+      },
+      {
+        "$oid": "da216ba322f24d919c49aaa6"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "a75c1748e4514191a7e5febb"
+      },
+      {
+        "$oid": "f68e419a61494977b564cb66"
+      },
+      {
+        "$oid": "1123e192e6d44b319be3b69a"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Smith & Wesson M&P</h1>\n    <p class=\"tagline\">Ergonomically superior personal defense handgun with a durable frame.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "64bd136c15424ca1b615366e"
+    },
+    "productName": "AR-15 Carbine",
+    "categoryId": {
+      "$oid": "09ee8c7550cd431089ba2871"
+    },
+    "productImageIds": [
+      {
+        "$oid": "2bf5c951505a44a69ccd0e1c"
+      },
+      {
+        "$oid": "d658fd718225429b84fffe63"
+      },
+      {
+        "$oid": "0ea18ef74628459386e64ffc"
+      },
+      {
+        "$oid": "7f7fd175a5ba4e3ab1911b49"
+      },
+      {
+        "$oid": "90f4fa0564d44078aca6eac7"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "cc34313ff0384ba196ee6324"
+      },
+      {
+        "$oid": "72a83134c7694b3cb9dedb0e"
+      },
+      {
+        "$oid": "9b8532af530240cd821f64f4"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>AR-15 Carbine</h1>\n    <p class=\"tagline\">A highly customizable semi-automatic platform for defense and sporting.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "79ef8cc6b77444939b883877"
+    },
+    "productName": "AK-47 Rifle",
+    "categoryId": {
+      "$oid": "09ee8c7550cd431089ba2871"
+    },
+    "productImageIds": [
+      {
+        "$oid": "9960c4fb6093446381360a2f"
+      },
+      {
+        "$oid": "e391a270c1f246f59e14861d"
+      },
+      {
+        "$oid": "e52ecbbf634249cebd1fe8ed"
+      },
+      {
+        "$oid": "a4999624489843b9a3897576"
+      },
+      {
+        "$oid": "850afe457f904dbd87538aed"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "f9ce2b239e41475896d8a376"
+      },
+      {
+        "$oid": "d9cb332248014dc1968b6a82"
+      },
+      {
+        "$oid": "edad1b097b6c4f6c828b8f09"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>AK-47 Rifle</h1>\n    <p class=\"tagline\">Renowned worldwide for its rugged simplicity and legendary reliability.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "17b71ed7d3f045af9790a97a"
+    },
+    "productName": "M1A Springfield",
+    "categoryId": {
+      "$oid": "09ee8c7550cd431089ba2871"
+    },
+    "productImageIds": [
+      {
+        "$oid": "468cef6b4f634bbaa6d2431a"
+      },
+      {
+        "$oid": "e3ba007228a64363b48c9226"
+      },
+      {
+        "$oid": "110df55a17544f0a8fbbf8cb"
+      },
+      {
+        "$oid": "70be172bfb704ea2b3508611"
+      },
+      {
+        "$oid": "606da975df8442e4a228b212"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "0aad8588584d480fb6e2975b"
+      },
+      {
+        "$oid": "c0bda370a776425aa3f8187f"
+      },
+      {
+        "$oid": "0a35a45b0fc4475b9eb1ed48"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>M1A Springfield</h1>\n    <p class=\"tagline\">A heavy-duty semi-automatic rifle carrying historical precision and power.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "fd0759e01e50407f8fd2a9c1"
+    },
+    "productName": "Remington 700",
+    "categoryId": {
+      "$oid": "09ee8c7550cd431089ba2871"
+    },
+    "productImageIds": [
+      {
+        "$oid": "7096a58efed74d56a390231f"
+      },
+      {
+        "$oid": "d037952056024fb1a43d35f6"
+      },
+      {
+        "$oid": "5fb4d8409c624814a341060e"
+      },
+      {
+        "$oid": "ab4661fa05f1433d9096af61"
+      },
+      {
+        "$oid": "ef3c3f40996943319967d977"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "55eab9dedfe54b428e4f6221"
+      },
+      {
+        "$oid": "8fb2849c626a42709605e9d7"
+      },
+      {
+        "$oid": "47bb32e193ef43e4b2849917"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Remington 700</h1>\n    <p class=\"tagline\">The ultimate bolt-action rifle trusted by precision marksmen everywhere.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "b6e1e9053db8476a8cc3e821"
+    },
+    "productName": "Ruger 10/22",
+    "categoryId": {
+      "$oid": "09ee8c7550cd431089ba2871"
+    },
+    "productImageIds": [
+      {
+        "$oid": "8642b88d71204d20911265e9"
+      },
+      {
+        "$oid": "306ffdd4cf8a4b479951090e"
+      },
+      {
+        "$oid": "3ac3e39f167544a1acac0396"
+      },
+      {
+        "$oid": "06e6208886e14de78f4e48e0"
+      },
+      {
+        "$oid": "cb0c5662d8f6456fbd96b31e"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "cb022a6eb3244984a3d437f2"
+      },
+      {
+        "$oid": "f93d820695a8463e8f440982"
+      },
+      {
+        "$oid": "888b47a7d3f6466d896f28ab"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Ruger 10/22</h1>\n    <p class=\"tagline\">The premier rimfire rifle perfect for target practice and small game.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "e889d7f904954cf587c35dea"
+    },
+    "productName": "Remington 870",
+    "categoryId": {
+      "$oid": "a5303e8338c4432fbe977fd1"
+    },
+    "productImageIds": [
+      {
+        "$oid": "a46553df18f54996ad2a38fd"
+      },
+      {
+        "$oid": "5f052c8e5e15463c9c97e6f7"
+      },
+      {
+        "$oid": "c44f765b9aa54167977f4540"
+      },
+      {
+        "$oid": "4c6a1141bfc5484896836652"
+      },
+      {
+        "$oid": "7660f53139e0459fbf5c7338"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "23894b2ebd9540d2bb21dcc5"
+      },
+      {
+        "$oid": "422bfb8cd9b248b4853d6b21"
+      },
+      {
+        "$oid": "f91d9e083565404f98e01c94"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Remington 870</h1>\n    <p class=\"tagline\">A pump-action classic setting the standard for security and hunting.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "15bcaab5f4ea45b5ad0e7f91"
+    },
+    "productName": "Mossberg 500",
+    "categoryId": {
+      "$oid": "a5303e8338c4432fbe977fd1"
+    },
+    "productImageIds": [
+      {
+        "$oid": "b9617d99dc2744cf9b268411"
+      },
+      {
+        "$oid": "6058a38179fd4a14bec60f1b"
+      },
+      {
+        "$oid": "b0de27cf17cd4273a039e771"
+      },
+      {
+        "$oid": "4e1c55551b7943a99aa994ea"
+      },
+      {
+        "$oid": "4bde94508a33481696a47f29"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "a17ad93b25354012aee571a8"
+      },
+      {
+        "$oid": "3ee0e7eb2bff43159ecaf054"
+      },
+      {
+        "$oid": "85e4fe7cdf4342c1931adba8"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Mossberg 500</h1>\n    <p class=\"tagline\">Battle-proven pump shotgun with dual extractors and ambidextrous safety.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "c7e8d72766b0449e96b1b706"
+    },
+    "productName": "Benelli M4",
+    "categoryId": {
+      "$oid": "a5303e8338c4432fbe977fd1"
+    },
+    "productImageIds": [
+      {
+        "$oid": "a9ee7be6908248b6a23a5c5d"
+      },
+      {
+        "$oid": "e3c5686042fe41528eb86735"
+      },
+      {
+        "$oid": "8330f85f746e49368ecbecf8"
+      },
+      {
+        "$oid": "ecd896702dcf42acad18ab5b"
+      },
+      {
+        "$oid": "6d380ec2dc31439db6a8b2d1"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "5c5a73ad78eb459f9ff48240"
+      },
+      {
+        "$oid": "94a4641033c641748c941164"
+      },
+      {
+        "$oid": "c6368e20762c4601901e5caa"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Benelli M4</h1>\n    <p class=\"tagline\">The tactical semi-automatic shotgun utilized by elite forces globally.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6968ac35af174fe486452676"
+    },
+    "productName": "Winchester SXP",
+    "categoryId": {
+      "$oid": "a5303e8338c4432fbe977fd1"
+    },
+    "productImageIds": [
+      {
+        "$oid": "f52d96f72e394ac89fe60e45"
+      },
+      {
+        "$oid": "042fc22ccd9c42fda9f33b52"
+      },
+      {
+        "$oid": "93530a148c824dd6b01b9579"
+      },
+      {
+        "$oid": "f7e68d1aee4e4d0b9c4c596c"
+      },
+      {
+        "$oid": "2ed9821e0a8a459b8c32d909"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "9fdc8b47932244a9854ccde6"
+      },
+      {
+        "$oid": "4139e3b8ac8641a38eb0c957"
+      },
+      {
+        "$oid": "d8d71289891840bbab353a5b"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Winchester SXP</h1>\n    <p class=\"tagline\">The fastest pump-action shotgun in the world with superior balance.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "d78236a6943f44d5acfff971"
+    },
+    "productName": "Beretta A300",
+    "categoryId": {
+      "$oid": "a5303e8338c4432fbe977fd1"
+    },
+    "productImageIds": [
+      {
+        "$oid": "a9b59a8a30d64b208b765305"
+      },
+      {
+        "$oid": "5d27a63056544a9d99ec518e"
+      },
+      {
+        "$oid": "082c83efc34947be871fe9e2"
+      },
+      {
+        "$oid": "90ba25e1a51e4caa8d461563"
+      },
+      {
+        "$oid": "7a50bd19aaf341dfab61995d"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "54d887dc785d4b278ca1d998"
+      },
+      {
+        "$oid": "00dcb3c4c5584f4792eb155a"
+      },
+      {
+        "$oid": "e30720ee6e8d4696a28637b7"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>Beretta A300</h1>\n    <p class=\"tagline\">A reliable, soft-shooting semi-automatic shotgun for sporting excellence.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring an ergonomic design, outstanding balance, and reliable mechanics, it delivers exceptional performance for sporting, recreational target shooting, and defensive applications. Built to last with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned action for smooth operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant protective coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials & Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame, high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit & Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability. Custom backstraps or adjustable stocks are available depending on model variants to ensure a comfortable fit for all users.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities regarding licensing and storage compliance. Includes manufacturer lifetime warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:17:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "e4ca0b5767424314a433d1d1"
+    },
+    "productName": "M249 SAW",
+    "categoryId": {
+      "$oid": "ea1e7a26eaea405489f6d789"
+    },
+    "productImageIds": [
+      {
+        "$oid": "168b7425ab0e4e95815cff6b"
+      },
+      {
+        "$oid": "34b32ed18075494eaa2989a5"
+      },
+      {
+        "$oid": "d869fba9a1dc4e7880cc4c26"
+      },
+      {
+        "$oid": "9ce7fb5994be47a4a30d03c6"
+      },
+      {
+        "$oid": "fb1648257c944f6a84db57ae"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "33ab6b8be8fa4d239d46ac70"
+      },
+      {
+        "$oid": "f6c595e24eea441f973f979d"
+      },
+      {
+        "$oid": "6e6167bd3031473997a3a324"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>M249 SAW</h1>\n    <p class=\"tagline\">Belt-fed light machine gun delivering sustained suppressive fire.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "8bcad6f5b16744ee9972d142"
+    },
+    "productName": "PKM Machine Gun",
+    "categoryId": {
+      "$oid": "ea1e7a26eaea405489f6d789"
+    },
+    "productImageIds": [
+      {
+        "$oid": "463565adea0447e8823aa128"
+      },
+      {
+        "$oid": "dbc59785d76445bd916c2d7e"
+      },
+      {
+        "$oid": "425db7302cca4b1894b40431"
+      },
+      {
+        "$oid": "e3ae50a2085e42c1bb0d8347"
+      },
+      {
+        "$oid": "66da2c365d45470983ca2a6f"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "a9339908584c48eaab11b735"
+      },
+      {
+        "$oid": "15e72e7c000d47ddaae9010e"
+      },
+      {
+        "$oid": "f8f0db5d56514fe396cc7da4"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>PKM Machine Gun</h1>\n    <p class=\"tagline\">Soviet-era general-purpose machine gun renowned for unmatched reliability.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "44a53104fa27416198a3ab67"
+    },
+    "productName": "M60 Machine Gun",
+    "categoryId": {
+      "$oid": "ea1e7a26eaea405489f6d789"
+    },
+    "productImageIds": [
+      {
+        "$oid": "8fc73ffabd534529b2e66c7e"
+      },
+      {
+        "$oid": "d76614b50e2f4251872cd22d"
+      },
+      {
+        "$oid": "095df5cf63bc4a57bf5dd266"
+      },
+      {
+        "$oid": "2ec54d6bd79140ab89582ed7"
+      },
+      {
+        "$oid": "f120ba066ecd421bbb8f1284"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "3cba0512c4774386a58c7de1"
+      },
+      {
+        "$oid": "31f8acf7c79842a7b357ccb4"
+      },
+      {
+        "$oid": "21353abb46b34152b72b06b6"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>M60 Machine Gun</h1>\n    <p class=\"tagline\">The iconic 7.62mm battle rifle squad support weapon of Vietnam War fame.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "c8c98038ea73432f9113a542"
+    },
+    "productName": "HK MG4",
+    "categoryId": {
+      "$oid": "ea1e7a26eaea405489f6d789"
+    },
+    "productImageIds": [
+      {
+        "$oid": "5c9f8f26ed1c41c3b39b960c"
+      },
+      {
+        "$oid": "fe8386bec7504253908906a5"
+      },
+      {
+        "$oid": "afdff107d46b4c758c895d62"
+      },
+      {
+        "$oid": "6e9a31c2fc754e3ea61ad719"
+      },
+      {
+        "$oid": "380210b57fda44e19703ed2c"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "2e9a04a4d56e43388f1d9eaa"
+      },
+      {
+        "$oid": "26ab4751fe4b44a1ab79151c"
+      },
+      {
+        "$oid": "0eee410d2274407493e434d9"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>HK MG4</h1>\n    <p class=\"tagline\">German-engineered belt-fed LMG built for modern infantry operations.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "50a8c78e824e48d9aca0e5b3"
+    },
+    "productName": "FN Minimi",
+    "categoryId": {
+      "$oid": "ea1e7a26eaea405489f6d789"
+    },
+    "productImageIds": [
+      {
+        "$oid": "08dd47ed4a584191a5bf3bff"
+      },
+      {
+        "$oid": "5d4578b1ffd844749d3b8d37"
+      },
+      {
+        "$oid": "d11426749db64aad9bbd90d8"
+      },
+      {
+        "$oid": "6874d4fc88e848808c595334"
+      },
+      {
+        "$oid": "cb925f2349674d9495a6702d"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "20989c15f228474492837084"
+      },
+      {
+        "$oid": "a617c994e9d746a2843048a5"
+      },
+      {
+        "$oid": "04602902d8dd426588d007da"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>FN Minimi</h1>\n    <p class=\"tagline\">NATO-standard 5.56mm LMG offering maximum firepower with minimal weight.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "a3618501c55f44d580830f26"
+    },
+    "productName": "M67 Fragmentation Grenade",
+    "categoryId": {
+      "$oid": "ff45b6b8cb154892a33dc655"
+    },
+    "productImageIds": [
+      {
+        "$oid": "9aef5706335240118a7af1d0"
+      },
+      {
+        "$oid": "a61e0435b0c8450fb765d1ec"
+      },
+      {
+        "$oid": "4bff747e4e8f49188e73ba2e"
+      },
+      {
+        "$oid": "d95168bbfab14ff990626689"
+      },
+      {
+        "$oid": "cabfa78ca020416492fb63b9"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "1f821dfea92f4abaaabc0987"
+      },
+      {
+        "$oid": "e182e78dc55f49c2ac8c9f6d"
+      },
+      {
+        "$oid": "1893951aa8cf4888886c5f90"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>M67 Fragmentation Grenade</h1>\n    <p class=\"tagline\">Standard US military fragmentation grenade with a 5-second fuse.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "77fd1af043374da68157930a"
+    },
+    "productName": "M18 Smoke Grenade",
+    "categoryId": {
+      "$oid": "ff45b6b8cb154892a33dc655"
+    },
+    "productImageIds": [
+      {
+        "$oid": "de806b967b094666805727a9"
+      },
+      {
+        "$oid": "bccf74b6fc0142c5a8d92553"
+      },
+      {
+        "$oid": "1f1305444a2d46e8a5d63df6"
+      },
+      {
+        "$oid": "754c60dda1ac4da1b6f31c18"
+      },
+      {
+        "$oid": "596f38d0ff3246cba6ed37e8"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "bf2d4f4e3c964210b786e2d7"
+      },
+      {
+        "$oid": "8764655376ce403da4d37b86"
+      },
+      {
+        "$oid": "3aad2adc632f49fbb04985ee"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>M18 Smoke Grenade</h1>\n    <p class=\"tagline\">Colored smoke signaling and concealment grenade for tactical use.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "eed23bafe02c4fdb87921e4e"
+    },
+    "productName": "AN/M14 Incendiary Grenade",
+    "categoryId": {
+      "$oid": "ff45b6b8cb154892a33dc655"
+    },
+    "productImageIds": [
+      {
+        "$oid": "c12fb996c4a94b0aa1364336"
+      },
+      {
+        "$oid": "8981c38b824948d2b4826301"
+      },
+      {
+        "$oid": "e067b87360f141959afc9a5e"
+      },
+      {
+        "$oid": "282b86b08356494986858e63"
+      },
+      {
+        "$oid": "e58bcf933db146dd9a813bfe"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "e9957aedc80c4019ae2fb70a"
+      },
+      {
+        "$oid": "bd1522070dd64965b97669ce"
+      },
+      {
+        "$oid": "5dc3f9c3238845d88e2c7fce"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>AN/M14 Incendiary Grenade</h1>\n    <p class=\"tagline\">High-temperature thermite incendiary grenade for material destruction.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "88e7616324b1478686734bac"
+    },
+    "productName": "M84 Stun Grenade",
+    "categoryId": {
+      "$oid": "ff45b6b8cb154892a33dc655"
+    },
+    "productImageIds": [
+      {
+        "$oid": "1756688bf76b4ab9bbb761a6"
+      },
+      {
+        "$oid": "8ea94a2a367e481db3b2f7ff"
+      },
+      {
+        "$oid": "8043090a2d104f57a26f1e7e"
+      },
+      {
+        "$oid": "7207d9b0b7cc451fb7adbade"
+      },
+      {
+        "$oid": "a2f568bb710646b5afddcde3"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "0d2b4bb32a4f4a7283312c19"
+      },
+      {
+        "$oid": "a8d1c1de8f174d52b638f628"
+      },
+      {
+        "$oid": "b76180b993cd425092507942"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>M84 Stun Grenade</h1>\n    <p class=\"tagline\">Non-lethal flashbang grenade disorienting targets with light and sound.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "fe28a328c02b4fc382f23d2c"
+    },
+    "productName": "RGD-5 Grenade",
+    "categoryId": {
+      "$oid": "ff45b6b8cb154892a33dc655"
+    },
+    "productImageIds": [
+      {
+        "$oid": "1518e64ef50241c9a70da191"
+      },
+      {
+        "$oid": "746557ec187f427489046133"
+      },
+      {
+        "$oid": "bf746bf28568443e95ee4f8c"
+      },
+      {
+        "$oid": "d33a61e6267442c7bc9ba770"
+      },
+      {
+        "$oid": "f88757da76e648288b6e3f3d"
+      }
+    ],
+    "productVariantIds": [
+      {
+        "$oid": "3bc10c50e25c441cb67063d5"
+      },
+      {
+        "$oid": "90032faeebb84aebb29b65d3"
+      },
+      {
+        "$oid": "65d1106e794849f09ecde6eb"
+      }
+    ],
+    "description": "<article class=\"product-description\" lang=\"en\">\n  <header>\n    <h1>RGD-5 Grenade</h1>\n    <p class=\"tagline\">Soviet standard defensive fragmentation grenade with proven effectiveness.</p>\n  </header>\n\n  <section class=\"overview\">\n    <h2>Overview</h2>\n    <p>\n      This model represents premium engineering in its class. Featuring reliable mechanics,\n      ergonomic design, and proven performance in field conditions. Built to exacting military\n      specifications with high-strength materials and rigorous quality control.\n    </p>\n  </section>\n\n  <section class=\"features\">\n    <h2>Key Features</h2>\n    <ul>\n      <li><strong>Color:</strong> Standard matte black or tactical gray</li>\n      <li><strong>Action:</strong> Precision-tuned for smooth, reliable operation</li>\n      <li><strong>Safety:</strong> Integrated multi-stage safety system</li>\n      <li><strong>Grip:</strong> Textured ergonomic grip for enhanced control</li>\n      <li><strong>Sights:</strong> High-visibility low-profile targeting sights</li>\n      <li><strong>Capacity:</strong> Standard capacity matching regulatory guidelines</li>\n      <li><strong>Finish:</strong> Corrosion-resistant mil-spec coating</li>\n    </ul>\n  </section>\n\n  <section class=\"materials-care\">\n    <h2>Materials &amp; Care</h2>\n    <p>\n      <strong>Typical composition:</strong> Aerospace-grade aluminum alloy frame,\n      high-tensile steel barrel, and durable polymer composite elements.\n    </p>\n    <h3>Care Instructions</h3>\n    <ul>\n      <li>Clean thoroughly after every use with approved solvents and lubricants.</li>\n      <li>Store in a secure, humidity-controlled environment.</li>\n      <li>Inspect action and safety mechanisms regularly.</li>\n      <li>Use only recommended caliber and quality ammunition.</li>\n    </ul>\n  </section>\n\n  <section class=\"sizing\">\n    <h2>Fit &amp; Sizing</h2>\n    <p>\n      Designed to provide balanced weight distribution and natural pointability.\n      Custom adjustable stocks available depending on model variants.\n    </p>\n  </section>\n\n  <section class=\"styling\">\n    <h2>Styling Tips</h2>\n    <ul>\n      <li>Equip with premium optical sights or tactical lights for enhanced utility.</li>\n      <li>Store in a matching heavy-duty custom hard case.</li>\n      <li>Pair with high-quality holsters or slings for comfortable transport.</li>\n    </ul>\n  </section>\n\n  <section class=\"additional-info\">\n    <h2>Additional Information</h2>\n    <p>\n      Subject to regional safety laws and guidelines. Check with local authorities\n      regarding licensing and storage compliance. Includes manufacturer warranty.\n    </p>\n  </section>\n\n  <footer>\n    <p class=\"disclaimer\"><small>Product details may vary by manufacturer. Refer to the specific product page for exact materials and measurements.</small></p>\n  </footer>\n</article>",
+    "productStatus": "active",
+    "createdAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-06T02:30:00.000Z"
     },
     "__v": 0
   }

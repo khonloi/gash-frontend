@@ -20,7 +20,7 @@ const ProductFavorite = () => {
   return (
     <>
       <ProductGridLayout
-        title="Your Favorite Products"
+        title="Favorite Products"
         rawProducts={favorites}
         loading={loading}
         error={error}
