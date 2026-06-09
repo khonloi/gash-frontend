@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../../hooks/useToast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
-import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../constants/constants";
-import Button from "../components/ui/Button";
-import Form from "../components/ui/Form";
+import { LOGIN_ERROR_MESSAGES, ERROR_TIMEOUT } from "../../constants/constants";
+import Button from "../../components/ui/Button";
+import Form from "../../components/ui/Form";
+import AuthTemplate from "./AuthTemplate";
 
 
 const Login = () => {
@@ -146,94 +147,92 @@ const Login = () => {
   ];
 
   return (
-    <div className="page-container flex flex-col items-center justify-center w-full">
-      <section className="bg-white rounded-xl w-full max-w-sm md:max-w-4xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="flex flex-col md:flex-row">
-          {/* Part 1: Sign In Heading and Forms */}
-          <div className="flex-1 p-4 sm:p-5 md:p-8">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
-              Sign In
-            </h1>
+    <AuthTemplate customLayout={true} maxWidth="md:max-w-4xl">
+      <div className="flex flex-col md:flex-row">
+        {/* Part 1: Sign In Heading and Forms */}
+        <div className="flex-1 p-4 sm:p-5 md:p-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
+            Sign In
+          </h1>
 
-            <Form
-              onSubmit={handleSubmit}
-              fields={fields}
-              submitText={isLoading ? "Signing In..." : "Sign In"}
-              isLoading={isLoading}
-              role="form"
-              aria-label="Sign in form"
-            >
-              <div className="text-right my-6">
-                <Link
-                  to="/forgot-password"
-                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
-                >
-                  Forgot Password?
-                </Link>
+          <Form
+            onSubmit={handleSubmit}
+            fields={fields}
+            submitText={isLoading ? "Signing In..." : "Sign In"}
+            isLoading={isLoading}
+            role="form"
+            aria-label="Sign in form"
+          >
+            <div className="text-right my-6">
+              <Link
+                to="/forgot-password"
+                className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none rounded"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+          </Form>
+        </div>
+
+        {/* Part 2: Login Options */}
+        <div className="flex-1 p-4 sm:p-5 md:p-8 bg-gray-50/50 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
+            Other Login Options
+          </h2>
+
+          <div className="space-y-4">
+            <div className="flex justify-start">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="signin_with"
+                size="large"
+                width="100%"
+                aria-label="Sign in with Google"
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
               </div>
-            </Form>
+              <div className="relative flex justify-center text-xs sm:text-sm">
+                <span className="px-2 bg-[#f9fafb] text-gray-500">Or</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              disabled={isLoading}
+              onClick={handlePasskeyLogin}
+              className="w-full"
+              aria-label="Sign in with Passkey"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Sign in with Passkey
+              </span>
+            </Button>
           </div>
 
-          {/* Part 2: Login Options */}
-          <div className="flex-1 p-4 sm:p-5 md:p-8 bg-gray-50/50 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-900">
-              Other Login Options
-            </h2>
-
-            <div className="space-y-4">
-              <div className="flex justify-start">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  text="signin_with"
-                  size="large"
-                  width="100%"
-                  aria-label="Sign in with Google"
-                />
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-xs sm:text-sm">
-                  <span className="px-2 bg-[#f9fafb] text-gray-500">Or</span>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                variant="secondary"
-                size="lg"
-                disabled={isLoading}
-                onClick={handlePasskeyLogin}
-                className="w-full"
-                aria-label="Sign in with Passkey"
+          <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-8">
+            <p className="text-center text-xs sm:text-sm text-gray-600">
+              New to GASH?{" "}
+              <Link
+                to="/signup"
+                className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
               >
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  Sign in with Passkey
-                </span>
-              </Button>
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-gray-200 md:border-t-0 md:pt-0 md:mt-8">
-              <p className="text-center text-xs sm:text-sm text-gray-600">
-                New to GASH?{" "}
-                <Link
-                  to="/signup"
-                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
-                >
-                  Create your GASH account
-                </Link>
-              </p>
-            </div>
+                Create your GASH account
+              </Link>
+            </p>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </AuthTemplate>
   );
 };
 

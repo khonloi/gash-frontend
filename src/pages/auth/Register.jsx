@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../components/ui/Button';
-import Form from '../components/ui/Form';
-import { useRegister } from '../features/auth/hooks/useRegister';
+import Button from '../../components/ui/Button';
+import Form from '../../components/ui/Form';
+import { useRegister } from '../../features/auth/hooks/useRegister';
+import AuthTemplate from './AuthTemplate';
 
 
 const Register = () => {
@@ -146,30 +147,24 @@ const Register = () => {
   ];
 
   return (
-    <div className="page-container flex flex-col items-center justify-center w-full">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
-        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
-          Complete Your Registration
-        </h1>
+    <AuthTemplate title="Complete Your Registration" maxWidth="max-w-5xl">
+      <Form
+        onSubmit={handleSubmit}
+        columns={columns}
+        submitText={isLoading ? 'Creating Account...' : 'Create your GASH account'}
+        isLoading={isLoading}
+      />
 
-        <Form
-          onSubmit={handleSubmit}
-          columns={columns}
-          submitText={isLoading ? 'Creating Account...' : 'Create your GASH account'}
-          isLoading={isLoading}
-        />
-
-        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
-          Already have an account?{' '}
-          <Link
-            to="/login"
-            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
-          >
-            Sign In
-          </Link>
-        </p>
-      </section>
-    </div>
+      <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
+        Already have an account?{' '}
+        <Link
+          to="/login"
+          className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors focus:outline-none rounded"
+        >
+          Sign In
+        </Link>
+      </p>
+    </AuthTemplate>
   );
 };
 

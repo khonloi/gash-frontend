@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { useToast } from '../hooks/useToast';
+import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../hooks/useToast';
 import emailjs from '@emailjs/browser';
-import Button from '../components/ui/Button';
-import Form from '../components/ui/Form';
+import Button from '../../components/ui/Button';
+import Form from '../../components/ui/Form';
+import AuthTemplate from './AuthTemplate';
 
 
 // Initialize EmailJS with Public API Key
@@ -148,39 +149,33 @@ const OTPVerification = () => {
   ];
 
   return (
-    <div className="page-container flex flex-col items-center justify-center w-full">
-      <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-sm shadow-sm border border-gray-200">
-        <h1 className="text-xl sm:text-2xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-center text-gray-900">
-          Verify OTP
-        </h1>
+    <AuthTemplate title="Verify OTP" maxWidth="max-w-sm">
+      <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
+        Enter the 6-digit OTP sent to {email} to{' '}
+        {type === 'forgot-password' ? 'reset your password' : 'verify your email'}.
+      </p>
 
-        <p className="text-sm text-gray-600 mb-4 sm:mb-5 text-center">
-          Enter the 6-digit OTP sent to {email} to{' '}
-          {type === 'forgot-password' ? 'reset your password' : 'verify your email'}.
-        </p>
+      <Form
+        onSubmit={handleSubmit}
+        fields={fields}
+        submitText={isLoading ? 'Verifying...' : 'Verify OTP'}
+        isLoading={isLoading}
+      />
 
-        <Form
-          onSubmit={handleSubmit}
-          fields={fields}
-          submitText={isLoading ? 'Verifying...' : 'Verify OTP'}
-          isLoading={isLoading}
-        />
-
-        <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
-          Didn't receive an OTP?{' '}
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={handleResendOTP}
-            disabled={isLoading}
-            className="inline"
-          >
-            Resend OTP
-          </Button>
-        </p>
-      </section>
-    </div>
+      <p className="text-center text-sm text-gray-600 mt-4 sm:mt-5">
+        Didn't receive an OTP?{' '}
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={handleResendOTP}
+          disabled={isLoading}
+          className="inline"
+        >
+          Resend OTP
+        </Button>
+      </p>
+    </AuthTemplate>
   );
 };
 
