@@ -66,7 +66,7 @@ const StatusBadge = ({ status }) => {
 export const ProductCardSkeleton = () => {
   return (
     <article
-      className="flex flex-col h-[17em] w-[11em] sm:h-[20em] sm:w-[13em] border-2 border-gray-300 rounded-xl overflow-hidden bg-white"
+      className="flex flex-col h-[17em] w-full max-w-[11em] sm:h-[20em] sm:max-w-[13em] border-2 border-gray-300 rounded-xl overflow-hidden bg-white"
       aria-label="Loading product"
       role="gridcell"
     >
@@ -123,7 +123,7 @@ const ProductCard = ({
 
   return (
     <article
-      className="flex flex-col h-[17em] w-[11em] sm:h-[20em] sm:w-[13em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-lg focus:shadow-lg focus:outline-none cursor-pointer transition-all duration-300 ease-in-out bg-white relative"
+      className="flex flex-col h-[17em] w-full max-w-[11em] sm:h-[20em] sm:max-w-[13em] border-2 border-gray-300 rounded-xl overflow-hidden hover:shadow-lg focus:shadow-lg focus:outline-none cursor-pointer transition-all duration-300 ease-in-out bg-white relative"
       onClick={() => handleProductClick(product._id)}
       onKeyDown={(e) => handleKeyDown(e, product._id)}
       role="gridcell"

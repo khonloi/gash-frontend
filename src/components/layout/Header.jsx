@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsDropdown from "../../features/notifications/components/NotificationsDropdown";
 import Form from "../ui/Form";
 
@@ -48,6 +49,91 @@ export default function Header() {
     } = useHeader();
 
     const badgeClass = "absolute bg-amber-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center";
+
+    const renderUserDropdownItems = (showNotifications = false) => (
+        <>
+            {showNotifications && (
+                <button
+                    onMouseDown={(e) => {
+                        e.stopPropagation();
+                        navigate('/notifications');
+                        setShowUserMenu(false);
+                    }}
+                    className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                    <NotificationsOutlinedIcon fontSize="small" className="text-gray-500" />
+                    <span>Notifications</span>
+                    {notificationCount > 0 && (
+                        <span className="bg-amber-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center ml-auto">
+                            {notificationCount}
+                        </span>
+                    )}
+                </button>
+            )}
+            <button
+                onMouseDown={(e) => {
+                    e.stopPropagation();
+                    navigate('/profile');
+                    setShowUserMenu(false);
+                }}
+                className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+                <PermIdentityOutlinedIcon fontSize="small" className="text-gray-500" />
+                <span>My Account</span>
+            </button>
+            <button
+                onMouseDown={(e) => {
+                    e.stopPropagation();
+                    navigate('/orders');
+                    setShowUserMenu(false);
+                }}
+                className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+                <ShoppingBagOutlinedIcon fontSize="small" className="text-gray-500" />
+                <span>My Orders</span>
+            </button>
+            <button
+                onMouseDown={(e) => {
+                    e.stopPropagation();
+                    navigate('/vouchers');
+                    setShowUserMenu(false);
+                }}
+                className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+                <ConfirmationNumberOutlinedIcon fontSize="small" className="text-gray-500" />
+                <span>My Vouchers</span>
+            </button>
+            <button
+                onMouseDown={(e) => {
+                    e.stopPropagation();
+                    navigate('/favorites');
+                    setShowUserMenu(false);
+                }}
+                className="flex items-center justify-between w-full p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+                <div className="flex items-center gap-3">
+                    <FavoriteBorderIcon fontSize="small" className="text-gray-500" />
+                    <span>My Favorites</span>
+                </div>
+                {favoriteCount > 0 && (
+                    <span className="bg-amber-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {favoriteCount}
+                    </span>
+                )}
+            </button>
+            <button
+                onMouseDown={(e) => {
+                    e.stopPropagation();
+                    handleLogout();
+                    setShowUserMenu(false);
+                }}
+                className="flex items-center gap-3 w-full text-left p-3 text-red-600 hover:bg-red-50 transition-colors text-sm font-medium"
+            >
+                <LogoutIcon fontSize="small" className="text-red-500" />
+                <span>Sign Out</span>
+            </button>
+        </>
+    );
 
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-[#131921] text-white shadow">
@@ -185,123 +271,44 @@ export default function Header() {
                             <Link to="/" className="flex items-center justify-center">
                                 <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
                             </Link>
-                            <div className="relative" ref={userMenuRef}>
-                                <button
-                                    onClick={() => {
-                                        if (!user) {
-                                            navigate("/login");
-                                        } else {
-                                            setShowUserMenu((prev) => !prev);
-                                        }
-                                    }}
-                                    title="My Account"
-                                    className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
-                                >
-                                    <PermIdentityOutlinedIcon />
-                                </button>
-                                {user && showUserMenu && (
-                                    <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                        <div className="px-4 py-2 hover:bg-[#ffb300]/20">
-                                            <NotificationsDropdown user={user} />
+                            <div className="flex items-center gap-1">
+                                <div className="relative">
+                                    <button
+                                        onClick={() => {
+                                            user ? navigate("/cart") : navigate("/login");
+                                        }}
+                                        title="Cart"
+                                        className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
+                                    >
+                                        <ShoppingBagOutlinedIcon />
+                                        {cartItemCount > 0 && (
+                                            <span className={`${badgeClass} -top-1 -right-1`}>
+                                                {cartItemCount}
+                                            </span>
+                                        )}
+                                    </button>
+                                </div>
+
+                                <div className="relative" ref={userMenuRef}>
+                                    <button
+                                        onClick={() => {
+                                            if (!user) {
+                                                navigate("/login");
+                                            } else {
+                                                setShowUserMenu((prev) => !prev);
+                                            }
+                                        }}
+                                        title="My Account"
+                                        className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
+                                    >
+                                        <PermIdentityOutlinedIcon />
+                                    </button>
+                                    {user && showUserMenu && (
+                                        <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
+                                            {renderUserDropdownItems(true)}
                                         </div>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-
-                                                navigate('/cart');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
-                                        >
-                                            <ShoppingBagOutlinedIcon fontSize="small" />
-                                            Cart
-                                            {cartItemCount > 0 && (
-                                                <span className={`${badgeClass} top-1 right-4`}>
-                                                    {cartItemCount}
-                                                </span>
-                                            )}
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-
-                                                navigate('/notifications');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
-                                        >
-                                            <NotificationsOutlinedIcon fontSize="small" />
-                                            Notifications
-                                            {notificationCount > 0 && (
-                                                <span className={`${badgeClass} top-1 right-4`}>
-                                                    {notificationCount}
-                                                </span>
-                                            )}
-                                        </button>
-                                        <Link
-                                            to="/profile"
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20"
-                                        >
-                                            <button
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation();
-
-                                                    navigate('/profile');
-                                                    setShowUserMenu(false);
-                                                }}
-                                                className="flex items-center gap-2 w-full text-left"
-                                            >
-                                                <PermIdentityOutlinedIcon fontSize="small" /> My Account
-                                            </button>
-                                        </Link>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                navigate('/orders');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                        >
-                                            <ShoppingBagOutlinedIcon fontSize="small" /> My Orders
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                navigate('/vouchers');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                        >
-                                            <ConfirmationNumberOutlinedIcon fontSize="small" /> My Vouchers
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-                                                navigate('/favorites');
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 relative"
-                                        >
-                                            <FavoriteBorderIcon fontSize="small" /> My Favorites
-                                            {favoriteCount > 0 && (
-                                                <span className={`${badgeClass} top-1 right-4`}>
-                                                    {favoriteCount}
-                                                </span>
-                                            )}
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => {
-                                                e.stopPropagation();
-
-                                                handleLogout();
-                                                setShowUserMenu(false);
-                                            }}
-                                            className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
-                                        >
-                                            Sign Out
-                                        </button>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </>
                     )}
@@ -454,75 +461,7 @@ export default function Header() {
                             )}
                             {user && showUserMenu && (
                                 <div className="absolute right-0 top-full mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate("/profile");
-                                            setShowUserMenu(false);
-                                        }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                    >
-                                        My Account
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-
-                                            navigate("/orders");
-                                            setShowUserMenu(false);
-                                        }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                    >
-                                        My Orders
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-
-                                            navigate("/vouchers");
-                                            setShowUserMenu(false);
-                                        }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                    >
-                                        My Vouchers
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-
-                                            navigate("/favorites");
-                                            setShowUserMenu(false);
-                                        }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors relative"
-                                    >
-                                        My Favorites
-                                        {favoriteCount > 0 && (
-                                            <span className={`${badgeClass} top-1 right-4`}>
-                                                {favoriteCount}
-                                            </span>
-                                        )}
-                                    </button>
-                                    {/* <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-
-                                            navigate("/feedback");
-                                            setShowUserMenu(false);
-                                        }}
-                                        className="w-full text-left px-4 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                    >
-                                        My Feedback
-                                    </button> */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleLogout();
-                                            setShowUserMenu(false);
-                                        }}
-                                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
-                                    >
-                                        Sign Out
-                                    </button>
+                                    {renderUserDropdownItems()}
                                 </div>
                             )}
                         </div>
