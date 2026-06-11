@@ -30,7 +30,7 @@ export default function Layout({ children }) {
       <Header />
 
       {/* Spacer để tránh nội dung bị che bởi fixed header */}
-      <div className="h-16 md:h-32" />
+      <div className="h-16 sm:h-32 md:h-36" />
 
       {/* Main content */}
       <main className="flex-1 min-h-screen">{children}</main>
