@@ -12,9 +12,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import CheckroomOutlinedIcon from "@mui/icons-material/CheckroomOutlined";
-import AssignmentReturnOutlinedIcon from "@mui/icons-material/AssignmentReturnOutlined";
 import gashHeroProducts from "../assets/image/gash_hero_products.png";
 import gashDiscountProducts from "../assets/image/gash_discount_products.png";
 import gashAccessoriesProducts from "../assets/image/gash_accessories_products.png";
@@ -332,7 +329,7 @@ const Home = () => {
 
           {/* Left Text Content */}
           <div className={textClass}>
-            <span className="text-xs sm:text-sm md:text-base font-semibold text-blue-900 mb-1 sm:mb-2 uppercase tracking-wider">
+            <span className="text-xs sm:text-sm md:text-base font-semibold text-blue-900 mb-1 sm:mb-2  tracking-wider">
               {slide.subtitle}
             </span>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-[#0f2942] leading-tight mb-2 sm:mb-3">
@@ -343,9 +340,9 @@ const Home = () => {
             </p>
             <Button
               onClick={() => navigate(slide.link)}
-              variant="secondary"
+              variant="default"
               size="md"
-              className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-sm transition-all"
+              className="px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-sm transition-all"
             >
               {slide.buttonText}
             </Button>
@@ -481,7 +478,7 @@ const Home = () => {
             {/* Tile 1: Left-most Gift Cards Card (spans 5 cols on lg) */}
             <div className="lg:col-span-5 bg-[#c3daf9] border-2 border-gray-300 rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] transition-all duration-300 ease-in-out hover:shadow-lg">
               <div className="z-10 flex flex-col items-start text-left max-w-xs">
-                <span className="text-xs font-semibold text-blue-955 uppercase tracking-widest">
+                <span className="text-xs font-semibold text-blue-955  tracking-widest">
                   GASH Gift Cards
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-semibold text-[#0d2847] mt-2 mb-6 leading-tight">
@@ -491,14 +488,14 @@ const Home = () => {
                   onClick={() => navigate("/products")}
                   variant="primary"
                   size="sm"
-                  className="bg-[#0f2942] hover:bg-[#1b4369] text-white px-5 py-2 rounded-full font-semibold transition-all shadow-sm"
+                  className="px-5 py-2 rounded-full font-semibold transition-all shadow-sm"
                 >
                   Shop gift cards
                 </Button>
               </div>
 
               {/* Styled e-Gift Card Previews with inline SVG */}
-              <div className="absolute -right-4 -bottom-4 w-52 h-44 pointer-events-none select-none">
+              <div className="absolute right-4 bottom-4 w-56 h-56 pointer-events-none select-none">
                 <svg viewBox="0 0 200 200" className="w-full h-full">
                   <defs>
                     <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -565,7 +562,7 @@ const Home = () => {
               {/* Center Top: Same-day delivery (Tile 2) */}
               <div className="bg-[#f2f4f7] border-2 border-gray-300 rounded-xl p-6 flex justify-between items-center overflow-hidden min-h-[160px] transition-all duration-300 ease-in-out hover:shadow-lg">
                 <div className="flex flex-col items-start text-left max-w-[65%]">
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-gray-500  tracking-wider">
                     Express Delivery
                   </span>
                   <h4 className="text-lg font-semibold text-[#0d2847] mt-1 mb-2">
@@ -578,13 +575,13 @@ const Home = () => {
                     Shop collections
                   </button>
                 </div>
-                <div className="w-20 h-16 flex items-center justify-center select-none pointer-events-none">
+                <div className="w-26 h-22 flex items-center justify-center select-none pointer-events-none">
                   <svg viewBox="0 0 100 80" className="w-full h-full">
                     {/* Speed lines */}
                     <path d="M10,25 L28,25" stroke="#2563eb" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
                     <path d="M5,38 L22,38" stroke="#2563eb" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
                     <path d="M12,50 L25,50" stroke="#2563eb" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
-                    
+
                     {/* Van body */}
                     <path d="M32,18 H70 L85,35 V60 H32 Z" fill="#3b82f6" />
                     {/* Cabin window */}
@@ -617,7 +614,7 @@ const Home = () => {
                     </button>
                   </div>
                   <div className="flex justify-end mt-2 select-none pointer-events-none">
-                    <svg viewBox="0 0 100 80" className="w-16 h-14">
+                    <svg viewBox="0 0 100 80" className="w-22 h-19">
                       {/* Rack stand */}
                       <line x1="10" y1="75" x2="90" y2="75" stroke="#334155" strokeWidth="3" strokeLinecap="round" />
                       <line x1="25" y1="75" x2="25" y2="15" stroke="#475569" strokeWidth="2.5" />
@@ -661,7 +658,7 @@ const Home = () => {
                     </button>
                   </div>
                   <div className="flex justify-end mt-2 select-none pointer-events-none">
-                    <svg viewBox="0 0 100 80" className="w-16 h-14">
+                    <svg viewBox="0 0 100 80" className="w-22 h-19">
                       {/* Box bottom/back shadow */}
                       <ellipse cx="50" cy="65" rx="25" ry="6" fill="#cbd5e1" opacity="0.6" />
 
@@ -673,7 +670,7 @@ const Home = () => {
                         <path d="M35,45 L55,35 L55,10 L35,20 Z" fill="#0ea5e9" />
                         {/* Top face */}
                         <path d="M35,20 L55,10 L35,0 L15,10 Z" fill="#38bdf8" />
-                        
+
                         {/* Tape line */}
                         <path d="M35,20 L35,45" stroke="#0369a1" strokeWidth="2.5" />
                         <path d="M35,20 L25,15 M35,20 L45,15" stroke="#0369a1" strokeWidth="2.5" />
@@ -692,7 +689,7 @@ const Home = () => {
             {/* Tile 5: Rightmost Tall Card (spans 3 cols on lg) */}
             <div className="lg:col-span-3 bg-white border-2 border-gray-300 rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] transition-all duration-300 ease-in-out hover:shadow-lg">
               <div className="z-10 flex flex-col items-start text-left">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-gray-500  tracking-wider">
                   Loyalty Program
                 </span>
                 <h3 className="text-xl font-semibold text-[#0d2847] mt-2 mb-2">
@@ -711,7 +708,7 @@ const Home = () => {
                 {/* Backdrop glowing effect */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-blue-100 rounded-full opacity-60 filter blur-xl pointer-events-none" />
 
-                <div className="w-48 h-32 mx-auto transition-all duration-300 hover:rotate-1 hover:scale-105">
+                <div className="w-56 h-36 mx-auto transition-all duration-300 hover:rotate-1 hover:scale-105">
                   <svg viewBox="0 0 160 100" className="w-full h-full drop-shadow-xl">
                     <defs>
                       <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -732,14 +729,14 @@ const Home = () => {
 
                     {/* Card Base */}
                     <rect x="0" y="0" width="160" height="100" rx="10" fill="url(#cardBg)" stroke="#1e293b" strokeWidth="0.5" />
-                    
+
                     {/* Decorative Gold lines / Wave pattern */}
                     <path d="M-10,80 Q30,60 80,85 T170,70 L170,110 L-10,110 Z" fill="url(#goldAcc)" opacity="0.15" />
                     <path d="M-10,85 Q40,65 90,95 T170,75 L170,110 L-10,110 Z" fill="url(#goldAcc)" opacity="0.25" />
 
                     {/* Brand logo */}
                     <text x="12" y="22" fill="url(#goldGlow)" fontSize="10" fontWeight="600" letterSpacing="0.1em">GASH</text>
-                    
+
                     {/* Contactless symbol */}
                     <path d="M140,15 A5,5 0 0,1 140,25 M143,12 A9,9 0 0,1 143,28 M146,9 A13,13 0 0,1 146,31" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
 
@@ -758,8 +755,8 @@ const Home = () => {
                 </div>
               </div>
 
-              <span className="text-[10px] font-semibold text-gray-400 tracking-wider text-center block uppercase mt-2">
-                OnePay Member Rewards
+              <span className="text-xs font-semibold text-gray-400 tracking-wider text-center block  mt-2">
+                AllPay Member Rewards
               </span>
             </div>
 
@@ -807,7 +804,7 @@ const Home = () => {
             {/* Tile 1: Left-most Large Card (spans 5 cols on lg) */}
             <div className="lg:col-span-5 bg-[#d0e1f9] border-2 border-gray-300 rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] transition-all duration-300 ease-in-out hover:shadow-lg">
               <div className="z-10 flex flex-col items-start text-left max-w-xs">
-                <span className="text-xs font-semibold text-blue-900 uppercase tracking-widest">
+                <span className="text-xs font-semibold text-blue-900  tracking-widest">
                   Nike, LEGO®, Owala & more
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-semibold text-[#0a2540] mt-2 mb-6 leading-tight">
@@ -815,9 +812,9 @@ const Home = () => {
                 </h3>
                 <Button
                   onClick={() => navigate("/products")}
-                  variant="secondary"
+                  variant="default"
                   size="sm"
-                  className="bg-white hover:bg-gray-50 text-[#0a2540] px-5 py-2 rounded-full font-semibold transition-all shadow-sm"
+                  className="px-5 py-2 rounded-full font-semibold transition-all shadow-sm"
                 >
                   Shop now
                 </Button>
@@ -828,7 +825,7 @@ const Home = () => {
                 <svg viewBox="0 0 200 200" className="w-full h-full">
                   {/* Background glow / circles */}
                   <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" strokeDasharray="6 6" />
-                  
+
                   {/* Owala Bottle */}
                   <g transform="translate(25, 40)">
                     <rect x="10" y="40" width="26" height="80" rx="8" fill="#2d3748" />
@@ -858,7 +855,7 @@ const Home = () => {
                 </svg>
               </div>
 
-              <div className="absolute left-6 sm:left-8 bottom-6 sm:bottom-8 z-10 bg-blue-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+              <div className="absolute left-6 sm:left-8 bottom-6 sm:bottom-8 z-10 bg-blue-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full  tracking-wider">
                 Top 100+
               </div>
             </div>
@@ -869,7 +866,7 @@ const Home = () => {
               {/* Center Top: Game day gear (Tile 2) */}
               <div className="bg-[#dceaf9] border-2 border-gray-300 rounded-xl p-6 flex justify-between items-center overflow-hidden min-h-[160px] relative transition-all duration-300 ease-in-out hover:shadow-lg">
                 <div className="flex flex-col items-start text-left max-w-[55%] z-10">
-                  <span className="text-xs font-semibold text-blue-900/60 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-blue-900/60  tracking-wider">
                     Team jerseys & more
                   </span>
                   <h4 className="text-lg font-semibold text-[#0a2540] mt-1 mb-2">
@@ -938,7 +935,7 @@ const Home = () => {
                 {/* Tile 3: Grooming Gifts */}
                 <div className="bg-[#e2ebd5] border-2 border-gray-300 rounded-xl p-5 flex flex-col justify-between overflow-hidden min-h-[160px] transition-all duration-300 ease-in-out hover:shadow-lg">
                   <div className="flex flex-col items-start text-left">
-                    <span className="text-[10px] font-semibold text-[#2d4a22] uppercase tracking-wider">
+                    <span className="text-[10px] font-semibold text-[#2d4a22]  tracking-wider">
                       Grooming gifts for Dad
                     </span>
                     <button
@@ -953,7 +950,7 @@ const Home = () => {
                     <div className="absolute bottom-[46px] w-4 h-4 bg-[#2d3748] rounded-t-sm border border-gray-700/20" />
                     <div className="absolute bottom-[40px] w-6 h-1.5 bg-[#2d4a22]/40" />
                     <div className="w-10 h-[42px] bg-gradient-to-br from-amber-100/70 to-amber-600/80 rounded border-2 border-amber-800/40 flex items-center justify-center shadow-sm">
-                      <span className="text-[6px] font-mono font-semibold text-amber-950/80 tracking-widest uppercase">GASH</span>
+                      <span className="text-[6px] font-mono font-semibold text-amber-950/80 tracking-widest ">GASH</span>
                     </div>
                   </div>
                 </div>
@@ -961,7 +958,7 @@ const Home = () => {
                 {/* Tile 4: Splash / Summer */}
                 <div className="bg-[#daf0f6] border-2 border-gray-300 rounded-xl p-5 flex flex-col justify-between overflow-hidden min-h-[160px] transition-all duration-300 ease-in-out hover:shadow-lg">
                   <div className="flex flex-col items-start text-left">
-                    <span className="text-[10px] font-semibold text-[#0e3c46] uppercase tracking-wider">
+                    <span className="text-[10px] font-semibold text-[#0e3c46]  tracking-wider">
                       Ready to make a splash
                     </span>
                     <button
@@ -991,7 +988,7 @@ const Home = () => {
             {/* Tile 5: Rightmost Tall Card (spans 3 cols on lg) */}
             <div className="lg:col-span-3 bg-[#1b4332] border-2 border-gray-800 rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] transition-all duration-300 ease-in-out hover:shadow-lg">
               <div className="z-10 flex flex-col items-start text-left text-white">
-                <span className="text-xs font-semibold text-green-200 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-green-200  tracking-wider">
                   Grilling musts in 1 click
                 </span>
                 <h3 className="text-xl font-semibold text-white mt-2 mb-2 leading-tight">
@@ -1027,7 +1024,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <span className="text-[8px] font-semibold text-green-300/60 tracking-wider text-center block uppercase mt-2">
+              <span className="text-[8px] font-semibold text-green-300/60 tracking-wider text-center block  mt-2">
                 *Excludes tax. Terms apply.
               </span>
             </div>

@@ -426,7 +426,7 @@ const ProductGridLayout = ({
       <aside className="w-full md:w-60 lg:w-64 px-0 flex-shrink-0 mb-4 md:mb-0 pb-4 md:pb-0" role="complementary" aria-label="Product filters">
         <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200 w-full">
           <button
-            className="flex justify-between items-center w-full md:mb-4 h-8 focus:outline-none"
+            className={`flex justify-between items-center w-full ${showMobileFilters ? "mb-4" : "mb-0"} md:mb-4 h-8 focus:outline-none`}
             onClick={() => setShowMobileFilters(!showMobileFilters)}
             aria-expanded={showMobileFilters}
             aria-controls="mobile-filters-content"
