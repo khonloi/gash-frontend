@@ -449,6 +449,32 @@ export const useCart = () => {
     );
   }, []);
 
+  const toggleAllChecked = useCallback((checkedValue) => {
+    setCartItems((prev) =>
+      prev.map((item) => {
+        const stockQuantity = item.variantId?.stockQuantity ?? 0;
+        const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+        const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+        const isOutOfStock = stockQuantity <= 0;
+        const isInactive = isVariantDiscontinued || isProductDiscontinued || isOutOfStock;
+
+        if (isInactive) return item;
+
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase().trim();
+          const productName = item.variantId?.productId?.productName?.toLowerCase() || "";
+          const productColorName = item.variantId?.productColorId?.productColorName?.toLowerCase() || "";
+          const productSizeName = item.variantId?.productSizeId?.productSizeName?.toLowerCase() || "";
+          const matches = productName.includes(query) || productColorName.includes(query) || productSizeName.includes(query);
+
+          if (!matches) return item;
+        }
+
+        return { ...item, checked: checkedValue };
+      })
+    );
+  }, [searchQuery]);
+
   return {
     user,
     cartItems,
@@ -472,6 +498,7 @@ export const useCart = () => {
     handleQuantityChange,
     handleRetry,
     toggleChecked,
+    toggleAllChecked,
     formatPrice
   };
 };

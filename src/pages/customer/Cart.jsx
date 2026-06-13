@@ -30,8 +30,38 @@ const Cart = () => {
     handleQuantityChange,
     handleRetry,
     toggleChecked,
+    toggleAllChecked,
     formatPrice
   } = useCart();
+
+  const activeFilteredItems = filteredCartItems.filter((item) => {
+    const stockQuantity = item.variantId?.stockQuantity ?? 0;
+    const isVariantDiscontinued = item.variantId?.variantStatus === "discontinued";
+    const isProductDiscontinued = item.variantId?.productId?.productStatus === "discontinued";
+    const isOutOfStock = stockQuantity <= 0;
+    return !(isVariantDiscontinued || isProductDiscontinued || isOutOfStock);
+  });
+
+  const isAllChecked = activeFilteredItems.length > 0 && activeFilteredItems.every((item) => item.checked);
+
+  const selectAllCheckbox = filteredCartItems.length > 0 && (
+    <div className="flex items-center gap-3 bg-gray-50 border-2 border-gray-300 rounded-xl p-4 mb-4 select-none">
+      <input
+        type="checkbox"
+        id="select-all"
+        checked={isAllChecked}
+        onChange={() => toggleAllChecked(!isAllChecked)}
+        className="w-5 h-5 accent-amber-400 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={activeFilteredItems.length === 0}
+      />
+      <label
+        htmlFor="select-all"
+        className="text-sm sm:text-base font-semibold text-gray-750 cursor-pointer flex-1"
+      >
+        Select All ({activeFilteredItems.length} active item{activeFilteredItems.length !== 1 ? "s" : ""})
+      </label>
+    </div>
+  );
 
   // Focus error notification
   const errorRef = useRef(null);
@@ -146,8 +176,8 @@ const Cart = () => {
   };
 
   const cartAside = (
-    <div className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 sm:p-5 flex-shrink-0 w-full" aria-label="Cart summary">
-      <p className="text-lg sm:text-xl font-bold text-red-600 mb-4 m-0">
+    <div className="bg-white sm:bg-gray-50 border-0 sm:border-2 border-gray-300 rounded-none sm:rounded-xl p-0 sm:p-5 flex flex-row sm:flex-col items-center sm:items-stretch justify-between sm:justify-start gap-4 flex-shrink-0 w-full" aria-label="Cart summary">
+      <p className="text-lg sm:text-xl font-bold text-red-600 m-0 shrink-0">
         Total: {formatPrice(totalPrice)}
       </p>
       <Button
@@ -164,7 +194,7 @@ const Cart = () => {
           hasInactiveSelectedItems
         }
         aria-label="Proceed to checkout"
-        className="w-full"
+        className="w-auto sm:w-full"
       >
         Proceed to Checkout
       </Button>
@@ -208,6 +238,7 @@ const Cart = () => {
       errorRef={errorRef}
       onRetry={handleRetry}
       aside={cartAside}
+      listHeader={selectAllCheckbox}
       hideSearch={loading || cartItems.length === 0}
       hideItemCount={true}
       customEmptyState={customEmptyState}

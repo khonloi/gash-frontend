@@ -33,6 +33,7 @@ const ListLayout = ({
   aside,
   hideSearch,
   hideItemCount,
+  listHeader,
   customEmptyState
 }) => {
   if (isAuthLoading) {
@@ -40,7 +41,7 @@ const ListLayout = ({
   }
 
   return (
-    <div className="page-container page-container-centered">
+    <div className="page-container page-container-centered pb-24 sm:pb-0">
       <section className="bg-white rounded-xl p-4 sm:p-5 md:p-6 w-full max-w-5xl shadow-sm border border-gray-200">
         <header className="mb-4">
           <h1 className="text-xl sm:text-2xl font-normal mb-2 m-0">{title}</h1>
@@ -192,16 +193,18 @@ const ListLayout = ({
           aside ? (
             <main className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8" role="main">
               <section className="flex-1 min-w-0" aria-label={`${title} items`}>
+                {listHeader}
                 <div className="space-y-4">
                   {currentItems?.map(renderItem)}
                 </div>
               </section>
-              <aside className="flex-shrink-0 sm:w-64 w-full" aria-label={`${title} summary`}>
+              <aside className="flex-shrink-0 w-full sm:w-64 fixed bottom-0 left-0 z-40 bg-white border-t-2 border-gray-300 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.08)] sm:static sm:z-auto sm:bg-transparent sm:border-0 sm:p-0 sm:shadow-none sm:sticky sm:top-44 sm:self-start" aria-label={`${title} summary`}>
                 {aside}
               </aside>
             </main>
           ) : (
             <div className="space-y-4">
+              {listHeader}
               {currentItems?.map(renderItem)}
             </div>
           )

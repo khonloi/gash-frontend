@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { useUserChat } from "../hooks/useUserChat";
 
 // use shared SOCKET_URL (same as API base)
@@ -31,15 +31,55 @@ export default function UserChat({ userId }) {
     MAX_MESSAGE_LENGTH,
   } = useUserChat(userId);
 
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+  const [chatPosition, setChatPosition] = React.useState("right");
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      dragX.set(0);
+      dragY.set(0);
+      setChatPosition("right");
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [dragX, dragY]);
+
+  const handleDragEnd = (event, info) => {
+    const screenWidth = window.innerWidth;
+    const initialButtonX = screenWidth - 24 - 56;
+    const currentDragX = dragX.get();
+    const currentButtonX = initialButtonX + currentDragX;
+
+    const leftOffset = 24 - initialButtonX;
+    const rightOffset = 0;
+    const midPoint = screenWidth / 2;
+
+    const isLeft = currentButtonX < midPoint;
+    const finalOffset = isLeft ? leftOffset : rightOffset;
+    setChatPosition(isLeft ? "left" : "right");
+
+    animate(dragX, finalOffset, {
+      type: "spring",
+      stiffness: 300,
+      damping: 25
+    });
+  };
+
   return (
     <>
       {/* Toggle button */}
       <motion.button
+        drag
+        dragMomentum={false}
+        dragElastic={0.1}
+        onDragEnd={handleDragEnd}
+        style={{ x: dragX, y: dragY, touchAction: "none" }}
         initial={false}
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-colors duration-300 ${isOpen
+        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-colors duration-300 cursor-grab active:cursor-grabbing ${isOpen
           ? "bg-red-500 hover:bg-red-600 text-white"
           : "bg-amber-500 hover:bg-amber-600 text-white"
           }`}
@@ -65,11 +105,13 @@ export default function UserChat({ userId }) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: "bottom right" }}
+            initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: chatPosition === "left" ? "bottom left" : "bottom right" }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed bottom-24 right-6 z-40 w-[400px] h-[550px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden"
+            className={`fixed bottom-24 z-40 w-[calc(100vw-32px)] sm:w-[400px] h-[500px] sm:h-[550px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden ${
+              chatPosition === "left" ? "left-6" : "right-6"
+            }`}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 flex items-center justify-between">

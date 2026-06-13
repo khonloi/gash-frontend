@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import gashLogo from "../../assets/image/gash-logo.svg";
 import { useHeader } from "./hooks/useHeader";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Material UI Icons
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
@@ -199,63 +200,69 @@ export default function Header() {
                                     </button>
                                 )}
                             </Form>
-                            {showDropdown && (
-                                <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white 
-                                border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out]
-                                max-h-96 overflow-y-auto">
-                                    {loading ? (
-                                        <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
-                                            <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
-                                            Searching...
-                                        </div>
-                                    ) : searchResults.length > 0 ? (
-                                        <>
-                                            {searchResults.map((item) => {
-                                                const minPrice = getMinPrice(item);
-                                                const imageUrl = getMainImageUrl(item);
+                            <AnimatePresence>
+                                {showDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                                        transition={{ duration: 0.15, ease: "easeOut" }}
+                                        className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden max-h-96 overflow-y-auto"
+                                    >
+                                        {loading ? (
+                                            <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
+                                                <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
+                                                Searching...
+                                            </div>
+                                        ) : searchResults.length > 0 ? (
+                                            <>
+                                                {searchResults.map((item) => {
+                                                    const minPrice = getMinPrice(item);
+                                                    const imageUrl = getMainImageUrl(item);
 
-                                                return (
-                                                    <Link
-                                                        key={item._id}
-                                                        to={`/product/${item._id}`}
-                                                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
-                                                        onClick={() => {
+                                                    return (
+                                                        <Link
+                                                            key={item._id}
+                                                            to={`/product/${item._id}`}
+                                                            className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
+                                                            onClick={() => {
 
-                                                            setShowDropdown(false);
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={imageUrl}
-                                                            alt={item.productName || "Product image"}
-                                                            className="w-14 h-14 rounded-lg object-cover shadow-sm"
-                                                        />
-                                                        <div className="flex flex-col">
-                                                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                                                                {item.productName || "Unnamed Product"}
-                                                            </p>
-                                                            <p className="text-sm text-red-600 font-semibold mt-1">
-                                                                {formatPrice(minPrice)}
-                                                            </p>
-                                                        </div>
-                                                    </Link>
-                                                );
-                                            })}
-                                            <button
-                                                onClick={() => {
+                                                                setShowDropdown(false);
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={imageUrl}
+                                                                alt={item.productName || "Product image"}
+                                                                className="w-14 h-14 rounded-lg object-cover shadow-sm"
+                                                            />
+                                                            <div className="flex flex-col">
+                                                                <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                                                                    {item.productName || "Unnamed Product"}
+                                                                </p>
+                                                                <p className="text-sm text-red-600 font-semibold mt-1">
+                                                                    {formatPrice(minPrice)}
+                                                                </p>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                                <button
+                                                    onClick={() => {
 
-                                                    navigate(`/search?q=${encodeURIComponent(search)}`);
-                                                    setShowDropdown(false);
-                                                }}
-                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                            >
-                                                View all results
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <div className="px-4 py-4 text-gray-500 text-center">No products found</div>
-                                    )}
-                                </div>
-                            )}
+                                                        navigate(`/search?q=${encodeURIComponent(search)}`);
+                                                        setShowDropdown(false);
+                                                    }}
+                                                    className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                                >
+                                                    View all results
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div className="px-4 py-4 text-gray-500 text-center">No products found</div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     ) : (
                         <>
@@ -303,11 +310,20 @@ export default function Header() {
                                     >
                                         <PermIdentityOutlinedIcon />
                                     </button>
-                                    {user && showUserMenu && (
-                                        <div className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                            {renderUserDropdownItems(true)}
-                                        </div>
-                                    )}
+                                    <AnimatePresence>
+                                        {user && showUserMenu && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                                className="absolute right-0 mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {renderUserDropdownItems(true)}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
                         </>
@@ -338,58 +354,66 @@ export default function Header() {
                                 <SearchIcon fontSize="small" />
                             </button>
                         </Form>
-                        {showDropdown && (
-                            <div className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden animate-[fadeIn_0.2s_ease-out] max-h-96 overflow-y-auto">
-                                {loading ? (
-                                    <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
-                                        <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
-                                        Searching...
-                                    </div>
-                                ) : searchResults.length > 0 ? (
-                                    <>
-                                        {searchResults.map((item) => {
-                                            const minPrice = getMinPrice(item);
-                                            const imageUrl = getMainImageUrl(item);
-                                            return (
-                                                <Link
-                                                    key={item._id}
-                                                    to={`/product/${item._id}`}
-                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
-                                                    onClick={() => {
-                                                        setShowDropdown(false);
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={imageUrl}
-                                                        alt={item.productName || "Product image"}
-                                                        className="w-14 h-14 rounded-lg object-cover shadow-sm"
-                                                    />
-                                                    <div className="flex flex-col">
-                                                        <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                                                            {item.productName || "Unnamed Product"}
-                                                        </p>
-                                                        <p className="text-sm text-red-600 font-semibold mt-1">
-                                                            {formatPrice(minPrice)}
-                                                        </p>
-                                                    </div>
-                                                </Link>
-                                            );
-                                        })}
-                                        <button
-                                            onClick={() => {
-                                                navigate(`/search?q=${encodeURIComponent(search)}`);
-                                                setShowDropdown(false);
-                                            }}
-                                            className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
-                                        >
-                                            View all results
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="px-4 py-4 text-gray-500 text-center">No products found</div>
-                                )}
-                            </div>
-                        )}
+                        <AnimatePresence>
+                            {showDropdown && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                                    transition={{ duration: 0.15, ease: "easeOut" }}
+                                    className="absolute top-full left-0 mt-2 w-full rounded-xl shadow-lg z-50 bg-white border border-gray-200 overflow-hidden max-h-96 overflow-y-auto"
+                                >
+                                    {loading ? (
+                                        <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
+                                            <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
+                                            Searching...
+                                        </div>
+                                    ) : searchResults.length > 0 ? (
+                                        <>
+                                            {searchResults.map((item) => {
+                                                const minPrice = getMinPrice(item);
+                                                const imageUrl = getMainImageUrl(item);
+                                                return (
+                                                    <Link
+                                                        key={item._id}
+                                                        to={`/product/${item._id}`}
+                                                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
+                                                        onClick={() => {
+                                                            setShowDropdown(false);
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={imageUrl}
+                                                            alt={item.productName || "Product image"}
+                                                            className="w-14 h-14 rounded-lg object-cover shadow-sm"
+                                                        />
+                                                        <div className="flex flex-col">
+                                                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                                                                {item.productName || "Unnamed Product"}
+                                                            </p>
+                                                            <p className="text-sm text-red-600 font-semibold mt-1">
+                                                                {formatPrice(minPrice)}
+                                                            </p>
+                                                        </div>
+                                                    </Link>
+                                                );
+                                            })}
+                                            <button
+                                                onClick={() => {
+                                                    navigate(`/search?q=${encodeURIComponent(search)}`);
+                                                    setShowDropdown(false);
+                                                }}
+                                                className="w-full text-center text-sm font-medium text-amber-600 py-2 hover:bg-[#ffb300]/20 transition-colors"
+                                            >
+                                                View all results
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="px-4 py-4 text-gray-500 text-center">No products found</div>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6" ref={userMenuRef}>
                         <div className="relative">
@@ -459,11 +483,20 @@ export default function Header() {
                                     <span className="font-semibold text-white">{getFirstName(user?.name)}</span>
                                 </span>
                             )}
-                            {user && showUserMenu && (
-                                <div className="absolute right-0 top-full mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden animate-[fadeDown_0.25s_ease-out] z-50">
-                                    {renderUserDropdownItems()}
-                                </div>
-                            )}
+                            <AnimatePresence>
+                                {user && showUserMenu && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                        transition={{ duration: 0.15, ease: "easeOut" }}
+                                        className="absolute right-0 top-full mt-2 w-44 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {renderUserDropdownItems()}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
