@@ -598,11 +598,10 @@ const ProductGridLayout = ({
                               handleFilterChange("sortBy", option.value);
                               setIsSortOpen(false);
                             }}
-                            className={`px-3 py-2 text-xs sm:text-sm cursor-pointer transition-colors ${
-                              sortBy === option.value
-                                ? "bg-amber-100 text-amber-900 font-semibold"
-                                : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                            className={`px-3 py-2 text-xs sm:text-sm cursor-pointer transition-colors ${sortBy === option.value
+                              ? "bg-amber-100 text-amber-900 font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                              }`}
                             role="option"
                             aria-selected={sortBy === option.value}
                           >
@@ -700,7 +699,7 @@ const ProductGridLayout = ({
 
           {/* Product Grid Section - Always visible */}
           {!loading && !isFiltering && activeProducts.length === 0 && !error && (
-            <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+            <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center" role="status">
               <p>No products found matching the criteria</p>
               {hasActiveFilters && (
                 <Button

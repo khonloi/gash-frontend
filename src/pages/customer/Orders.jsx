@@ -5,6 +5,7 @@ import OrderSuccessModal from "../../features/orders/components/OrderSuccessModa
 import Button from "../../components/ui/Button";
 import { useOrders } from "../../features/orders/hooks/useOrders";
 import ListLayout from "../../components/layout/ListLayout";
+import ProductListItem from "../../components/ui/ProductListItem";
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -112,86 +113,69 @@ const Orders = () => {
     const productImage = firstProduct?.variantId?.variantImage || "/placeholder.png";
     const productName = firstProduct?.variantId?.productId?.productName || "Product (Variant not available)";
 
+    const orderTitle = (
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2 leading-tight">
+          {productName || "Order"}
+        </p>
+        {order.orderDetails?.length > 1 && (
+          <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+            +{order.orderDetails.length - 1} more
+          </span>
+        )}
+      </div>
+    );
+
+    const orderSubtitle = (
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          {getStatusBadge(order.orderStatus, "order")}
+          {getStatusBadge(order.payStatus, "pay")}
+        </div>
+        <div className="flex items-center gap-2 flex-wrap mt-1">
+          <p className="text-xs sm:text-sm text-gray-600 m-0">
+            Order #{order._id.slice(-8).toUpperCase()}
+          </p>
+          <span className="text-gray-400">•</span>
+          <p className="text-xs sm:text-sm text-gray-600 m-0">
+            {formatDate(order.orderDate)}
+          </p>
+        </div>
+      </div>
+    );
+
     return (
-      <article
+      <ProductListItem
         key={order._id}
-        className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row gap-4 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm"
-        tabIndex={0}
-        aria-label={`Order: ${order._id}`}
-      >
-        <div className="flex items-stretch gap-6 flex-1">
-          {firstProduct && (
-            <img
-              src={productImage}
-              alt={productName}
-              className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
-              onError={(e) => {
-                e.target.src = "/placeholder.png";
-              }}
-            />
-          )}
-
-          <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
-                {productName || "Order"}
-              </p>
-              {order.orderDetails?.length > 1 && (
-                <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                  +{order.orderDetails.length - 1} more
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-xs sm:text-sm text-gray-600 m-0">
-                Order #{order._id.slice(-8).toUpperCase()}
-              </p>
-              <span className="text-gray-400">•</span>
-              <p className="text-xs sm:text-sm text-gray-600 m-0">
-                {formatDate(order.orderDate)}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap mt-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Status:</span>
-                {getStatusBadge(order.orderStatus, "order")}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Payment:</span>
-                {getStatusBadge(order.payStatus, "pay")}
-              </div>
-            </div>
-
-            <p className="text-base font-semibold text-red-600 m-0 mt-1">
-              Total: {formatPrice(order.finalPrice)}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-row sm:flex-col items-center sm:items-center sm:justify-center gap-3 sm:gap-4">
-          {order.payStatus?.toLowerCase() === "paid" && (
+        image={productImage}
+        title={orderTitle}
+        subtitle={orderSubtitle}
+        totalPrice={formatPrice(order.finalPrice)}
+        ariaLabel={`Order: ${order._id}`}
+        rightActions={
+          <>
+            {order.payStatus?.toLowerCase() === "paid" && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => navigate(`/bills/${order._id}`)}
+                className="text-green-600"
+                title="View Bill"
+              >
+                View Bill
+              </Button>
+            )}
             <Button
-              variant="default"
+              variant="primary"
               size="sm"
-              onClick={() => navigate(`/bills/${order._id}`)}
-              className="text-green-600"
-              title="View Bill"
+              onClick={() => setSelectedOrderId(order._id)}
+              title="View Details"
             >
-              View Bill
+              View Details
             </Button>
-          )}
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setSelectedOrderId(order._id)}
-            title="View Details"
-          >
-            View Details
-          </Button>
-        </div>
-      </article>
+          </>
+        }
+      />
     );
   };
 

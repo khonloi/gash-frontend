@@ -14,6 +14,7 @@ import { useToast } from '../../hooks/useToast';
 import Api from '../../common/SummaryAPI';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { GoogleLogin } from '@react-oauth/google';
+import ProductListItem from '../../components/ui/ProductListItem';
 
 const Checkout = () => {
   const {
@@ -183,7 +184,7 @@ const Checkout = () => {
                 <LoadingSpinner size="lg" color="yellow" />
               </div>
             ) : itemsToDisplay.length === 0 ? (
-              <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+              <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center" role="status">
                 <p>No items in checkout</p>
               </div>
             ) : (
@@ -194,37 +195,15 @@ const Checkout = () => {
                 const price = item.productPrice || variantData?.variantPrice || 0;
                 const totalItemPrice = price * quantity;
                 return (
-                  <article
+                  <ProductListItem
                     key={item._id || variantData?._id}
-                    className="bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 transition-shadow hover:shadow-sm"
-                    tabIndex={0}
-                    aria-label={`Checkout item: ${productData?.productName || 'Unnamed Product'}`}
-                  >
-                    <div className="flex items-stretch gap-6">
-                      <img
-                        src={variantData?.variantImage || '/placeholder.png'}
-                        alt={productData?.productName || 'Product'}
-                        className="w-20 sm:w-24 aspect-square object-cover rounded-lg flex-shrink-0"
-                        onError={(e) => {
-                          e.target.src = '/placeholder.png';
-                        }}
-                      />
-                      <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
-                        <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2">
-                          {productData?.productName || 'Unnamed Product'}
-                        </p>
-                        <p className="text-sm text-gray-600 m-0">
-                          Color: {variantData?.productColorId?.productColorName || 'N/A'}, Size: {variantData?.productSizeId?.productSizeName || 'N/A'}
-                        </p>
-                        <p className="text-sm text-gray-600 m-0">
-                          Price: {formatPrice(price)}
-                        </p>
-                        <p className="text-base font-semibold text-red-600 m-0">
-                          Total: {formatPrice(totalItemPrice)}
-                        </p>
-                      </div>
-                    </div>
-                  </article>
+                    image={variantData?.variantImage}
+                    title={productData?.productName || 'Unnamed Product'}
+                    subtitle={`Color: ${variantData?.productColorId?.productColorName || 'N/A'}, Size: ${variantData?.productSizeId?.productSizeName || 'N/A'}`}
+                    price={formatPrice(price)}
+                    totalPrice={formatPrice(totalItemPrice)}
+                    ariaLabel={`Checkout item: ${productData?.productName || 'Unnamed Product'}`}
+                  />
                 );
               })
             )}

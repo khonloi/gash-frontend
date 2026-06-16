@@ -168,7 +168,7 @@ const Feedback = () => {
         {loading ? (
           <LoadingSkeleton count={3} />
         ) : displayItems.length === 0 ? (
-          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center gap-4" role="status">
+          <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center" role="status">
             <div className="text-gray-400">
               <svg
                 className="w-16 h-16 mx-auto"

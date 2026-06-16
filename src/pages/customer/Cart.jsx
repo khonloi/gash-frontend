@@ -4,6 +4,7 @@ import Button from "../../components/ui/Button";
 import ConfirmationModal from "../../features/orders/components/ConfirmationModal";
 import { useCart } from "../../features/cart/hooks/useCart";
 import ListLayout from "../../components/layout/ListLayout";
+import ProductListItem from "../../components/ui/ProductListItem";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -90,88 +91,55 @@ const Cart = () => {
         : "";
 
     return (
-      <article
+      <ProductListItem
         key={item._id}
-        className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm ${isInactive ? "opacity-60 grayscale" : ""}`}
-        tabIndex={0}
-        aria-label={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
-      >
-        <div className="flex items-center gap-4 sm:gap-6 flex-1 w-full">
-          <input
-            type="checkbox"
-            checked={item.checked || false}
-            onChange={() => toggleChecked(item._id)}
-            className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label={`Select ${item.variantId?.productId?.productName || "product"} for checkout`}
-            disabled={isInactive}
-          />
-
-          <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-50 rounded-xl flex items-center justify-center">
-            <img
-              src={item.variantId?.variantImage || "/placeholder-image.png"}
-              alt={item.variantId?.productId?.productName || "Product"}
-              className="w-full h-full object-contain rounded-lg"
-              onError={(e) => {
-                e.target.src = "/placeholder-image.png";
+        image={item.variantId?.variantImage}
+        title={item.variantId?.productId?.productName || "Unnamed Product"}
+        subtitle={`Color: ${item.variantId?.productColorId?.productColorName || "N/A"}, Size: ${item.variantId?.productSizeId?.productSizeName || "N/A"}`}
+        price={formatPrice(item.productPrice)}
+        stock={stockQuantity}
+        totalPrice={formatPrice((item.productPrice || 0) * quantity)}
+        isInactive={isInactive}
+        inactiveMessage={inactiveMessage}
+        ariaLabel={`Cart item: ${item.variantId?.productId?.productName || "Unnamed Product"}`}
+        checkboxProps={{
+          checked: item.checked || false,
+          onChange: () => toggleChecked(item._id),
+          ariaLabel: `Select ${item.variantId?.productId?.productName || "product"} for checkout`,
+          disabled: isInactive,
+        }}
+        rightActions={
+          <>
+            <input
+              type="number"
+              id={`quantity-${item._id}`}
+              min="1"
+              max={maxQuantity}
+              value={quantityValue !== undefined ? quantityValue : quantity}
+              onChange={(e) => handleQuantityChange(item._id, e.target.value)}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value === "" || isNaN(parseInt(value, 10))) {
+                  const currentQty = parseInt(item.productQuantity, 10) || 1;
+                  setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
+                }
               }}
+              className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
+              disabled={isUpdating || actionInProgress || isInactive}
             />
-          </div>
-
-          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 sm:gap-1.5">
-            <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2 leading-tight">
-              {item.variantId?.productId?.productName || "Unnamed Product"}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600 m-0">
-              Color: {item.variantId?.productColorId?.productColorName || "N/A"}, Size:{" "}
-              {item.variantId?.productSizeId?.productSizeName || "N/A"}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600 m-0">
-              Price: {formatPrice(item.productPrice)}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600 m-0">
-              Stock: {stockQuantity}
-            </p>
-            {isInactive && (
-              <p className="text-xs sm:text-sm font-semibold text-red-600 m-0">
-                {inactiveMessage}
-              </p>
-            )}
-            <p className="text-sm sm:text-base font-bold text-red-600 m-0 mt-1">
-              Total: {formatPrice((item.productPrice || 0) * quantity)}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-row sm:flex-col items-center gap-3 sm:gap-4 shrink-0 self-start sm:self-center pl-9 sm:pl-0">
-          <input
-            type="number"
-            id={`quantity-${item._id}`}
-            min="1"
-            max={maxQuantity}
-            value={quantityValue !== undefined ? quantityValue : quantity}
-            onChange={(e) => handleQuantityChange(item._id, e.target.value)}
-            onBlur={(e) => {
-              const value = e.target.value;
-              if (value === "" || isNaN(parseInt(value, 10))) {
-                const currentQty = parseInt(item.productQuantity, 10) || 1;
-                setQuantityValues((prev) => ({ ...prev, [item._id]: currentQty }));
-              }
-            }}
-            className="px-3 py-1.5 border-2 border-gray-300 rounded-md bg-white text-xs sm:text-sm w-20 transition-colors hover:bg-gray-50 hover:border-blue-600 focus:outline-none disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-            aria-label={`Quantity for ${item.variantId?.productId?.productName || "product"}`}
-            disabled={isUpdating || actionInProgress || isInactive}
-          />
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleRemoveItemClick(item._id)}
-            aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
-            disabled={isUpdating || actionInProgress}
-          >
-            Remove
-          </Button>
-        </div>
-      </article>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => handleRemoveItemClick(item._id)}
+              aria-label={`Remove ${item.variantId?.productId?.productName || "product"} from cart`}
+              disabled={isUpdating || actionInProgress}
+            >
+              Remove
+            </Button>
+          </>
+        }
+      />
     );
   };
 
