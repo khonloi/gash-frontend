@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import FocusTrap from "focus-trap-react";
 
 const ModalContext = createContext(null);
 
@@ -57,16 +58,18 @@ const Modal = ({
             role="dialog"
             aria-modal="true"
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className={`bg-white rounded-xl shadow-2xl border-2 border-gray-300 w-full ${maxWidth} overflow-hidden flex flex-col`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {children}
-            </motion.div>
+            <FocusTrap focusTrapOptions={{ initialFocus: false, fallbackFocus: () => document.body }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+                className={`bg-white rounded-xl shadow-2xl border-2 border-gray-300 w-full ${maxWidth} overflow-hidden flex flex-col`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {children}
+              </motion.div>
+            </FocusTrap>
           </motion.div>
         </ModalContext.Provider>
       )}

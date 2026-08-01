@@ -104,8 +104,8 @@ const Form = React.forwardRef(({
               className={`w-full py-3 bg-gray-50 border-2 rounded-xl transition-all outline-none appearance-none pr-10
                 ${field.leftIcon ? "pl-11" : "pl-4"}
                 ${field.error
-                  ? "border-red-500 bg-red-50/30 focus:border-red-500"
-                  : "border-gray-300 focus:border-amber-400 focus:bg-white"
+                  ? "border-red-500 bg-red-50/30 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                  : "border-gray-300 focus:border-brand-primary-500 focus:ring-2 focus:ring-brand-primary-500/20 focus:bg-white"
                 }
                 ${field.inputClassName || ""}`}
               {...field.inputProps}

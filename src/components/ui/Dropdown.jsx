@@ -50,10 +50,10 @@ export default function Dropdown({
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -8 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.3 }}
             className={`absolute ${
               align === "right" ? "right-0" : "left-0"
             } mt-2 bg-white text-gray-900 rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200 ${contentClassName}`}

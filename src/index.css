@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-primary-500: #E9A319;
+  --color-brand-primary-600: #C88A15;
+  --color-brand-primary-700: #A86523;
+  --color-brand-primary-800: #8B5420;
+}
 @font-face {
   font-family: "Font";
   /* Choose a name for your font family */

@@ -27,8 +27,8 @@ const TextArea = React.forwardRef(({
         rows={rows}
         className={`w-full py-3 px-4 bg-gray-50 border-2 rounded-xl transition-all outline-none resize-none
           ${error 
-            ? "border-red-500 bg-red-50/30 focus:border-red-500" 
-            : "border-gray-300 focus:border-amber-400 focus:bg-white"
+            ? "border-red-500 bg-red-50/30 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+            : "border-gray-300 focus:border-brand-primary-500 focus:ring-2 focus:ring-brand-primary-500/20 focus:bg-white"
           } 
           ${className}`}
         {...props}
