@@ -1,11 +1,7 @@
 import React from "react";
 import { SOCKET_URL } from "../../../common/axiosClient";
 import EmojiPicker from "emoji-picker-react";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import CloseIcon from "@mui/icons-material/Close";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
-import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
+import { MessageCircle, X, Send, Camera, Smile } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { useUserChat } from "../hooks/useUserChat";
 
@@ -94,9 +90,9 @@ export default function UserChat({ userId }) {
           transition={{ duration: 0.2 }}
         >
           {isOpen ? (
-            <CloseIcon fontSize="medium" />
+            <X className="w-6 h-6" />
           ) : (
-            <ChatBubbleOutlineIcon fontSize="medium" />
+            <MessageCircle className="w-6 h-6" />
           )}
         </motion.div>
       </motion.button>
@@ -117,7 +113,7 @@ export default function UserChat({ userId }) {
             <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                  <ChatBubbleOutlineIcon fontSize="small" className="text-amber-600" />
+                  <MessageCircle className="w-4 h-4 text-amber-600" />
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-sm">Customer Support</h3>
@@ -131,7 +127,7 @@ export default function UserChat({ userId }) {
                 onClick={toggleChat}
                 aria-label="Close chat"
               >
-                <CloseIcon fontSize="small" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -190,7 +186,7 @@ export default function UserChat({ userId }) {
                   title="Upload image"
                   aria-label="Upload image"
                 >
-                  <PhotoCameraOutlinedIcon fontSize="small" />
+                  <Camera className="w-5 h-5" />
                 </button>
 
                 {/* Emoji */}
@@ -200,7 +196,7 @@ export default function UserChat({ userId }) {
                   title="Add emoji"
                   aria-label="Add emoji"
                 >
-                  <EmojiEmotionsOutlinedIcon fontSize="small" />
+                  <Smile className="w-5 h-5" />
                 </button>
 
                 <input
@@ -221,7 +217,7 @@ export default function UserChat({ userId }) {
                   title="Send message"
                   aria-label="Send message"
                 >
-                  <SendOutlinedIcon fontSize="small" />
+                  <Send className="w-4 h-4" />
                 </button>
               </div>
 
@@ -238,7 +234,7 @@ export default function UserChat({ userId }) {
                       className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100"
                       aria-label="Close emoji picker"
                     >
-                      <CloseIcon fontSize="small" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                   <EmojiPicker

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Api from '../../common/SummaryAPI';
 import { useToast } from '../../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
-import { LiveTv } from '@mui/icons-material';
 
 const LiveStream = () => {
     const navigate = useNavigate();

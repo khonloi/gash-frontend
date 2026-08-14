@@ -1,11 +1,9 @@
 import React, { useState, useCallback, useContext } from 'react';
+import { Banknote, Landmark } from 'lucide-react';
 import OrderSuccessModal from '../../features/orders/components/OrderSuccessModal';
 import LoadingSpinner, { LoadingButton } from '../../components/ui/LoadingSpinner';
 import Button from '../../components/ui/Button';
 import Form from '../../components/ui/Form';
-
-import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
-import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import { useCheckout } from '../../features/orders/hooks/useCheckout';
 import Modal from '../../components/ui/Modal';
 import PasswordInput from '../../components/ui/PasswordInput';
@@ -114,7 +112,7 @@ const Checkout = () => {
             />
             <div className="ml-3 flex items-center gap-3 flex-1">
               <div className="p-2 bg-blue-100 text-blue-600 rounded-lg flex-shrink-0">
-                <LocalAtmOutlinedIcon className="w-5 h-5" />
+                <Banknote className="w-5 h-5" />
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-900">Cash on Delivery (COD)</span>
@@ -135,7 +133,7 @@ const Checkout = () => {
             />
             <div className="ml-3 flex items-center gap-3 flex-1">
               <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg flex-shrink-0">
-                <AccountBalanceOutlinedIcon className="w-5 h-5" />
+                <Landmark className="w-5 h-5" />
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-900">VNPay (Bank Transfer)</span>

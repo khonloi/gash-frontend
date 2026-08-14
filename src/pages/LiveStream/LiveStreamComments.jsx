@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { Chat, Close, PushPin, Send, MoreVert } from '@mui/icons-material';
+import { MessageSquare, X, Pin, Send, MoreVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Form from '../../components/ui/Form';
@@ -173,7 +173,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                             onClick={() => setShowMenu(!showMenu)}
                             className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white p-1.5 rounded-lg transition-all hover:bg-gray-700/50"
                         >
-                            <MoreVert className="w-4 h-4" />
+                            <MoreVertical className="w-4 h-4" />
                         </button>
                         {showMenu && (
                             <div className="absolute right-0 top-10 bg-gray-900/98 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl z-10 min-w-[140px] overflow-hidden">
@@ -182,7 +182,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                                         onClick={handlePinToggle}
                                         className="w-full px-4 py-2.5 text-left text-sm text-gray-200 hover:bg-gradient-to-r hover:from-yellow-900/30 hover:to-yellow-800/20 flex items-center gap-2 transition-all"
                                     >
-                                        <PushPin className="w-4 h-4" />
+                                        <Pin className="w-4 h-4" />
                                         {comment.isPinned ? 'Unpin' : 'Pin'}
                                     </button>
                                 )}
@@ -191,7 +191,7 @@ const CommentItem = ({ comment, currentUserId, hostId, onHideComment, onPinComme
                                         onClick={handleHideComment}
                                         className="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-gradient-to-r hover:from-red-900/30 hover:to-red-800/20 flex items-center gap-2 transition-all"
                                     >
-                                        <Close className="w-4 h-4" />
+                                        <X className="w-4 h-4" />
                                         Delete
                                     </button>
                                 )}
@@ -518,19 +518,13 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
             <div className="bg-gradient-to-br from-black via-gray-900 to-black p-3 flex items-center justify-between border-b border-gray-700/50 shadow-lg">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                        <Chat className="w-4 h-4 text-white" />
+                        <MessageSquare className="w-4 h-4 text-white" />
                     </div>
                     <div>
                         <h3 className="text-white font-bold text-sm">Comments</h3>
                         <p className="text-white/70 text-[10px]">Live chat</p>
                     </div>
                 </div>
-                {/* <button
-                    onClick={onToggle}
-                    className="text-white hover:bg-white/20 p-1.5 rounded-full transition-all duration-300 hover:scale-110 transform border border-white/10"
-                >
-                    <Close className="w-4 h-4" />
-                </button> */}
             </div>
 
             {/* Reactions Section - Same row as header */}
@@ -582,7 +576,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
                 {comments.length === 0 ? (
                     <div className="text-center py-8">
                         <div className="w-16 h-16 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm border border-gray-700/50">
-                            <Chat className="w-8 h-8 text-gray-600" />
+                            <MessageSquare className="w-8 h-8 text-gray-600" />
                         </div>
                         <p className="text-gray-300 text-sm font-medium mb-1">No comments yet</p>
                         <p className="text-gray-500 text-xs">Be the first to comment!</p>

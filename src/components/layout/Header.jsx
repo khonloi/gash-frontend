@@ -3,21 +3,19 @@ import { Link } from "react-router-dom";
 import gashLogo from "../../assets/image/gash-logo.svg";
 import { useHeader } from "./hooks/useHeader";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Material UI Icons
-import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
-import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined';
-import LogoutIcon from '@mui/icons-material/Logout';
+import {
+    User,
+    Bell,
+    ShoppingBag,
+    Search,
+    X,
+    Heart,
+    Tv,
+    Ticket,
+    LogOut
+} from "lucide-react";
 import NotificationsDropdown from "../../features/notifications/components/NotificationsDropdown";
 import Form from "../ui/Form";
-
-
 
 export default function Header() {
     const {
@@ -28,49 +26,32 @@ export default function Header() {
         showDropdown,
         setShowDropdown,
         loading,
-        showUserMenu,
-        setShowUserMenu,
-        mobileSearchOpen,
-        setMobileSearchOpen,
         cartItemCount,
         notificationCount,
         livestreamCount,
         favoriteCount,
         randomCategories,
-        navigate,
-        dropdownRef,
+        showUserMenu,
+        setShowUserMenu,
+        mobileSearchOpen,
+        setMobileSearchOpen,
         userMenuRef,
-        handleLogout,
-        getMinPrice,
-        getMainImageUrl,
+        dropdownRef,
+        navigate,
         handleSearchSubmit,
+        handleLogout,
         handleLiveStreamClick,
+        getFirstName,
+        getMainImageUrl,
+        getMinPrice,
         formatPrice,
-        getFirstName
     } = useHeader();
 
-    const badgeClass = "absolute bg-amber-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center";
+    const badgeClass =
+        "absolute bg-amber-500 text-white text-[10px] sm:text-xs font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center pointer-events-none";
 
-    const renderUserDropdownItems = (showNotifications = false) => (
+    const renderUserDropdownItems = (isMobile = false) => (
         <>
-            {showNotifications && (
-                <button
-                    onMouseDown={(e) => {
-                        e.stopPropagation();
-                        navigate('/notifications');
-                        setShowUserMenu(false);
-                    }}
-                    className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
-                    <NotificationsOutlinedIcon fontSize="small" className="text-gray-500" />
-                    <span>Notifications</span>
-                    {notificationCount > 0 && (
-                        <span className="bg-amber-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center ml-auto">
-                            {notificationCount}
-                        </span>
-                    )}
-                </button>
-            )}
             <button
                 onMouseDown={(e) => {
                     e.stopPropagation();
@@ -79,7 +60,7 @@ export default function Header() {
                 }}
                 className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
             >
-                <PermIdentityOutlinedIcon fontSize="small" className="text-gray-500" />
+                <User className="w-4 h-4 text-gray-500" />
                 <span>My Account</span>
             </button>
             <button
@@ -90,7 +71,7 @@ export default function Header() {
                 }}
                 className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
             >
-                <ShoppingBagOutlinedIcon fontSize="small" className="text-gray-500" />
+                <ShoppingBag className="w-4 h-4 text-gray-500" />
                 <span>My Orders</span>
             </button>
             <button
@@ -101,7 +82,7 @@ export default function Header() {
                 }}
                 className="flex items-center gap-3 w-full text-left p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
             >
-                <ConfirmationNumberOutlinedIcon fontSize="small" className="text-gray-500" />
+                <Ticket className="w-4 h-4 text-gray-500" />
                 <span>My Vouchers</span>
             </button>
             <button
@@ -113,7 +94,7 @@ export default function Header() {
                 className="flex items-center justify-between w-full p-3 hover:bg-[#ffb300]/20 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
             >
                 <div className="flex items-center gap-3">
-                    <FavoriteBorderIcon fontSize="small" className="text-gray-500" />
+                    <Heart className="w-4 h-4 text-gray-500" />
                     <span>My Favorites</span>
                 </div>
                 {favoriteCount > 0 && (
@@ -130,7 +111,7 @@ export default function Header() {
                 }}
                 className="flex items-center gap-3 w-full text-left p-3 text-red-600 hover:bg-red-50 transition-colors text-sm font-medium"
             >
-                <LogoutIcon fontSize="small" className="text-red-500" />
+                <LogOut className="w-4 h-4 text-red-500" />
                 <span>Sign Out</span>
             </button>
         </>
@@ -180,23 +161,21 @@ export default function Header() {
                                     <button
                                         type="button"
                                         onClick={() => {
-
                                             setSearch("");
                                         }}
                                         className="absolute right-2 p-2 text-gray-500 hover:text-red-500"
                                     >
-                                        <CloseIcon fontSize="small" />
+                                        <X className="w-4 h-4" />
                                     </button>
                                 ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
-
                                             setMobileSearchOpen(false);
                                         }}
                                         className="absolute right-2 p-2 text-gray-600 hover:text-red-500"
                                     >
-                                        <CloseIcon fontSize="small" />
+                                        <X className="w-4 h-4" />
                                     </button>
                                 )}
                             </Form>
@@ -226,7 +205,6 @@ export default function Header() {
                                                             to={`/product/${item._id}`}
                                                             className="flex items-center gap-3 px-4 py-3 hover:bg-[#ffb300]/20 transition-colors border-b last:border-0"
                                                             onClick={() => {
-
                                                                 setShowDropdown(false);
                                                             }}
                                                         >
@@ -248,7 +226,6 @@ export default function Header() {
                                                 })}
                                                 <button
                                                     onClick={() => {
-
                                                         navigate(`/search?q=${encodeURIComponent(search)}`);
                                                         setShowDropdown(false);
                                                     }}
@@ -273,7 +250,7 @@ export default function Header() {
                                 title="Search"
                                 className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                             >
-                                <SearchIcon />
+                                <Search className="w-5 h-5" />
                             </button>
                             <Link to="/" className="flex items-center justify-center">
                                 <img src={gashLogo} alt="GASH Logo" className="h-6 sm:h-7" />
@@ -287,7 +264,7 @@ export default function Header() {
                                         title="Cart"
                                         className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                                     >
-                                        <ShoppingBagOutlinedIcon />
+                                        <ShoppingBag className="w-5 h-5" />
                                         {cartItemCount > 0 && (
                                             <span className={`${badgeClass} -top-1 -right-1`}>
                                                 {cartItemCount}
@@ -308,7 +285,7 @@ export default function Header() {
                                         title="My Account"
                                         className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                                     >
-                                        <PermIdentityOutlinedIcon />
+                                        <User className="w-5 h-5" />
                                     </button>
                                     <AnimatePresence>
                                         {user && showUserMenu && (
@@ -351,7 +328,7 @@ export default function Header() {
                                 className="flex-1 pl-3 sm:pl-4 md:pl-5 pr-10 sm:pr-12 py-1.5 sm:py-2 text-sm sm:text-base text-gray-900 focus:outline-none"
                             />
                             <button type="submit" className="p-2 mr-2 text-gray-600 hover:text-amber-500 transition-colors duration-200 ease-in-out">
-                                <SearchIcon fontSize="small" />
+                                <Search className="w-5 h-5" />
                             </button>
                         </Form>
                         <AnimatePresence>
@@ -422,7 +399,7 @@ export default function Header() {
                                 title="Live Stream"
                                 className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                             >
-                                <TvOutlinedIcon />
+                                <Tv className="w-5 h-5" />
                                 {livestreamCount > 0 && (
                                     <span className={`${badgeClass} -top-1 -right-1`}>
                                         {livestreamCount}
@@ -438,7 +415,7 @@ export default function Header() {
                                 title="Cart"
                                 className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                             >
-                                <ShoppingBagOutlinedIcon />
+                                <ShoppingBag className="w-5 h-5" />
                                 {cartItemCount > 0 && (
                                     <span className={`${badgeClass} -top-1 -right-1`}>
                                         {cartItemCount}
@@ -464,19 +441,18 @@ export default function Header() {
                                     title="Notifications"
                                     className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                                 >
-                                    <NotificationsOutlinedIcon />
+                                    <Bell className="w-5 h-5" />
                                 </button>
                             </div>
                         )}
                         <div className="relative flex items-center gap-2 cursor-pointer" onClick={() => {
-
                             user ? setShowUserMenu((prev) => !prev) : navigate("/login");
                         }}>
                             <button
                                 title="My Account"
                                 className="p-2 text-white hover:text-amber-500 transition-colors duration-200 ease-in-out relative"
                             >
-                                <PermIdentityOutlinedIcon />
+                                <User className="w-5 h-5" />
                             </button>
                             {user && (
                                 <span className="hidden md:block text-xs md:text-sm text-gray-200">

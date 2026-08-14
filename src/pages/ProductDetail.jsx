@@ -5,8 +5,6 @@ import rehypeRaw from "rehype-raw";
 import ProductFeedback from "../features/feedback/components/ProductFeedback";
 import Button from "../components/ui/Button";
 import ProductCard, { ProductCardSkeleton } from "../features/products/components/ProductCard";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useProductDetail } from "../features/products/hooks/useProductDetail";
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 
@@ -310,7 +308,7 @@ const ProductDetail = () => {
                 disabled={thumbnailIndex === 0}
                 aria-label="Previous thumbnails"
               >
-                <ChevronLeftIcon fontSize="small" className="text-gray-900" />
+                <ChevronLeft className="w-4 h-4 text-gray-900" />
               </button>
               <div className="flex gap-2 overflow-x-auto overflow-y-hidden scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] max-w-full">
                 {visibleThumbnails.map((thumbnail, index) => (
@@ -348,7 +346,7 @@ const ProductDetail = () => {
                 }
                 aria-label="Next thumbnails"
               >
-                <ChevronRightIcon fontSize="small" className="text-gray-900" />
+                <ChevronRight className="w-4 h-4 text-gray-900" />
               </button>
             </div>
           </div>

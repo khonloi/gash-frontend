@@ -2,16 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Api from '../../common/SummaryAPI';
 import { useToast } from '../../hooks/useToast';
-import {
-    LiveTv,
-    Fullscreen,
-    FullscreenExit,
-    Videocam,
-    Chat,
-    ArrowBack,
-    ShoppingBag,
-    Info
-} from '@mui/icons-material';
 import { LIVEKIT_CONFIG } from '../../config/livekit';
 import LiveStreamComments from './LiveStreamComments';
 import LiveStreamProducts from './LiveStreamProducts';

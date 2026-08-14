@@ -1,6 +1,5 @@
-// ProductCard.jsx
 import React from "react";
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Trash2 } from "lucide-react";
 
 // Helper function to get minimum price from product variants
 const getMinPrice = (product) => {
@@ -138,7 +137,7 @@ const ProductCard = ({
           aria-label={`Remove ${product.productName || "product"} from favorites`}
           title="Remove from favorites"
         >
-          <DeleteOutlineIcon fontSize="small" className="text-gray-700 hover:text-red-600" />
+          <Trash2 className="w-4 h-4 text-gray-700 hover:text-red-600" />
         </button>
       )}
 
