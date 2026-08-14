@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import { AuthContext } from "../../../context/AuthContext";
 import Api from "../../../common/SummaryAPI";
+import { SOCKET_URL } from "../../../common/axiosClient";
 import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../../../constants/constants";
 
 const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
@@ -170,8 +171,7 @@ export const useHeader = () => {
             return;
         }
 
-        const baseURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
-        const socket = io(baseURL, {
+        const socket = io(SOCKET_URL, {
             transports: ["websocket", "polling"],
             reconnection: true,
             reconnectionAttempts: 5,

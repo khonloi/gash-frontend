@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { Bell, Mail, Globe, Save } from "lucide-react";
 import Button from "../components/ui/Button";
+import Api from "../common/SummaryAPI";
 
 export default function Notifications() {
   const { user } = useContext(AuthContext);
@@ -19,10 +19,10 @@ export default function Notifications() {
       try {
         if (!user?._id) return;
         setLoading(true);
-        const res = await axios.get(
-          `http://localhost:5000/notifications/preferences/${user._id}`
-        );
-        setPrefs(res.data.preferences || { email: true, web: true });
+        const token = localStorage.getItem("token");
+        const res = await Api.notifications.getPreferences(user._id, token);
+        const data = res.data?.preferences || res.preferences || { email: true, web: true };
+        setPrefs(data);
       } catch (err) {
         console.error("Error loading preferences:", err);
       } finally {
@@ -40,14 +40,12 @@ export default function Notifications() {
         return;
       }
       setLoading(true);
-      await axios.put(
-        `http://localhost:5000/notifications/preferences/${user._id}`,
-        prefs
-      );
+      const token = localStorage.getItem("token");
+      await Api.notifications.updatePreferences(user._id, prefs, token);
       showToast("Your notification settings have been saved!", "success", 3000);
     } catch (err) {
       console.error("Error saving preferences:", err);
-      const errorMessage = err.response?.data?.message || "Something went wrong while saving your settings.";
+      const errorMessage = err.response?.data?.message || err.message || "Something went wrong while saving your settings.";
       showToast(errorMessage, "error", 3000);
     } finally {
       setLoading(false);

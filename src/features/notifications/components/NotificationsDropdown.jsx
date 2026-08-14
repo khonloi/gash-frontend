@@ -6,6 +6,7 @@ import Dropdown from "../../../components/ui/Dropdown";
 import { useNavigate } from "react-router-dom";
 import { sendOrderNotificationEmail, extractOrderIdFromMessage } from "../../../utils/orderEmailNotification";
 import Api from "../../../common/SummaryAPI";
+import { SOCKET_URL } from "../../../common/axiosClient";
 
 const MAX_ORDER_CACHE = 20;
 
@@ -110,8 +111,7 @@ export default function NotificationsDropdown({ user }) {
     }
 
     // Lấy URL backend chính xác
-    const baseURL =
-      import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:5000";
+    const baseURL = SOCKET_URL;
 
     // Create socket if it doesn't exist
     if (!socketRef.current) {
@@ -189,12 +189,10 @@ export default function NotificationsDropdown({ user }) {
       // Refresh notifications list when badge updates
       const fetchNotifications = async () => {
         try {
-          const res = await fetch(
-            `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
-          );
-          if (!res.ok) throw new Error("Failed to fetch notifications");
-          const notificationData = await res.json();
-          setNotifications(notificationData);
+          const token = localStorage.getItem("token");
+          const res = await Api.notifications.getUserNotifications(user._id, token);
+          const notificationData = res.data || res;
+          setNotifications(Array.isArray(notificationData) ? notificationData : []);
         } catch (err) {
           console.error("Lỗi khi refresh thông báo:", err);
         }
@@ -237,12 +235,10 @@ export default function NotificationsDropdown({ user }) {
           setTimeout(() => {
             const fetchNotifications = async () => {
               try {
-                const res = await fetch(
-                  `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
-                );
-                if (!res.ok) throw new Error("Failed to fetch notifications");
-                const notificationData = await res.json();
-                setNotifications(notificationData);
+                const token = localStorage.getItem("token");
+                const res = await Api.notifications.getUserNotifications(user._id, token);
+                const notificationData = res.data || res;
+                setNotifications(Array.isArray(notificationData) ? notificationData : []);
               } catch (err) {
                 console.error("Lỗi khi refresh thông báo:", err);
               }
@@ -314,12 +310,10 @@ export default function NotificationsDropdown({ user }) {
     const fetchNotifications = async () => {
       if (!user?._id) return;
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch notifications");
-        const data = await res.json();
-        setNotifications(data);
+        const token = localStorage.getItem("token");
+        const res = await Api.notifications.getUserNotifications(user._id, token);
+        const data = res.data || res;
+        setNotifications(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Lỗi khi lấy thông báo:", err);
       }
@@ -338,10 +332,8 @@ export default function NotificationsDropdown({ user }) {
   // Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/mark-read/${id}`,
-        { method: "PUT" }
-      );
+      const token = localStorage.getItem("token");
+      await Api.notifications.markAsRead(id, token);
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
@@ -353,10 +345,8 @@ export default function NotificationsDropdown({ user }) {
   // Xóa 1 thông báo (cho user)
   const deleteNotification = async (id) => {
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/user/${user._id}/${id}`,
-        { method: "DELETE" }
-      );
+      const token = localStorage.getItem("token");
+      await Api.notifications.deleteUserNotification(user._id, id, token);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
     } catch (err) {
       console.error("Lỗi khi xóa thông báo:", err);
@@ -366,10 +356,8 @@ export default function NotificationsDropdown({ user }) {
   // 🧹 Xóa toàn bộ thông báo
   const clearAll = async () => {
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/notifications/clear/${user._id}`,
-        { method: "DELETE" }
-      );
+      const token = localStorage.getItem("token");
+      await Api.notifications.clearAll(user._id, token);
       setNotifications([]);
     } catch (err) {
       console.error("Lỗi khi clear all:", err);
