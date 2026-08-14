@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useContext, useRef, useCallb
 import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import { ToastContext } from './ToastContext';
+import { disconnectSocket } from '../common/socketManager';
+import { storage } from '../utils/storage';
 
 export const AuthContext = createContext();
 
@@ -23,10 +25,9 @@ export const AuthProvider = ({ children }) => {
 
   const handleForcedLogout = useCallback((message) => {
     clearSessionTimer();
+    disconnectSocket();
     showToast(message, 'error');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('loginTime');
+    storage.clearAuthSession();
     setUser(null);
     navigate('/login');
   }, [clearSessionTimer, navigate, showToast]);
@@ -52,23 +53,20 @@ export const AuthProvider = ({ children }) => {
 
   // Initial session hydration on mount
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    const loginTime = localStorage.getItem('loginTime');
+    const token = storage.getToken();
+    const storedUser = storage.getStoredUser();
+    const loginTime = storage.getLoginTime();
 
     if (token && storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        setUser(storedUser);
 
         if (loginTime) {
           startSessionTimer(parseInt(loginTime, 10));
         }
       } catch (err) {
         console.error('Failed to parse stored user:', err);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        localStorage.removeItem('loginTime');
+        storage.clearAuthSession();
       }
     }
     setIsAuthLoading(false);
@@ -85,7 +83,7 @@ export const AuthProvider = ({ children }) => {
           const status = error.response.status;
           const msg = error.response.data?.message || '';
           if (status === 401 || (status === 403 && msg.includes('inactive'))) {
-            if (localStorage.getItem('token')) {
+            if (storage.getToken()) {
               const logoutMessage = status === 401
                 ? 'Your session has expired or token is invalid. You will be logged out.'
                 : 'Your account has been suspended or deactivated. You will be logged out.';
@@ -119,9 +117,9 @@ export const AuthProvider = ({ children }) => {
 
   const saveAuthSession = useCallback((token, account) => {
     const loginTime = Date.now();
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(account));
-    localStorage.setItem('loginTime', loginTime.toString());
+    storage.setToken(token);
+    storage.setStoredUser(account);
+    storage.setLoginTime(loginTime);
     setUser(account);
     startSessionTimer(loginTime);
   }, [startSessionTimer]);
@@ -266,9 +264,8 @@ export const AuthProvider = ({ children }) => {
     }
 
     clearSessionTimer();
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('loginTime');
+    disconnectSocket();
+    storage.clearAuthSession();
     setUser(null);
     navigate('/login');
   };

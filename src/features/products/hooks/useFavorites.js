@@ -3,23 +3,7 @@ import { useToast } from "../../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import Api from "../../../common/SummaryAPI";
-import {
-  API_RETRY_COUNT,
-  API_RETRY_DELAY,
-} from "../../../constants/constants";
-
-// API functions
-const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await apiCall();
-      return response.data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-    }
-  }
-};
+import { fetchWithRetry } from "../../../utils/fetchWithRetry";
 
 export const useFavorites = () => {
   const { user } = useContext(AuthContext);

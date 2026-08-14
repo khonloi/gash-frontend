@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
-import { API_RETRY_COUNT, API_RETRY_DELAY } from "../constants/constants";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import Button from "../components/ui/Button";
 import HeroCarousel from "../features/home/components/HeroCarousel";
@@ -9,22 +8,11 @@ import CategorySlider from "../features/home/components/CategorySlider";
 import PromoGridSection from "../features/home/components/PromoGridSection";
 import GiftGuideSection from "../features/home/components/GiftGuideSection";
 import HomeProductSection from "../features/home/components/HomeProductSection";
+import { fetchWithRetry } from "../utils/fetchWithRetry";
 
 import gashHeroProducts from "../assets/image/gash_hero_products.png";
 import gashDiscountProducts from "../assets/image/gash_discount_products.png";
 import gashAccessoriesProducts from "../assets/image/gash_accessories_products.png";
-
-const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await apiCall();
-      return response.data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-    }
-  }
-};
 
 const carouselSlides = [
   {

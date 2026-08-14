@@ -6,6 +6,7 @@ import { useToast } from '../../hooks/useToast';
 import gashLogo from '../../assets/image/gash-logo.svg';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { formatPrice, formatDate } from '../../utils/formatters';
 
 const Bill = () => {
     const { orderId } = useParams();
@@ -48,17 +49,6 @@ const Bill = () => {
             fetchBillData();
         }
     }, [orderId, fetchBillData]);
-
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price);
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN');
-    };
 
     const handleExportPDF = async () => {
         if (!billData || !billRef.current) {

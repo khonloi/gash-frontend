@@ -3,9 +3,7 @@ import { MessageSquare, X, Pin, Send, MoreVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Form from '../../components/ui/Form';
-
-import io from 'socket.io-client';
-import { SOCKET_URL } from '../../common/axiosClient';
+import { getSocket } from '../../common/socketManager';
 import Api from '../../common/SummaryAPI';
 import LiveStreamReactions from './LiveStreamReactions';
 
@@ -335,16 +333,21 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
     useEffect(() => {
         if (!isVisible || !liveId || !user) return;
 
-        // Connect to socket
-        const socket = io(SOCKET_URL, { transports: ['websocket'] });
+        const socket = getSocket();
         socketRef.current = socket;
 
-        socket.on('connect', () => {
+        const joinRoom = () => {
             socket.emit('joinLiveProductRoom', liveId);
-        });
+        };
+
+        if (socket.connected) {
+            joinRoom();
+        } else {
+            socket.once('connect', joinRoom);
+        }
 
         // Listen for new comments (real-time)
-        socket.on('comment:added', (data) => {
+        const handleCommentAdded = (data) => {
             // Normalize liveId comparison (handle both string and ObjectId)
             const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
             const currentLiveId = liveId?.toString?.() || liveId;
@@ -396,21 +399,20 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
                     }
                 }, 200);
             }
-        });
+        };
 
         // Listen for comment deletion (if user sends comment that gets deleted)
-        socket.on('comment:deleted', (data) => {
+        const handleCommentDeleted = (data) => {
             // Normalize liveId comparison (handle both string and ObjectId)
             const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
             const currentLiveId = liveId?.toString?.() || liveId;
             if (data?.commentId && dataLiveId === currentLiveId) {
                 setComments(prev => prev.filter(c => c._id !== data.commentId));
-
             }
-        });
+        };
 
         // Listen for comment pin/unpin (real-time updates)
-        socket.on('comment:pinned', (data) => {
+        const handleCommentPinned = (data) => {
             // Normalize liveId comparison (handle both string and ObjectId)
             const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
             const currentLiveId = liveId?.toString?.() || liveId;
@@ -428,9 +430,9 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
                     });
                 });
             }
-        });
+        };
 
-        socket.on('comment:unpinned', (data) => {
+        const handleCommentUnpinned = (data) => {
             // Normalize liveId comparison (handle both string and ObjectId)
             const dataLiveId = data?.liveId?.toString?.() || data?.liveId;
             const currentLiveId = liveId?.toString?.() || liveId;
@@ -448,22 +450,18 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
                     });
                 });
             }
-        });
+        };
 
-        // Handle connection errors
-        socket.on('connect_error', (error) => {
-            console.error('WebSocket connection error:', error);
-        });
-
-        socket.on('disconnect', (reason) => {
-            console.warn('WebSocket disconnected:', reason);
-        });
+        socket.on('comment:added', handleCommentAdded);
+        socket.on('comment:deleted', handleCommentDeleted);
+        socket.on('comment:pinned', handleCommentPinned);
+        socket.on('comment:unpinned', handleCommentUnpinned);
 
         return () => {
-            socket.disconnect();
-            if (socketRef.current === socket) {
-                socketRef.current = null;
-            }
+            socket.off('comment:added', handleCommentAdded);
+            socket.off('comment:deleted', handleCommentDeleted);
+            socket.off('comment:pinned', handleCommentPinned);
+            socket.off('comment:unpinned', handleCommentUnpinned);
         };
     }, [isVisible, liveId, user]);
 

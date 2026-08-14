@@ -7,6 +7,7 @@ import Button from "../../../components/ui/Button";
 import ConfirmationModal from "../../orders/components/ConfirmationModal";
 import Modal from "../../../components/ui/Modal";
 import TextArea from "../../../components/ui/TextArea";
+import { formatPrice } from "../../../utils/formatters";
 
 const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
   const { showToast } = useToast();
@@ -20,9 +21,6 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     deleting: false,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const formatPrice = (p) =>
-    p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
   // Render star rating
   const renderStars = (rating) => {

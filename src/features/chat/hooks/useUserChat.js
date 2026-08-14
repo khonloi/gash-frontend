@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import io from "socket.io-client";
-import { SOCKET_URL } from "../../../common/axiosClient";
 import Api from "../../../common/SummaryAPI";
 import { useToast } from "../../../hooks/useToast";
+import { getSocket, registerUserSocket } from "../../../common/socketManager";
 
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -29,30 +28,28 @@ export const useUserChat = (userId) => {
             return;
         }
 
-        socket.current = io(SOCKET_URL, { transports: ["websocket"] });
+        registerUserSocket(userId);
+        const sock = getSocket();
+        socket.current = sock;
 
-        socket.current.on("connect", () => {
-            socket.current.emit("start_chat", { userId, messageText: "" });
-        });
-
-        socket.current.on("chat_history", ({ conversation: convo, messages: history }) => {
+        const handleChatHistory = ({ conversation: convo, messages: history }) => {
             setConversation(convo || null);
             setMessages(history || []);
             if (convo && convo.id) {
-                socket.current.emit("join_room", convo.id);
+                sock.emit("join_room", convo.id);
             }
-        });
+        };
 
-        socket.current.on("new_message", (msg) => {
+        const handleNewMessage = (msg) => {
             if (
                 conversationRef.current &&
                 msg.conversationId.toString() === conversationRef.current.id.toString()
             ) {
                 setMessages((prev) => [...prev, msg]);
             }
-        });
+        };
 
-        socket.current.on("conversation_closed", ({ conversationId }) => {
+        const handleConversationClosed = ({ conversationId }) => {
             if (
                 conversationRef.current &&
                 conversationId.toString() === conversationRef.current.id.toString()
@@ -62,12 +59,18 @@ export const useUserChat = (userId) => {
                 setMessages([]);
                 setIsOpen(false);
             }
-        });
+        };
+
+        sock.emit("start_chat", { userId, messageText: "" });
+
+        sock.on("chat_history", handleChatHistory);
+        sock.on("new_message", handleNewMessage);
+        sock.on("conversation_closed", handleConversationClosed);
 
         return () => {
-            if (socket.current) {
-                socket.current.disconnect();
-            }
+            sock.off("chat_history", handleChatHistory);
+            sock.off("new_message", handleNewMessage);
+            sock.off("conversation_closed", handleConversationClosed);
         };
     }, [userId, showToast]);
 

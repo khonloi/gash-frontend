@@ -1,5 +1,6 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
+import { formatPrice } from "../../../utils/formatters";
 
 // Helper function to get minimum price from product variants
 const getMinPrice = (product) => {
@@ -19,11 +20,6 @@ const getMainImageUrl = (product) => {
   }
   const mainImage = product.productImageIds.find(img => img.isMain);
   return mainImage?.imageUrl || product.productImageIds[0]?.imageUrl || "/placeholder-image.png";
-};
-
-const formatPrice = (price) => {
-  if (typeof price !== "number" || isNaN(price)) return "N/A";
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 };
 
 // Status badge component
@@ -146,6 +142,7 @@ const ProductCard = ({
           src={imageUrl}
           alt={product.productName || "Product image"}
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover rounded-t-xl"
           onError={(e) => {
             e.target.src = "/placeholder-image.png";
@@ -179,4 +176,4 @@ const ProductCard = ({
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

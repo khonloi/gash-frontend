@@ -1,8 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
-import { mockUser } from './mock/mockData'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+import { mockUser } from './mock/mockData';
+import { storage } from './utils/storage';
 
 // Demo Mode Initialization
 const isDemoMode = import.meta.env.VITE_APP_USE_MOCK === 'true';
@@ -14,18 +15,15 @@ const initApp = async () => {
       setupMocks();
 
       // Ensure a clean session for Demo Mode
-      const storedUser = localStorage.getItem('user');
-      const storedToken = localStorage.getItem('token');
+      const storedUser = storage.getStoredUser();
+      const storedToken = storage.getToken();
 
       // Check if we need to hydrate the demo user
-      // We check for !storedToken OR if the stored user ID doesn't match the mock user ID
-      // This handles the case where a real user might have been logged in previously
-      if (!storedToken || !storedUser || (JSON.parse(storedUser)._id !== mockUser._id)) {
-
-        localStorage.clear();
-        localStorage.setItem('token', 'demo-token-12345');
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        localStorage.setItem('loginTime', Date.now().toString());
+      if (!storedToken || !storedUser || storedUser._id !== mockUser._id) {
+        storage.clear();
+        storage.setToken('demo-token-12345');
+        storage.setStoredUser(mockUser);
+        storage.setLoginTime(Date.now().toString());
       }
     } catch (error) {
       console.error("[GASH] Failed to load mock setup:", error);
@@ -36,7 +34,7 @@ const initApp = async () => {
     <React.StrictMode>
       <App />
     </React.StrictMode>,
-  )
+  );
 };
 
 initApp();

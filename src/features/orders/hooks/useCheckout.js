@@ -3,29 +3,21 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 import { useToast } from '../../../hooks/useToast';
 import Api from "../../../common/SummaryAPI";
+import { formatPrice } from "../../../utils/formatters";
+import { storage } from "../../../utils/storage";
 
 const CHECKOUT_STORAGE_KEY = 'checkout_persistent_data';
 
 const saveCheckoutData = (data) => {
-  try {
-    localStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(data));
-  } catch (err) {
-    console.warn('Failed to save checkout data', err);
-  }
+  storage.setItem(CHECKOUT_STORAGE_KEY, data);
 };
 
 const loadCheckoutData = () => {
-  try {
-    const data = localStorage.getItem(CHECKOUT_STORAGE_KEY);
-    return data ? JSON.parse(data) : null;
-  } catch (err) {
-    console.warn('Failed to load checkout data', err);
-    return null;
-  }
+  return storage.getItem(CHECKOUT_STORAGE_KEY, null);
 };
 
 const clearCheckoutData = () => {
-  localStorage.removeItem(CHECKOUT_STORAGE_KEY);
+  storage.removeItem(CHECKOUT_STORAGE_KEY);
 };
 
 export const useCheckout = () => {
@@ -134,7 +126,7 @@ export const useCheckout = () => {
   }, [user]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = storage.getToken();
 
     if (!token && !user) {
       showToast('Please login to continue', 'warning');
@@ -150,14 +142,6 @@ export const useCheckout = () => {
       fetchCartItems();
     }
   }, [user, navigate, buyNowState, selectedItems.length, fetchCartItems, showToast, location.pathname, fetchUserSettings]);
-
-  const formatPrice = useCallback((price) => {
-    if (typeof price !== "number" || isNaN(price)) return "N/A";
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-  }, []);
 
   const totalPrice = useMemo(() => {
     if (buyNowState) {

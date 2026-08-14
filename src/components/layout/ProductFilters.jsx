@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "../ui/Button";
+import { formatPrice as defaultFormatPrice } from "../../utils/formatters";
 
 export default function ProductFilters({
   categoriesList = [],
@@ -18,7 +19,7 @@ export default function ProductFilters({
   hasActiveFilters,
   showMobileFilters,
   setShowMobileFilters,
-  formatPrice,
+  formatPrice = defaultFormatPrice,
 }) {
   const FilterSection = ({ title, options, selectedValue, filterType }) => (
     <fieldset className="mb-4 border-2 border-gray-300 rounded-xl p-3">

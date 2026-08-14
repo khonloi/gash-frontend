@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Api from '../../common/SummaryAPI';
 import { useToast } from '../../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
+import { storage } from '../../utils/storage';
 
 const LiveStream = () => {
     const navigate = useNavigate();
@@ -34,7 +35,7 @@ const LiveStream = () => {
             }
 
             setIsLoading(true);
-            const token = localStorage.getItem('token');
+            const token = storage.getToken();
 
             if (!token) {
                 showToast('Please login to view livestream', 'error');
@@ -105,7 +106,7 @@ const LiveStream = () => {
     // Check stream status realtime function
     const checkStreamStatus = useCallback(async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = storage.getToken();
             if (!token) return;
 
             // Check cache first

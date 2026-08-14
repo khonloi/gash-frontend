@@ -15,6 +15,7 @@ import OrderItemsList from "./OrderItemsList";
 import { getStatusBadge } from "../utils/orderUtils";
 import Modal from "../../../components/ui/Modal";
 import TextArea from "../../../components/ui/TextArea";
+import { formatPrice } from "../../../utils/formatters";
 
 const OrderDetailsModal = ({ orderId, onClose }) => {
     const { showToast } = useToast();
@@ -39,9 +40,6 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
     const [showDeleteFeedbackConfirm, setShowDeleteFeedbackConfirm] = useState(false);
     const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState('');
-
-    const formatPrice = (p) =>
-        p?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
     const handleCancelOrder = async () => {
         setShowConfirmModal(true);

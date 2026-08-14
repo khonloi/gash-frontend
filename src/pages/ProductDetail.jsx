@@ -388,28 +388,29 @@ const ProductDetail = () => {
                   <legend className="text-sm sm:text-base font-semibold m-0">Color:</legend>
                   <div className="flex flex-wrap gap-2">
                     {availableColors.map((color) => {
+                      const colorName = typeof color === "object" && color !== null ? color.productColorName || color.name || "" : color;
                       // Disable if product is inactive/discontinued OR if all variants with this color are inactive/discontinued
                       const isDisabled = isProductInactive ||
                         isProductDiscontinued ||
-                        isColorInactiveOrDiscontinued(color) ||
-                        !isColorInStock(color);
+                        isColorInactiveOrDiscontinued(colorName) ||
+                        !isColorInStock(colorName);
                       return (
                         <button
-                          key={color}
+                          key={colorName || color}
                           className={`px-3 py-1.5 border-2 rounded-md bg-white text-xs sm:text-sm transition-colors focus:outline-none ${isDisabled
                             ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
-                            : selectedColor === color
+                            : selectedColor === colorName
                               ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
                               : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
                             }`}
-                          onClick={() => !isDisabled && handleColorClick(color)}
+                          onClick={() => !isDisabled && handleColorClick(colorName)}
                           disabled={isDisabled}
                           type="button"
-                          aria-label={`Select ${color} color`}
-                          aria-pressed={selectedColor === color}
+                          aria-label={`Select ${colorName} color`}
+                          aria-pressed={selectedColor === colorName}
                           aria-disabled={isDisabled}
                         >
-                          {color}
+                          {colorName}
                         </button>
                       );
                     })}
@@ -421,29 +422,30 @@ const ProductDetail = () => {
                   <legend className="text-sm sm:text-base font-semibold m-0">Size:</legend>
                   <div className="flex flex-wrap gap-2">
                     {availableSizes.map((size) => {
+                      const sizeName = typeof size === "object" && size !== null ? size.productSizeName || size.name || "" : size;
                       // Disable if product is inactive/discontinued OR if the specific size (or color-size combo) is inactive/discontinued
                       const isDisabled = isProductInactive ||
                         isProductDiscontinued ||
-                        isSizeInactiveOrDiscontinued(size) ||
-                        !isSizeInStock(size) ||
-                        (selectedColor && !isValidCombination(selectedColor, size));
+                        isSizeInactiveOrDiscontinued(sizeName) ||
+                        !isSizeInStock(sizeName) ||
+                        (selectedColor && !isValidCombination(selectedColor, sizeName));
                       return (
                         <button
-                          key={size}
+                          key={sizeName || size}
                           className={`px-3 py-1.5 border-2 rounded-md bg-white text-xs sm:text-sm transition-colors focus:outline-none ${isDisabled
                             ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-100"
-                            : selectedSize === size
+                            : selectedSize === sizeName
                               ? "border-amber-400 bg-amber-50 font-semibold cursor-pointer"
                               : "border-gray-300 hover:bg-gray-50 hover:border-blue-600 cursor-pointer"
                             }`}
-                          onClick={() => !isDisabled && handleSizeClick(size)}
+                          onClick={() => !isDisabled && handleSizeClick(sizeName)}
                           disabled={isDisabled}
                           type="button"
-                          aria-label={`Select ${size} size`}
-                          aria-pressed={selectedSize === size}
+                          aria-label={`Select ${sizeName} size`}
+                          aria-pressed={selectedSize === sizeName}
                           aria-disabled={isDisabled}
                         >
-                          {size}
+                          {sizeName}
                         </button>
                       );
                     })}

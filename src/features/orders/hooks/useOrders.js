@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import { useToast } from "../../../hooks/useToast";
 import Api from "../../../common/SummaryAPI";
-import { io } from "socket.io-client";
-import { SOCKET_URL } from "../../../common/axiosClient";
+import { getSocket, registerUserSocket } from "../../../common/socketManager";
+import { formatPrice, formatDate } from "../../../utils/formatters";
 
 export const useOrders = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -17,7 +17,6 @@ export const useOrders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [vnpaySuccessInfo, setVnpaySuccessInfo] = useState(null);
-  const socketRef = useRef(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -105,26 +104,10 @@ export const useOrders = () => {
   useEffect(() => {
     if (!user?._id) return;
 
-    if (!socketRef.current) {
-      const token = localStorage.getItem("token");
-      socketRef.current = io(SOCKET_URL, {
-        transports: ["websocket", "polling"],
-        auth: { token },
-        withCredentials: true,
-      });
-    }
+    registerUserSocket(user._id);
+    const socket = getSocket();
 
-    const socket = socketRef.current;
-
-    socket.on("connect", () => {
-      socket.emit("userConnected", user._id);
-      const token = localStorage.getItem("token");
-      if (token) {
-        socket.emit("authenticate", token);
-      }
-    });
-
-    socket.on("orderUpdated", (payload) => {
+    const handleOrderUpdated = (payload) => {
       const updatedOrder = payload.order || payload;
       const orderUserId = payload.userId || updatedOrder.accountId?._id || updatedOrder.accountId;
 
@@ -203,25 +186,12 @@ export const useOrders = () => {
           showToast(message, "info");
         }
       }
-    });
+    };
 
-    socket.on("connect_error", (err) => {
-      console.error("Orders Socket connection error:", err.message);
-    });
-
-    socket.on("disconnect", (reason) => {
-      console.warn("⚠️ Orders Socket disconnected:", reason);
-    });
+    socket.on("orderUpdated", handleOrderUpdated);
 
     return () => {
-      socket.off("connect");
-      socket.off("orderUpdated");
-      socket.off("connect_error");
-      socket.off("disconnect");
-      if (socket.connected) {
-        socket.disconnect();
-      }
-      socketRef.current = null;
+      socket.off("orderUpdated", handleOrderUpdated);
     };
   }, [user, showToast]);
 
@@ -281,21 +251,6 @@ export const useOrders = () => {
       fetchOrders();
     }
   };
-
-  const formatDate = (date) =>
-    new Date(date).toLocaleDateString("en-GB", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-  const formatPrice = useCallback((price) => {
-    if (typeof price !== "number" || isNaN(price)) return "N/A";
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-  }, []);
 
   return {
     user,

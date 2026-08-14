@@ -1,22 +1,11 @@
 import { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { io } from "socket.io-client";
 import { AuthContext } from "../../../context/AuthContext";
 import Api from "../../../common/SummaryAPI";
-import { SOCKET_URL } from "../../../common/axiosClient";
-import { SEARCH_DEBOUNCE_DELAY, API_RETRY_COUNT, API_RETRY_DELAY } from "../../../constants/constants";
-
-const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await apiCall();
-            return response.data;
-        } catch (error) {
-            if (i === retries - 1) throw error;
-            await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-        }
-    }
-};
+import { getSocket, registerUserSocket } from "../../../common/socketManager";
+import { SEARCH_DEBOUNCE_DELAY } from "../../../constants/constants";
+import { fetchWithRetry } from "../../../utils/fetchWithRetry";
+import { formatPrice } from "../../../utils/formatters";
 
 const CART_UPDATE_EVENT = 'cartUpdated';
 const NOTIFICATION_UPDATE_EVENT = 'notificationUpdated';
@@ -42,11 +31,10 @@ export const useHeader = () => {
     const dropdownRef = useRef(null);
     const userMenuRef = useRef(null);
     const fetchTimeoutRef = useRef({ cart: null, notification: null, livestream: null, favorite: null });
-    const socketRef = useRef(null);
 
     // Fetch cart item count
     const fetchCartItemCount = useCallback(async () => {
-        if (!user) {
+        if (!user?._id) {
             setCartItemCount(0);
             return;
         }
@@ -54,10 +42,13 @@ export const useHeader = () => {
             const cartData = await fetchWithRetry(() =>
                 Api.newCart.getByAccount(user._id)
             );
-            const itemCount = Array.isArray(cartData?.data)
-                ? cartData.data.filter(item => (item.productQuantity ?? 0) > 0).length
-                : 0;
-            setCartItemCount(itemCount);
+            if (Array.isArray(cartData)) {
+                setCartItemCount(cartData.length);
+            } else if (cartData?.data && Array.isArray(cartData.data)) {
+                setCartItemCount(cartData.data.length);
+            } else {
+                setCartItemCount(0);
+            }
         } catch {
             setCartItemCount(0);
         }
@@ -65,7 +56,7 @@ export const useHeader = () => {
 
     // Fetch notification count
     const fetchNotificationCount = useCallback(async () => {
-        if (!user) {
+        if (!user?._id) {
             setNotificationCount(0);
             return;
         }
@@ -73,11 +64,15 @@ export const useHeader = () => {
             const notificationData = await fetchWithRetry(() =>
                 Api.notifications.getUserNotifications(user._id)
             );
-            const notificationList = Array.isArray(notificationData?.data) 
-                ? notificationData.data 
-                : (Array.isArray(notificationData) ? notificationData : []);
-            const unreadCount = notificationList.filter(item => !item.isRead).length;
-            setNotificationCount(unreadCount);
+            if (Array.isArray(notificationData)) {
+                const unread = notificationData.filter((n) => !n.isRead).length;
+                setNotificationCount(unread);
+            } else if (notificationData?.data && Array.isArray(notificationData.data)) {
+                const unread = notificationData.data.filter((n) => !n.isRead).length;
+                setNotificationCount(unread);
+            } else {
+                setNotificationCount(0);
+            }
         } catch {
             setNotificationCount(0);
         }
@@ -85,48 +80,43 @@ export const useHeader = () => {
 
     // Fetch livestream count
     const fetchLivestreamCount = useCallback(async () => {
-        if (!user) {
-            setLivestreamCount(0);
-            return;
-        }
         try {
             const livestreamData = await fetchWithRetry(() =>
-                Api.livestream.getLiveNow()
+                Api.livestream.getLive()
             );
-            const activeCount = livestreamData?.data?.count || livestreamData?.data?.livestreams?.length || 0;
-            setLivestreamCount(activeCount);
+            if (Array.isArray(livestreamData)) {
+                setLivestreamCount(livestreamData.length);
+            } else if (livestreamData?.data && Array.isArray(livestreamData.data)) {
+                setLivestreamCount(livestreamData.data.length);
+            } else if (livestreamData?.success && Array.isArray(livestreamData.liveStreams)) {
+                setLivestreamCount(livestreamData.liveStreams.length);
+            } else {
+                setLivestreamCount(0);
+            }
         } catch {
             setLivestreamCount(0);
         }
-    }, [user]);
+    }, []);
 
     // Fetch random categories
     const fetchCategories = useCallback(async () => {
         try {
-            const cached = sessionStorage.getItem('header_random_categories');
-            if (cached) {
-                setRandomCategories(JSON.parse(cached));
-                return;
-            }
-
             const response = await fetchWithRetry(() => Api.categories.getAll());
-            const categories = response?.data || [];
-            const activeCategories = categories.filter(cat => !cat.isDeleted);
-
-            if (activeCategories.length > 0) {
-                const shuffled = [...activeCategories].sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, 5);
-                setRandomCategories(selected);
-                sessionStorage.setItem('header_random_categories', JSON.stringify(selected));
+            if (response && response.data) {
+                const categoriesData = response.data.categories || response.data;
+                if (Array.isArray(categoriesData)) {
+                    const shuffled = [...categoriesData].sort(() => 0.5 - Math.random());
+                    setRandomCategories(shuffled.slice(0, 3));
+                }
             }
-        } catch (error) {
-            console.error("Error fetching categories for header:", error);
+        } catch {
+            setRandomCategories([]);
         }
     }, []);
 
     // Fetch favorite count
     const fetchFavoriteCount = useCallback(async () => {
-        if (!user) {
+        if (!user?._id) {
             setFavoriteCount(0);
             return;
         }
@@ -134,9 +124,15 @@ export const useHeader = () => {
             const favoritesData = await fetchWithRetry(() =>
                 Api.favorites.fetch()
             );
-            const favList = favoritesData?.favorites || favoritesData?.data || favoritesData || [];
-            const itemCount = Array.isArray(favList) ? favList.length : 0;
-            setFavoriteCount(itemCount);
+            let count = 0;
+            if (Array.isArray(favoritesData)) {
+                count = favoritesData.length;
+            } else if (favoritesData?.favorites && Array.isArray(favoritesData.favorites)) {
+                count = favoritesData.favorites.length;
+            } else if (favoritesData?.data && Array.isArray(favoritesData.data)) {
+                count = favoritesData.data.length;
+            }
+            setFavoriteCount(count);
         } catch {
             setFavoriteCount(0);
         }
@@ -163,68 +159,51 @@ export const useHeader = () => {
         fetchTimeoutRef.current.favorite = setTimeout(fetchFavoriteCount, 10);
     }, [fetchFavoriteCount]);
 
-    // Socket.IO updates
+    // Socket.IO updates via singleton
     useEffect(() => {
-        if (!user?._id) {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
-            return;
-        }
+        if (!user?._id) return;
 
-        const socket = io(SOCKET_URL, {
-            transports: ["websocket", "polling"],
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 2000,
-            withCredentials: true,
-        });
+        registerUserSocket(user._id);
+        const socket = getSocket();
 
-        socketRef.current = socket;
-
-        socket.on("connect", () => {
-            socket.emit("userConnected", user._id);
-            socket.emit("joinRoom", user._id);
-        });
-
-        socket.on("cartUpdated", () => {
+        const handleCartUpdated = () => {
             debouncedFetchCartItemCount();
-        });
+        };
 
-        socket.on("livestreamCountChanged", (data) => {
-            if (typeof data.count === 'number') {
+        const handleLivestreamCountChanged = (data) => {
+            if (typeof data?.count === 'number') {
                 setLivestreamCount(data.count);
             } else {
                 debouncedFetchLivestreamCount();
             }
-        });
+        };
 
-        socket.on("newNotification", () => {
+        const handleNewNotification = () => {
             debouncedFetchNotificationCount();
-        });
+        };
 
-        socket.on("notificationBadgeUpdate", (data) => {
-            if (!data.userId || data.userId === user._id) {
+        const handleNotificationBadgeUpdate = (data) => {
+            if (!data?.userId || data.userId === user._id) {
                 debouncedFetchNotificationCount();
             }
-        });
+        };
 
-        socket.on("favoriteUpdated", () => {
+        const handleFavoriteUpdated = () => {
             debouncedFetchFavoriteCount();
-        });
+        };
 
-        socket.on("connect_error", (err) => {
-            console.error("Header Socket connection error:", err.message);
-        });
-
-        socket.on("disconnect", (reason) => {
-            console.warn("⚠️ Header Socket disconnected:", reason);
-        });
+        socket.on("cartUpdated", handleCartUpdated);
+        socket.on("livestreamCountChanged", handleLivestreamCountChanged);
+        socket.on("newNotification", handleNewNotification);
+        socket.on("notificationBadgeUpdate", handleNotificationBadgeUpdate);
+        socket.on("favoriteUpdated", handleFavoriteUpdated);
 
         return () => {
-            socket.disconnect();
-            socketRef.current = null;
+            socket.off("cartUpdated", handleCartUpdated);
+            socket.off("livestreamCountChanged", handleLivestreamCountChanged);
+            socket.off("newNotification", handleNewNotification);
+            socket.off("notificationBadgeUpdate", handleNotificationBadgeUpdate);
+            socket.off("favoriteUpdated", handleFavoriteUpdated);
         };
     }, [user, debouncedFetchCartItemCount, debouncedFetchNotificationCount, debouncedFetchLivestreamCount, debouncedFetchFavoriteCount]);
 
@@ -409,13 +388,6 @@ export const useHeader = () => {
             console.error("Error fetching live streams:", error);
             navigate("/live");
         }
-    };
-
-    const formatPrice = (price) => {
-        if (!price) {
-            return "";
-        }
-        return `${price.toLocaleString()} ₫`;
     };
 
     const getFirstName = (name) => {

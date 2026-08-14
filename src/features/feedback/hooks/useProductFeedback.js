@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../../../hooks/useToast';
 import Api from '../../../common/SummaryAPI';
+import { formatDateTime as formatDate } from '../../../utils/formatters';
 
 export const useProductFeedback = (productId) => {
     const { showToast } = useToast();
@@ -92,25 +93,6 @@ export const useProductFeedback = (productId) => {
             fetchFeedbacks(productId);
         }
     }, [productId, fetchFeedbacks]);
-
-    const formatDate = useCallback((dateString) => {
-        if (!dateString) return "Unknown Date";
-        try {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return "Unknown Date";
-
-            // Format as DD/MM/YYYY HH:MM (Vietnamese standard)
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-
-            return `${day}/${month}/${year} ${hours}:${minutes}`;
-        } catch {
-            return "Unknown Date";
-        }
-    }, []);
 
     return {
         feedbacks,

@@ -1,21 +1,10 @@
 import axiosClient from "./axiosClient";
+import { fetchWithRetry } from "../utils/fetchWithRetry";
 
 const Api = {
   // ==== Utils ====
   utils: {
-    fetchWithRetry: async (apiCall, retries = 3, delay = 1000) => {
-      for (let i = 0; i < retries; i++) {
-        try {
-          const response = typeof apiCall === "function" ? await apiCall() : await axiosClient(apiCall);
-          return response?.data || response;
-        } catch (error) {
-          if (i === retries - 1) throw error;
-          await new Promise((resolve) =>
-            setTimeout(resolve, delay * Math.pow(2, i)),
-          );
-        }
-      }
-    },
+    fetchWithRetry,
   },
 
   // ==== Upload ====
@@ -184,6 +173,7 @@ const Api = {
   newProducts: {
     getAll: (filters = {}) => axiosClient.get("/products", { params: filters }),
     getById: (productId) => axiosClient.get(`/products/${productId}`),
+    getOne: (productId) => axiosClient.get(`/products/${productId}`),
     create: (data) => axiosClient.post("/products", data),
     update: (productId, data) => axiosClient.put(`/products/${productId}`, data),
     delete: (productId) => axiosClient.delete(`/products/${productId}`),
@@ -192,6 +182,11 @@ const Api = {
     deleteImage: (productId, imageId) =>
       axiosClient.delete(`/products/${productId}/images/${imageId}`),
     search: (params) => axiosClient.get("/products/search", { params }),
+  },
+
+  // ==== Product Images ====
+  productImages: {
+    getByProduct: (productId) => axiosClient.get(`/products/${productId}`),
   },
 
   // ==== New Product Variants ====

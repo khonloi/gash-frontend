@@ -10,6 +10,8 @@ import {
   FILTER_STORAGE_KEY,
   SEARCH_DEBOUNCE_DELAY
 } from "../../constants/constants";
+import { formatPrice } from "../../utils/formatters";
+import { storage } from "../../utils/storage";
 
 // Helper function to get minimum price from product variants
 const getMinPrice = (product) => {
@@ -20,11 +22,6 @@ const getMinPrice = (product) => {
     .filter(v => v.variantStatus !== "discontinued" && v.variantPrice > 0)
     .map(v => v.variantPrice);
   return prices.length > 0 ? Math.min(...prices) : 0;
-};
-
-const formatPrice = (price) => {
-  if (typeof price !== "number" || isNaN(price)) return "N/A";
-  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 };
 
 const ProductGridLayout = ({
@@ -52,10 +49,9 @@ const ProductGridLayout = ({
     if (urlVal !== null) return urlVal;
 
     try {
-      const item = window.localStorage.getItem(FILTER_STORAGE_KEY);
-      if (item) {
-        const parsed = JSON.parse(item);
-        if (parsed[paramKey] !== undefined) return parsed[paramKey];
+      const parsed = storage.getItem(FILTER_STORAGE_KEY, {});
+      if (parsed && typeof parsed === "object" && parsed[paramKey] !== undefined) {
+        return parsed[paramKey];
       }
     } catch (err) {
       console.warn(`Error reading localStorage for filters:`, err);

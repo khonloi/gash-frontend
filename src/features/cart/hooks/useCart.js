@@ -3,36 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import { useToast } from "../../../hooks/useToast";
 import Api from "../../../common/SummaryAPI";
-import {
-  API_RETRY_COUNT,
-  API_RETRY_DELAY,
-  TOAST_TIMEOUT,
-} from "../../../constants/constants";
-
-// Custom hook for debounced values
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debouncedValue;
-};
-
-// API retry function
-const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await apiCall();
-      return response.data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-    }
-  }
-};
+import { TOAST_TIMEOUT } from "../../../constants/constants";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { fetchWithRetry } from "../../../utils/fetchWithRetry";
+import { formatPrice } from "../../../utils/formatters";
+import { storage } from "../../../utils/storage";
 
 export const useCart = () => {
   const { user } = useContext(AuthContext);
@@ -124,7 +99,7 @@ export const useCart = () => {
   );
 
   useEffect(() => {
-    if (!user && !localStorage.getItem("token")) {
+    if (!user && !storage.getToken()) {
       navigate("/login", { replace: true });
     } else if (user) {
       fetchCartItems();
@@ -135,7 +110,7 @@ export const useCart = () => {
     const updateQuantities = async () => {
       if (!user?._id || Object.keys(debouncedQuantities).length === 0) return;
 
-      const token = localStorage.getItem("token");
+      const token = storage.getToken();
       if (!token) return;
 
       setCartItems((currentItems) => {
@@ -331,14 +306,6 @@ export const useCart = () => {
     },
     [cartItems, user, showToast, itemToDelete]
   );
-
-  const formatPrice = useCallback((price) => {
-    if (typeof price !== "number" || isNaN(price)) return "N/A";
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-  }, []);
 
   const filteredCartItems = useMemo(() => {
     if (!searchQuery.trim()) {

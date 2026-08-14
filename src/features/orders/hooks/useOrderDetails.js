@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useRef, useContext } from "react";
-import { io } from "socket.io-client";
 import { AuthContext } from "../../../context/AuthContext";
-import { SOCKET_URL } from "../../../common/axiosClient";
 import Api from "../../../common/SummaryAPI";
 import { useToast } from "../../../hooks/useToast";
+import { getSocket, registerUserSocket } from "../../../common/socketManager";
 
 export const useOrderDetails = (orderId) => {
     const { user } = useContext(AuthContext);
@@ -23,8 +22,6 @@ export const useOrderDetails = (orderId) => {
     // VNPay countdown timer state
     const [timeLeft, setTimeLeft] = useState(null);
     const [isVNPayExpired, setIsVNPayExpired] = useState(false);
-
-    const socketRef = useRef(null);
 
     // 🧭 Fetch order with all details
     const fetchOrderDetails = useCallback(async () => {
@@ -123,26 +120,10 @@ export const useOrderDetails = (orderId) => {
     useEffect(() => {
         if (!user?._id || !orderId) return;
 
-        if (!socketRef.current) {
-            const token = localStorage.getItem("token");
-            socketRef.current = io(SOCKET_URL, {
-                transports: ["websocket", "polling"],
-                auth: { token },
-                withCredentials: true,
-            });
-        }
+        registerUserSocket(user._id);
+        const socket = getSocket();
 
-        const socket = socketRef.current;
-
-        socket.on("connect", () => {
-            socket.emit("userConnected", user._id);
-            const token = localStorage.getItem("token");
-            if (token) {
-                socket.emit("authenticate", token);
-            }
-        });
-
-        socket.on("orderUpdated", (payload) => {
+        const handleOrderUpdated = (payload) => {
             const updatedOrder = payload.order || payload;
             const orderUserId = payload.userId || updatedOrder.accountId?._id || updatedOrder.accountId;
 
@@ -165,11 +146,12 @@ export const useOrderDetails = (orderId) => {
                     };
                 });
             }
-        });
+        };
+
+        socket.on("orderUpdated", handleOrderUpdated);
 
         return () => {
-            socket.off("connect");
-            socket.off("orderUpdated");
+            socket.off("orderUpdated", handleOrderUpdated);
         };
     }, [user?._id, orderId]);
 

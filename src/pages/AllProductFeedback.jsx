@@ -4,6 +4,7 @@ import Api from '../common/SummaryAPI';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner, { LoadingSkeleton } from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
+import { formatDate } from '../utils/formatters';
 
 const AllProductFeedback = () => {
   const { id } = useParams();
@@ -94,15 +95,6 @@ const AllProductFeedback = () => {
       setFeedbackLoading(false);
     }
   }, [showToast]);
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Unknown Date';
-    return new Date(dateString).toLocaleDateString("en-GB", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
 
   const uniqueColors = [...new Set(feedbacks.filter(f => f.variant?.color).map(f => f.variant.color))].sort();
   const uniqueSizes = [...new Set(feedbacks.filter(f => f.variant?.size).map(f => f.variant.size))].sort();
@@ -253,7 +245,13 @@ const AllProductFeedback = () => {
                       <div className="flex-shrink-0 relative">
                         <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                           {userImg ? (
-                            <img src={userImg} alt={feedback.customer?.username || 'User'} className="w-full h-full object-cover" />
+                            <img
+                              src={userImg}
+                              alt={feedback.customer?.username || 'User'}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             <span className="text-white font-bold text-xl">
                               {(feedback.customer?.username?.[0]?.toUpperCase() || 'A')}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import io from 'socket.io-client';
-import { SOCKET_URL } from '../../common/axiosClient';
 import Api from '../../common/SummaryAPI';
+import { formatPrice } from '../../utils/formatters';
+import { getSocket } from '../../common/socketManager';
 
 const LiveStreamProducts = ({ liveId }) => {
     const [products, setProducts] = useState([]);
@@ -103,12 +103,6 @@ const LiveStreamProducts = ({ liveId }) => {
             });
 
         return prices.length > 0 ? Math.min(...prices) : 0;
-    };
-
-    // Helper: Format price to VND currency
-    const formatPrice = (price) => {
-        if (!price || price === 0) return '0 ₫';
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
 
     // Helper: Sort products - pinned first, then by added date (newest first)
@@ -251,18 +245,25 @@ const LiveStreamProducts = ({ liveId }) => {
 
 
     // Setup WebSocket for real-time products updates
+    // Setup WebSocket for real-time products updates
     useEffect(() => {
         if (!liveId) return;
 
-        const socket = io(SOCKET_URL, { transports: ['websocket'] });
+        const socket = getSocket();
         socketRef.current = socket;
 
-        socket.on('connect', () => {
+        const joinRoom = () => {
             socket.emit('joinLiveProductRoom', liveId);
-        });
+        };
+
+        if (socket.connected) {
+            joinRoom();
+        } else {
+            socket.once('connect', joinRoom);
+        }
 
         // Handle product added
-        socket.on('product:added', (data) => {
+        const handleProductAdded = (data) => {
             if (data?.liveId === liveId && data?.liveProduct) {
                 const hasImages = (data.liveProduct.productId?.productImageIds?.length > 0) ||
                     (data.liveProduct.product?.image);
@@ -298,10 +299,10 @@ const LiveStreamProducts = ({ liveId }) => {
                     return sortProducts([...prev, productWithPin]);
                 });
             }
-        });
+        };
 
         // Handle product removed
-        socket.on('product:removed', (data) => {
+        const handleProductRemoved = (data) => {
             if (data?.liveId === liveId && data?.productId) {
                 setProducts(prev => prev.filter(p => {
                     // Handle both WebSocket format (productId as string) and API format (productId as object)
@@ -309,10 +310,10 @@ const LiveStreamProducts = ({ liveId }) => {
                     return pId !== data.productId;
                 }));
             }
-        });
+        };
 
         // Handle product pinned
-        socket.on('product:pinned', (data) => {
+        const handleProductPinned = (data) => {
             if (data?.liveId === liveId && data?.liveProduct) {
                 // Backend emits full liveProduct object, not just ID
                 const productIdToPin = data.liveProduct._id || data.liveProductId;
@@ -327,10 +328,10 @@ const LiveStreamProducts = ({ liveId }) => {
                     return sortProducts(updated);
                 });
             }
-        });
+        };
 
         // Handle product unpinned
-        socket.on('product:unpinned', (data) => {
+        const handleProductUnpinned = (data) => {
             if (data?.liveId === liveId && data?.liveProductId) {
                 setProducts(prev => {
                     const updated = prev.map(p =>
@@ -340,15 +341,18 @@ const LiveStreamProducts = ({ liveId }) => {
                     return sortProducts(updated);
                 });
             }
-        });
+        };
+
+        socket.on('product:added', handleProductAdded);
+        socket.on('product:removed', handleProductRemoved);
+        socket.on('product:pinned', handleProductPinned);
+        socket.on('product:unpinned', handleProductUnpinned);
 
         return () => {
-            socket.off('connect');
-            socket.off('product:added');
-            socket.off('product:removed');
-            socket.off('product:pinned');
-            socket.off('product:unpinned');
-            socket.close();
+            socket.off('product:added', handleProductAdded);
+            socket.off('product:removed', handleProductRemoved);
+            socket.off('product:pinned', handleProductPinned);
+            socket.off('product:unpinned', handleProductUnpinned);
         };
     }, [liveId, loadProducts]);
 

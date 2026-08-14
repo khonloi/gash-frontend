@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { AuthContext } from '../../context/AuthContext';
-import io from 'socket.io-client';
-import { SOCKET_URL } from '../../common/axiosClient';
+import { getSocket } from '../../common/socketManager';
 import Api from '../../common/SummaryAPI';
 
 const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }) => {
@@ -274,16 +273,21 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
     useEffect(() => {
         if (!liveId || !user) return;
 
-        // Connect to socket
-        const socket = io(SOCKET_URL, { transports: ['websocket'] });
+        const socket = getSocket();
         socketRef.current = socket;
 
-        socket.on('connect', () => {
+        const joinRoom = () => {
             socket.emit('joinLiveProductRoom', liveId);
-        });
+        };
+
+        if (socket.connected) {
+            joinRoom();
+        } else {
+            socket.once('connect', joinRoom);
+        }
 
         // Listen for new reactions (real-time) - ALL users see these
-        socket.on('reaction:added', (data) => {
+        const handleReactionAdded = (data) => {
             if (data?.reaction && data?.liveId === liveId) {
                 const reactionType = data.reaction.reactionType;
                 if (reactionType && ['like', 'love', 'haha', 'wow', 'sad', 'angry'].includes(reactionType)) {
@@ -383,22 +387,12 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
                     });
                 }
             }
-        });
+        };
 
-        // Handle connection errors
-        socket.on('connect_error', (error) => {
-            console.error('Reactions WebSocket connection error:', error);
-        });
-
-        socket.on('disconnect', (reason) => {
-            console.warn('Reactions WebSocket disconnected:', reason);
-        });
+        socket.on('reaction:added', handleReactionAdded);
 
         return () => {
-            socket.disconnect();
-            if (socketRef.current === socket) {
-                socketRef.current = null;
-            }
+            socket.off('reaction:added', handleReactionAdded);
         };
     }, [liveId, user, handleReactionClick]);
 

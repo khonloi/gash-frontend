@@ -39,6 +39,8 @@ const ProductListItem = ({
           <img
             src={image || "/placeholder-image.png"}
             alt={typeof title === "string" ? title : "Product"}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-contain rounded-lg"
             onError={(e) => {
               e.target.src = "/placeholder-image.png";
@@ -100,4 +102,4 @@ const ProductListItem = ({
   );
 };
 
-export default ProductListItem;
+export default React.memo(ProductListItem);

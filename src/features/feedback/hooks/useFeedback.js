@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { useToast } from "../../../hooks/useToast";
 import Api from "../../../common/SummaryAPI";
+import { formatDate } from "../../../utils/formatters";
 
 export const useFeedback = () => {
   const { user, isAuthLoading } = useContext(AuthContext);
@@ -298,13 +299,6 @@ export const useFeedback = () => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const formatDate = (date) =>
-    new Date(date).toLocaleDateString("en-GB", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
 
   const displayItems = showEligibleOnly ? filteredEligibleItems : filteredFeedbacks;
   const totalPages = Math.ceil(displayItems.length / itemsPerPage);

@@ -3,23 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import ProductCard, { ProductCardSkeleton } from "../features/products/components/ProductCard";
 import Button from "../components/ui/Button";
-import {
-  API_RETRY_COUNT,
-  API_RETRY_DELAY,
-} from "../constants/constants";
-
-// API functions
-const fetchWithRetry = async (apiCall, retries = API_RETRY_COUNT, delay = API_RETRY_DELAY) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await apiCall();
-      return response.data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-    }
-  }
-};
+import { fetchWithRetry } from "../utils/fetchWithRetry";
 
 const Search = () => {
   const { state, search } = useLocation();
