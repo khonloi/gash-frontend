@@ -100,10 +100,7 @@ export const useCheckout = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No authentication token found');
-
-      const response = await Api.newCart.getByAccount(user._id, token);
+      const response = await Api.newCart.getByAccount(user._id);
       setCartItems(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       let errorMessage = 'Failed to load cart items';
@@ -126,13 +123,10 @@ export const useCheckout = () => {
   const fetchUserSettings = useCallback(async () => {
     if (!user?._id) return;
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
       const profileResponse = await Api.accounts.getProfile(user._id);
       setRequireAuthForCheckout(profileResponse.data.requireAuthForCheckout || false);
 
-      const passkeysResponse = await Api.passkeys.getUserPasskeys(token);
+      const passkeysResponse = await Api.passkeys.getUserPasskeys();
       setPasskeys(passkeysResponse.data.passkeys || []);
     } catch (err) {
       console.error('Fetch user settings error:', err);
@@ -178,8 +172,7 @@ export const useCheckout = () => {
 
   const handleApplyVoucher = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!user || !token) {
+      if (!user) {
         showToast('Please login to apply voucher.', 'error');
         return;
       }
@@ -189,7 +182,7 @@ export const useCheckout = () => {
         totalPrice: totalPrice
       };
 
-      const applyResponse = await Api.voucher.applyVoucher(applyData, token);
+      const applyResponse = await Api.voucher.applyVoucher(applyData);
 
       if (applyResponse.data && applyResponse.data.success) {
         const { data } = applyResponse.data;
@@ -368,9 +361,6 @@ export const useCheckout = () => {
     const trimmedPhone = formData.phone.trim();
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No authentication token found');
-
       const orderData = {
         accountId: user._id,
         addressReceive: trimmedAddress,
@@ -386,7 +376,7 @@ export const useCheckout = () => {
         totalPrice: totalPrice,
       };
 
-      const checkoutRes = await Api.order.checkout(orderData, token);
+      const checkoutRes = await Api.order.checkout(orderData);
 
       if (paymentMethod === 'COD') {
         if (!isBuyNow && itemsToOrder.length > 0) {
@@ -399,7 +389,7 @@ export const useCheckout = () => {
               })
               .filter(Boolean);
             if (boughtCartIds.length > 0) {
-              await Api.cart.batchRemove(boughtCartIds, token);
+              await Api.cart.batchRemove(boughtCartIds);
             }
           } catch (e) {
             console.error('Clear cart error:', e);
@@ -433,8 +423,7 @@ export const useCheckout = () => {
 
         try {
           const paymentUrlRes = await Api.order.getPaymentUrl(
-            { orderId, bankCode: "", language: "vn" },
-            token
+            { orderId, bankCode: "", language: "vn" }
           );
 
           const paymentUrl = paymentUrlRes?.data?.paymentUrl;

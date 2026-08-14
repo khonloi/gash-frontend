@@ -40,9 +40,7 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
     const fetchReactions = useCallback(async () => {
         if (!liveId || !user) return;
         try {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            const response = await Api.livestream.getReactions(liveId, token);
+            const response = await Api.livestream.getReactions(liveId);
             if (response.data?.success) {
                 const reactionData = response.data.data?.reactions || {
                     like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0, total: 0
@@ -194,12 +192,8 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
 
         // Send to backend - will trigger WebSocket broadcast to all viewers
         try {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
             const response = await Api.livestream.addReaction(
-                { liveId, reactionType },
-                token
+                { liveId, reactionType }
             );
 
             if (response.data?.success) {

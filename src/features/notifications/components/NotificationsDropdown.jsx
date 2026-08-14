@@ -56,16 +56,11 @@ export default function NotificationsDropdown({ user }) {
         return cachedOrder;
       }
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        return cachedOrder || null;
-      }
-
       try {
         let orderIdToFetch = cachedOrder?._id;
 
         if (!orderIdToFetch) {
-          const response = await Api.order.getOrders(user._id, token);
+          const response = await Api.order.getOrders(user._id);
           const ordersList = response.data?.data || [];
           const matchedOrder = ordersList.find(
             (orderItem) =>
@@ -85,7 +80,7 @@ export default function NotificationsDropdown({ user }) {
           return cachedOrder || null;
         }
 
-        const detailedResponse = await Api.order.getOrder(orderIdToFetch, token);
+        const detailedResponse = await Api.order.getOrder(orderIdToFetch);
         const detailedOrder = detailedResponse.data?.data;
         if (detailedOrder) {
           mergeOrderIntoCache(normalizedSuffix, detailedOrder);
@@ -184,13 +179,11 @@ export default function NotificationsDropdown({ user }) {
     };
 
     // Listen for badge updates to refresh notification list
-    const handleBadgeUpdate = (data) => {
-
+    const handleBadgeUpdate = () => {
       // Refresh notifications list when badge updates
       const fetchNotifications = async () => {
         try {
-          const token = localStorage.getItem("token");
-          const res = await Api.notifications.getUserNotifications(user._id, token);
+          const res = await Api.notifications.getUserNotifications(user._id);
           const notificationData = res.data || res;
           setNotifications(Array.isArray(notificationData) ? notificationData : []);
         } catch (err) {
@@ -202,7 +195,6 @@ export default function NotificationsDropdown({ user }) {
 
     // Listen for deleted notifications to remove them immediately
     const handleNotificationDeleted = (data) => {
-
       const { notificationId, userId } = data;
 
       if (!notificationId) {
@@ -221,22 +213,15 @@ export default function NotificationsDropdown({ user }) {
           const nId = n._id?.toString() || n._id;
           const deletedId = notificationId?.toString() || notificationId;
           const shouldKeep = nId !== deletedId;
-          if (!shouldKeep) {
-
-          }
           return shouldKeep;
         });
 
-        if (filtered.length !== prev.length) {
-
-        } else {
-          console.warn(`⚠️ Notification with ID ${notificationId} not found in current list, refreshing...`);
+        if (filtered.length === prev.length) {
           // Fallback: refresh the list if notification not found (might be a race condition)
           setTimeout(() => {
             const fetchNotifications = async () => {
               try {
-                const token = localStorage.getItem("token");
-                const res = await Api.notifications.getUserNotifications(user._id, token);
+                const res = await Api.notifications.getUserNotifications(user._id);
                 const notificationData = res.data || res;
                 setNotifications(Array.isArray(notificationData) ? notificationData : []);
               } catch (err) {
@@ -282,12 +267,10 @@ export default function NotificationsDropdown({ user }) {
     // If already connected, emit userConnected immediately
     if (socket.connected) {
       socket.emit("userConnected", user._id);
-
     }
 
     // Re-join rooms on reconnect
     const handleReconnect = () => {
-
       socket.emit("userConnected", user._id);
     };
     socket.on("reconnect", handleReconnect);
@@ -310,8 +293,7 @@ export default function NotificationsDropdown({ user }) {
     const fetchNotifications = async () => {
       if (!user?._id) return;
       try {
-        const token = localStorage.getItem("token");
-        const res = await Api.notifications.getUserNotifications(user._id, token);
+        const res = await Api.notifications.getUserNotifications(user._id);
         const data = res.data || res;
         setNotifications(Array.isArray(data) ? data : []);
       } catch (err) {
@@ -324,16 +306,13 @@ export default function NotificationsDropdown({ user }) {
     return () => clearInterval(interval);
   }, [user]);
 
-
-
   // 🔢 Số lượng chưa đọc
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   // Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      await Api.notifications.markAsRead(id, token);
+      await Api.notifications.markAsRead(id);
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
@@ -345,8 +324,7 @@ export default function NotificationsDropdown({ user }) {
   // Xóa 1 thông báo (cho user)
   const deleteNotification = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      await Api.notifications.deleteUserNotification(user._id, id, token);
+      await Api.notifications.deleteUserNotification(user._id, id);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
     } catch (err) {
       console.error("Lỗi khi xóa thông báo:", err);
@@ -356,8 +334,7 @@ export default function NotificationsDropdown({ user }) {
   // 🧹 Xóa toàn bộ thông báo
   const clearAll = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await Api.notifications.clearAll(user._id, token);
+      await Api.notifications.clearAll(user._id);
       setNotifications([]);
     } catch (err) {
       console.error("Lỗi khi clear all:", err);

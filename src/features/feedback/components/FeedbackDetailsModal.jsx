@@ -63,16 +63,11 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     }, 10000);
 
     try {
-      const token = localStorage.getItem("token");
-
       if (!orderId) {
         throw new Error("Order ID is missing");
       }
       if (!variantId) {
         throw new Error("Variant ID is missing");
-      }
-      if (!token) {
-        throw new Error("Authentication token is missing");
       }
       if (!rating) {
         throw new Error("Rating is required");
@@ -100,8 +95,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       await Api.feedback.addFeedback(
         orderId,
         actualVariantId,
-        feedbackData,
-        token
+        feedbackData
       );
 
       showToast("Feedback created successfully", "success");
@@ -138,16 +132,11 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     }, 10000);
 
     try {
-      const token = localStorage.getItem("token");
-
       if (!orderId) {
         throw new Error("Order ID is missing");
       }
       if (!variantId) {
         throw new Error("Variant ID is missing");
-      }
-      if (!token) {
-        throw new Error("Authentication token is missing");
       }
       if (!rating) {
         throw new Error("Rating is required");
@@ -175,8 +164,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
       await Api.feedback.editFeedback(
         orderId,
         actualVariantId,
-        feedbackData,
-        token
+        feedbackData
       );
 
       showToast("Feedback updated successfully", "success");
@@ -210,21 +198,16 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     setLoadingStates(prev => ({ ...prev, deleting: true }));
 
     try {
-      const token = localStorage.getItem("token");
-
       if (!orderId) {
         throw new Error("Order ID is missing");
       }
       if (!feedback.variantId) {
         throw new Error("Variant ID is missing");
       }
-      if (!token) {
-        throw new Error("Authentication token is missing");
-      }
 
       const actualVariantId = feedback.variantId.startsWith('item_') ? null : feedback.variantId;
 
-      await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
+      await Api.feedback.deleteFeedback(orderId, actualVariantId);
 
       showToast("Feedback deleted successfully", "success");
       onUpdate?.();
@@ -235,7 +218,7 @@ const FeedbackDetailsModal = ({ feedback, orderId, onClose, onUpdate }) => {
     } finally {
       setLoadingStates(prev => ({ ...prev, deleting: false }));
     }
-  }, [orderId, feedback.variantId, showToast, onUpdate, onClose]);
+  }, [orderId, feedback?.variantId, showToast, onUpdate, onClose]);
 
   const { feedback: feedbackData, productName, productImage, color, size, quantity, unitPrice, totalPrice, orderDate } = feedback || {};
 

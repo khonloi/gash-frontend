@@ -179,12 +179,8 @@ const LiveStreamDetail = () => {
                 // Leave livestream via API
                 if (hasJoinedRef.current && selectedStream?._id) {
                     try {
-                        const token = localStorage.getItem('token');
-                        if (token) {
-                            await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
-                            hasJoinedRef.current = false;
-
-                        }
+                        await Api.livestream.leave({ livestreamId: selectedStream._id });
+                        hasJoinedRef.current = false;
                     } catch (error) {
                         console.error('Error leaving livestream:', error);
                     }
@@ -362,7 +358,7 @@ const LiveStreamDetail = () => {
                     return;
                 }
 
-                const response = await Api.livestream.join({ livestreamId: id }, token);
+                const response = await Api.livestream.join({ livestreamId: id });
 
                 if (response.data?.success) {
                     const streamData = response.data.data;
@@ -429,14 +425,11 @@ const LiveStreamDetail = () => {
         try {
             // Leave via API
             if (hasJoinedRef.current && selectedStream?._id) {
-                const token = localStorage.getItem('token');
-                if (token) {
-                    try {
-                        await Api.livestream.leave({ livestreamId: selectedStream._id }, token);
-                        hasJoinedRef.current = false;
-                    } catch (apiError) {
-                        console.error('Error calling leave API:', apiError);
-                    }
+                try {
+                    await Api.livestream.leave({ livestreamId: selectedStream._id });
+                    hasJoinedRef.current = false;
+                } catch (apiError) {
+                    console.error('Error calling leave API:', apiError);
                 }
             }
             await disconnectFromLiveKit();
@@ -470,11 +463,8 @@ const LiveStreamDetail = () => {
         return () => {
             // Leave livestream if still joined
             if (hasJoinedRef.current && selectedStream?._id) {
-                const token = localStorage.getItem('token');
-                if (token) {
-                    Api.livestream.leave({ livestreamId: selectedStream._id }, token).catch(console.error);
-                    hasJoinedRef.current = false;
-                }
+                Api.livestream.leave({ livestreamId: selectedStream._id }).catch(console.error);
+                hasJoinedRef.current = false;
             }
 
             if (room) {

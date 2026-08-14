@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import io from "socket.io-client";
 import { SOCKET_URL } from "../../../common/axiosClient";
+import Api from "../../../common/SummaryAPI";
 import { useToast } from "../../../hooks/useToast";
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -117,29 +118,23 @@ export const useUserChat = (userId) => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("image", file);
-
         try {
-            const res = await fetch(`${SOCKET_URL}/upload`, {
-                method: "POST",
-                body: formData,
-            });
-            const data = await res.json();
+            const res = await Api.upload.image(file);
+            const data = res.data;
 
-            if (data?.success && data.url) {
+            if (data?.success && (data.url || data.imageUrl)) {
                 socket.current.emit("send_message", {
                     conversationId: conversation.id,
                     senderId: userId,
                     type: "image",
-                    imageUrl: data.url,
+                    imageUrl: data.url || data.imageUrl,
                 });
             } else {
-                showToast("Upload thất bại!", "error");
+                showToast("Failed to upload image", "error");
             }
         } catch (err) {
             console.error("Upload error:", err);
-            showToast("Lỗi khi upload ảnh", "error");
+            showToast("Failed to upload image", "error");
         }
     }, [conversation, userId, showToast]);
 

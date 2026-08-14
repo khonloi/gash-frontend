@@ -30,8 +30,7 @@ export const useOrderDetails = (orderId) => {
     const fetchOrderDetails = useCallback(async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
-            const response = await Api.order.getOrder(orderId, token);
+            const response = await Api.order.getOrder(orderId);
             const orderData = response.data.data;
             setOrder(orderData);
         } catch (err) {
@@ -177,8 +176,7 @@ export const useOrderDetails = (orderId) => {
     // Cancel order
     const cancelOrder = async (reason) => {
         try {
-            const token = localStorage.getItem("token");
-            await Api.order.cancel(orderId, reason, token);
+            await Api.order.cancel(orderId, reason);
             showToast("Order cancelled successfully", "success");
             await fetchOrderDetails();
             return { success: true };
@@ -204,13 +202,10 @@ export const useOrderDetails = (orderId) => {
         }, 10000);
 
         try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("Authentication token is missing");
-
             const actualVariantId = variantId.startsWith('item_') ? null : variantId;
 
             if (actionType === 'delete') {
-                await Api.feedback.deleteFeedback(orderId, actualVariantId, token);
+                await Api.feedback.deleteFeedback(orderId, actualVariantId);
                 showToast("Feedback deleted successfully", "success");
             } else {
                 const { rating, comment } = data;
@@ -223,10 +218,10 @@ export const useOrderDetails = (orderId) => {
                 };
 
                 if (actionType === 'add') {
-                    await Api.feedback.addFeedback(orderId, actualVariantId, feedbackData, token);
+                    await Api.feedback.addFeedback(orderId, actualVariantId, feedbackData);
                     showToast("Feedback created successfully", "success");
                 } else {
-                    await Api.feedback.editFeedback(orderId, actualVariantId, feedbackData, token);
+                    await Api.feedback.editFeedback(orderId, actualVariantId, feedbackData);
                     showToast("Feedback updated successfully", "success");
                 }
             }

@@ -3,11 +3,11 @@ import axiosClient from "./axiosClient";
 const Api = {
   // ==== Utils ====
   utils: {
-    fetchWithRetry: async (url, options = {}, retries = 3, delay = 1000) => {
+    fetchWithRetry: async (apiCall, retries = 3, delay = 1000) => {
       for (let i = 0; i < retries; i++) {
         try {
-          const response = await axiosClient(url, options);
-          return response.data;
+          const response = typeof apiCall === "function" ? await apiCall() : await axiosClient(apiCall);
+          return response?.data || response;
         } catch (error) {
           if (i === retries - 1) throw error;
           await new Promise((resolve) =>
@@ -53,43 +53,21 @@ const Api = {
 
   // ==== Cart ====
   cart: {
-    fetch: (userId, token) =>
-      axiosClient.get(`/carts/account/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    addItem: (cartItem, token) =>
-      axiosClient.post("/carts", cartItem, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    updateItem: (itemId, data, token) =>
-      axiosClient.put(`/carts/${itemId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    removeItem: (itemId, token) =>
-      axiosClient.delete(`/carts/${itemId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    batchRemove: async (ids, token) => {
-      await Promise.all(
-        ids.map((id) =>
-          axiosClient.delete(`/carts/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ),
-      );
+    fetch: (userId) => axiosClient.get(`/carts/account/${userId}`),
+    addItem: (cartItem) => axiosClient.post("/carts", cartItem),
+    updateItem: (itemId, data) => axiosClient.put(`/carts/${itemId}`, data),
+    removeItem: (itemId) => axiosClient.delete(`/carts/${itemId}`),
+    batchRemove: async (ids) => {
+      await Promise.all(ids.map((id) => axiosClient.delete(`/carts/${id}`)));
       return { success: true };
     },
-    clearCart: async (userId, token) => {
-      const res = await axiosClient.get(`/carts/account/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    clearCart: async (userId) => {
+      const res = await axiosClient.get(`/carts/account/${userId}`);
       const data = res.data?.data || res.data;
       const items = Array.isArray(data) ? data : [];
       await Promise.all(
         items.map((item) =>
-          axiosClient.delete(`/carts/${item._id || item.cartId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          axiosClient.delete(`/carts/${item._id || item.cartId}`),
         ),
       );
       return true;
@@ -98,139 +76,73 @@ const Api = {
 
   // ==== Favorites ====
   favorites: {
-    fetch: (token) =>
-      axiosClient.get("/favorites", {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    add: (favoriteItem, token) =>
-      axiosClient.post("/favorites", favoriteItem, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    remove: (favoriteId, token) =>
-      axiosClient.delete(`/favorites/${favoriteId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    fetch: () => axiosClient.get("/favorites"),
+    add: (favoriteItem) => axiosClient.post("/favorites", favoriteItem),
+    remove: (favoriteId) => axiosClient.delete(`/favorites/${favoriteId}`),
   },
 
   // ==== Order/Checkout ====
   order: {
     // Get all orders for a user
-    getOrders: (userId, token) =>
-      axiosClient.get(`/orders/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getOrders: (userId) => axiosClient.get(`/orders/user/${userId}`),
 
     // Get single order by ID for user and admin
-    getOrder: (orderId, token) =>
-      axiosClient.get(`/orders/get-order-by-id/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getOrder: (orderId) => axiosClient.get(`/orders/get-order-by-id/${orderId}`),
 
     // Get all orders for admin
-    getAllOrdersForAdmin: (token) =>
-      axiosClient.get(`/orders/admin/get-all-order`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getAllOrdersForAdmin: () => axiosClient.get(`/orders/admin/get-all-order`),
 
     // Search orders
-    searchOrders: (queryParams, token) =>
-      axiosClient.get(`/orders/search`, {
-        params: queryParams,
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    searchOrders: (queryParams) =>
+      axiosClient.get(`/orders/search`, { params: queryParams }),
 
     // Update order by admin
-    updateOrderByAdmin: (orderId, data, token) =>
-      axiosClient.put(`/orders/admin/update/${orderId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    updateOrderByAdmin: (orderId, data) =>
+      axiosClient.put(`/orders/admin/update/${orderId}`, data),
 
     // Delete order
-    deleteOrder: (orderId, token) =>
-      axiosClient.delete(`/orders/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    deleteOrder: (orderId) => axiosClient.delete(`/orders/${orderId}`),
 
     // Create VNPay payment URL
-    getPaymentUrl: (data, token) =>
-      axiosClient.post("/orders/payment-url", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getPaymentUrl: (data) => axiosClient.post("/orders/payment-url", data),
 
     // VNPay return handler
     vnpayReturn: (params) => axiosClient.get(`/orders/vnpay-return${params}`),
 
     // Cancel order
-    cancel: (orderId, cancelReason, token) =>
-      axiosClient.patch(
-        `/orders/${orderId}/cancel`,
-        { cancelReason },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      ),
+    cancel: (orderId, cancelReason) =>
+      axiosClient.patch(`/orders/${orderId}/cancel`, { cancelReason }),
 
     // Checkout
-    checkout: (data, token) =>
-      axiosClient.post("/orders/checkout", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    checkout: (data) => axiosClient.post("/orders/checkout", data),
 
     // Create order detail
-    createOrderDetail: (data, token) =>
-      axiosClient.post("/order-details/create-order-detail", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    createOrderDetail: (data) =>
+      axiosClient.post("/order-details/create-order-detail", data),
 
     // Get all order details for an order
-    getAllOrderDetails: (orderId, token) =>
-      axiosClient.get(`/order-details/get-all-order-details/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getAllOrderDetails: (orderId) =>
+      axiosClient.get(`/order-details/get-all-order-details/${orderId}`),
 
     // Get single order detail by ID
-    getOrderDetailById: (orderDetailId, token) =>
-      axiosClient.get(
-        `/order-details/get-order-detail-by-id/${orderDetailId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
+    getOrderDetailById: (orderDetailId) =>
+      axiosClient.get(`/order-details/get-order-detail-by-id/${orderDetailId}`),
 
     // Update order detail
-    updateOrderDetail: (orderDetailId, data, token) =>
-      axiosClient.put(
-        `/order-details/update-order-detail/${orderDetailId}`,
-        data,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
+    updateOrderDetail: (orderDetailId, data) =>
+      axiosClient.put(`/order-details/update-order-detail/${orderDetailId}`, data),
 
     // Delete order detail
-    deleteOrderDetail: (orderDetailId, token) =>
-      axiosClient.delete(
-        `/order-details/delete-order-detail/${orderDetailId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
+    deleteOrderDetail: (orderDetailId) =>
+      axiosClient.delete(`/order-details/delete-order-detail/${orderDetailId}`),
 
     // Search order details
-    searchOrderDetails: (queryParams, token) =>
-      axiosClient.get("/order-details/search", {
-        params: queryParams,
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    searchOrderDetails: (queryParams) =>
+      axiosClient.get("/order-details/search", { params: queryParams }),
 
     // Get order details by product
     getOrderDetailsByProduct: (productId) =>
-      axiosClient.get(
-        `/order-details/get-order-details-by-product/${productId}`,
-      ),
+      axiosClient.get(`/order-details/get-order-details-by-product/${productId}`),
   },
 
   // ==== Categories ====
@@ -244,22 +156,12 @@ const Api = {
       axiosClient.get(`/feedback/get-all-feedback/${variantId}`, {
         params: { page, limit },
       }),
-    addFeedback: (orderId, variantId, data, token) =>
-      axiosClient.patch(
-        `/feedback/${orderId}/add-feedback/${variantId}`,
-        data,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
-    editFeedback: (orderId, variantId, data, token) =>
-      axiosClient.put(`/feedback/${orderId}/edit-feedback/${variantId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    deleteFeedback: (orderId, variantId, token) =>
-      axiosClient.delete(`/feedback/${orderId}/delete-feedback/${variantId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    addFeedback: (orderId, variantId, data) =>
+      axiosClient.patch(`/feedback/${orderId}/add-feedback/${variantId}`, data),
+    editFeedback: (orderId, variantId, data) =>
+      axiosClient.put(`/feedback/${orderId}/edit-feedback/${variantId}`, data),
+    deleteFeedback: (orderId, variantId) =>
+      axiosClient.delete(`/feedback/${orderId}/delete-feedback/${variantId}`),
   },
 
   // ==== Products ====
@@ -267,12 +169,11 @@ const Api = {
     getProduct: (productId) => axiosClient.get(`/products/${productId}`),
     getVariants: (productId) =>
       axiosClient.get(`/variants/get-all-variants?productId=${productId}`),
-    getImages: (productId) =>
-      axiosClient.get(`/products/${productId}`),
+    getImages: (productId) => axiosClient.get(`/products/${productId}`),
     getFeedbacks: (productId) =>
       axiosClient.get(`/order-details/product/${productId}`),
     search: (query) => {
-      const sanitizedQuery = query.trim().replace(/[<>]/g, "");
+      const sanitizedQuery = (query || "").trim().replace(/[<>]/g, "");
       return axiosClient.get("/products/search", {
         params: { q: sanitizedQuery },
       });
@@ -283,26 +184,13 @@ const Api = {
   newProducts: {
     getAll: (filters = {}) => axiosClient.get("/products", { params: filters }),
     getById: (productId) => axiosClient.get(`/products/${productId}`),
-    create: (data, token) =>
-      axiosClient.post("/products", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    update: (productId, data, token) =>
-      axiosClient.put(`/products/${productId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    delete: (productId, token) =>
-      axiosClient.delete(`/products/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    addImage: (productId, data, token) =>
-      axiosClient.post(`/products/${productId}/images`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    deleteImage: (productId, imageId, token) =>
-      axiosClient.delete(`/products/${productId}/images/${imageId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    create: (data) => axiosClient.post("/products", data),
+    update: (productId, data) => axiosClient.put(`/products/${productId}`, data),
+    delete: (productId) => axiosClient.delete(`/products/${productId}`),
+    addImage: (productId, data) =>
+      axiosClient.post(`/products/${productId}/images`, data),
+    deleteImage: (productId, imageId) =>
+      axiosClient.delete(`/products/${productId}/images/${imageId}`),
     search: (params) => axiosClient.get("/products/search", { params }),
   },
 
@@ -312,192 +200,93 @@ const Api = {
       axiosClient.get("/variants/get-all-variants", { params: filters }),
     getById: (variantId) =>
       axiosClient.get(`/variants/get-variant-detail/${variantId}`),
-    create: (data, token) =>
-      axiosClient.post("/variants/create-variant", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    update: (variantId, data, token) =>
-      axiosClient.put(`/variants/update-variant/${variantId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    delete: (variantId, token) =>
-      axiosClient.delete(`/variants/delete-variant/${variantId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    create: (data) => axiosClient.post("/variants/create-variant", data),
+    update: (variantId, data) =>
+      axiosClient.put(`/variants/update-variant/${variantId}`, data),
+    delete: (variantId) =>
+      axiosClient.delete(`/variants/delete-variant/${variantId}`),
   },
 
   // ==== New Cart ====
   newCart: {
-    create: (data, token) =>
-      axiosClient.post("/carts", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    getByAccount: (accountId, token) =>
-      axiosClient.get(`/carts/account/${accountId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    getById: (cartId, token) =>
-      axiosClient.get(`/carts/${cartId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    update: (cartId, data, token) =>
-      axiosClient.put(`/carts/${cartId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    delete: (cartId, token) =>
-      axiosClient.delete(`/carts/${cartId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    create: (data) => axiosClient.post("/carts", data),
+    getByAccount: (accountId) => axiosClient.get(`/carts/account/${accountId}`),
+    getById: (cartId) => axiosClient.get(`/carts/${cartId}`),
+    update: (cartId, data) => axiosClient.put(`/carts/${cartId}`, data),
+    delete: (cartId) => axiosClient.delete(`/carts/${cartId}`),
   },
 
   // ==== Voucher ====
   voucher: {
-    applyVoucher: (data, token) =>
-      axiosClient.post("/vouchers/apply-voucher", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    applyVoucher: (data) => axiosClient.post("/vouchers/apply-voucher", data),
     getAll: () => axiosClient.get("/vouchers/get-all"),
   },
 
   // ==== Bills ====
   bills: {
-    export: (orderId, token) =>
-      axiosClient.get(`/bills/export-bill/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    export: (orderId) => axiosClient.get(`/bills/export-bill/${orderId}`),
   },
 
   // ==== Passkeys ====
   passkeys: {
-    // Generate registration options
-    generateRegistrationOptions: (token) =>
-      axiosClient.post(
-        "/passkeys/register/generate",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
-    // Verify registration
-    verifyRegistration: (data, token) =>
-      axiosClient.post("/passkeys/register/verify", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Generate authentication options
+    generateRegistrationOptions: () =>
+      axiosClient.post("/passkeys/register/generate", {}),
+    verifyRegistration: (data) =>
+      axiosClient.post("/passkeys/register/verify", data),
     generateAuthenticationOptions: (username) =>
       axiosClient.post("/passkeys/auth/generate", { username }),
-    // Verify authentication
     verifyAuthentication: (data) =>
       axiosClient.post("/passkeys/auth/verify", data),
-    // Get user's passkeys
-    getUserPasskeys: (token) =>
-      axiosClient.get("/passkeys/list", {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Delete a passkey
-    deletePasskey: (passkeyId, token) =>
-      axiosClient.delete(`/passkeys/${passkeyId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getUserPasskeys: () => axiosClient.get("/passkeys/list"),
+    deletePasskey: (passkeyId) => axiosClient.delete(`/passkeys/${passkeyId}`),
   },
 
   // ==== Auth ====
   auth: {
-    // Verify password for checkout
-    verifyPassword: (password, token) =>
-      axiosClient.post(
-        "/auth/verify-password",
-        { password },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
-    // Update checkout authentication setting
-    updateCheckoutAuthSetting: (requireAuth, token) =>
-      axiosClient.put(
-        "/auth/checkout-auth-setting",
-        { requireAuth },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      ),
+    verifyPassword: (password) =>
+      axiosClient.post("/auth/verify-password", { password }),
+    updateCheckoutAuthSetting: (requireAuth) =>
+      axiosClient.put("/auth/checkout-auth-setting", { requireAuth }),
   },
 
   // ==== Livestream ====
   livestream: {
-    // Get currently live streams (User can only see live streams)
-    getLiveNow: (token) =>
-      axiosClient.get("/livestream/live-now", {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Join livestream
-    join: (data, token) =>
-      axiosClient.post("/livestream/join", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Leave livestream
-    leave: (data, token) =>
-      axiosClient.post("/livestream/leave", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Add reaction to livestream
-    addReaction: (data, token) =>
-      axiosClient.post("/livestream-reactions/add-reaction", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Get reaction counts for a livestream (User và Admin dùng chung - reaction ko có xóa)
-    getReactions: (liveId, token) =>
-      axiosClient.get(`/livestream-reactions/reactions/${liveId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Get all active products in a livestream (User và Admin dùng chung - chỉ active products)
-    getLiveProducts: (liveId, token) =>
-      axiosClient.get(`/livestream-products/${liveId}/live-products`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Add comment to livestream
-    addComment: (data, token) =>
-      axiosClient.post("/livestream-comments/add-comment", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Get comments for a livestream (User - only non-deleted comments)
-    getComments: (liveId, token) =>
-      axiosClient.get(`/livestream-comments/comments/${liveId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    // Hide comment
-    hideComment: (commentId, token) =>
-      axiosClient.delete(`/livestream-comments/${commentId}/hide-comment`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getLiveNow: () => axiosClient.get("/livestream/live-now"),
+    getLive: () => axiosClient.get("/livestream/live-now"), // Alias
+    join: (data) => axiosClient.post("/livestream/join", data),
+    leave: (data) => axiosClient.post("/livestream/leave", data),
+    addReaction: (data) =>
+      axiosClient.post("/livestream-reactions/add-reaction", data),
+    getReactions: (liveId) =>
+      axiosClient.get(`/livestream-reactions/reactions/${liveId}`),
+    getLiveProducts: (liveId) =>
+      axiosClient.get(`/livestream-products/${liveId}/live-products`),
+    addComment: (data) =>
+      axiosClient.post("/livestream-comments/add-comment", data),
+    getComments: (liveId) =>
+      axiosClient.get(`/livestream-comments/comments/${liveId}`),
+    hideComment: (commentId) =>
+      axiosClient.delete(`/livestream-comments/${commentId}/hide-comment`),
   },
 
   // ==== Notifications ====
   notifications: {
-    getUserNotifications: (userId, token) =>
-      axiosClient.get(`/notifications/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    markAsRead: (id, token) =>
-      axiosClient.put(`/notifications/mark-read/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    clearAll: (userId, token) =>
-      axiosClient.delete(`/notifications/clear/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    deleteUserNotification: (userId, id, token) =>
-      axiosClient.delete(`/notifications/user/${userId}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    getPreferences: (userId, token) =>
-      axiosClient.get(`/notifications/preferences/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    updatePreferences: (userId, data, token) =>
-      axiosClient.put(`/notifications/preferences/${userId}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    getUserNotifications: (userId) =>
+      axiosClient.get(`/notifications/user/${userId}`),
+    getByAccount: (userId) => axiosClient.get(`/notifications/user/${userId}`), // Alias
+    markAsRead: (id) => axiosClient.put(`/notifications/mark-read/${id}`, {}),
+    clearAll: (userId) => axiosClient.delete(`/notifications/clear/${userId}`),
+    deleteUserNotification: (userId, id) =>
+      axiosClient.delete(`/notifications/user/${userId}/${id}`),
+    getPreferences: (userId) =>
+      axiosClient.get(`/notifications/preferences/${userId}`),
+    updatePreferences: (userId, data) =>
+      axiosClient.put(`/notifications/preferences/${userId}`, data),
+  },
+
+  // Alias for backward compatibility
+  newNotifications: {
+    getByAccount: (userId) => axiosClient.get(`/notifications/user/${userId}`),
   },
 };
 

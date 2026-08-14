@@ -222,10 +222,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
 
         try {
             setError(null);
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
-            const response = await Api.livestream.getComments(liveId, token);
+            const response = await Api.livestream.getComments(liveId);
 
             if (response.data?.success) {
                 // Backend returns: { success: true, data: comments, count, totalCount, ... }
@@ -267,14 +264,12 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
 
         try {
             setIsSending(true);
-            const token = localStorage.getItem('token');
-            if (!token) return;
 
             // Backend expects: { liveId, commentText }
             const response = await Api.livestream.addComment({
                 liveId,
                 commentText: content
-            }, token);
+            });
 
             if (response.data?.success) {
                 // Comment will be added automatically via WebSocket in real-time
@@ -320,10 +315,7 @@ const LiveStreamComments = ({ liveId, hostId, isVisible }) => {
 
         try {
             setIsSending(true);
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
-            const response = await Api.livestream.hideComment(commentId, token);
+            const response = await Api.livestream.hideComment(commentId);
 
             if (response.data?.success) {
                 // Comment will be deleted automatically via WebSocket in real-time

@@ -42,13 +42,7 @@ export const useFavorites = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Authentication token missing");
-        setFavorites([]);
-        return;
-      }
-      const response = await fetchWithRetry(() => Api.favorites.fetch(token));
+      const response = await fetchWithRetry(() => Api.favorites.fetch());
       const favoritesData = response?.favorites || response?.data || response || [];
 
       if (!Array.isArray(favoritesData)) {
@@ -92,14 +86,7 @@ export const useFavorites = () => {
     setShowDeleteConfirm(false);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        showToast("Authentication token missing", "error", 3000);
-        navigate("/login");
-        setFavoriteToDelete(null);
-        return;
-      }
-      await fetchWithRetry(() => Api.favorites.remove(favoriteId, token));
+      await fetchWithRetry(() => Api.favorites.remove(favoriteId));
       setFavorites((prev) => prev.filter((fav) => fav._id !== favoriteId));
       showToast("Product removed from favorites successfully", "success", 3000);
     } catch (err) {

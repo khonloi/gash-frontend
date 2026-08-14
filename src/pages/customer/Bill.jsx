@@ -23,8 +23,7 @@ const Bill = () => {
             setLoading(true);
             setError(null);
 
-            const token = localStorage.getItem('token');
-            const response = await Api.bills.export(orderId, token);
+            const response = await Api.bills.export(orderId);
             const orderData = response.data.data;
 
             // Check if order is paid before allowing bill access
@@ -45,8 +44,7 @@ const Bill = () => {
     }, [orderId, showToast]);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (orderId && token) {
+        if (orderId) {
             fetchBillData();
         }
     }, [orderId, fetchBillData]);

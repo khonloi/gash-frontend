@@ -30,8 +30,7 @@ export const useOrders = () => {
       }
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const response = await Api.order.getOrders(user._id, token);
+        const response = await Api.order.getOrders(user._id);
         const data = response.data.data || [];
 
         if (!Array.isArray(data)) {

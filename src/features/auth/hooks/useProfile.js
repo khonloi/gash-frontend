@@ -114,11 +114,8 @@ export const useProfile = () => {
     const fetchPasskeys = useCallback(async () => {
         if (!user || !user._id) return;
         try {
-            const token = localStorage.getItem('token');
-            if (token) {
-                const response = await Api.passkeys.getUserPasskeys(token);
-                setPasskeys(response.data.passkeys || []);
-            }
+            const response = await Api.passkeys.getUserPasskeys();
+            setPasskeys(response.data.passkeys || []);
         } catch (err) {
             console.error('Fetch passkeys error:', err);
         }
@@ -135,13 +132,7 @@ export const useProfile = () => {
     const handleSetupPasskey = useCallback(async () => {
         setIsSettingUpPasskey(true);
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                showToast('Please log in again', 'error', 3000);
-                return;
-            }
-
-            const regResponse = await Api.passkeys.generateRegistrationOptions(token);
+            const regResponse = await Api.passkeys.generateRegistrationOptions();
             const { options, challenge } = regResponse.data;
 
             const registrationResponse = await startRegistration(options);
@@ -158,7 +149,7 @@ export const useProfile = () => {
                 deviceType,
             };
 
-            await Api.passkeys.verifyRegistration(verifyData, token);
+            await Api.passkeys.verifyRegistration(verifyData);
 
             showToast('Passkey authentication set up successfully', 'success', 2000);
             fetchPasskeys();
@@ -179,14 +170,7 @@ export const useProfile = () => {
         if (!passkeyToDelete) return;
 
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                showToast('Please log in again', 'error', 3000);
-                setPasskeyToDelete(null);
-                return;
-            }
-
-            await Api.passkeys.deletePasskey(passkeyToDelete, token);
+            await Api.passkeys.deletePasskey(passkeyToDelete);
             showToast('Passkey authentication removed successfully', 'success', 2000);
             fetchPasskeys();
             setPasskeyToDelete(null);
@@ -200,13 +184,7 @@ export const useProfile = () => {
 
     const handleToggleCheckoutAuth = useCallback(async (checked) => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                showToast('Please log in again', 'error', 3000);
-                return;
-            }
-
-            await Api.auth.updateCheckoutAuthSetting(checked, token);
+            await Api.auth.updateCheckoutAuthSetting(checked);
             setRequireAuthForCheckout(checked);
             showToast(
                 checked

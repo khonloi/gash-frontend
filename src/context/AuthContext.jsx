@@ -1,54 +1,82 @@
-// Updated AuthContext.jsx (updated interceptor to handle 403 for inactive/suspended, added polling for status check every 1 minute, renamed handleSessionExpired to handleForcedLogout for generality)
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
 import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
-import { ToastContext } from './ToastContext'; // Import ToastContext
+import { ToastContext } from './ToastContext';
 
 export const AuthContext = createContext();
 
+const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const navigate = useNavigate();
-  const { showToast } = useContext(ToastContext); // Get showToast
+  const { showToast } = useContext(ToastContext);
+  const sessionTimerRef = useRef(null);
 
-  const handleForcedLogout = (message) => {
+  const clearSessionTimer = useCallback(() => {
+    if (sessionTimerRef.current) {
+      clearTimeout(sessionTimerRef.current);
+      sessionTimerRef.current = null;
+    }
+  }, []);
+
+  const handleForcedLogout = useCallback((message) => {
+    clearSessionTimer();
     showToast(message, 'error');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
     setUser(null);
     navigate('/login');
-  };
+  }, [clearSessionTimer, navigate, showToast]);
 
   const isDemoMode = import.meta.env.VITE_APP_USE_MOCK === 'true';
 
+  const startSessionTimer = useCallback((loginTimeMs) => {
+    clearSessionTimer();
+    if (isDemoMode) return;
+
+    const currentTime = Date.now();
+    const timeElapsed = currentTime - loginTimeMs;
+
+    if (timeElapsed >= SESSION_DURATION) {
+      handleForcedLogout('Your session has expired. You will be logged out.');
+    } else {
+      const remainingTime = SESSION_DURATION - timeElapsed;
+      sessionTimerRef.current = setTimeout(() => {
+        handleForcedLogout('Your session has expired. You will be logged out.');
+      }, remainingTime);
+    }
+  }, [clearSessionTimer, handleForcedLogout, isDemoMode]);
+
+  // Initial session hydration on mount
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     const loginTime = localStorage.getItem('loginTime');
 
-    if (token && storedUser && loginTime) {
-      if (isDemoMode) {
-        setUser(JSON.parse(storedUser));
-        return;
-      }
+    if (token && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
 
-      const currentTime = Date.now();
-      const sessionDuration = 24 * 60 * 60 * 1000; // 1 day
-      const timeElapsed = currentTime - parseInt(loginTime);
-
-      if (timeElapsed >= sessionDuration) {
-        handleForcedLogout('Your session has expired. You will be logged out.');
-      } else {
-        setUser(JSON.parse(storedUser));
-        const remainingTime = sessionDuration - timeElapsed;
-        setTimeout(() => {
-          handleForcedLogout('Your session has expired. You will be logged out.');
-        }, remainingTime);
+        if (loginTime) {
+          startSessionTimer(parseInt(loginTime, 10));
+        }
+      } catch (err) {
+        console.error('Failed to parse stored user:', err);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('loginTime');
       }
     }
-  }, [showToast, isDemoMode]);
+    setIsAuthLoading(false);
 
+    return () => clearSessionTimer();
+  }, [startSessionTimer, clearSessionTimer]);
+
+  // Axios response interceptor to handle session expiry or suspension
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
       (response) => response,
@@ -70,22 +98,33 @@ export const AuthProvider = ({ children }) => {
     );
 
     return () => axiosClient.interceptors.response.eject(interceptor);
-  }, [showToast]);
+  }, [handleForcedLogout]);
 
-  // Added: Polling to check account status every 1 minute for near-immediate logout if status changes
+  // Polling to check account status every 1 minute
   useEffect(() => {
     let interval;
-    if (user) {
+    if (user && !isDemoMode) {
       interval = setInterval(async () => {
         try {
           await axiosClient.get('/auth/check-status');
-        } catch (error) {
-          // Interceptor will handle logout if 403 due to inactive
+        } catch {
+          // Interceptor will handle logout if 401 / 403
         }
-      }, 60000); // Every 1 minute
+      }, 60000);
     }
-    return () => clearInterval(interval);
-  }, [user]);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [user, isDemoMode]);
+
+  const saveAuthSession = useCallback((token, account) => {
+    const loginTime = Date.now();
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(account));
+    localStorage.setItem('loginTime', loginTime.toString());
+    setUser(account);
+    startSessionTimer(loginTime);
+  }, [startSessionTimer]);
 
   const login = async (username, password) => {
     try {
@@ -95,24 +134,10 @@ export const AuthProvider = ({ children }) => {
       });
 
       const { token, account } = response.data;
-      const loginTime = Date.now().toString();
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(account));
-      localStorage.setItem('loginTime', loginTime);
-      setUser(account);
-
-
-
-      if (!isDemoMode) {
-        setTimeout(() => {
-          handleForcedLogout('Your session has expired. You will be logged out.');
-        }, 24 * 60 * 60 * 1000);
-      }
-
+      saveAuthSession(token, account);
       navigate('/');
     } catch (error) {
-      const msg = error.response?.data?.message || 'Login failed. Please try again.';
+      const msg = error.response?.data?.message || error.message || 'Login failed. Please try again.';
       showToast(msg, 'error');
       throw error;
     }
@@ -121,26 +146,12 @@ export const AuthProvider = ({ children }) => {
   const googleLogin = async (token) => {
     try {
       const response = await axiosClient.post('/auth/google-login', { token });
-
       const { token: jwtToken, account } = response.data;
-      const loginTime = Date.now().toString();
-
-      localStorage.setItem('token', jwtToken);
-      localStorage.setItem('user', JSON.stringify(account));
-      localStorage.setItem('loginTime', loginTime);
-      setUser(account);
-
+      saveAuthSession(jwtToken, account);
       showToast('Google logged in successfully', 'success');
-
-      if (!isDemoMode) {
-        setTimeout(() => {
-          handleForcedLogout('Your session has expired. You will be logged out.');
-        }, 24 * 60 * 60 * 1000);
-      }
-
       navigate('/');
     } catch (error) {
-      const msg = error.response?.data?.message || 'Google login failed.';
+      const msg = error.response?.data?.message || error.message || 'Google login failed.';
       showToast(msg, 'error');
       throw error;
     }
@@ -156,7 +167,7 @@ export const AuthProvider = ({ children }) => {
       showToast('OTP sent to your email.', 'info');
       return response;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Failed to send OTP.';
+      const msg = error.response?.data?.message || error.message || 'Failed to send OTP.';
       showToast(msg, 'error');
       throw error;
     }
@@ -184,7 +195,7 @@ export const AuthProvider = ({ children }) => {
       showToast('OTP verified successfully', 'success');
       return response;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Invalid or expired OTP.';
+      const msg = error.response?.data?.message || error.message || 'Invalid or expired OTP.';
       showToast(msg, 'error');
       throw error;
     }
@@ -192,29 +203,14 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (formData) => {
     try {
-
       const response = await axiosClient.post('/auth/register', { ...formData });
-
       const { token, account } = response.data;
-      const loginTime = Date.now().toString();
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(account));
-      localStorage.setItem('loginTime', loginTime);
-      setUser(account);
-
+      saveAuthSession(token, account);
       showToast('Account created successfully', 'success');
-
-      if (!isDemoMode) {
-        setTimeout(() => {
-          handleForcedLogout('Your session has expired. You will be logged out.');
-        }, 24 * 60 * 60 * 1000);
-      }
-
       navigate('/');
     } catch (error) {
       console.error('Signup error:', error.response?.data || error.message);
-      const msg = error.response?.data?.message || 'Signup failed. Please try again.';
+      const msg = error.response?.data?.message || error.message || 'Signup failed. Please try again.';
       showToast(msg, 'error');
       throw error;
     }
@@ -228,7 +224,7 @@ export const AuthProvider = ({ children }) => {
       });
       showToast('Password reset successfully', 'success');
     } catch (error) {
-      const msg = error.response?.data?.message || 'Failed to reset password.';
+      const msg = error.response?.data?.message || error.message || 'Failed to reset password.';
       showToast(msg, 'error');
       throw error;
     }
@@ -253,36 +249,23 @@ export const AuthProvider = ({ children }) => {
       });
 
       const { token, account } = verifyResponse.data;
-      const loginTime = Date.now().toString();
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(account));
-      localStorage.setItem('loginTime', loginTime);
-      setUser(account);
-
+      saveAuthSession(token, account);
       showToast('Passkey logged in successfully', 'success');
-
-      if (!isDemoMode) {
-        setTimeout(() => {
-          handleForcedLogout('Your session has expired. You will be logged out.');
-        }, 24 * 60 * 60 * 1000);
-      }
-
       navigate('/');
     } catch (error) {
-      const msg = error.response?.data?.message || 'Passkey login failed. Please try again.';
+      const msg = error.response?.data?.message || error.message || 'Passkey login failed. Please try again.';
       showToast(msg, 'error');
       throw error;
     }
   };
 
   const logout = () => {
-    // Demo Mode Restriction
-    if (import.meta.env.VITE_APP_USE_MOCK === 'true') {
+    if (isDemoMode) {
       showToast("This page is running in demo mode. To fully explore the project, please clone it and run it locally.", 'info');
       return;
     }
 
+    clearSessionTimer();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
@@ -294,6 +277,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        isAuthLoading,
         login,
         googleLogin,
         passkeyLogin,
@@ -307,4 +291,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+};

@@ -262,10 +262,7 @@ export const useProductDetail = () => {
       if (!user || !id) return;
 
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const response = await Api.favorites.fetch(token);
+        const response = await Api.favorites.fetch();
         const favorites = response.data?.favorites || response.data || [];
 
         const favoriteEntry = favorites.find(fav =>
@@ -484,15 +481,8 @@ export const useProductDetail = () => {
     setIsAddingToFavorites(true);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        showToast("Authentication token missing", "error", TOAST_TIMEOUT);
-        navigate("/login");
-        return;
-      }
-
       if (isFavorited && favoriteId) {
-        await Api.favorites.remove(favoriteId, token);
+        await Api.favorites.remove(favoriteId);
         setIsFavorited(false);
         setFavoriteId(null);
         showToast("Product removed from favorites successfully", "success", TOAST_TIMEOUT);
@@ -501,7 +491,7 @@ export const useProductDetail = () => {
           accountId: user._id,
           productId: id,
         };
-        const response = await Api.favorites.add(favoriteItem, token);
+        const response = await Api.favorites.add(favoriteItem);
         const newFavorite = response.data?.favorite || response.data;
         setIsFavorited(true);
         setFavoriteId(newFavorite._id);
@@ -546,8 +536,7 @@ export const useProductDetail = () => {
         productPrice: selectedVariant.variantPrice,
       };
 
-      const token = localStorage.getItem("token");
-      await Api.newCart.create(cartItem, token);
+      await Api.newCart.create(cartItem);
 
       showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully`, "success", TOAST_TIMEOUT);
     } catch (err) {

@@ -52,9 +52,9 @@ export const useHeader = () => {
         }
         try {
             const cartData = await fetchWithRetry(() =>
-                Api.newCart.getByAccount(user._id, user.token)
+                Api.newCart.getByAccount(user._id)
             );
-            const itemCount = Array.isArray(cartData.data)
+            const itemCount = Array.isArray(cartData?.data)
                 ? cartData.data.filter(item => (item.productQuantity ?? 0) > 0).length
                 : 0;
             setCartItemCount(itemCount);
@@ -71,11 +71,12 @@ export const useHeader = () => {
         }
         try {
             const notificationData = await fetchWithRetry(() =>
-                Api.newNotifications.getByAccount(user._id, user.token)
+                Api.notifications.getUserNotifications(user._id)
             );
-            const unreadCount = Array.isArray(notificationData.data)
-                ? notificationData.data.filter(item => !item.isRead).length
-                : 0;
+            const notificationList = Array.isArray(notificationData?.data) 
+                ? notificationData.data 
+                : (Array.isArray(notificationData) ? notificationData : []);
+            const unreadCount = notificationList.filter(item => !item.isRead).length;
             setNotificationCount(unreadCount);
         } catch {
             setNotificationCount(0);
@@ -90,9 +91,9 @@ export const useHeader = () => {
         }
         try {
             const livestreamData = await fetchWithRetry(() =>
-                Api.livestream.getLive(user.token)
+                Api.livestream.getLiveNow()
             );
-            const activeCount = livestreamData.data?.count || 0;
+            const activeCount = livestreamData?.data?.count || livestreamData?.data?.livestreams?.length || 0;
             setLivestreamCount(activeCount);
         } catch {
             setLivestreamCount(0);
@@ -131,9 +132,10 @@ export const useHeader = () => {
         }
         try {
             const favoritesData = await fetchWithRetry(() =>
-                Api.favorites.fetch(user.token)
+                Api.favorites.fetch()
             );
-            const itemCount = Array.isArray(favoritesData) ? favoritesData.length : 0;
+            const favList = favoritesData?.favorites || favoritesData?.data || favoritesData || [];
+            const itemCount = Array.isArray(favList) ? favList.length : 0;
             setFavoriteCount(itemCount);
         } catch {
             setFavoriteCount(0);
@@ -376,13 +378,12 @@ export const useHeader = () => {
 
     const handleLiveStreamClick = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
+            if (!user) {
                 navigate("/login");
                 return;
             }
 
-            const response = await Api.livestream.getLiveNow(token);
+            const response = await Api.livestream.getLiveNow();
 
             if (response.data?.success) {
                 let streams = [];

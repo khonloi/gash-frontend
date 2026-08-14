@@ -73,11 +73,8 @@ export const useCart = () => {
       setError(null);
 
       try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
-
         const response = await fetchWithRetry(() =>
-          Api.newCart.getByAccount(user._id, token)
+          Api.newCart.getByAccount(user._id)
         );
 
         const data = response?.data || response;
@@ -181,8 +178,7 @@ export const useCart = () => {
             try {
               const response = await Api.newCart.update(
                 cartId,
-                { productQuantity: newQuantity.toString() },
-                token
+                { productQuantity: newQuantity.toString() }
               );
               return { cartId, response, newQuantity, success: true };
             } catch (err) {
@@ -308,10 +304,7 @@ export const useCart = () => {
       });
 
       try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
-
-        await Api.newCart.delete(cartId, token);
+        await Api.newCart.delete(cartId);
 
         cartCache.current = {
           items: cartItems.filter((item) => item._id !== cartId),

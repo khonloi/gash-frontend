@@ -19,8 +19,7 @@ export default function Notifications() {
       try {
         if (!user?._id) return;
         setLoading(true);
-        const token = localStorage.getItem("token");
-        const res = await Api.notifications.getPreferences(user._id, token);
+        const res = await Api.notifications.getPreferences(user._id);
         const data = res.data?.preferences || res.preferences || { email: true, web: true };
         setPrefs(data);
       } catch (err) {
@@ -40,8 +39,7 @@ export default function Notifications() {
         return;
       }
       setLoading(true);
-      const token = localStorage.getItem("token");
-      await Api.notifications.updatePreferences(user._id, prefs, token);
+      await Api.notifications.updatePreferences(user._id, prefs);
       showToast("Your notification settings have been saved!", "success", 3000);
     } catch (err) {
       console.error("Error saving preferences:", err);

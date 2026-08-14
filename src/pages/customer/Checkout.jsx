@@ -342,13 +342,7 @@ const LocalCheckoutAuthModal = ({ open, onClose, onAuthenticated, user, passkeys
     setIsAuthenticating(true);
     setAuthMethod('password');
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        showToast('Please log in again', 'error', 3000);
-        return;
-      }
-
-      const response = await Api.auth.verifyPassword(password, token);
+      const response = await Api.auth.verifyPassword(password);
       if (response.data.verified) {
         showToast('Authentication successful', 'success', 2000);
         onAuthenticated();

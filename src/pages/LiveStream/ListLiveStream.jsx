@@ -49,7 +49,7 @@ const LiveStream = () => {
             ongoingCallsRef.current.getLiveNow = true;
 
             try {
-                const response = await Api.livestream.getLiveNow(token);
+                const response = await Api.livestream.getLiveNow();
 
                 if (response.data?.success) {
                     // Backend may return: { success: true, data: { livestream: {...} } } or { livestreams: [...] }
@@ -130,7 +130,7 @@ const LiveStream = () => {
             ongoingCallsRef.current.checkStatus = true;
 
             try {
-                const response = await Api.livestream.getLiveNow(token);
+                const response = await Api.livestream.getLiveNow();
 
                 if (response.data?.success) {
                     // Backend may return: { success: true, data: { livestream: {...} } } or { livestreams: [...] }

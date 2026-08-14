@@ -156,13 +156,11 @@ const LiveStreamProducts = ({ liveId }) => {
         return 0;
     }, []);
 
-    // Load live products
     const loadProducts = useCallback(async () => {
         if (!liveId) return;
         try {
             setIsLoading(true);
-            const token = localStorage.getItem('token');
-            const response = await Api.livestream.getLiveProducts(liveId, token);
+            const response = await Api.livestream.getLiveProducts(liveId);
 
             // Handle different response structures
             // API might return axios response (response.data) or direct data
