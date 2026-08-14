@@ -13,8 +13,10 @@ import Api from '../../common/SummaryAPI';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { GoogleLogin } from '@react-oauth/google';
 import ProductListItem from '../../components/ui/ProductListItem';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const Checkout = () => {
+  useDocumentTitle("Secure Checkout");
   const {
     successInfo,
     setSuccessInfo,

@@ -13,13 +13,13 @@ const PasswordInput = React.forwardRef(({ className = "", ...props }, ref) => {
     <button
       type="button"
       onClick={toggleVisibility}
-      className="p-1 hover:text-gray-600 transition-colors focus:outline-none"
+      className="p-1 text-gray-500 hover:text-gray-700 transition-colors focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none rounded-md"
       aria-label={showPassword ? "Hide password" : "Show password"}
     >
       {showPassword ? (
-        <EyeOff className="w-5 h-5" />
+        <EyeOff className="w-5 h-5" aria-hidden="true" />
       ) : (
-        <Eye className="w-5 h-5" />
+        <Eye className="w-5 h-5" aria-hidden="true" />
       )}
     </button>
   );

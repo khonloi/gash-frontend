@@ -5,8 +5,10 @@ import ConfirmationModal from "../../features/orders/components/ConfirmationModa
 import { useCart } from "../../features/cart/hooks/useCart";
 import ListLayout from "../../components/layout/ListLayout";
 import ProductListItem from "../../components/ui/ProductListItem";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 const Cart = () => {
+  useDocumentTitle("Shopping Cart");
   const navigate = useNavigate();
   const {
     user,

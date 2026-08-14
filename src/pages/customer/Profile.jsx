@@ -5,8 +5,10 @@ import { User, Tag, Mail, Phone, Users, Calendar, MapPin } from "lucide-react";
 import LocalChangePasswordModal from "../../features/auth/components/LocalChangePasswordModal";
 import LocalEditProfileModal from "../../features/auth/components/LocalEditProfileModal";
 import SecuritySection from "../../features/auth/components/SecuritySection";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 const Profile = () => {
+  useDocumentTitle("My Profile & Security");
   const {
     user,
     profile,

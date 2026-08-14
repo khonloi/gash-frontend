@@ -2,8 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Compass, Home, ArrowLeft } from "lucide-react";
 import Button from "../components/ui/Button";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 export default function NotFound() {
+  useDocumentTitle("Page Not Found");
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
       <div className="max-w-md w-full text-center space-y-6">

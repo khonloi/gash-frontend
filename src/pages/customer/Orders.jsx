@@ -6,8 +6,10 @@ import Button from "../../components/ui/Button";
 import { useOrders } from "../../features/orders/hooks/useOrders";
 import ListLayout from "../../components/layout/ListLayout";
 import ProductListItem from "../../components/ui/ProductListItem";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 const Orders = () => {
+  useDocumentTitle("My Orders");
   const navigate = useNavigate();
   const {
     user,

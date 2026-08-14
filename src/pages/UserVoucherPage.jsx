@@ -2,8 +2,10 @@ import React from "react";
 import Button from "../components/ui/Button";
 import { useVouchers } from "../features/vouchers/hooks/useVouchers";
 import ListLayout from "../components/layout/ListLayout";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const UserVoucherPage = () => {
+  useDocumentTitle("My Vouchers & Rewards");
   const {
     isAuthLoading,
     vouchers,

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../common/SummaryAPI";
 import { API_RETRY_COUNT, API_RETRY_DELAY } from "../constants/constants";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 import Button from "../components/ui/Button";
 import HeroCarousel from "../features/home/components/HeroCarousel";
 import CategorySlider from "../features/home/components/CategorySlider";
@@ -79,6 +80,7 @@ const carouselSlides = [
 ];
 
 const Home = () => {
+  useDocumentTitle("Home — Streetwear & Curated Apparel", "Discover premium streetwear and curated minimalist fashion at GASH.");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

@@ -2,8 +2,10 @@ import React from "react";
 import ConfirmationModal from "../../features/orders/components/ConfirmationModal";
 import { useFavorites } from "../../features/products/hooks/useFavorites";
 import ProductGridLayout from "../../components/layout/ProductGridLayout";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 const ProductFavorite = () => {
+  useDocumentTitle("My Wishlist & Favorites");
   const {
     favorites,
     loading,

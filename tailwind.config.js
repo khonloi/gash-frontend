@@ -3,6 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        custom: ["Font", "sans-serif"],
+      },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0", transform: "translateY(-5px)" },
@@ -11,9 +14,6 @@ export default {
         slideDown: {
           "0%": { opacity: "0", transform: "translateY(-10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        fontFamily: {
-          custom: ["Font", "sans-serif"],
         },
       },
       animation: {

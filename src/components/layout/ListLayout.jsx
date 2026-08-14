@@ -1,6 +1,7 @@
 import React from "react";
 import LoadingSpinner, { LoadingSkeleton } from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
+import EmptyState from "../ui/EmptyState";
 
 const ListLayout = ({
   title,
@@ -141,52 +142,28 @@ const ListLayout = ({
         ) : filteredItems?.length === 0 ? (
           totalItems === 0 && customEmptyState ? (
             customEmptyState
+          ) : totalItems === 0 ? (
+            <EmptyState
+              title={emptyStateTitle || "No items found"}
+              description={emptyStateMessage || "Explore our collection to add items."}
+              actionText="Explore Products"
+              actionLink="/products"
+            />
           ) : (
             <div className="text-center text-xs sm:text-sm text-gray-500 border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 mb-3 sm:mb-4 w-full min-h-[100px] flex flex-col items-center justify-center" role="status">
-              <div className="text-gray-400">
-                {emptyIcon || (
-                  <svg
-                    className="w-16 h-16 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-                    />
-                  </svg>
-                )}
-              </div>
-              {totalItems === 0 ? (
-                <>
-                  <p className="text-gray-500 italic text-base sm:text-lg">{emptyStateTitle}</p>
-                  <p className="text-gray-400 text-xs sm:text-sm mt-2">
-                    {emptyStateMessage}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-gray-500 italic text-base sm:text-lg">
-                    {noResultsTitle}
-                  </p>
-                  <p className="text-gray-400 text-xs sm:text-sm mt-2">
-                    {noResultsMessage}
-                  </p>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => {
-                      setSearchQuery("");
-                    }}
-                    className="text-blue-600"
-                  >
-                    Clear Search
-                  </Button>
-                </>
-              )}
+              <p className="text-gray-900 font-semibold text-base sm:text-lg">
+                {noResultsTitle || "No items match your search"}
+              </p>
+              <p className="text-gray-500 text-xs sm:text-sm mt-1 mb-4">
+                {noResultsMessage || "Try adjusting your search query."}
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setSearchQuery("")}
+              >
+                Clear Search
+              </Button>
             </div>
           )
         ) : (

@@ -7,6 +7,7 @@ import Button from "../components/ui/Button";
 import ProductCard, { ProductCardSkeleton } from "../features/products/components/ProductCard";
 import { useProductDetail } from "../features/products/hooks/useProductDetail";
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const THUMBNAILS_PER_PAGE = 4;
 
@@ -70,6 +71,11 @@ const ProductDetail = () => {
     isSizeInStock,
     isSizeInactiveOrDiscontinued,
   } = useProductDetail();
+
+  useDocumentTitle(
+    product?.productName || "Product Detail",
+    product?.productDescription ? product.productDescription.slice(0, 150) : undefined
+  );
 
   // Product Detail Skeleton Component
   const ProductDetailSkeleton = () => (

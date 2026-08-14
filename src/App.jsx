@@ -7,6 +7,7 @@ import Layout from "./pages/Layout";
 import ScrollToTop from "./pages/ScrollToTop";
 import LoadingFallback from "./components/common/LoadingFallback";
 import PrivateRoute from "./components/common/PrivateRoute";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 // ==== Lazy-loaded Pages (Route-level Code Splitting) ====
 const Home = lazy(() => import("./pages/Home"));
@@ -71,8 +72,9 @@ const App = () => {
           <AuthProvider>
             <ScrollToTop />
             <Layout>
-              <Suspense fallback={<LoadingFallback />}>
-                <Routes>
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingFallback />}>
+                  <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/products" element={<ProductList />} />
@@ -184,8 +186,9 @@ const App = () => {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
-              <ChatIfLoggedIn />
-            </Layout>
+            </ErrorBoundary>
+            <ChatIfLoggedIn />
+          </Layout>
           </AuthProvider>
         </ToastProvider>
       </Router>

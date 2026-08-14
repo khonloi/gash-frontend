@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import FocusTrap from "focus-trap-react";
@@ -25,6 +25,8 @@ const Modal = ({
   zIndex = "z-[110]",
   backdropClass = "bg-black/40 backdrop-blur-sm",
 }) => {
+  const titleId = useId();
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -45,7 +47,7 @@ const Modal = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <ModalContext.Provider value={{ onClose }}>
+        <ModalContext.Provider value={{ onClose, titleId }}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -57,6 +59,7 @@ const Modal = ({
             }}
             role="dialog"
             aria-modal="true"
+            aria-labelledby={titleId}
           >
             <FocusTrap focusTrapOptions={{ initialFocus: false, fallbackFocus: () => document.body }}>
               <motion.div
@@ -81,20 +84,20 @@ const Modal = ({
  * Modal.Header Component
  */
 const Header = ({ children, showClose = true, className = "" }) => {
-  const { onClose } = useModal();
+  const { onClose, titleId } = useModal();
 
   return (
     <div className={`flex items-center justify-between px-6 py-4 border-b-2 border-gray-300 bg-gray-50 ${className}`}>
       {typeof children === "string" ? (
-        <h2 className="text-xl font-semibold text-gray-900">{children}</h2>
+        <h2 id={titleId} className="text-xl font-semibold text-gray-900">{children}</h2>
       ) : (
-        children
+        <div id={titleId}>{children}</div>
       )}
       {showClose && (
         <button
           type="button"
           onClick={onClose}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-all border border-transparent hover:border-gray-200"
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-all border border-transparent hover:border-gray-200 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
