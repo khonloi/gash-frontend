@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Tag } from "lucide-react";
 
 export default function CategorySlider({
   categories = [],
@@ -35,19 +35,22 @@ export default function CategorySlider({
   };
 
   return (
-    <section className="w-full mt-6 bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-gray-200">
-      <h2 className="text-left mb-4 sm:mb-5 text-lg sm:text-xl font-semibold text-gray-900">
-        Browse by Category
-      </h2>
+    <section className="w-full mt-8 bg-white rounded-2xl p-5 sm:p-6 shadow-xs border border-gray-100">
+      <div className="flex items-center gap-2 mb-4 sm:mb-5">
+        <span className="w-2 h-5 bg-brand-primary-500 rounded-full inline-block" />
+        <h2 className="text-left text-lg sm:text-xl font-bold tracking-tight text-gray-900">
+          Browse by Category
+        </h2>
+      </div>
 
       {loading ? (
         <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {[...Array(7)].map((_, index) => (
             <div
               key={index}
-              className="w-36 flex-shrink-0 border border-gray-200 rounded-xl overflow-hidden p-3 bg-gray-50 flex items-center justify-center min-h-[3rem]"
+              className="w-36 sm:w-40 flex-shrink-0 rounded-2xl overflow-hidden p-3.5 bg-gray-50 flex items-center justify-center min-h-[3.25rem]"
             >
-              <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+              <div className="h-4 rounded-md animate-shimmer w-20" />
             </div>
           ))}
         </div>
@@ -62,7 +65,7 @@ export default function CategorySlider({
             {categories.map((category) => (
               <div
                 key={category}
-                className="w-36 sm:w-40 flex-shrink-0 border-2 border-gray-200 hover:border-amber-400 rounded-xl p-3 flex items-center justify-center text-center cursor-pointer hover:shadow-md transition-all duration-200 bg-white min-h-[3.25rem] focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="group w-36 sm:w-44 flex-shrink-0 border-2 border-gray-200 hover:border-brand-primary-500 rounded-2xl p-3.5 flex items-center justify-center gap-2 text-center cursor-pointer card-lift bg-white min-h-[3.5rem] focus:outline-none focus:ring-2 focus:ring-amber-500 select-none"
                 tabIndex={0}
                 role="button"
                 aria-label={`Browse ${category} category`}
@@ -74,7 +77,8 @@ export default function CategorySlider({
                   }
                 }}
               >
-                <span className="font-semibold text-xs sm:text-sm text-gray-900 line-clamp-2">
+                <Tag className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-600 transition-colors shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm text-gray-800 group-hover:text-amber-700 transition-colors line-clamp-1">
                   {category}
                 </span>
               </div>

@@ -41,7 +41,7 @@ export const useChangePassword = (onSuccess) => {
                 const hasUpperCase = /[A-Z]/.test(value);
                 const hasLowerCase = /[a-z]/.test(value);
                 const hasNumber = /\d/.test(value);
-                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
+                const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value);
                 const characterTypesMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(Boolean).length;
                 if (characterTypesMet < 3) {
                     return 'Passwords must be at least 8 characters and include three of four types: uppercase, lowercase, number, or special';

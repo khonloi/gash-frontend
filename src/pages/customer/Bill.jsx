@@ -4,8 +4,7 @@ import Api from '../../common/SummaryAPI';
 import LoadingSpinner, { LoadingButton } from '../../components/ui/LoadingSpinner';
 import { useToast } from '../../hooks/useToast';
 import gashLogo from '../../assets/image/gash-logo.svg';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+// PDF generation libraries will be dynamically imported when needed
 import { formatPrice, formatDate } from '../../utils/formatters';
 
 const Bill = () => {
@@ -58,6 +57,10 @@ const Bill = () => {
 
         setIsExporting(true);
         try {
+            // Dynamically import heavy libraries
+            const html2canvas = (await import('html2canvas')).default;
+            const { jsPDF } = await import('jspdf');
+
             // Create canvas from the existing UI ref
             const canvas = await html2canvas(billRef.current, {
                 scale: 2,

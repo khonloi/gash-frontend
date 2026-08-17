@@ -96,6 +96,7 @@ const BlogPost = () => {
                   src={post.image || "/placeholder.svg"}
                   alt={post.title}
                   loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     e.target.src = "/placeholder.svg";
                     e.target.alt = `Image not available for ${post.title}`;

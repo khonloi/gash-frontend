@@ -409,6 +409,8 @@ export const useProfile = () => {
         handleToggleCheckoutAuth,
         handleSubmit,
         handleCancel,
-        handleDeleteConfirm
+        handleDeleteConfirm,
+        fetchProfile,
+        logout
     };
 };

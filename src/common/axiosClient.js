@@ -50,18 +50,21 @@ axiosClient.interceptors.response.use(
     const status = error.response?.status;
     const serverMessage = error.response?.data?.message;
 
-    const fallbackMessage =
-      status === 401
-        ? "Unauthorized access - please log in"
-        : status === 403
-        ? "Forbidden - you do not have permission"
-        : status === 404
-        ? "Resource not found"
-        : status >= 500
-        ? "Server error - please try again later"
-        : !error.response
-        ? "Failed to connect to server. Please check your network connection."
-        : "An unexpected error occurred. Please try again.";
+    let fallbackMessage = "An unexpected error occurred. Please try again.";
+
+    if (error.code === 'ECONNABORTED') {
+      fallbackMessage = "Request timed out. Please try again.";
+    } else if (!error.response) {
+      fallbackMessage = "Failed to connect to server. Please check your network connection.";
+    } else if (status === 401) {
+      fallbackMessage = "Unauthorized access - please log in";
+    } else if (status === 403) {
+      fallbackMessage = "Forbidden - you do not have permission";
+    } else if (status === 404) {
+      fallbackMessage = "Resource not found";
+    } else if (status >= 500) {
+      fallbackMessage = "Server error - please try again later";
+    }
 
     const message = serverMessage || fallbackMessage;
     return Promise.reject({ ...error, message, status });

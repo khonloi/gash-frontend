@@ -1,50 +1,33 @@
 import React, { useState, useCallback, useRef } from "react";
 import { ToastContext } from "../../context/ToastContext";
 import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState({
+    id: null,
     message: "",
     type: "",
     visible: false,
-    isClosing: false,
-    isEntering: false,
   });
 
   const closeTimerRef = useRef(null);
 
-  const showToast = useCallback((message, type = "info", timeout = 3000) => {
+  const showToast = useCallback((message, type = "info", timeout = 3500) => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
 
+    const id = Date.now();
     setToast({
-      message: "",
-      type: "",
-      visible: false,
-      isClosing: false,
-      isEntering: false,
+      id,
+      message,
+      type,
+      visible: true,
     });
 
-    requestAnimationFrame(() => {
-      setToast({
-        message,
-        type,
-        visible: true,
-        isClosing: false,
-        isEntering: true,
-      });
-
-      setTimeout(() => {
-        setToast((prev) => ({ ...prev, isEntering: false }));
-      }, 300);
-
-      closeTimerRef.current = setTimeout(() => {
-        setToast((prev) => ({ ...prev, isClosing: true }));
-        setTimeout(() => {
-          setToast({ message: "", type: "", visible: false, isClosing: false, isEntering: false });
-          closeTimerRef.current = null;
-        }, 350);
-      }, timeout);
-    });
+    closeTimerRef.current = setTimeout(() => {
+      setToast((prev) => (prev.id === id ? { ...prev, visible: false } : prev));
+      closeTimerRef.current = null;
+    }, timeout);
   }, []);
 
   const closeToast = useCallback(() => {
@@ -52,72 +35,69 @@ export const ToastProvider = ({ children }) => {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
-    setToast((prev) => ({ ...prev, isClosing: true }));
-    setTimeout(() => {
-      setToast({ message: "", type: "", visible: false, isClosing: false, isEntering: false });
-    }, 350);
+    setToast((prev) => ({ ...prev, visible: false }));
   }, []);
 
-  const toastStyles = {
-    success: "border-green-500 bg-green-50 text-green-900",
-    error: "border-red-500 bg-red-50 text-red-900",
-    info: "border-blue-500 bg-blue-50 text-blue-900",
+  const toastVariants = {
+    success: {
+      card: "border-green-500/30 bg-white/95 text-gray-900 shadow-green-500/10",
+      accent: "bg-green-500",
+      icon: <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" aria-hidden="true" />,
+    },
+    error: {
+      card: "border-red-500/30 bg-white/95 text-gray-900 shadow-red-500/10",
+      accent: "bg-red-500",
+      icon: <AlertCircle className="w-5 h-5 text-red-600 shrink-0" aria-hidden="true" />,
+    },
+    info: {
+      card: "border-amber-500/30 bg-white/95 text-gray-900 shadow-amber-500/10",
+      accent: "bg-brand-primary-500",
+      icon: <Info className="w-5 h-5 text-amber-600 shrink-0" aria-hidden="true" />,
+    },
   };
 
-  const icons = {
-    success: <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" aria-hidden="true" />,
-    error: <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" aria-hidden="true" />,
-    info: <Info className="w-5 h-5 text-blue-600 flex-shrink-0" aria-hidden="true" />,
-  };
+  const currentVariant = toastVariants[toast.type] || toastVariants.info;
 
   return (
     <ToastContext.Provider value={{ showToast, closeToast }}>
       {children}
 
-      {toast.visible && (
-        <div
-          className={`
-            fixed bottom-6 left-1/2 z-[9999]
-            max-w-sm w-[calc(100%-3rem)]
-            rounded-xl p-4 border-l-4
-            shadow-xl bg-white
-            ${toastStyles[toast.type] || toastStyles.info}
-            ${toast.isClosing
-              ? "opacity-0 translate-y-4"
-              : toast.isEntering
-                ? "opacity-0 translate-y-4"
-                : "opacity-100 translate-y-0"}
-          `}
-          style={{
-            transform: toast.isClosing
-              ? "translateX(-50%) translateY(20px)"
-              : toast.isEntering
-                ? "translateX(-50%) translateY(20px)"
-                : "translateX(-50%) translateY(0)",
-            transition: toast.isClosing
-              ? "opacity 350ms cubic-bezier(0.68, -0.275, 0.115, 0.825), transform 350ms cubic-bezier(0.68, -0.275, 0.115, 0.825)"
-              : toast.isEntering
-                ? "opacity 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-                : "opacity 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-          }}
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-          tabIndex={0}
-        >
-          <div className="flex items-center gap-3">
-            {icons[toast.type] || icons.info}
-            <p className="text-sm font-medium flex-1">{toast.message}</p>
-            <button
-              onClick={closeToast}
-              className="flex-shrink-0 p-1 rounded-full hover:bg-gray-200/60 transition-colors focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
-              aria-label="Close notification"
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none flex flex-col items-center max-w-sm w-[calc(100%-2rem)]">
+        <AnimatePresence>
+          {toast.visible && (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, y: 24, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              className={`
+                pointer-events-auto w-full
+                rounded-2xl p-4 border
+                shadow-2xl backdrop-blur-md
+                relative overflow-hidden
+                ${currentVariant.card}
+              `}
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
             >
-              <X className="w-4 h-4 text-gray-500" />
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="flex items-center gap-3">
+                {currentVariant.icon}
+                <p className="text-sm font-medium flex-1 text-gray-800">{toast.message}</p>
+                <button
+                  type="button"
+                  onClick={closeToast}
+                  className="shrink-0 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
+                  aria-label="Close notification"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </ToastContext.Provider>
   );
 };

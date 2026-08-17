@@ -115,7 +115,7 @@ export const useRegister = () => {
 
       try {
         // Skip image upload for now to debug register issue
-        let imageUrl = '';
+        const imageUrl = '';
         if (selectedFile) {
           // const uploadResponse = await Api.upload.image(selectedFile);
           // imageUrl = uploadResponse.data?.url;

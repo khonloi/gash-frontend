@@ -39,7 +39,9 @@ const Profile = () => {
     handleToggleCheckoutAuth,
     handleSubmit,
     handleCancel,
-    handleDeleteConfirm
+    handleDeleteConfirm,
+    fetchProfile,
+    logout
   } = useProfile();
 
   const firstInputRef = useRef(null);
@@ -122,6 +124,8 @@ const Profile = () => {
                       <img
                         src={profile.image || "https://via.placeholder.com/128x128?text=User"}
                         alt={profile.username}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full rounded-full object-cover border-4 border-white shadow-sm"
                         onError={(e) => { e.target.src = "https://via.placeholder.com/128x128?text=User"; }}
                       />

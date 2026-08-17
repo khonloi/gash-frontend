@@ -25,6 +25,7 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
     // Track displayed reactions by user+type+timeWindow to avoid duplicates
     // Key format: `${userId}_${reactionType}_${timeWindow}` where timeWindow = Math.floor(timestamp/1000)
     const displayedReactionsRef = useRef(new Map()); // Map<key, true>
+    const pendingServerReactionsRef = useRef(new Map());
 
     const REACTION_TYPES = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
     const REACTION_EMOJIS = {
@@ -207,8 +208,6 @@ const LiveStreamReactions = ({ liveId, horizontal = false, showComments = true }
                     setTimeout(() => {
                         pendingServerReactionsRef.current.delete(serverReactionId);
                     }, 5000);
-                } else {
-
                 }
                 // WebSocket will handle the real-time update, no need to fetch
             }

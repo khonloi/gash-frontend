@@ -1,9 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import App from './App';
 import './index.css';
 import { mockUser } from './mock/mockData';
 import { storage } from './utils/storage';
+
+// Initialize React Query Client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // Demo Mode Initialization
 const isDemoMode = import.meta.env.VITE_APP_USE_MOCK === 'true';
@@ -32,7 +46,10 @@ const initApp = async () => {
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </React.StrictMode>,
   );
 };

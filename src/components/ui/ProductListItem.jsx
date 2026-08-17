@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-const ProductListItem = ({
+const ProductListItem = memo(({
   image,
   title,
   subtitle,
@@ -16,7 +16,7 @@ const ProductListItem = ({
 }) => {
   return (
     <article
-      className={`bg-white border-2 border-gray-300 rounded-xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition-shadow hover:shadow-sm border border-gray-200 focus-within:shadow-sm ${
+      className={`group bg-white rounded-2xl p-4 sm:p-5 mb-4 last:mb-0 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 border-2 border-gray-200 card-lift ${
         isInactive ? "opacity-60 grayscale" : ""
       } ${onClick ? "cursor-pointer" : ""}`}
       tabIndex={0}
@@ -29,19 +29,19 @@ const ProductListItem = ({
             type="checkbox"
             checked={checkboxProps.checked || false}
             onChange={checkboxProps.onChange}
-            className="w-5 h-5 accent-amber-400 cursor-pointer flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-5 h-5 rounded-md accent-amber-500 cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={checkboxProps.ariaLabel}
             disabled={checkboxProps.disabled}
           />
         )}
 
-        <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-50 rounded-xl flex items-center justify-center">
+        <div className="w-24 h-24 sm:w-28 sm:h-28 shrink-0 bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100">
           <img
             src={image || "/placeholder-image.png"}
             alt={typeof title === "string" ? title : "Product"}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-contain rounded-lg"
+            className="w-full h-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
               e.target.src = "/placeholder-image.png";
             }}
@@ -50,7 +50,7 @@ const ProductListItem = ({
 
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 sm:gap-1.5">
           {typeof title === "string" ? (
-            <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2 leading-tight">
+            <p className="text-base sm:text-lg font-semibold text-gray-900 m-0 line-clamp-2 leading-tight group-hover:text-amber-700 transition-colors">
               {title}
             </p>
           ) : (
@@ -59,7 +59,7 @@ const ProductListItem = ({
 
           {subtitle && (
             typeof subtitle === "string" ? (
-              <p className="text-xs sm:text-sm text-gray-600 m-0">
+              <p className="text-xs sm:text-sm text-gray-500 m-0">
                 {subtitle}
               </p>
             ) : (
@@ -68,19 +68,19 @@ const ProductListItem = ({
           )}
 
           {price !== undefined && (
-            <p className="text-xs sm:text-sm text-gray-600 m-0">
-              Price: {price}
+            <p className="text-xs sm:text-sm text-gray-600 m-0 font-medium">
+              Price: <span className="text-gray-900 font-semibold">{price}</span>
             </p>
           )}
 
           {stock !== undefined && (
-            <p className="text-xs sm:text-sm text-gray-600 m-0">
+            <p className="text-xs sm:text-sm text-gray-500 m-0">
               Stock: {stock}
             </p>
           )}
 
           {isInactive && inactiveMessage && (
-            <p className="text-xs sm:text-sm font-semibold text-red-600 m-0">
+            <p className="text-xs sm:text-sm font-semibold text-red-600 m-0 bg-red-50 px-2 py-0.5 rounded-md inline-block border border-red-200">
               {inactiveMessage}
             </p>
           )}
@@ -100,6 +100,8 @@ const ProductListItem = ({
       )}
     </article>
   );
-};
+});
 
-export default React.memo(ProductListItem);
+ProductListItem.displayName = "ProductListItem";
+
+export default ProductListItem;

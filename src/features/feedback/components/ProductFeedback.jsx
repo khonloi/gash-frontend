@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LoadingForm from '../../../components/ui/LoadingSpinner';
+import { LoadingForm } from '../../../components/ui/LoadingSpinner';
 import Button from '../../../components/ui/Button';
 import { useProductFeedback } from '../hooks/useProductFeedback';
 

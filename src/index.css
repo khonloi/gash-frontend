@@ -1,10 +1,19 @@
 @import "tailwindcss";
 
 @theme {
+  --color-brand-primary-50: #FDF8E2;
+  --color-brand-primary-100: #FBF0B5;
+  --color-brand-primary-200: #F7E085;
+  --color-brand-primary-300: #F2CD54;
+  --color-brand-primary-400: #EEBD2E;
   --color-brand-primary-500: #E9A319;
   --color-brand-primary-600: #C88A15;
   --color-brand-primary-700: #A86523;
   --color-brand-primary-800: #8B5420;
+  --color-brand-primary-900: #6A3E17;
+  --color-surface-card: #FFFFFF;
+  --color-surface-subtle: #F9FAFB;
+  --color-surface-muted: #F3F4F6;
 }
 @font-face {
   font-family: "Font";
@@ -14,6 +23,49 @@
 
 body {
   font-family: "Font", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphic & Depth Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.glass-panel-dark {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.card-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Shimmer Skeleton Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #F3F4F6 0%, #E5E7EB 50%, #F3F4F6 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
 }
 
 /* Page Layout Utilities */

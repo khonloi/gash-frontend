@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import Api from "../common/SummaryAPI";
+import { useHomeProducts } from "../hooks/useHomeProducts";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import Button from "../components/ui/Button";
 import HeroCarousel from "../features/home/components/HeroCarousel";
@@ -8,8 +8,6 @@ import CategorySlider from "../features/home/components/CategorySlider";
 import PromoGridSection from "../features/home/components/PromoGridSection";
 import GiftGuideSection from "../features/home/components/GiftGuideSection";
 import HomeProductSection from "../features/home/components/HomeProductSection";
-import { fetchWithRetry } from "../utils/fetchWithRetry";
-
 import gashHeroProducts from "../assets/image/gash_hero_products.png";
 import gashDiscountProducts from "../assets/image/gash_discount_products.png";
 import gashAccessoriesProducts from "../assets/image/gash_accessories_products.png";
@@ -69,90 +67,16 @@ const carouselSlides = [
 
 const Home = () => {
   useDocumentTitle("Home — Streetwear & Curated Apparel", "Discover premium streetwear and curated minimalist fashion at GASH.");
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
-
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetchWithRetry(() => Api.products.getAll());
-      const productsData = response?.data || response || [];
-
-      if (!Array.isArray(productsData) || productsData.length === 0) {
-        setError("No products available at this time");
-        setProducts([]);
-        setCategories([]);
-        return;
-      }
-
-      // Filter active products with variants
-      const activeProducts = productsData.filter(
-        (product) => product.productStatus === "active" &&
-          product.productVariantIds?.length > 0
-      );
-
-      setProducts(activeProducts);
-
-      // Extract unique categories from products, filter out deleted categories
-      const uniqueCategories = [
-        ...new Set(
-          activeProducts
-            .filter((product) => product.categoryId && !product.categoryId.isDeleted)
-            .map((product) => product.categoryId?.categoryName)
-            .filter(Boolean)
-        ),
-      ];
-      setCategories(uniqueCategories);
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to fetch products");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  // Shuffle helpers
-  const getRandomItems = (arr, count, excludeIds = []) => {
-    if (!Array.isArray(arr) || arr.length <= count) return arr;
-    const filtered = excludeIds.length > 0 ? arr.filter(item => !excludeIds.includes(item._id || item)) : arr;
-    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  };
-
-  const [forYouProducts, setForYouProducts] = useState([]);
-  const [recommendedProducts, setRecommendedProducts] = useState([]);
-  const [randomCategorySections, setRandomCategorySections] = useState([]);
-
-  useEffect(() => {
-    if (products.length > 0) {
-      const forYou = getRandomItems(products, 5);
-      setForYouProducts(forYou);
-      setRecommendedProducts(getRandomItems(products, 5, forYou.map(p => p._id)));
-    }
-  }, [products]);
-
-  useEffect(() => {
-    if (categories.length > 0 && products.length > 0) {
-      const shuffledCategories = [...categories].sort(() => 0.5 - Math.random());
-      const selectedCategories = shuffledCategories.slice(0, 2);
-
-      const sections = selectedCategories.map(catName => {
-        const matching = products.filter(p => p.categoryId?.categoryName === catName);
-        return {
-          categoryName: catName,
-          products: getRandomItems(matching, 5)
-        };
-      });
-      setRandomCategorySections(sections);
-    }
-  }, [categories, products]);
+  const {
+    loading,
+    error,
+    categories,
+    forYouProducts,
+    recommendedProducts,
+    randomCategorySections,
+    fetchProducts,
+  } = useHomeProducts();
 
   const handleCategoryClick = useCallback((category) => {
     navigate(`/products?category=${encodeURIComponent(category)}`);
@@ -176,40 +100,48 @@ const Home = () => {
       <HeroCarousel slides={carouselSlides} navigate={navigate} />
 
       {/* Hero Promo Banner */}
-      <div className="w-full mt-6 bg-[#002f6c] border-2 border-gray-300 rounded-xl p-4 sm:p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between shadow-sm overflow-hidden relative">
+      <div className="w-full mt-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-700/50 rounded-3xl p-6 sm:p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between shadow-xl overflow-hidden relative group">
+        {/* Background decorative glow */}
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+
         <div className="flex flex-col items-start text-left max-w-xl z-10">
-          <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">
-            Exclusive Selection
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/20 uppercase tracking-wider mb-3">
+            ★ Exclusive Selection
           </span>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-2 leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-3 leading-tight">
             Curated pieces for everyday style
           </h1>
-          <p className="text-xs sm:text-sm text-gray-200 mb-4 max-w-md">
-            Discover modern classics designed with intentional details, premium fabrics, and timeless cuts.
+          <p className="text-sm sm:text-base text-gray-300 mb-6 max-w-md leading-relaxed">
+            Discover modern classics designed with intentional details, premium fabrics, and timeless streetwear cuts.
           </p>
           <Button
             onClick={() => navigate("/products")}
-            variant="primary"
-            size="sm"
-            className="px-5 py-2.5 rounded-full font-bold shadow-md hover:shadow-lg transition-all"
+            variant="gradient"
+            size="md"
+            className="font-bold shadow-lg"
           >
-            Explore now
+            Explore Collection →
           </Button>
         </div>
 
-        <div className="mt-4 md:mt-0 flex gap-3 z-10">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden shadow-md border-2 border-white/20">
+        <div className="mt-6 md:mt-0 flex gap-4 z-10">
+          <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 backdrop-blur-md bg-white/10 card-lift">
             <img
               src={gashHeroProducts}
               alt="Curated style"
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden shadow-md border-2 border-white/20">
+          <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 backdrop-blur-md bg-white/10 card-lift">
             <img
               src={gashDiscountProducts}
               alt="Trending fashion item"
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
         </div>

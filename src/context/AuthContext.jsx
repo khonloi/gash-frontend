@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback, useMemo } from 'react';
 import axiosClient from '../common/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import { ToastContext } from './ToastContext';
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     startSessionTimer(loginTime);
   }, [startSessionTimer]);
 
-  const login = async (username, password) => {
+  const login = useCallback(async (username, password) => {
     try {
       const response = await axiosClient.post('/auth/login', {
         username,
@@ -139,9 +139,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [navigate, saveAuthSession, showToast]);
 
-  const googleLogin = async (token) => {
+  const googleLogin = useCallback(async (token) => {
     try {
       const response = await axiosClient.post('/auth/google-login', { token });
       const { token: jwtToken, account } = response.data;
@@ -153,9 +153,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [navigate, saveAuthSession, showToast]);
 
-  const requestSignupOTP = async (email, type = 'register') => {
+  const requestSignupOTP = useCallback(async (email, type = 'register') => {
     try {
       const endpoint =
         type === 'register'
@@ -169,9 +169,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [showToast]);
 
-  const verifyOTP = async (email, otp, formData, type, resend = false) => {
+  const verifyOTP = useCallback(async (email, otp, formData, type, resend = false) => {
     try {
       if (resend) {
         const endpoint =
@@ -197,9 +197,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [showToast]);
 
-  const signup = async (formData) => {
+  const signup = useCallback(async (formData) => {
     try {
       const response = await axiosClient.post('/auth/register', { ...formData });
       const { token, account } = response.data;
@@ -212,9 +212,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [navigate, saveAuthSession, showToast]);
 
-  const resetPassword = async ({ email, newPassword }) => {
+  const resetPassword = useCallback(async ({ email, newPassword }) => {
     try {
       await axiosClient.post('/auth/forgot-password/reset', {
         email,
@@ -226,9 +226,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [showToast]);
 
-  const passkeyLogin = async (username) => {
+  const passkeyLogin = useCallback(async (username) => {
     try {
       const { startAuthentication } = await import('@simplewebauthn/browser');
 
@@ -255,9 +255,9 @@ export const AuthProvider = ({ children }) => {
       showToast(msg, 'error');
       throw error;
     }
-  };
+  }, [navigate, saveAuthSession, showToast]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     if (isDemoMode) {
       showToast("This page is running in demo mode. To fully explore the project, please clone it and run it locally.", 'info');
       return;
@@ -268,23 +268,34 @@ export const AuthProvider = ({ children }) => {
     storage.clearAuthSession();
     setUser(null);
     navigate('/login');
-  };
+  }, [isDemoMode, clearSessionTimer, navigate, showToast]);
+
+  const authContextValue = useMemo(() => ({
+    user,
+    isAuthLoading,
+    login,
+    googleLogin,
+    passkeyLogin,
+    requestSignupOTP,
+    verifyOTP,
+    signup,
+    resetPassword,
+    logout,
+  }), [
+    user,
+    isAuthLoading,
+    login,
+    googleLogin,
+    passkeyLogin,
+    requestSignupOTP,
+    verifyOTP,
+    signup,
+    resetPassword,
+    logout,
+  ]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthLoading,
-        login,
-        googleLogin,
-        passkeyLogin,
-        requestSignupOTP,
-        verifyOTP,
-        signup,
-        resetPassword,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

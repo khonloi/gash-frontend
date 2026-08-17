@@ -6,21 +6,21 @@ export default function PromoGridSection({ navigate }) {
     <div className="w-full mt-8 sm:mt-10 mb-2">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
         {/* Tile 1: Left-most Gift Cards Card (spans 5 cols on lg) */}
-        <div className="lg:col-span-5 bg-[#c3daf9] border-2 border-gray-300 rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] transition-all duration-300 ease-in-out hover:shadow-lg">
+        <div className="lg:col-span-5 bg-gradient-to-br from-blue-100 via-blue-50 to-indigo-100 border border-blue-200/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] shadow-sm card-lift">
           <div className="z-10 flex flex-col items-start text-left max-w-xs">
-            <span className="text-xs font-semibold text-blue-950 tracking-widest">
+            <span className="text-xs font-bold text-blue-900 tracking-widest uppercase">
               GASH Gift Cards
             </span>
-            <h3 className="text-2xl sm:text-3xl font-semibold text-[#0d2847] mt-2 mb-6 leading-tight">
+            <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2 mb-6 leading-tight">
               Give the gift of premium style
             </h3>
             <Button
               onClick={() => navigate("/products")}
               variant="primary"
               size="sm"
-              className="px-5 py-2 rounded-full font-semibold transition-all shadow-sm"
+              className="font-bold shadow-md"
             >
-              Shop gift cards
+              Shop gift cards →
             </Button>
           </div>
 
@@ -89,19 +89,19 @@ export default function PromoGridSection({ navigate }) {
         {/* Center Column (spans 4 cols on lg) */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           {/* Center Top: Same-day delivery */}
-          <div className="bg-[#f2f4f7] border-2 border-gray-300 rounded-xl p-6 flex justify-between items-center overflow-hidden min-h-[160px] transition-all duration-300 ease-in-out hover:shadow-lg">
+          <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 flex justify-between items-center overflow-hidden min-h-[160px] shadow-xs card-lift">
             <div className="flex flex-col items-start text-left max-w-[65%]">
-              <span className="text-xs font-semibold text-gray-500 tracking-wider">
+              <span className="text-xs font-bold text-amber-600 tracking-wider uppercase">
                 Express Delivery
               </span>
-              <h4 className="text-lg font-semibold text-[#0d2847] mt-1 mb-2">
+              <h4 className="text-base sm:text-lg font-bold text-slate-900 mt-1 mb-2 leading-snug">
                 Free express delivery on orders over $75
               </h4>
               <button
                 onClick={() => navigate("/products")}
-                className="text-xs font-semibold text-blue-700 underline hover:text-blue-900"
+                className="text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors"
               >
-                Shop collections
+                Shop collections →
               </button>
             </div>
             <div className="w-24 h-20 flex items-center justify-center select-none pointer-events-none">
@@ -123,16 +123,16 @@ export default function PromoGridSection({ navigate }) {
           {/* Center Bottom: 2 Cards side-by-side */}
           <div className="grid grid-cols-2 gap-4 flex-1">
             {/* Tile 3 */}
-            <div className="bg-[#eaeff5] border-2 border-gray-300 rounded-xl p-5 flex flex-col justify-between overflow-hidden min-h-[160px] transition-all duration-300 ease-in-out hover:shadow-lg">
+            <div className="bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200/80 rounded-3xl p-5 flex flex-col justify-between overflow-hidden min-h-[160px] shadow-xs card-lift">
               <div className="flex flex-col items-start text-left">
-                <h4 className="text-sm sm:text-base font-semibold text-[#0d2847] leading-snug">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                   Explore seasonal outerwear styles
                 </h4>
                 <button
                   onClick={() => navigate("/products")}
-                  className="text-xs font-semibold text-blue-700 underline hover:text-blue-900 mt-2"
+                  className="text-xs font-semibold text-amber-600 hover:text-amber-700 transition-colors mt-2"
                 >
-                  Shop outerwear
+                  Shop outerwear →
                 </button>
               </div>
               <div className="flex justify-end mt-2 select-none pointer-events-none">
@@ -160,16 +160,16 @@ export default function PromoGridSection({ navigate }) {
             </div>
 
             {/* Tile 4 */}
-            <div className="bg-[#d2efff] border-2 border-gray-300 rounded-xl p-5 flex flex-col justify-between overflow-hidden min-h-[160px] transition-all duration-300 ease-in-out hover:shadow-lg">
+            <div className="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200/80 rounded-3xl p-5 flex flex-col justify-between overflow-hidden min-h-[160px] shadow-xs card-lift">
               <div className="flex flex-col items-start text-left">
-                <h4 className="text-sm sm:text-base font-semibold text-[#0d2847] leading-snug">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                   30-day effortless returns & exchanges
                 </h4>
                 <button
                   onClick={() => navigate("/products")}
-                  className="text-xs font-semibold text-blue-700 underline hover:text-blue-900 mt-2"
+                  className="text-xs font-semibold text-sky-700 hover:text-sky-800 transition-colors mt-2"
                 >
-                  Read returns policy
+                  Read policy →
                 </button>
               </div>
               <div className="flex justify-end mt-2 select-none pointer-events-none">
@@ -191,19 +191,19 @@ export default function PromoGridSection({ navigate }) {
         </div>
 
         {/* Tile 5: Rightmost Tall Card */}
-        <div className="lg:col-span-3 bg-white border-2 border-gray-300 rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] transition-all duration-300 ease-in-out hover:shadow-lg">
+        <div className="lg:col-span-3 bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative min-h-[350px] shadow-sm card-lift">
           <div className="z-10 flex flex-col items-start text-left">
-            <span className="text-xs font-semibold text-gray-500 tracking-wider">
+            <span className="text-xs font-bold text-amber-600 tracking-wider uppercase">
               Loyalty Program
             </span>
-            <h3 className="text-xl font-semibold text-[#0d2847] mt-2 mb-2">
+            <h3 className="text-xl font-bold text-slate-900 mt-2 mb-2 leading-snug">
               Earn points & redeem exclusive vouchers
             </h3>
             <button
               onClick={() => navigate("/vouchers")}
-              className="text-xs font-semibold text-blue-700 underline hover:text-blue-900"
+              className="text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors"
             >
-              Join rewards
+              Join rewards →
             </button>
           </div>
 

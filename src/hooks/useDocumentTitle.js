@@ -12,7 +12,7 @@ export default function useDocumentTitle(title, description) {
     document.title = fullTitle;
 
     if (description) {
-      let metaDesc = document.querySelector('meta[name="description"]');
+      const metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) {
         metaDesc.setAttribute("content", description);
       }

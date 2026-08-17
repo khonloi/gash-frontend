@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Api from '../common/SummaryAPI';
 import { useToast } from '../hooks/useToast';
+import { useProductFeedback } from '../hooks/useProductFeedback';
 import LoadingSpinner, { LoadingSkeleton } from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import { formatDate } from '../utils/formatters';
@@ -10,110 +10,25 @@ const AllProductFeedback = () => {
   const { id } = useParams();
   const { showToast } = useToast();
 
-  const [product, setProduct] = useState(null);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [feedbackStats, setFeedbackStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
-  const [feedbackError, setFeedbackError] = useState(null);
-  const [feedbacksToShow, setFeedbacksToShow] = useState(5);
-
-  const [ratingFilter, setRatingFilter] = useState('');
-  const [colorFilter, setColorFilter] = useState('');
-  const [sizeFilter, setSizeFilter] = useState('');
-
-  const fetchProduct = useCallback(async () => {
-    setLoading(true);
-    try {
-      const productResponse = await Api.products.getById(id);
-      setProduct(productResponse.data);
-    } catch (err) {
-      console.error('Product fetch error:', err);
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to fetch product details";
-      if (err?.response?.status === 404) {
-        setProduct(null);
-      } else {
-        showToast(errorMessage, "error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [id, showToast]);
-
-  const fetchFeedbacks = useCallback(async (productId = null) => {
-    if (!productId) {
-      setFeedbacks([]);
-      setFeedbackLoading(false);
-      return;
-    }
-
-    setFeedbackLoading(true);
-    setFeedbackError(null);
-
-    try {
-      const feedbackResponse = await Api.feedback.getAllFeedback(productId);
-      let feedbacksData = [];
-      if (feedbackResponse.data?.feedbacks && Array.isArray(feedbackResponse.data.feedbacks)) {
-        feedbacksData = feedbackResponse.data.feedbacks;
-      } else if (Array.isArray(feedbackResponse.data)) {
-        feedbacksData = feedbackResponse.data;
-      } else if (feedbackResponse.data?.data && Array.isArray(feedbackResponse.data.data)) {
-        feedbacksData = feedbackResponse.data.data;
-      }
-
-      const validFeedbacks = feedbacksData
-        .filter(f => {
-          if (!f || !f.feedback) return false;
-          // Filter out feedbacks with no rating and no content
-          const hasRating = f.feedback?.rating !== null && f.feedback?.rating !== undefined && f.feedback.rating >= 1 && f.feedback.rating <= 5;
-          const hasContent = f.feedback?.content && f.feedback.content.trim() !== '';
-          return hasRating || hasContent;
-        })
-        .sort((a, b) => {
-          if (a.customer?.is_current_user && !b.customer?.is_current_user) return -1;
-          if (!a.customer?.is_current_user && b.customer?.is_current_user) return 1;
-          return new Date(b.feedback?.createdAt || b.order_date) - new Date(a.feedback?.createdAt || a.order_date);
-        });
-
-      setFeedbacks(validFeedbacks);
-      if (feedbackResponse.data?.statistics) setFeedbackStats(feedbackResponse.data.statistics);
-      if (feedbackResponse.data?.product) {
-        setProduct(prev => ({
-          ...prev,
-          name: feedbackResponse.data.product.product_name,
-          pro_name: feedbackResponse.data.product.product_name,
-        }));
-      }
-    } catch (err) {
-      console.error('Feedback fetch error:', err);
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to load reviews";
-      setFeedbackError(errorMessage);
-      if (err?.response?.status !== 404 && err?.response?.status !== 401) {
-        showToast(errorMessage, "error", 3000);
-      }
-    } finally {
-      setFeedbackLoading(false);
-    }
-  }, [showToast]);
-
-  const uniqueColors = [...new Set(feedbacks.filter(f => f.variant?.color).map(f => f.variant.color))].sort();
-  const uniqueSizes = [...new Set(feedbacks.filter(f => f.variant?.size).map(f => f.variant.size))].sort();
-
-  const filteredFeedbacks = feedbacks.filter(feedback => {
-    const matchesRating = ratingFilter ? feedback.feedback?.rating === parseInt(ratingFilter) : true;
-    const matchesColor = colorFilter ? feedback.variant?.color === colorFilter : true;
-    const matchesSize = sizeFilter ? feedback.variant?.size === sizeFilter : true;
-    return matchesRating && matchesColor && matchesSize;
-  });
-
-  useEffect(() => {
-    setFeedbacksToShow(5);
-  }, [ratingFilter, colorFilter, sizeFilter]);
-
-  useEffect(() => { if (id) fetchProduct(); }, [fetchProduct, id]);
-  useEffect(() => { if (id) fetchFeedbacks(id); }, [id, fetchFeedbacks]);
-
-  const handleShowMore = () => setFeedbacksToShow(prev => prev + 5);
+  const {
+    product,
+    loading,
+    filteredFeedbacks,
+    feedbackStats,
+    feedbackLoading,
+    feedbackError,
+    feedbacksToShow,
+    ratingFilter,
+    setRatingFilter,
+    colorFilter,
+    setColorFilter,
+    sizeFilter,
+    setSizeFilter,
+    uniqueColors,
+    uniqueSizes,
+    handleShowMore,
+    fetchFeedbacks
+  } = useProductFeedback(id, showToast);
 
   if (!id || loading || !product) {
     return (
