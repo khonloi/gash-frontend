@@ -1,0 +1,130 @@
+.bannerSection {
+  padding: 2.5rem 0;
+  background-color: var(--color-white);
+}
+
+.bannerCard {
+  position: relative;
+  min-height: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(12, 28, 48, 0.12);
+  transition: transform var(--transition-normal);
+}
+
+.bannerCard:hover {
+  transform: translateY(-2px);
+}
+
+.bgImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  transition: transform 6s ease;
+}
+
+.bannerCard:hover .bgImage {
+  transform: scale(1.03);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(12, 28, 48, 0.92) 0%, rgba(12, 28, 48, 0.6) 50%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.reverse .overlay {
+  background: linear-gradient(270deg, rgba(12, 28, 48, 0.92) 0%, rgba(12, 28, 48, 0.6) 50%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.reverse {
+  justify-content: flex-end;
+}
+
+.content {
+  position: relative;
+  z-index: 5;
+  padding: 3rem 4rem;
+  max-width: 620px;
+  color: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.badge {
+  background-color: var(--color-primary-turquoise);
+  color: var(--color-navy);
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dateRange {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.ctaWrapper {
+  margin-top: 0.75rem;
+}
+
+.sharpCta {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  font-size: 0.95rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-fast);
+}
+
+.sharpCta:hover {
+  background-color: var(--color-primary-turquoise);
+  color: var(--color-navy);
+  transform: translateX(4px);
+  box-shadow: 0 6px 18px rgba(0, 229, 201, 0.4);
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 2rem 1.5rem;
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+}

@@ -109,7 +109,7 @@
 
 .brandsGrid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
   margin-top: 1.5rem;
 }
@@ -136,7 +136,7 @@
 
 .brandName {
   font-weight: 900;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   letter-spacing: 0.08em;
   color: var(--color-navy);
   text-align: center;
@@ -154,43 +154,191 @@
   }
 }
 
+/* New Collections Section */
+.collectionsSection {
+  padding: 3.5rem 0;
+  background-color: var(--color-white);
+}
+
+.collectionsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1200px) {
+  .collectionsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .collectionsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Featured 4-Grid Section */
+.featuredGridSection {
+  padding: 3.5rem 0;
+  background-color: var(--color-bg-light);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.featuredFourGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .featuredFourGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .featuredFourGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sports Section (6 Lifestyle Athlete Cards) */
+.sportsSection {
+  padding: 3.5rem 0;
+  background-color: var(--color-white);
+}
+
+.sportsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .sportsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .sportsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Sport & Lifestyle Journal Section */
+.journalSection {
+  padding: 4rem 0;
+  background-color: var(--color-bg-light);
+  border-top: 1px solid var(--color-border);
+}
+
+.journalHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.filterPills {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filterPill {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 1.4rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filterPill:hover {
+  border-color: var(--color-navy);
+  color: var(--color-navy-dark);
+}
+
+.activePill {
+  background-color: var(--color-navy);
+  color: var(--color-white);
+  border-color: var(--color-navy);
+}
+
+.articlesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .articlesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .articlesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Trust Section */
 .trustSection {
-  padding: 3rem 0;
+  padding: 3.5rem 0;
   background-color: var(--color-navy);
   color: var(--color-white);
 }
 
 .trustGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
 }
 
 .trustItem {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .trustIcon {
-  color: var(--color-primary-green);
+  color: var(--color-primary-turquoise);
   flex-shrink: 0;
 }
 
 .trustItem h4 {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 800;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .trustItem p {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.4;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .trustGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+}
+
+@media (max-width: 600px) {
   .trustGrid {
     grid-template-columns: 1fr;
     gap: 1.5rem;

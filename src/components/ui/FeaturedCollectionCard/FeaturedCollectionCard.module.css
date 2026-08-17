@@ -1,0 +1,119 @@
+.card {
+  position: relative;
+  height: 380px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(12, 28, 48, 0.1);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(12, 28, 48, 0.2);
+}
+
+.bgImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s ease;
+}
+
+.card:hover .bgImage {
+  transform: scale(1.06);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(12, 28, 48, 0.75) 0%, rgba(12, 28, 48, 0.3) 50%, rgba(12, 28, 48, 0.85) 100%);
+  transition: opacity var(--transition-fast);
+}
+
+.card:hover .overlay {
+  background: linear-gradient(180deg, rgba(12, 28, 48, 0.85) 0%, rgba(12, 28, 48, 0.4) 50%, rgba(12, 28, 48, 0.9) 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.brandsText {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.categoryBadge {
+  background-color: var(--color-navy);
+  color: var(--color-primary-turquoise);
+  border: 1px solid var(--color-primary-turquoise);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  align-self: flex-start;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--color-white);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ctaWrapper {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sharpCta {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: all var(--transition-fast);
+}
+
+.card:hover .sharpCta {
+  background-color: var(--color-primary-turquoise);
+  color: var(--color-navy);
+  transform: translateX(2px);
+}

@@ -1,23 +1,26 @@
 :root {
-  /* Supersports Core Brand Colors */
-  --color-primary-green: #73D100;
-  --color-primary-green-hover: #63B500;
+  /* Electric Turquoise Athletic Brand Colors (Option 1) */
+  --color-primary-green: #00E5C9;
+  --color-primary-green-hover: #00CCAE;
+  --color-primary-turquoise: #00E5C9;
+  --color-primary-turquoise-hover: #00CCAE;
+
   --color-navy: #0C1C30;
   --color-navy-light: #162B45;
   --color-navy-dark: #07111e;
   --color-royal-blue: #003CD6;
-  --color-sale-red: #E60000;
-  --color-sale-red-light: #FF2A2A;
+  --color-sale-red: #FF3366;
+  --color-sale-red-light: #FF5C85;
 
   /* Neutrals & Surfaces */
   --color-white: #FFFFFF;
-  --color-bg-light: #F8F9FA;
-  --color-bg-gray: #F2F4F7;
-  --color-card-bg: #F5F6F8;
+  --color-bg-light: #F8FAFC;
+  --color-bg-gray: #F1F5F9;
+  --color-card-bg: #F1F5F9;
   --color-text-main: #0C1C30;
   --color-text-body: #333F48;
   --color-text-muted: #707A8A;
-  --color-border: #E2E5E9;
+  --color-border: #E2E8F0;
   --color-border-dark: #2B384A;
 
   /* Typography */
