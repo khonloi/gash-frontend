@@ -1,0 +1,283 @@
+.heroSection {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  padding: 0;
+}
+
+.carouselContainer {
+  position: relative;
+  width: 100%;
+}
+
+.slideCard {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  box-shadow: none;
+  transition: all 0.5s ease-in-out;
+}
+
+.bgImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.45;
+  transition: transform 6s ease;
+}
+
+.slideCard:hover .bgImage {
+  transform: scale(1.04);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(12, 28, 48, 0.95) 0%, rgba(12, 28, 48, 0.7) 50%, rgba(0, 0, 0, 0.25) 100%);
+}
+
+.contentContainer {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  max-width: 650px;
+  color: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.discountCallout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.highlightBadge {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  font-weight: 900;
+  font-size: 1.25rem;
+  padding: 0.35rem 1rem;
+  border-radius: 4px;
+  letter-spacing: -0.02em;
+  display: inline-block;
+}
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+}
+
+.dateRange {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin-top: -0.25rem;
+}
+
+.ctaWrapper {
+  margin-top: 1rem;
+}
+
+.sharpCta {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all var(--transition-fast);
+}
+
+.sharpCta:hover {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  transform: translateX(4px);
+  box-shadow: 0 6px 20px rgba(115, 209, 0, 0.5);
+}
+
+/* Arrows */
+.arrowBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.arrowBtn:hover {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.prevBtn {
+  left: 1.5rem;
+}
+
+.nextBtn {
+  right: 1.5rem;
+}
+
+/* Dots */
+.dots {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  transition: all var(--transition-fast);
+}
+
+.activeDot {
+  width: 28px;
+  border-radius: 9999px;
+  background-color: var(--color-primary-green);
+}
+
+/* Floating Badge Wrapper */
+.badgeWrapper {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--container-max-width);
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.floatingPromoBadge {
+  pointer-events: auto;
+}
+
+.badgeCircle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #0055FF, #0022AA);
+  border: 3px solid var(--color-white);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-green);
+  text-align: center;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform var(--transition-normal);
+}
+
+.badgeCircle:hover {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+.badgeTop {
+  font-size: 1.2rem;
+  letter-spacing: -0.03em;
+}
+
+.badgeBottom {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.badgePill {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+@media (max-width: 768px) {
+  .slideCard {
+    height: 380px;
+  }
+  .contentContainer {
+    padding: 0 1rem;
+  }
+  .content {
+    max-width: 100%;
+  }
+  .title {
+    font-size: 1.8rem;
+  }
+  .arrowBtn {
+    width: 36px;
+    height: 36px;
+  }
+  .prevBtn {
+    left: 0.5rem;
+  }
+  .nextBtn {
+    right: 0.5rem;
+  }
+  .badgeWrapper {
+    display: none;
+  }
+}

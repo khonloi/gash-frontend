@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
+import { Header } from "@/components/layout/Header/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jocksport | Premium E-Commerce",
-  description: "Your ultimate destination for modern athletic gear.",
+  title: "JOCKSPORTS | Premium Athletic Footwear, Apparel & Accessories",
+  description: "Leading sports retail destination - 100% authentic athletic gear from Nike, Adidas, Puma, Under Armour, Asics and more.",
 };
 
 export default function RootLayout({
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <ReactQueryProvider>
+          <Header />
           {children}
         </ReactQueryProvider>
       </body>

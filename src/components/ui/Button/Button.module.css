@@ -1,0 +1,83 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  line-height: 1;
+}
+
+/* Variants */
+.sharp {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sharp:hover {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(115, 209, 0, 0.35);
+}
+
+.pill-green {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  border-radius: 9999px;
+}
+
+.pill-green:hover {
+  background-color: var(--color-primary-green-hover);
+  transform: scale(1.02);
+}
+
+.pill-navy {
+  background-color: var(--color-navy);
+  color: var(--color-white);
+  border-radius: 9999px;
+}
+
+.pill-navy:hover {
+  background-color: var(--color-navy-light);
+}
+
+.outline {
+  background-color: transparent;
+  color: var(--color-navy);
+  border: 1.5px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.outline:hover {
+  border-color: var(--color-navy);
+}
+
+/* Sizes */
+.sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+}
+
+.md {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+.lg {
+  padding: 1rem 2.25rem;
+  font-size: 1.1rem;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+}

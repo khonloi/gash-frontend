@@ -1,63 +1,61 @@
 :root {
-  --background-rgb: 250, 250, 250;
-  --foreground-rgb: 23, 23, 23;
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --accent-color: #ec4899;
-  --text-muted: #6b7280;
-  --border-color: #e5e7eb;
-  
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* Supersports Core Brand Colors */
+  --color-primary-green: #73D100;
+  --color-primary-green-hover: #63B500;
+  --color-navy: #0C1C30;
+  --color-navy-light: #162B45;
+  --color-navy-dark: #07111e;
+  --color-royal-blue: #003CD6;
+  --color-sale-red: #E60000;
+  --color-sale-red-light: #FF2A2A;
+
+  /* Neutrals & Surfaces */
+  --color-white: #FFFFFF;
+  --color-bg-light: #F8F9FA;
+  --color-bg-gray: #F2F4F7;
+  --color-card-bg: #F5F6F8;
+  --color-text-main: #0C1C30;
+  --color-text-body: #333F48;
+  --color-text-muted: #707A8A;
+  --color-border: #E2E5E9;
+  --color-border-dark: #2B384A;
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* Dimensions & Spacing */
+  --header-top-height: 36px;
+  --header-main-height: 70px;
+  --header-usp-height: 44px;
+  --container-max-width: 1280px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-rgb: 10, 10, 10;
-    --foreground-rgb: 237, 237, 237;
-    --primary-color: #6366f1;
-    --primary-hover: #818cf8;
-    --accent-color: #f472b6;
-    --text-muted: #9ca3af;
-    --border-color: #374151;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  height: 100%;
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  background-color: var(--color-white);
+  color: var(--color-text-body);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.2s ease-in-out;
-}
-
-a:hover {
-  color: var(--primary-color);
+  transition: color var(--transition-fast);
 }
 
 button {
@@ -65,21 +63,82 @@ button {
   border: none;
   background: none;
   font-family: inherit;
+  outline: none;
 }
 
-/* Glassmorphism utility classes */
-.glass-panel {
-  background: rgba(var(--background-rgb), 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--border-color), 0.3);
-  border-radius: 16px;
+input {
+  font-family: inherit;
+  outline: none;
 }
 
-/* Smooth gradients for premium feel */
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* Typography Utilities */
+.heading-section {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-navy);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.heading-section::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 24px;
+  background-color: var(--color-primary-green);
+  border-radius: 2px;
+}
+
+/* Button & Action Utilities */
+.btn-sharp {
+  background-color: var(--color-white);
+  color: var(--color-navy);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.btn-sharp:hover {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(115, 209, 0, 0.4);
+}
+
+.btn-pill-green {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-pill-green:hover {
+  background-color: var(--color-primary-green-hover);
+  transform: scale(1.03);
 }

@@ -1,0 +1,82 @@
+.categoryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  group: true;
+}
+
+.circleContainer {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: visible;
+  padding: 4px;
+  background: linear-gradient(135deg, var(--color-border), #ffffff);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.categoryItem:hover .circleContainer {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(12, 28, 48, 0.15);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.iconBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-navy);
+  color: var(--color-primary-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--color-white);
+  transition: all var(--transition-fast);
+}
+
+.categoryItem:hover .iconBadge {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  text-align: center;
+  letter-spacing: -0.01em;
+  transition: color var(--transition-fast);
+}
+
+.categoryItem:hover .title {
+  color: var(--color-navy-light);
+}
+
+@media (max-width: 768px) {
+  .circleContainer {
+    width: 100px;
+    height: 100px;
+  }
+  .iconBadge {
+    width: 28px;
+    height: 28px;
+  }
+  .title {
+    font-size: 0.8rem;
+  }
+}

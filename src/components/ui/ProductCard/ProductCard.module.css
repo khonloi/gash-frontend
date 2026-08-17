@@ -1,0 +1,141 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  border: 1px solid transparent;
+}
+
+.card:hover {
+  border-color: var(--color-border);
+  box-shadow: 0 8px 24px rgba(12, 28, 48, 0.08);
+  transform: translateY(-3px);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  background-color: var(--color-card-bg);
+  overflow: hidden;
+}
+
+.imageLink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.06);
+}
+
+.discountBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: var(--color-sale-red);
+  color: var(--color-white);
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 2px;
+  z-index: 2;
+  letter-spacing: 0.02em;
+}
+
+.quickAddBtn {
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  background-color: var(--color-navy);
+  color: var(--color-white);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: bottom 0.25s ease, background-color var(--transition-fast);
+  z-index: 3;
+}
+
+.card:hover .quickAddBtn {
+  bottom: 0;
+}
+
+.quickAddBtn:hover {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+}
+
+.content {
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.brand {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.titleLink {
+  text-decoration: none;
+}
+
+.title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.4em;
+  transition: color var(--transition-fast);
+}
+
+.titleLink:hover .title {
+  color: var(--color-royal-blue);
+}
+
+.pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.salePrice {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-sale-red);
+}
+
+.originalPrice {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
