@@ -92,7 +92,7 @@ export const useCheckout = () => {
 
     setLoading(true);
     try {
-      const response = await Api.newCart.getByAccount(user._id);
+      const response = await Api.cart.getByAccount(user._id);
       setCartItems(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       let errorMessage = 'Failed to load cart items';

@@ -14,12 +14,27 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({ errorInfo });
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
     console.error("[ErrorBoundary caught an error]:", error, errorInfo);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.resetKey !== undefined && prevProps.resetKey !== this.props.resetKey) {
+      if (this.state.hasError) {
+        this.setState({ hasError: false, error: null, errorInfo: null });
+      }
+    }
   }
 
   handleReset = () => {
     this.setState({ hasError: false, error: null, errorInfo: null });
-    window.location.reload();
+    if (this.props.onReset) {
+      this.props.onReset();
+    } else {
+      window.location.reload();
+    }
   };
 
   handleGoHome = () => {
@@ -29,6 +44,13 @@ export default class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
+      if (typeof this.props.fallback === "function") {
+        return this.props.fallback({
+          error: this.state.error,
+          resetErrorBoundary: this.handleReset,
+        });
+      }
+
       if (this.props.fallback) {
         return this.props.fallback;
       }

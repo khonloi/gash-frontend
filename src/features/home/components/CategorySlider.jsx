@@ -62,12 +62,16 @@ export default function CategorySlider({
             {categories.map((category) => (
               <div
                 key={category}
-                className="w-36 sm:w-40 flex-shrink-0 border-2 border-gray-200 hover:border-amber-400 rounded-xl p-3 flex items-center justify-center text-center cursor-pointer hover:shadow-md transition-all duration-200 bg-white min-h-[3.25rem]"
+                className="w-36 sm:w-40 flex-shrink-0 border-2 border-gray-200 hover:border-amber-400 rounded-xl p-3 flex items-center justify-center text-center cursor-pointer hover:shadow-md transition-all duration-200 bg-white min-h-[3.25rem] focus:outline-none focus:ring-2 focus:ring-amber-500"
                 tabIndex={0}
-                role="listitem"
+                role="button"
+                aria-label={`Browse ${category} category`}
                 onClick={() => onCategoryClick(category)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") onCategoryClick(category);
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onCategoryClick(category);
+                  }
                 }}
               >
                 <span className="font-semibold text-xs sm:text-sm text-gray-900 line-clamp-2">

@@ -18,7 +18,7 @@ const ProductList = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchWithRetry(() => Api.newProducts.getAll());
+      const response = await fetchWithRetry(() => Api.products.getAll());
       const productsData = response?.data || response || [];
 
       if (!Array.isArray(productsData) || productsData.length === 0) {
@@ -39,7 +39,7 @@ const ProductList = () => {
     if (hasFetchedVariantsRef.current) return;
     hasFetchedVariantsRef.current = true;
     try {
-      const response = await fetchWithRetry(() => Api.newVariants.getAll());
+      const response = await fetchWithRetry(() => Api.variants.getAll());
       const variantsData = response?.data || response || [];
 
       if (!Array.isArray(variantsData)) {

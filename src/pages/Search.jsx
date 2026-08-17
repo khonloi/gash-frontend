@@ -24,7 +24,7 @@ const Search = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchWithRetry(() => Api.newProducts.search({ name: searchQuery.trim(), status: "active" }));
+      const response = await fetchWithRetry(() => Api.products.search({ name: searchQuery.trim(), status: "active" }));
       const productsData = response?.data || response || [];
 
       if (!Array.isArray(productsData)) {

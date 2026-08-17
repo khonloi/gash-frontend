@@ -45,8 +45,10 @@ export const useOrders = () => {
         );
         setOrders(sorted);
         setFilteredOrders(sorted);
-      } catch {
-        showToast("Failed to load orders", "error");
+      } catch (err) {
+        console.error("[useOrders] Error fetching orders:", err);
+        const msg = err?.response?.data?.message || "Failed to load orders";
+        showToast(msg, "error");
         setOrders([]);
         setFilteredOrders([]);
       } finally {

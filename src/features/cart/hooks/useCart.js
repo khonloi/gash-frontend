@@ -49,7 +49,7 @@ export const useCart = () => {
 
       try {
         const response = await fetchWithRetry(() =>
-          Api.newCart.getByAccount(user._id)
+          Api.cart.getByAccount(user._id)
         );
 
         const data = response?.data || response;
@@ -151,7 +151,7 @@ export const useCart = () => {
         Promise.all(
           updates.map(async ({ cartId, newQuantity }) => {
             try {
-              const response = await Api.newCart.update(
+              const response = await Api.cart.update(
                 cartId,
                 { productQuantity: newQuantity.toString() }
               );
@@ -279,7 +279,7 @@ export const useCart = () => {
       });
 
       try {
-        await Api.newCart.delete(cartId);
+        await Api.cart.delete(cartId);
 
         cartCache.current = {
           items: cartItems.filter((item) => item._id !== cartId),

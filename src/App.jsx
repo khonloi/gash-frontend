@@ -63,6 +63,129 @@ function ChatIfLoggedIn() {
   );
 }
 
+// Component: routes container with route-aware error boundary
+function AppRoutes() {
+  const location = useLocation();
+
+  return (
+    <ErrorBoundary resetKey={location.pathname}>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/product/:id/all-feedback" element={<AllProductFeedback />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/news" element={<BlogPost />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/vnpay-return" element={<VNPayReturn />} />
+          <Route path="/live" element={<ListLiveStream />} />
+
+          {/* Protected customer routes */}
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <PrivateRoute>
+                <Cart />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <PrivateRoute>
+                <Checkout />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <PrivateRoute>
+                <Orders />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/orders/:id"
+            element={
+              <PrivateRoute>
+                <OrderDetails />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/bills/:orderId"
+            element={
+              <PrivateRoute>
+                <Bill />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <PrivateRoute>
+                <ProductFavorite />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/feedback"
+            element={
+              <PrivateRoute>
+                <Feedback />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/vouchers"
+            element={
+              <PrivateRoute>
+                <UserVoucherPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <PrivateRoute>
+                <Notifications />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/live/:id"
+            element={
+              <PrivateRoute>
+                <ViewLiveStream />
+              </PrivateRoute>
+            }
+          />
+
+          {/* 404 Catch-all */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // ==== App Component ====
 const App = () => {
   return (
@@ -72,123 +195,9 @@ const App = () => {
           <AuthProvider>
             <ScrollToTop />
             <Layout>
-              <ErrorBoundary>
-                <Suspense fallback={<LoadingFallback />}>
-                  <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/products" element={<ProductList />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/product/:id/all-feedback" element={<AllProductFeedback />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/otp-verification" element={<OTPVerification />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/search" element={<Search />} />
-                  <Route path="/news" element={<BlogPost />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/vnpay-return" element={<VNPayReturn />} />
-                  <Route path="/live" element={<ListLiveStream />} />
-
-                  {/* Protected customer routes */}
-                  <Route
-                    path="/profile"
-                    element={
-                      <PrivateRoute>
-                        <Profile />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/cart"
-                    element={
-                      <PrivateRoute>
-                        <Cart />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/checkout"
-                    element={
-                      <PrivateRoute>
-                        <Checkout />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/orders"
-                    element={
-                      <PrivateRoute>
-                        <Orders />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/orders/:id"
-                    element={
-                      <PrivateRoute>
-                        <OrderDetails />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/bills/:orderId"
-                    element={
-                      <PrivateRoute>
-                        <Bill />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/favorites"
-                    element={
-                      <PrivateRoute>
-                        <ProductFavorite />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/feedback"
-                    element={
-                      <PrivateRoute>
-                        <Feedback />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/vouchers"
-                    element={
-                      <PrivateRoute>
-                        <UserVoucherPage />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/notifications"
-                    element={
-                      <PrivateRoute>
-                        <Notifications />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/live/:id"
-                    element={
-                      <PrivateRoute>
-                        <ViewLiveStream />
-                      </PrivateRoute>
-                    }
-                  />
-
-                  {/* 404 Catch-all */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </ErrorBoundary>
-            <ChatIfLoggedIn />
-          </Layout>
+              <AppRoutes />
+              <ChatIfLoggedIn />
+            </Layout>
           </AuthProvider>
         </ToastProvider>
       </Router>

@@ -28,6 +28,8 @@ export default defineConfig({
           'vendor-livekit': ['livekit-client'],
           'vendor-export': ['jspdf', 'html2canvas', 'xlsx', 'file-saver'],
           'vendor-auth': ['@react-oauth/google', '@simplewebauthn/browser'],
+          'vendor-markdown': ['react-markdown', 'remark-gfm', 'rehype-raw'],
+          'vendor-emoji': ['emoji-picker-react'],
         },
       },
     },

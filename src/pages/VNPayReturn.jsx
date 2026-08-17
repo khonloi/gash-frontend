@@ -33,7 +33,8 @@ export default function VNPayReturn() {
             paymentMethod: 'VNPay',
           });
         }
-      } catch {
+      } catch (err) {
+        console.error("[VNPayReturn] Error during payment verification:", err);
         setStatus('failed');
         setSuccessInfo({
           status: 'failed',

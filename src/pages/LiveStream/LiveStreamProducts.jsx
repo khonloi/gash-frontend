@@ -128,7 +128,7 @@ const LiveStreamProducts = ({ liveId }) => {
         }
 
         try {
-            const response = await Api.newProducts.getById(productId);
+            const response = await Api.products.getById(productId);
             if (response.data?.success && response.data.data) {
                 const product = response.data.data;
                 // Try to get price from variants

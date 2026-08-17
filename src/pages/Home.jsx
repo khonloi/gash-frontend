@@ -79,7 +79,7 @@ const Home = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchWithRetry(() => Api.newProducts.getAll());
+      const response = await fetchWithRetry(() => Api.products.getAll());
       const productsData = response?.data || response || [];
 
       if (!Array.isArray(productsData) || productsData.length === 0) {

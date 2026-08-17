@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
+import OfflineBanner from '../components/common/OfflineBanner';
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -20,6 +21,7 @@ export default function Layout({ children }) {
   if (isAuthPage) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <OfflineBanner />
         {/* Skip Navigation Link */}
         <a
           href="#main-content"
@@ -36,6 +38,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <OfflineBanner />
       {/* Skip Navigation Link */}
       <a
         href="#main-content"

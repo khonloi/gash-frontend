@@ -36,7 +36,11 @@ export default function HeroCarousel({
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full rounded-2xl overflow-hidden border-2 border-gray-300 shadow-sm transition-all duration-300">
+    <section
+      className="relative w-full rounded-2xl overflow-hidden border-2 border-gray-300 shadow-sm transition-all duration-300"
+      aria-roledescription="carousel"
+      aria-label="Featured promotions carousel"
+    >
       <div
         className="relative flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
@@ -45,6 +49,9 @@ export default function HeroCarousel({
           <div
             key={index}
             className={`min-w-full ${slide.bgClass} flex flex-col md:flex-row items-center justify-between p-6 sm:p-10 md:p-14 min-h-[360px] md:min-h-[420px]`}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${index + 1} of ${slides.length}: ${slide.title}`}
           >
             <div
               className={`flex flex-col items-start max-w-lg z-10 ${

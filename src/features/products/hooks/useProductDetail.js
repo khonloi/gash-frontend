@@ -88,7 +88,7 @@ export const useProductDetail = () => {
     setError(null);
 
     try {
-      const productResponse = await fetchWithRetry(() => Api.newProducts.getById(id));
+      const productResponse = await fetchWithRetry(() => Api.products.getById(id));
       const productData = productResponse?.data || productResponse;
 
       if (!productData) {
@@ -341,7 +341,7 @@ export const useProductDetail = () => {
         productPrice: selectedVariant.variantPrice,
       };
 
-      await Api.newCart.create(cartItem);
+      await Api.cart.create(cartItem);
       showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to cart successfully`, "success", TOAST_TIMEOUT);
     } catch (err) {
       const message = err.response?.data?.message || err.message || "Failed to add item to cart";
@@ -391,7 +391,7 @@ export const useProductDetail = () => {
   const fetchAllProducts = useCallback(async () => {
     setProductsLoading(true);
     try {
-      const response = await fetchWithRetry(() => Api.newProducts.getAll());
+      const response = await fetchWithRetry(() => Api.products.getAll());
       const productsData = response?.data || response || [];
 
       if (!Array.isArray(productsData) || productsData.length === 0) {

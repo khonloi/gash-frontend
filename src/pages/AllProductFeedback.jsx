@@ -25,7 +25,7 @@ const AllProductFeedback = () => {
   const fetchProduct = useCallback(async () => {
     setLoading(true);
     try {
-      const productResponse = await Api.newProducts.getById(id);
+      const productResponse = await Api.products.getById(id);
       setProduct(productResponse.data);
     } catch (err) {
       console.error('Product fetch error:', err);

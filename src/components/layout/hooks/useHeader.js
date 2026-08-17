@@ -40,7 +40,7 @@ export const useHeader = () => {
         }
         try {
             const cartData = await fetchWithRetry(() =>
-                Api.newCart.getByAccount(user._id)
+                Api.cart.getByAccount(user._id)
             );
             if (Array.isArray(cartData)) {
                 setCartItemCount(cartData.length);
@@ -319,7 +319,7 @@ export const useHeader = () => {
         try {
             setLoading(true);
             const productsData = await fetchWithRetry(() =>
-                Api.newProducts.search({ name: sanitizedQuery, status: "active" })
+                Api.products.search({ name: sanitizedQuery, status: "active" })
             );
             const productsArray = Array.isArray(productsData.data) ? productsData.data : [];
             const filteredProducts = productsArray.filter(

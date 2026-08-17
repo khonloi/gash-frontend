@@ -1,9 +1,10 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { SOCKET_URL } from "../../../common/axiosClient";
-import EmojiPicker from "emoji-picker-react";
 import { MessageCircle, X, Send, Camera, Smile } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { useUserChat } from "../hooks/useUserChat";
+
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 // use shared SOCKET_URL (same as API base)
 
@@ -237,11 +238,19 @@ export default function UserChat({ userId }) {
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <EmojiPicker
-                    width="100%"
-                    height="400px"
-                    onEmojiClick={handleEmojiClick}
-                  />
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center h-80 text-sm text-gray-400">
+                        Loading emojis...
+                      </div>
+                    }
+                  >
+                    <EmojiPicker
+                      width="100%"
+                      height="400px"
+                      onEmojiClick={handleEmojiClick}
+                    />
+                  </Suspense>
                 </div>
               )}
 
