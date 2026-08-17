@@ -1,0 +1,55 @@
+.pageContainer {
+  padding-bottom: 80px;
+}
+
+.productTopSection {
+  display: flex;
+  gap: 48px;
+  margin-top: 16px;
+}
+
+.galleryWrapper {
+  flex: 1.2;
+  min-width: 0;
+}
+
+.infoWrapper {
+  flex: 1;
+  min-width: 0;
+  position: sticky;
+  top: 120px; /* Assuming header is sticky and takes up some height */
+  height: fit-content;
+}
+
+.relatedSection {
+  margin-top: 80px;
+  padding-top: 64px;
+  border-top: 1px solid var(--color-border);
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 992px) {
+  .productTopSection {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .infoWrapper {
+    position: static;
+  }
+
+  .relatedGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .relatedGrid {
+    grid-template-columns: 1fr;
+  }
+}

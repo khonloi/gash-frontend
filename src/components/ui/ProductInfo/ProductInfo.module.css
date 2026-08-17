@@ -1,0 +1,245 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--color-text-body);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.metaInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--color-text-body);
+  margin-bottom: 16px;
+}
+
+.category {
+  text-transform: uppercase;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pricing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.price {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.originalPrice {
+  font-size: 18px;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin-bottom: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 12px;
+}
+
+.sectionTitle span {
+  font-weight: 400;
+  color: var(--color-text-body);
+}
+
+.colorGrid {
+  display: flex;
+  gap: 12px;
+}
+
+.colorBtn {
+  width: 60px;
+  height: 80px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: #f5f5f5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.colorBtn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.activeColor {
+  border: 2px solid var(--color-text-main);
+}
+
+.sizeGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.sizeBtn {
+  padding: 12px 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sizeBtn:hover:not(.outOfStock) {
+  border-color: var(--color-text-main);
+}
+
+.activeSize {
+  border-color: var(--color-text-main);
+  background-color: var(--color-text-main);
+  color: var(--color-white);
+}
+
+.outOfStock {
+  color: var(--color-text-muted);
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.outOfStock::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--color-border);
+  transform: translateY(-50%) rotate(-20deg);
+}
+
+.helpers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.helperBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  color: var(--color-text-body);
+  text-decoration: underline;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.helperBtn:hover {
+  color: var(--color-primary-turquoise);
+}
+
+.fitScale {
+  margin-bottom: 32px;
+  padding: 16px;
+  background-color: var(--color-bg-light);
+  border-radius: 8px;
+}
+
+.fitBar {
+  height: 8px;
+  background: linear-gradient(to right, #e2e8f0, #cbd5e1);
+  border-radius: 4px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.fitIndicator {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background-color: #00E5C9; /* Turquoise indicator */
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.fitLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.fitLabels span {
+  flex: 1;
+}
+
+.activeFitLabel {
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.addToCartBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  background-color: #39b54a; /* Green from reference */
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addToCartBtn:hover {
+  background-color: #2e933c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(57, 181, 74, 0.3);
+}
+
+@media (max-width: 576px) {
+  .sizeGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

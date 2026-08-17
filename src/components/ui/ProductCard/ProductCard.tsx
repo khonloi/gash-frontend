@@ -18,6 +18,7 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({
+  id,
   brand,
   title,
   originalPrice,
@@ -37,7 +38,7 @@ export function ProductCard({
         {discountPercent && (
           <span className={styles.discountBadge}>-{discountPercent}%</span>
         )}
-        <Link href={`#`} className={styles.imageLink}>
+        <Link href={`/products/${id}`} className={styles.imageLink}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={imageUrl} alt={title} className={styles.image} />
         </Link>
@@ -56,7 +57,7 @@ export function ProductCard({
 
       <div className={styles.content}>
         <span className={styles.brand}>{brand}</span>
-        <Link href={`#`} className={styles.titleLink}>
+        <Link href={`/products/${id}`} className={styles.titleLink}>
           <h3 className={styles.title}>{title}</h3>
         </Link>
 
