@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Ruler, MapPin, ShoppingBag } from 'lucide-react'
+import { Ruler, MapPin, ShoppingBag, Plus, Minus, Zap } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import styles from './ProductInfo.module.css'
 
@@ -30,6 +30,7 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(colors[0]?.id)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [quantity, setQuantity] = useState(1)
   const addItem = useCartStore((state) => state.addItem)
 
   const formatPrice = (p: number) => {
@@ -41,8 +42,17 @@ export function ProductInfo({
       alert("Please select a size first.")
       return
     }
-    addItem()
-    alert("Item added to cart successfully!")
+    addItem(quantity)
+    alert(`Added ${quantity} item(s) to cart successfully!`)
+  }
+
+  const handleBuyNow = () => {
+    if (!selectedSize) {
+      alert("Please select a size first.")
+      return
+    }
+    addItem(quantity)
+    alert(`Proceeding to checkout with ${quantity} item(s)...`)
   }
 
   return (
@@ -123,13 +133,49 @@ export function ProductInfo({
         </div>
       </div>
 
-      <button 
-        className={styles.addToCartBtn} 
-        onClick={handleAddToCart}
-      >
-        <ShoppingBag size={20} />
-        <span>ADD TO CART</span>
-      </button>
+      <div className={styles.section}>
+        <p className={styles.sectionTitle}>Quantity</p>
+        <div className={styles.quantitySelector}>
+          <button
+            type="button"
+            className={styles.quantityBtn}
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={quantity <= 1}
+            aria-label="Decrease quantity"
+          >
+            <Minus size={16} />
+          </button>
+          <span className={styles.quantityValue}>{quantity}</span>
+          <button
+            type="button"
+            className={styles.quantityBtn}
+            onClick={() => setQuantity((q) => q + 1)}
+            aria-label="Increase quantity"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.actionButtons}>
+        <button 
+          className={styles.addToCartBtn} 
+          onClick={handleAddToCart}
+          type="button"
+        >
+          <ShoppingBag size={20} />
+          <span>ADD TO CART</span>
+        </button>
+
+        <button 
+          className={styles.buyNowBtn} 
+          onClick={handleBuyNow}
+          type="button"
+        >
+          <Zap size={20} />
+          <span>BUY NOW</span>
+        </button>
+      </div>
     </div>
   )
 }

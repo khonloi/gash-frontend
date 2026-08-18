@@ -641,4 +641,13 @@ export const mockRelatedProducts = [
     salePrice: 3200000,
     imageUrl: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=500&q=80",
   },
+  {
+    id: "r5",
+    brand: "NIKE",
+    title: "Women's Sportswear Therma-FIT Repel Jacket",
+    originalPrice: 2800000,
+    salePrice: 2240000,
+    discountPercent: 20,
+    imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=500&q=80",
+  },
 ];
