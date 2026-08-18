@@ -51,7 +51,7 @@
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.65rem;
 }
 
 .brandsText {
@@ -68,7 +68,7 @@
   border: 1px solid var(--color-primary-turquoise);
   font-size: 0.75rem;
   font-weight: 800;
-  padding: 0.2rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 2px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -79,14 +79,15 @@
   font-size: 1.8rem;
   font-weight: 900;
   color: var(--color-white);
-  line-height: 1.1;
+  line-height: 1.25;
   text-transform: uppercase;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .subtitle {
   font-size: 0.85rem;
+  line-height: 1.5;
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -104,7 +105,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.5rem 1.25rem;
+  padding: 0.55rem 1.35rem;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -116,4 +117,30 @@
   background-color: var(--color-primary-turquoise);
   color: var(--color-navy);
   transform: translateX(2px);
+}
+
+@media (max-width: 768px) {
+  .card {
+    height: 320px;
+    padding: 1.25rem;
+  }
+
+  .content {
+    gap: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+    line-height: 1.25;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .sharpCta {
+    font-size: 0.75rem;
+    padding: 0.45rem 1.15rem;
+  }
 }

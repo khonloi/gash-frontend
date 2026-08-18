@@ -46,7 +46,14 @@ export function ProductCard({
           className={styles.quickAddBtn}
           onClick={(e) => {
             e.preventDefault()
-            addItem()
+            addItem({
+              productId: id,
+              title,
+              brand,
+              price: salePrice || originalPrice,
+              imageUrl,
+              quantity: 1,
+            })
           }}
           title="Add to Cart"
         >

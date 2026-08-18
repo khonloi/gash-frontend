@@ -4,6 +4,7 @@ import "./globals.css";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
 import { Header } from "@/components/layout/Header/Header";
 import { Footer } from "@/components/layout/Footer/Footer";
+import { ToastContainer } from "@/components/ui/Toast/ToastContainer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
+          <ToastContainer />
         </ReactQueryProvider>
       </body>
     </html>

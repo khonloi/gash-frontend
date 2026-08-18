@@ -313,6 +313,22 @@
   box-shadow: 0 4px 12px rgba(57, 181, 74, 0.3);
 }
 
+@media (max-width: 768px) {
+  .title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .price {
+    font-size: 20px;
+  }
+
+  .brand {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+}
+
 @media (max-width: 576px) {
   .sizeGrid {
     grid-template-columns: repeat(3, 1fr);

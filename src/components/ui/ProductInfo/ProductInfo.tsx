@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Ruler, MapPin, ShoppingBag, Plus, Minus, Zap } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
+import { useToastStore } from '@/store/useToastStore'
 import styles from './ProductInfo.module.css'
 
 interface ProductInfoProps {
@@ -32,6 +33,7 @@ export function ProductInfo({
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const addItem = useCartStore((state) => state.addItem)
+  const { addToast } = useToastStore()
 
   const formatPrice = (p: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p)
@@ -39,20 +41,40 @@ export function ProductInfo({
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert("Please select a size first.")
+      addToast("Please select a size first.", "error")
       return
     }
-    addItem(quantity)
-    alert(`Added ${quantity} item(s) to cart successfully!`)
+    const colorObj = colors.find((c) => c.id === selectedColor)
+    addItem({
+      productId: sku,
+      title,
+      brand,
+      price: price,
+      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
+      quantity,
+      size: selectedSize,
+      color: colorObj?.name,
+    })
+    addToast(`Added ${quantity} item(s) to cart successfully!`, "success")
   }
 
   const handleBuyNow = () => {
     if (!selectedSize) {
-      alert("Please select a size first.")
+      addToast("Please select a size first.", "error")
       return
     }
-    addItem(quantity)
-    alert(`Proceeding to checkout with ${quantity} item(s)...`)
+    const colorObj = colors.find((c) => c.id === selectedColor)
+    addItem({
+      productId: sku,
+      title,
+      brand,
+      price: price,
+      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
+      quantity,
+      size: selectedSize,
+      color: colorObj?.name,
+    })
+    addToast(`Proceeding to checkout with ${quantity} item(s)...`, "info")
   }
 
   return (

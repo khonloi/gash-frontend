@@ -17,9 +17,14 @@ import { useCartStore } from '@/store/useCartStore'
 import styles from './MainNavbar.module.css'
 
 export function MainNavbar() {
-  const items = useCartStore((state) => state.items)
+  const items = useCartStore((state) => state.getTotalItems())
   const [searchQuery, setSearchQuery] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Prevent background scrolling when mobile drawer is open
   useEffect(() => {
@@ -96,9 +101,9 @@ export function MainNavbar() {
             </Link>
 
             {/* Cart Bag */}
-            <Link href="#" className={styles.cartIconWrapper} title="Cart">
-              <ShoppingBag size={22} />
-              {items > 0 && <span className={styles.cartBadge}>{items}</span>}
+            <Link href="/checkout" className={styles.cartIconWrapper} title="Checkout">
+              <ShoppingBag size={22} className={styles.icon} />
+              {mounted && items > 0 && <span className={styles.cartBadge}>{items}</span>}
             </Link>
 
             {/* Flag / Language */}
@@ -169,12 +174,12 @@ export function MainNavbar() {
 
         {/* Drawer Actions */}
         <div className={styles.drawerFooter}>
-          <Link href="#" className={styles.drawerActionItem} onClick={closeDrawer}>
+          <Link href="/checkout" className={styles.drawerActionItem} onClick={closeDrawer}>
             <div className={styles.drawerActionIconWrap}>
               <ShoppingBag size={20} />
-              {items > 0 && <span className={styles.drawerCartBadge}>{items}</span>}
+              {mounted && items > 0 && <span className={styles.drawerCartBadge}>{items}</span>}
             </div>
-            <span>Shopping Cart ({items} {items === 1 ? 'item' : 'items'})</span>
+            <span>Shopping Cart ({mounted ? items : 0} {(mounted ? items : 0) === 1 ? 'item' : 'items'})</span>
           </Link>
 
           <Link href="#" className={styles.drawerActionItem} onClick={closeDrawer}>

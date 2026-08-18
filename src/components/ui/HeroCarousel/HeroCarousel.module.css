@@ -64,7 +64,7 @@
   color: var(--color-white);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.95rem;
 }
 
 .discountCallout {
@@ -87,28 +87,29 @@
 .title {
   font-size: 2.8rem;
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.22;
   text-transform: uppercase;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+  color: var(--color-white);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .subtitle {
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
-  max-width: 500px;
+  max-width: 520px;
 }
 
 .dateRange {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
-  margin-top: -0.25rem;
+  margin-top: -0.1rem;
 }
 
 .ctaWrapper {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 .sharpCta {
@@ -256,28 +257,79 @@
 
 @media (max-width: 768px) {
   .slideCard {
-    height: 380px;
+    height: 350px;
   }
   .contentContainer {
-    padding: 0 1rem;
+    padding: 0 1.25rem;
   }
   .content {
     max-width: 100%;
+    gap: 0.65rem;
+  }
+  .highlightBadge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.65rem;
   }
   .title {
-    font-size: 1.8rem;
+    font-size: 1.35rem;
+    line-height: 1.25;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    max-width: 95%;
+  }
+  .dateRange {
+    font-size: 0.75rem;
+  }
+  .ctaWrapper {
+    margin-top: 0.5rem;
+  }
+  .sharpCta {
+    font-size: 0.85rem;
+    padding: 0.55rem 1.35rem;
+    gap: 0.45rem;
   }
   .arrowBtn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
   .prevBtn {
-    left: 0.5rem;
+    left: 0.4rem;
   }
   .nextBtn {
-    right: 0.5rem;
+    right: 0.4rem;
+  }
+  .dots {
+    bottom: 0.85rem;
+    gap: 0.35rem;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+  }
+  .activeDot {
+    width: 20px;
   }
   .badgeWrapper {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .slideCard {
+    height: 320px;
+  }
+  .title {
+    font-size: 1.2rem;
+    line-height: 1.25;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+  .sharpCta {
+    font-size: 0.8rem;
+    padding: 0.45rem 1.15rem;
   }
 }
