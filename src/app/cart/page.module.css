@@ -178,7 +178,8 @@
 .summary {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   align-self: start;
 }
@@ -242,27 +243,6 @@
 .totalValue {
   font-weight: 700;
   color: var(--color-sale-red);
-}
-
-.checkoutBtn {
-  width: 100%;
-  justify-content: center;
-  background-color: var(--color-navy);
-  color: var(--color-white);
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  margin-top: 1.5rem;
-  border-radius: 0;
-  box-shadow: 0 4px 12px rgba(12, 28, 48, 0.15);
-}
-
-.checkoutBtn:hover {
-  background-color: var(--color-navy-light);
-  color: var(--color-white);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(12, 28, 48, 0.25);
 }
 
 .paymentMethods {

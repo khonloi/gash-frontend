@@ -4,6 +4,8 @@ import React from 'react'
 import Link from 'next/link'
 import { ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
+import { Badge } from '@/components/ui/Badge/Badge'
+import { Button } from '@/components/ui/Button/Button'
 import styles from './ProductCard.module.css'
 
 export interface ProductCardProps {
@@ -36,13 +38,15 @@ export function ProductCard({
     <div className={styles.card}>
       <div className={styles.imageWrapper}>
         {discountPercent && (
-          <span className={styles.discountBadge}>-{discountPercent}%</span>
+          <Badge variant="destructive" className={styles.discountBadge}>-{discountPercent}%</Badge>
         )}
         <Link href={`/products/${id}`} className={styles.imageLink}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={imageUrl} alt={title} className={styles.image} />
         </Link>
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           className={styles.quickAddBtn}
           onClick={(e) => {
             e.preventDefault()
@@ -56,10 +60,10 @@ export function ProductCard({
             })
           }}
           title="Add to Cart"
+          icon={<ShoppingBag size={15} />}
         >
-          <ShoppingBag size={18} />
-          <span>Add to Cart</span>
-        </button>
+          Add to Cart
+        </Button>
       </div>
 
       <div className={styles.content}>

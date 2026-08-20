@@ -1,41 +1,48 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { X, ShoppingBag } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
-import { Button } from '../Button/Button'
-import styles from './CartSidebar.module.css'
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { X, ShoppingBag } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+import { Button } from "../Button/Button";
+import styles from "./CartSidebar.module.css";
 
 interface CartSidebarProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
-  const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore()
-  const [mounted, setMounted] = useState(false)
+  const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  if (!mounted) return null
+  if (!mounted) return null;
 
   return (
     <>
-      <div 
-        className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ''}`} 
+      <div
+        className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ""}`}
         onClick={onClose}
       />
-      
-      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+
+      <aside
+        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}
+      >
         <div className={styles.header}>
           <h2>Shopping Cart</h2>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Close cart">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Close cart"
+          >
             <X size={24} />
-          </button>
+          </Button>
         </div>
 
         <div className={styles.content}>
@@ -43,7 +50,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <div className={styles.emptyCart}>
               <ShoppingBag size={48} className={styles.emptyCartIcon} />
               <p>Your cart is currently empty.</p>
-              <Button onClick={onClose} variant="sharp">
+              <Button onClick={onClose} variant="primary">
                 Continue Shopping
               </Button>
             </div>
@@ -59,7 +66,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                       sizes="80px"
                     />
                   </div>
-                  
+
                   <div className={styles.itemDetails}>
                     <div>
                       <div className={styles.itemBrand}>{item.brand}</div>
@@ -70,19 +77,23 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                         {item.size && <span>{item.size}</span>}
                       </div>
                     </div>
-                    
+
                     <div className={styles.itemActions}>
                       <div className={styles.quantityControl}>
-                        <button 
+                        <button
                           className={styles.quantityBtn}
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
                         >
                           -
                         </button>
                         <span className={styles.quantity}>{item.quantity}</span>
-                        <button 
+                        <button
                           className={styles.quantityBtn}
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
                         >
                           +
                         </button>
@@ -91,9 +102,9 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                         ${item.price.toFixed(2)}
                       </div>
                     </div>
-                    
+
                     <div>
-                      <button 
+                      <button
                         className={styles.removeBtn}
                         onClick={() => removeItem(item.id)}
                       >
@@ -111,17 +122,23 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           <div className={styles.footer}>
             <div className={styles.subtotalRow}>
               <span className={styles.subtotalLabel}>Subtotal</span>
-              <span className={styles.subtotalValue}>${getTotalPrice().toFixed(2)}</span>
+              <span className={styles.subtotalValue}>
+                ${getTotalPrice().toFixed(2)}
+              </span>
             </div>
-            
+
             <div className={styles.actions}>
-              <Link href="/checkout" onClick={onClose} style={{ width: '100%' }}>
-                <Button variant="sharp" className={styles.checkoutBtn}>
-                  CHECKOUT
+              <Link
+                href="/checkout"
+                onClick={onClose}
+                style={{ width: "100%" }}
+              >
+                <Button variant="primary" style={{ width: "100%" }}>
+                  Check Out
                 </Button>
               </Link>
-              <Link href="/cart" onClick={onClose} style={{ width: '100%' }}>
-                <Button variant="outline" className={styles.viewCartBtn}>
+              <Link href="/cart" onClick={onClose} style={{ width: "100%" }}>
+                <Button variant="outline" style={{ width: "100%" }}>
                   View Cart
                 </Button>
               </Link>
@@ -130,5 +147,5 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         )}
       </aside>
     </>
-  )
+  );
 }

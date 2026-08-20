@@ -1,6 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { Play } from 'lucide-react'
+import { Badge } from '@/components/ui/Badge/Badge'
+import { Button } from '@/components/ui/Button/Button'
 import styles from './PromoBanner.module.css'
 
 export interface PromoBannerProps {
@@ -41,16 +43,17 @@ export function PromoBanner({
           )}
           <div className={styles.overlay} />
 
-          <div className={styles.content}>
-            {badge && <span className={styles.badge}>{badge}</span>}
+          <div className={`${styles.content} animate-fade-in`}>
+            {badge && <Badge variant="primary" className={styles.badge}>{badge}</Badge>}
             <h2 className={styles.title}>{title}</h2>
             <p className={styles.subtitle}>{subtitle}</p>
             {dateRange && <span className={styles.dateRange}>{dateRange}</span>}
 
             <div className={styles.ctaWrapper}>
-              <Link href={href} className={styles.sharpCta}>
-                <span>{ctaText}</span>
-                <Play size={14} fill="currentColor" />
+              <Link href={href}>
+                <Button variant="sharp" icon={<Play size={14} fill="currentColor" />}>
+                  {ctaText}
+                </Button>
               </Link>
             </div>
           </div>

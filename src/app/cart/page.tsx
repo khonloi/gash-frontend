@@ -1,27 +1,32 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { ShoppingBag } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
-import { Button } from '@/components/ui/Button/Button'
-import styles from './page.module.css'
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ShoppingBag } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+import { Button } from "@/components/ui/Button/Button";
+import styles from "./page.module.css";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } = useCartStore()
-  const [mounted, setMounted] = useState(false)
+  const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } =
+    useCartStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
-    return <div className={styles.cartPage}><div className="container" /></div>
+    return (
+      <div className={styles.cartPage}>
+        <div className="container" />
+      </div>
+    );
   }
 
-  const subtotal = getTotalPrice()
-  const totalItems = getTotalItems()
+  const subtotal = getTotalPrice();
+  const totalItems = getTotalItems();
 
   return (
     <div className={styles.cartPage}>
@@ -33,11 +38,14 @@ export default function CartPage() {
 
         {items.length === 0 ? (
           <div className={styles.emptyState}>
-            <ShoppingBag size={64} style={{ color: 'var(--color-border)', marginBottom: '1rem' }} />
+            <ShoppingBag
+              size={64}
+              style={{ color: "var(--color-border)", marginBottom: "1rem" }}
+            />
             <h2>Your cart is empty</h2>
             <p>Looks like you haven't added anything to your cart yet.</p>
             <Link href="/">
-              <Button variant="sharp">Shop Now</Button>
+              <Button variant="primary">Shop Now</Button>
             </Link>
           </div>
         ) : (
@@ -108,37 +116,70 @@ export default function CartPage() {
             <div className={styles.summary}>
               <div className={styles.promoBanner}>
                 <h3>REGISTER NOW | RECEIVE</h3>
-                <p>A <span className={styles.promoHighlight}>$10 VOUCHER</span> FOR YOUR FIRST ORDER</p>
+                <p>
+                  A <span className={styles.promoHighlight}>$10 VOUCHER</span>{" "}
+                  FOR YOUR FIRST ORDER
+                </p>
               </div>
 
               <div className={styles.summaryContent}>
                 <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>({totalItems}) items</span>
-                  <span className={styles.summaryValue}>${subtotal.toFixed(2)}</span>
+                  <span className={styles.summaryLabel}>
+                    ({totalItems}) items
+                  </span>
+                  <span className={styles.summaryValue}>
+                    ${subtotal.toFixed(2)}
+                  </span>
                 </div>
-                
+
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Discount</span>
-                  <span className={styles.summaryLabel} style={{ fontSize: '0.75rem' }}>Applied at checkout</span>
+                  <span
+                    className={styles.summaryLabel}
+                    style={{ fontSize: "0.75rem" }}
+                  >
+                    Applied at checkout
+                  </span>
                 </div>
-                
+
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Shipping fee</span>
-                  <span className={styles.summaryLabel} style={{ fontSize: '0.75rem' }}>Calculated at checkout</span>
+                  <span
+                    className={styles.summaryLabel}
+                    style={{ fontSize: "0.75rem" }}
+                  >
+                    Calculated at checkout
+                  </span>
                 </div>
 
                 <div className={`${styles.summaryRow} ${styles.totalRow}`}>
                   <span className={styles.totalLabel}>Total:</span>
-                  <span className={styles.totalValue}>${subtotal.toFixed(2)}</span>
+                  <span className={styles.totalValue}>
+                    ${subtotal.toFixed(2)}
+                  </span>
                 </div>
 
-                <Link href="/checkout" style={{ width: '100%', display: 'block' }}>
-                  <Button variant="sharp" className={styles.checkoutBtn}>
-                    CHECKOUT
+                <Link
+                  href="/checkout"
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    marginTop: "var(--space-6)",
+                  }}
+                >
+                  <Button variant="primary" style={{ width: "100%" }}>
+                    Check Out
                   </Button>
                 </Link>
-                
-                <div style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--color-sale-red)' }}>
+
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: "0.5rem",
+                    fontSize: "0.75rem",
+                    color: "var(--color-sale-red)",
+                  }}
+                >
                   *Shipping fee and voucher applied at checkout
                 </div>
 
@@ -146,9 +187,15 @@ export default function CartPage() {
                   <div className={styles.paymentTitle}>Fast checkout with:</div>
                   <div className={styles.paymentIcons}>
                     {/* Placeholders for payment icons */}
-                    <span style={{ fontWeight: 'bold', color: '#003087' }}>VISA</span>
-                    <span style={{ fontWeight: 'bold', color: '#EB001B' }}>MasterCard</span>
-                    <span style={{ fontWeight: 'bold', color: '#0079C1' }}>PayPal</span>
+                    <span style={{ fontWeight: "bold", color: "#003087" }}>
+                      VISA
+                    </span>
+                    <span style={{ fontWeight: "bold", color: "#EB001B" }}>
+                      MasterCard
+                    </span>
+                    <span style={{ fontWeight: "bold", color: "#0079C1" }}>
+                      PayPal
+                    </span>
                   </div>
                 </div>
               </div>
@@ -157,5 +204,5 @@ export default function CartPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

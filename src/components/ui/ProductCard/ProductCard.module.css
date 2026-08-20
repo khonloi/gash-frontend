@@ -10,15 +10,15 @@
 
 .card:hover {
   border-color: var(--color-border);
-  box-shadow: 0 8px 24px rgba(12, 28, 48, 0.08);
-  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
   padding-top: 100%; /* 1:1 Aspect Ratio */
-  background-color: var(--color-card-bg);
+  background-color: var(--color-slate-50);
   overflow: hidden;
 }
 
@@ -46,38 +46,43 @@
 
 .discountBadge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: var(--color-sale-red);
-  color: var(--color-white);
-  font-weight: 800;
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 2px;
+  top: var(--space-3);
+  left: var(--space-3);
   z-index: 2;
-  letter-spacing: 0.02em;
 }
 
 .quickAddBtn {
   position: absolute;
-  bottom: -40px;
+  bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--color-navy);
-  color: var(--color-white);
-  font-size: 0.85rem;
+  height: 36px;
+  padding: 0 var(--space-3) !important;
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 0.65rem;
-  display: flex;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-none);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: bottom 0.25s ease, background-color var(--transition-fast);
+  gap: var(--space-2);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease,
+              visibility 0.2s ease,
+              background-color var(--transition-fast),
+              color var(--transition-fast);
   z-index: 3;
 }
 
 .card:hover .quickAddBtn {
-  bottom: 0;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .quickAddBtn:hover {

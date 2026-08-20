@@ -54,7 +54,7 @@ export function MainNavbar() {
 
   return (
     <>
-      <div className={styles.navbar}>
+      <div className={`${styles.navbar} mica-dark`}>
         <div className={`container ${styles.navContainer}`}>
           {/* Brand Logo */}
           <Link href="/" className={styles.logo} onClick={closeDrawer}>
