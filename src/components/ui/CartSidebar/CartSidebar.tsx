@@ -1,0 +1,134 @@
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { X, ShoppingBag } from 'lucide-react'
+import { useCartStore } from '@/store/useCartStore'
+import { Button } from '../Button/Button'
+import styles from './CartSidebar.module.css'
+
+interface CartSidebarProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
+  const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
+  return (
+    <>
+      <div 
+        className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ''}`} 
+        onClick={onClose}
+      />
+      
+      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+        <div className={styles.header}>
+          <h2>Shopping Cart</h2>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close cart">
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className={styles.content}>
+          {items.length === 0 ? (
+            <div className={styles.emptyCart}>
+              <ShoppingBag size={48} className={styles.emptyCartIcon} />
+              <p>Your cart is currently empty.</p>
+              <Button onClick={onClose} variant="sharp">
+                Continue Shopping
+              </Button>
+            </div>
+          ) : (
+            <div className={styles.itemList}>
+              {items.map((item) => (
+                <div key={item.id} className={styles.item}>
+                  <div className={styles.itemImage}>
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title}
+                      fill
+                      sizes="80px"
+                    />
+                  </div>
+                  
+                  <div className={styles.itemDetails}>
+                    <div>
+                      <div className={styles.itemBrand}>{item.brand}</div>
+                      <div className={styles.itemName}>{item.title}</div>
+                      <div className={styles.itemOptions}>
+                        {item.color && <span>{item.color}</span>}
+                        {item.color && item.size && <span> / </span>}
+                        {item.size && <span>{item.size}</span>}
+                      </div>
+                    </div>
+                    
+                    <div className={styles.itemActions}>
+                      <div className={styles.quantityControl}>
+                        <button 
+                          className={styles.quantityBtn}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          -
+                        </button>
+                        <span className={styles.quantity}>{item.quantity}</span>
+                        <button 
+                          className={styles.quantityBtn}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className={styles.itemPrice}>
+                        ${item.price.toFixed(2)}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <button 
+                        className={styles.removeBtn}
+                        onClick={() => removeItem(item.id)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {items.length > 0 && (
+          <div className={styles.footer}>
+            <div className={styles.subtotalRow}>
+              <span className={styles.subtotalLabel}>Subtotal</span>
+              <span className={styles.subtotalValue}>${getTotalPrice().toFixed(2)}</span>
+            </div>
+            
+            <div className={styles.actions}>
+              <Link href="/checkout" onClick={onClose} style={{ width: '100%' }}>
+                <Button variant="sharp" className={styles.checkoutBtn}>
+                  CHECKOUT
+                </Button>
+              </Link>
+              <Link href="/cart" onClick={onClose} style={{ width: '100%' }}>
+                <Button variant="outline" className={styles.viewCartBtn}>
+                  View Cart
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </aside>
+    </>
+  )
+}

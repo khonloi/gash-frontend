@@ -14,12 +14,14 @@ import {
   X
 } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
+import { CartSidebar } from '@/components/ui/CartSidebar/CartSidebar'
 import styles from './MainNavbar.module.css'
 
 export function MainNavbar() {
   const items = useCartStore((state) => state.getTotalItems())
   const [searchQuery, setSearchQuery] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -101,10 +103,10 @@ export function MainNavbar() {
             </Link>
 
             {/* Cart Bag */}
-            <Link href="/checkout" className={styles.cartIconWrapper} title="Checkout">
+            <button className={styles.cartIconWrapper} onClick={() => setIsCartSidebarOpen(true)} aria-label="Open cart">
               <ShoppingBag size={22} className={styles.icon} />
               {mounted && items > 0 && <span className={styles.cartBadge}>{items}</span>}
-            </Link>
+            </button>
 
             {/* Flag / Language */}
             <div className={styles.countryFlag} title="English (US)">
@@ -174,13 +176,19 @@ export function MainNavbar() {
 
         {/* Drawer Actions */}
         <div className={styles.drawerFooter}>
-          <Link href="/checkout" className={styles.drawerActionItem} onClick={closeDrawer}>
+          <button 
+            className={styles.drawerActionItem} 
+            onClick={() => {
+              closeDrawer()
+              setIsCartSidebarOpen(true)
+            }}
+          >
             <div className={styles.drawerActionIconWrap}>
               <ShoppingBag size={20} />
               {mounted && items > 0 && <span className={styles.drawerCartBadge}>{items}</span>}
             </div>
             <span>Shopping Cart ({mounted ? items : 0} {(mounted ? items : 0) === 1 ? 'item' : 'items'})</span>
-          </Link>
+          </button>
 
           <Link href="#" className={styles.drawerActionItem} onClick={closeDrawer}>
             <User size={20} />
@@ -198,6 +206,11 @@ export function MainNavbar() {
           </div>
         </div>
       </aside>
+
+      <CartSidebar 
+        isOpen={isCartSidebarOpen} 
+        onClose={() => setIsCartSidebarOpen(false)} 
+      />
     </>
   )
 }
