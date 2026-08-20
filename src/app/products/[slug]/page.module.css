@@ -55,13 +55,20 @@
 }
 
 @media (max-width: 768px) {
+  .relatedSection {
+    margin-top: 40px;
+    padding-top: 32px;
+  }
+
   .relatedGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .relatedGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 }

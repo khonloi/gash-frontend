@@ -35,21 +35,27 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <ShoppingBag size={64} className={styles.emptyIcon} />
-        <h1 className={styles.emptyTitle}>Your cart is empty</h1>
-        <p className={styles.emptyDesc}>Looks like you haven't added anything to your cart yet.</p>
-        <Link href="/" className={styles.continueShoppingBtn}>
-          Continue Shopping
-        </Link>
+      <div className={styles.checkoutPage}>
+        <div className="container">
+          <div className={styles.emptyState}>
+            <ShoppingBag size={64} className={styles.emptyIcon} />
+            <h1 className={styles.emptyTitle}>Your cart is empty</h1>
+            <p className={styles.emptyDesc}>Looks like you haven't added anything to your cart yet.</p>
+            <Link href="/" className={styles.continueShoppingBtn}>
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className={styles.checkoutContainer}>
-      {/* Left Column - Forms */}
-      <div className={styles.leftColumn}>
+    <div className={styles.checkoutPage}>
+      <div className="container">
+        <div className={styles.checkoutContainer}>
+          {/* Left Column - Forms */}
+          <div className={styles.leftColumn}>
         {/* Breadcrumb */}
         <div style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
           <Link href="/cart" style={{ color: 'var(--color-text)' }}>Cart</Link>
@@ -257,5 +263,7 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  </div>
+</div>
   )
 }

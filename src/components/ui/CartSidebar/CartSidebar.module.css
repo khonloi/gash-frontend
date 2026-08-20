@@ -195,18 +195,29 @@
   color: var(--color-navy);
 }
 
-.removeBtn {
-  font-size: 0.875rem;
-  color: var(--color-sale-red);
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
+.quantityWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.removeBtn:hover {
-  color: var(--color-sale-red-light);
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.deleteBtn:hover {
+  color: var(--color-sale-red);
+  background-color: var(--color-bg-gray);
 }
 
 .footer {

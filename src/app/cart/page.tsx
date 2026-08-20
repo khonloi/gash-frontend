@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/ui/Button/Button";
 import styles from "./page.module.css";
@@ -32,7 +32,7 @@ export default function CartPage() {
     <div className={styles.cartPage}>
       <div className="container">
         <Link href="/" className={styles.continueShopping}>
-          &lt; Continue Shopping
+          &lt; Continue to Shopping
         </Link>
         <h1 className={styles.title}>Shopping Cart</h1>
 
@@ -77,36 +77,40 @@ export default function CartPage() {
                     ${item.price.toFixed(2)}
                   </div>
 
-                  <div className={styles.quantityControl}>
+                  <div className={styles.quantityWrapper}>
+                    <div className={styles.quantityControl}>
+                      <button
+                        className={styles.quantityBtn}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <span className={styles.quantity}>{item.quantity}</span>
+                      <button
+                        className={styles.quantityBtn}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
                     <button
-                      className={styles.quantityBtn}
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      aria-label="Decrease quantity"
+                      className={styles.deleteBtn}
+                      onClick={() => removeItem(item.id)}
+                      title="Remove item"
+                      aria-label="Remove item"
                     >
-                      -
-                    </button>
-                    <span className={styles.quantity}>{item.quantity}</span>
-                    <button
-                      className={styles.quantityBtn}
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      aria-label="Increase quantity"
-                    >
-                      +
+                      <Trash2 size={16} />
                     </button>
                   </div>
 
-                  <div className={styles.itemPriceControls}>
-                    <div>
-                      <div className={styles.itemTotal}>
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </div>
-                      <button
-                        className={styles.removeBtn}
-                        onClick={() => removeItem(item.id)}
-                      >
-                        Remove
-                      </button>
-                    </div>
+                  <div className={styles.itemTotal}>
+                    ${(item.price * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}

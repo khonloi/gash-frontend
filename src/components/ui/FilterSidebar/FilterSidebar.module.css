@@ -3,17 +3,85 @@
   background: var(--color-white);
 }
 
-.header {
+.desktopHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 16px;
 }
 
-.title {
-  font-size: 18px;
+.desktopHeaderContent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-navy);
+}
+
+.mobileToggleBtn {
+  display: none;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: var(--color-navy);
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.mobileToggleBtn:hover {
+  background-color: var(--color-bg-gray);
+}
+
+.mobileToggleLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mobileToggleRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.toggleStatus {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-text-main);
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-navy);
   margin: 0;
+}
+
+.activeBadge {
+  background-color: var(--color-primary-green);
+  color: var(--color-navy);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.mobileChevron {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chevronRotated {
+  transform: rotate(180deg);
+}
+
+.categoriesWrapper {
+  display: block;
 }
 
 .categories {
@@ -44,7 +112,7 @@
 
 .categoryTitle {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .optionsList {
@@ -59,7 +127,6 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  group: hover;
 }
 
 .hiddenInput {
@@ -87,16 +154,17 @@
 .checkboxActive {
   background: var(--color-primary-turquoise);
   border-color: var(--color-primary-turquoise);
+  color: var(--color-navy);
 }
 
 .optionLabel {
   font-size: 14px;
-  color: var(--color-text-body);
+  color: var(--color-text-main);
   flex: 1;
 }
 
 .checkboxLabel:hover .optionLabel {
-  color: var(--color-primary-turquoise);
+  color: var(--color-royal-blue);
 }
 
 .optionCount {
@@ -131,7 +199,8 @@
 }
 
 .colorActive {
-  border-color: var(--color-primary-turquoise);
+  border-color: var(--color-navy);
+  border-width: 2px;
 }
 
 .colorSwatch {
@@ -139,4 +208,30 @@
   height: 100%;
   border-radius: 50%;
   display: block;
+}
+
+@media (max-width: 992px) {
+  .desktopHeader {
+    display: none;
+  }
+
+  .mobileToggleBtn {
+    display: flex;
+    margin-bottom: 4px;
+  }
+
+  .categoriesWrapper {
+    display: none;
+    padding: 16px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-top: 6px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  .categoriesWrapper.categoriesExpanded {
+    display: block;
+  }
 }

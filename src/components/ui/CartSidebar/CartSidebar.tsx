@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ShoppingBag } from "lucide-react";
+import { X, ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "../Button/Button";
 import styles from "./CartSidebar.module.css";
@@ -79,37 +79,40 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     </div>
 
                     <div className={styles.itemActions}>
-                      <div className={styles.quantityControl}>
+                      <div className={styles.quantityWrapper}>
+                        <div className={styles.quantityControl}>
+                          <button
+                            className={styles.quantityBtn}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
+                            aria-label="Decrease quantity"
+                          >
+                            -
+                          </button>
+                          <span className={styles.quantity}>{item.quantity}</span>
+                          <button
+                            className={styles.quantityBtn}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
                         <button
-                          className={styles.quantityBtn}
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
+                          className={styles.deleteBtn}
+                          onClick={() => removeItem(item.id)}
+                          title="Remove item"
+                          aria-label="Remove item"
                         >
-                          -
-                        </button>
-                        <span className={styles.quantity}>{item.quantity}</span>
-                        <button
-                          className={styles.quantityBtn}
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
-                        >
-                          +
+                          <Trash2 size={16} />
                         </button>
                       </div>
                       <div className={styles.itemPrice}>
                         ${item.price.toFixed(2)}
                       </div>
-                    </div>
-
-                    <div>
-                      <button
-                        className={styles.removeBtn}
-                        onClick={() => removeItem(item.id)}
-                      >
-                        Remove
-                      </button>
                     </div>
                   </div>
                 </div>

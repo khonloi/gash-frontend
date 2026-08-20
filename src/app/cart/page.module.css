@@ -4,7 +4,7 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--color-navy);
   margin-bottom: 2rem;
@@ -16,7 +16,7 @@
   font-weight: 600;
   color: var(--color-navy);
   margin-bottom: 1.5rem;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .content {
@@ -109,14 +109,10 @@
   text-align: right;
 }
 
-.itemPriceControls {
+.quantityWrapper {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  min-width: 90px;
-  text-align: right;
-  gap: 0.35rem;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .quantityControl {
@@ -154,32 +150,38 @@
   color: var(--color-navy);
 }
 
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.deleteBtn:hover {
+  color: var(--color-sale-red);
+  background-color: var(--color-slate-100);
+}
+
 .itemTotal {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-navy);
-}
-
-.removeBtn {
-  font-size: 0.8rem;
   color: var(--color-sale-red);
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  transition: color var(--transition-fast);
-}
-
-.removeBtn:hover {
-  color: var(--color-sale-red-light);
+  min-width: 90px;
+  text-align: right;
 }
 
 .summary {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
   overflow: hidden;
   align-self: start;
 }
@@ -278,7 +280,7 @@
 @media (max-width: 768px) {
   .item {
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
   }
 
@@ -290,12 +292,11 @@
     display: none;
   }
 
-  .quantityControl {
+  .quantityWrapper {
     margin-top: 0.5rem;
   }
 
-  .itemPriceControls {
+  .itemTotal {
     margin-left: auto;
-    align-items: flex-end;
   }
 }
