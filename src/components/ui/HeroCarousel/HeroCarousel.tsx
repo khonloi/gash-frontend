@@ -1,74 +1,80 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
-import styles from './HeroCarousel.module.css'
+import React, { useState, useEffect, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import styles from "./HeroCarousel.module.css";
 
 interface SlideData {
-  id: number
-  badge: string
-  title: string
-  subtitle: string
-  dateRange: string
-  ctaText: string
-  bgGradient: string
-  image: string
+  id: number;
+  badge: string;
+  title: string;
+  subtitle: string;
+  dateRange: string;
+  ctaText: string;
+  bgGradient: string;
+  image: string;
 }
 
 const slides: SlideData[] = [
   {
     id: 1,
-    badge: 'EXTRA 15% OFF*',
-    title: 'BACK TO YOUR ROUTINE',
-    subtitle: 'Exclusive for new members - Get $15 off on your first order over $100',
-    dateRange: 'Aug 6 - 19 (*Terms & conditions apply)',
-    ctaText: 'SHOP NOW',
-    bgGradient: 'linear-gradient(135deg, #003CD6 0%, #001B6B 100%)',
-    image: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80',
+    badge: "EXTRA 15% OFF*",
+    title: "BACK TO YOUR ROUTINE",
+    subtitle:
+      "Exclusive for new members - Get $15 off on your first order over $100",
+    dateRange: "Aug 6 - 19 (*Terms & conditions apply)",
+    ctaText: "SHOP NOW",
+    bgGradient: "linear-gradient(135deg, #003CD6 0%, #001B6B 100%)",
+    image:
+      "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: 2,
-    badge: 'ADIDAS SPECIAL SALE',
-    title: 'ULTRA BOOST & RUNNING',
-    subtitle: 'Elevate your speed and endurance with pinnacle energy-return technology',
-    dateRange: 'Applied on selected styles only',
-    ctaText: 'EXPLORE NOW',
-    bgGradient: 'linear-gradient(135deg, #0C1C30 0%, #1A365D 100%)',
-    image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
+    badge: "ADIDAS SPECIAL SALE",
+    title: "ULTRA BOOST & RUNNING",
+    subtitle:
+      "Elevate your speed and endurance with pinnacle energy-return technology",
+    dateRange: "Applied on selected styles only",
+    ctaText: "EXPLORE NOW",
+    bgGradient: "linear-gradient(135deg, #0C1C30 0%, #1A365D 100%)",
+    image:
+      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: 3,
-    badge: 'NEW ARRIVALS 2026',
-    title: 'SUMMER TRAINING GEAR',
-    subtitle: '4-way stretch, ultra-breathable athletic apparel engineered for peak performance',
-    dateRange: 'Buy 2 get 1 training accessory free',
-    ctaText: 'VIEW COLLECTION',
-    bgGradient: 'linear-gradient(135deg, #005F73 0%, #0A9396 100%)',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
+    badge: "NEW ARRIVALS 2026",
+    title: "SUMMER TRAINING GEAR",
+    subtitle:
+      "4-way stretch, ultra-breathable athletic apparel engineered for peak performance",
+    dateRange: "Buy 2 get 1 training accessory free",
+    ctaText: "VIEW COLLECTION",
+    bgGradient: "linear-gradient(135deg, #005F73 0%, #0A9396 100%)",
+    image:
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
   },
-]
+];
 
 export function HeroCarousel() {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1))
-  }, [])
+    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  }, []);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
-  }, [])
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  }, []);
 
   useEffect(() => {
-    if (isPaused) return
+    if (isPaused) return;
     const timer = setInterval(() => {
-      nextSlide()
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [nextSlide, isPaused])
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [nextSlide, isPaused]);
 
-  const slide = slides[currentSlide]
+  const slide = slides[currentSlide];
 
   return (
     <div
@@ -130,7 +136,7 @@ export function HeroCarousel() {
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ''}`}
+                className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ""}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -152,5 +158,5 @@ export function HeroCarousel() {
         </div>
       </div>
     </div>
-  )
+  );
 }

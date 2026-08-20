@@ -41,7 +41,7 @@ export default function Home() {
     journalFilter === "All"
       ? journalArticles
       : journalArticles.filter(
-          (art) => art.category.toUpperCase() === journalFilter.toUpperCase()
+          (art) => art.category.toUpperCase() === journalFilter.toUpperCase(),
         );
 
   return (
@@ -200,7 +200,7 @@ export default function Home() {
                   >
                     {filter === "All" ? "All Stories" : filter}
                   </button>
-                )
+                ),
               )}
             </div>
           </div>

@@ -333,7 +333,6 @@ export const brands = [
   "+30 MORE BRANDS",
 ];
 
-
 // ----------------------------------------------------------------------
 // COLLECTIONS MOCK DATA
 // ----------------------------------------------------------------------
@@ -350,19 +349,21 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "black",
     size: "m",
     gender: "women",
-    imageUrl: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y2",
     brand: "LULULEMON",
-    title: "Align™ High-Rise Pant 25\"",
+    title: 'Align™ High-Rise Pant 25"',
     originalPrice: 98,
     salePrice: 98,
     category: "bottoms",
     color: "pink",
     size: "s",
     gender: "women",
-    imageUrl: "https://images.unsplash.com/photo-1552196563-55259259a54f?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1552196563-55259259a54f?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y3",
@@ -375,7 +376,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "blue",
     size: "l",
     gender: "women",
-    imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y4",
@@ -388,7 +390,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "black",
     size: "m",
     gender: "women",
-    imageUrl: "https://images.unsplash.com/photo-1548690312-e3b507d8c110?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1548690312-e3b507d8c110?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y5",
@@ -401,7 +404,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "grey",
     size: "s",
     gender: "women",
-    imageUrl: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y6",
@@ -413,7 +417,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "black",
     size: "one-size",
     gender: "unisex",
-    imageUrl: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y7",
@@ -426,7 +431,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "grey",
     size: "l",
     gender: "men",
-    imageUrl: "https://images.unsplash.com/photo-1514989940723-e8e51635b782?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1514989940723-e8e51635b782?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y8",
@@ -439,7 +445,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "blue",
     size: "one-size",
     gender: "unisex",
-    imageUrl: "https://images.unsplash.com/photo-1599447421416-3414500d18a5?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1599447421416-3414500d18a5?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y9",
@@ -451,7 +458,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "pink",
     size: "one-size",
     gender: "unisex",
-    imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y10",
@@ -463,7 +471,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "black",
     size: "m",
     gender: "women",
-    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y11",
@@ -476,7 +485,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "white",
     size: "m",
     gender: "men",
-    imageUrl: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "y12",
@@ -489,7 +499,8 @@ export const MOCK_YOGA_PRODUCTS = [
     color: "grey",
     size: "one-size",
     gender: "unisex",
-    imageUrl: "https://images.unsplash.com/photo-1593368857313-81a1795b54fa?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1593368857313-81a1795b54fa?auto=format&fit=crop&w=500&q=80",
   },
 ];
 
@@ -576,12 +587,14 @@ export const mockProductDetail = {
     {
       id: "sea-salt",
       name: "BEIGE (SEA SALT)",
-      imageUrl: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=150&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=150&q=80",
     },
     {
       id: "dusty-pink",
       name: "PINK (DUSTY PINK)",
-      imageUrl: "https://images.unsplash.com/photo-1544441892-794166f1e310?auto=format&fit=crop&w=150&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1544441892-794166f1e310?auto=format&fit=crop&w=150&q=80",
     },
   ],
   sizes: [
@@ -599,11 +612,11 @@ export const mockProductDetail = {
     "Note: US fit is larger than standard Asian sizing. Please size down if you prefer a slim fit.",
   ],
   specs: {
-    "Sports": "Outdoor / Lifestyle",
+    Sports: "Outdoor / Lifestyle",
     "Collar Type": "Stand collar",
     "Fit Type": "Loose Fit",
-    "Material": "100% polyester MTR filament fleece 250g",
-  }
+    Material: "100% polyester MTR filament fleece 250g",
+  },
 };
 
 export const mockRelatedProducts = [
@@ -611,43 +624,48 @@ export const mockRelatedProducts = [
     id: "r1",
     brand: "COLUMBIA",
     title: "Women's Columbia Arcadia II Rain Jacket",
-    originalPrice: 88.00,
-    salePrice: 70.40,
+    originalPrice: 88.0,
+    salePrice: 70.4,
     discountPercent: 20,
-    imageUrl: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "r2",
     brand: "THE NORTH FACE",
     title: "Women's The North Face Resolve 2",
-    originalPrice: 95.00,
-    salePrice: 95.00,
-    imageUrl: "https://images.unsplash.com/photo-1544441892-794166f1e310?auto=format&fit=crop&w=500&q=80",
+    originalPrice: 95.0,
+    salePrice: 95.0,
+    imageUrl:
+      "https://images.unsplash.com/photo-1544441892-794166f1e310?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "r3",
     brand: "COLUMBIA",
     title: "Women's Columbia Fire Side II Fleece",
-    originalPrice: 75.00,
+    originalPrice: 75.0,
     salePrice: 56.25,
     discountPercent: 25,
-    imageUrl: "https://images.unsplash.com/photo-1544441892-794166f1e312?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1544441892-794166f1e312?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "r4",
     brand: "PATAGONIA",
     title: "Women's Patagonia Better Sweater",
-    originalPrice: 139.00,
-    salePrice: 139.00,
-    imageUrl: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=500&q=80",
+    originalPrice: 139.0,
+    salePrice: 139.0,
+    imageUrl:
+      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=500&q=80",
   },
   {
     id: "r5",
     brand: "NIKE",
     title: "Women's Sportswear Therma-FIT Repel Jacket",
-    originalPrice: 110.00,
-    salePrice: 88.00,
+    originalPrice: 110.0,
+    salePrice: 88.0,
     discountPercent: 20,
-    imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=500&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=500&q=80",
   },
 ];

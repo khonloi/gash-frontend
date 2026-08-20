@@ -32,7 +32,7 @@ export default function CartPage() {
     <div className={styles.cartPage}>
       <div className="container">
         <Link href="/" className={styles.continueShopping}>
-          &lt; Continue to Shopping
+          Continue to Shopping
         </Link>
         <h1 className={styles.title}>Shopping Cart</h1>
 
