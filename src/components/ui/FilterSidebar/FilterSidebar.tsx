@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ChevronDown, ChevronUp, Check, SlidersHorizontal } from 'lucide-react'
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react'
+import { Checkbox } from '@/components/ui/Checkbox/Checkbox'
 import styles from './FilterSidebar.module.css'
 
 export type FilterOption = {
@@ -27,7 +28,7 @@ interface FilterSidebarProps {
   onClearFilters?: () => void
 }
 
-export function FilterSidebar({ categories, activeFilters, onFilterChange, onClearFilters }: FilterSidebarProps) {
+export function FilterSidebar({ categories, activeFilters, onFilterChange }: FilterSidebarProps) {
   const [isMobileExpanded, setIsMobileExpanded] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(
     categories.reduce((acc, cat) => ({ ...acc, [cat.id]: true }), {})
@@ -49,6 +50,7 @@ export function FilterSidebar({ categories, activeFilters, onFilterChange, onCle
     <aside className={styles.sidebar}>
       {/* Mobile Accordion Header Button */}
       <button 
+        type="button"
         className={styles.mobileToggleBtn}
         onClick={() => setIsMobileExpanded(prev => !prev)}
         aria-expanded={isMobileExpanded}
@@ -91,6 +93,7 @@ export function FilterSidebar({ categories, activeFilters, onFilterChange, onCle
           return (
             <div key={category.id} className={styles.category}>
               <button 
+                type="button"
                 className={styles.categoryHeader} 
                 onClick={() => toggleCategory(category.id)}
                 aria-expanded={isExpanded}
@@ -102,23 +105,15 @@ export function FilterSidebar({ categories, activeFilters, onFilterChange, onCle
               {isExpanded && (
                 <div className={styles.optionsList}>
                   {category.type === 'checkbox' && category.options.map(option => {
-                    const isActive = activeFilters[category.id]?.includes(option.id)
+                    const isActive = activeFilters[category.id]?.includes(option.id) || false
                     return (
-                      <label key={option.id} className={styles.checkboxLabel}>
-                        <div className={`${styles.checkbox} ${isActive ? styles.checkboxActive : ''}`}>
-                          {isActive && <Check size={12} strokeWidth={3} />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          className={styles.hiddenInput}
-                          checked={isActive || false}
-                          onChange={() => onFilterChange(category.id, option.id)}
-                        />
-                        <span className={styles.optionLabel}>{option.label}</span>
-                        {option.count !== undefined && (
-                          <span className={styles.optionCount}>({option.count})</span>
-                        )}
-                      </label>
+                      <Checkbox
+                        key={option.id}
+                        checked={isActive}
+                        onChange={() => onFilterChange(category.id, option.id)}
+                        label={option.label}
+                        count={option.count}
+                      />
                     )
                   })}
 
@@ -129,6 +124,7 @@ export function FilterSidebar({ categories, activeFilters, onFilterChange, onCle
                         return (
                           <button
                             key={option.id}
+                            type="button"
                             className={`${styles.colorButton} ${isActive ? styles.colorActive : ''}`}
                             onClick={() => onFilterChange(category.id, option.id)}
                             title={option.label}

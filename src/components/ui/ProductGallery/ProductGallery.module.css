@@ -1,7 +1,7 @@
 .gallery {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
   width: 100%;
 }
 
@@ -9,8 +9,8 @@
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  background-color: var(--color-bg-muted);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -23,16 +23,21 @@
   object-fit: cover;
 }
 
+.noImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
 .badgeNew {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background-color: #39b54a;
-  color: white;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 4px;
+  top: var(--space-4);
+  right: var(--space-4);
   z-index: 1;
 }
 
@@ -40,38 +45,38 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.85);
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--color-text-main);
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   z-index: 1;
 }
 
 .navButton:hover {
-  background-color: white;
+  background-color: var(--color-white);
   color: var(--color-primary-turquoise);
 }
 
 .prevButton {
-  left: 16px;
+  left: var(--space-4);
 }
 
 .nextButton {
-  right: 16px;
+  right: var(--space-4);
 }
 
 .thumbnailList {
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: var(--space-2);
 }
 
 .thumbnailList::-webkit-scrollbar {
@@ -80,7 +85,7 @@
 
 .thumbnailList::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .thumbnailBtn {
@@ -90,12 +95,12 @@
   aspect-ratio: 1 / 1;
   border: 1px solid transparent;
   padding: 0;
-  background-color: #f5f5f5;
-  border-radius: 6px;
+  background-color: var(--color-bg-muted);
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: pointer;
   opacity: 0.6;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .thumbnailBtn:hover {

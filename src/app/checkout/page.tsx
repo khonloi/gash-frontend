@@ -2,8 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingBag, ChevronRight } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import {
+  Button,
+  Input,
+  Checkbox,
+  RadioGroup,
+  Breadcrumb,
+  EmptyState,
+  RadioOption,
+} from "@/components/ui";
 import styles from "./page.module.css";
 
 export default function CheckoutPage() {
@@ -12,6 +21,7 @@ export default function CheckoutPage() {
 
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [keepUpdated, setKeepUpdated] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -30,8 +40,13 @@ export default function CheckoutPage() {
 
   if (!mounted) {
     return (
-      <div className={styles.emptyState}>
-        <p className={styles.emptyDesc}>Loading checkout...</p>
+      <div className={styles.checkoutPage}>
+        <div className="container">
+          <EmptyState
+            title="Loading checkout..."
+            description="Please wait while we prepare your order summary."
+          />
+        </div>
       </div>
     );
   }
@@ -40,20 +55,65 @@ export default function CheckoutPage() {
     return (
       <div className={styles.checkoutPage}>
         <div className="container">
-          <div className={styles.emptyState}>
-            <ShoppingBag size={64} className={styles.emptyIcon} />
-            <h1 className={styles.emptyTitle}>Your cart is empty</h1>
-            <p className={styles.emptyDesc}>
-              Looks like you haven't added anything to your cart yet.
-            </p>
-            <Link href="/" className={styles.continueShoppingBtn}>
-              Continue Shopping
-            </Link>
-          </div>
+          <EmptyState
+            icon={<ShoppingBag size={64} />}
+            title="Your cart is empty"
+            description="Looks like you haven't added anything to your cart yet."
+            action={
+              <Button as={Link} href="/" variant="primary" size="lg">
+                Continue Shopping
+              </Button>
+            }
+          />
         </div>
       </div>
     );
   }
+
+  const breadcrumbItems = [
+    { label: "Cart", href: "/cart" },
+    { label: "Information" },
+    { label: "Shipping" },
+    { label: "Payment" },
+  ];
+
+  const shippingOptions: RadioOption[] = [
+    {
+      value: "standard",
+      title: "Standard Shipping",
+      description: "3-5 business days",
+      rightElement: <span>$30.00</span>,
+    },
+    {
+      value: "express",
+      title: "Express Shipping",
+      description: "1-2 business days",
+      rightElement: <span>$50.00</span>,
+    },
+  ];
+
+  const paymentOptions: RadioOption[] = [
+    {
+      value: "cod",
+      title: "Cash on Delivery (COD)",
+      description: "Pay with cash upon delivery.",
+    },
+    {
+      value: "credit_card",
+      title: "Credit Card",
+      description: "Visa, Mastercard, AMEX, JCB",
+    },
+    {
+      value: "momo",
+      title: "MoMo E-Wallet",
+      description: "Pay via MoMo App",
+    },
+    {
+      value: "vnpay",
+      title: "VNPay QR",
+      description: "Scan QR code with banking app",
+    },
+  ];
 
   return (
     <div className={styles.checkoutPage}>
@@ -61,54 +121,24 @@ export default function CheckoutPage() {
         <div className={styles.checkoutContainer}>
           {/* Left Column - Forms */}
           <div className={styles.leftColumn}>
-            {/* Breadcrumb */}
-            <div
-              style={{
-                fontSize: "0.875rem",
-                color: "var(--color-text-muted)",
-                display: "flex",
-                gap: "8px",
-                alignItems: "center",
-              }}
-            >
-              <Link href="/cart" style={{ color: "var(--color-text)" }}>
-                Cart
-              </Link>
-              <ChevronRight size={14} />
-              <span style={{ fontWeight: 500, color: "var(--color-text)" }}>
-                Information
-              </span>
-              <ChevronRight size={14} />
-              <span>Shipping</span>
-              <ChevronRight size={14} />
-              <span>Payment</span>
-            </div>
+            <Breadcrumb items={breadcrumbItems} />
 
             {/* Contact Info */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Contact Information</h2>
               <div className={styles.inputGroup}>
-                <input
+                <Input
                   type="email"
                   placeholder="Email or mobile phone number"
-                  className={styles.input}
+                  inputSize="lg"
                 />
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    fontSize: "0.875rem",
-                    marginTop: "8px",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    style={{ accentColor: "var(--color-primary)" }}
+                <div className={styles.checkboxWrap}>
+                  <Checkbox
+                    checked={keepUpdated}
+                    onChange={setKeepUpdated}
+                    label="Keep me up to date on news and exclusive offers"
                   />
-                  Keep me up to date on news and exclusive offers
-                </label>
+                </div>
               </div>
             </section>
 
@@ -116,73 +146,61 @@ export default function CheckoutPage() {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Shipping Address</h2>
               <div className={styles.formGrid}>
-                <div
-                  className={styles.inputGroup}
-                  style={{ gridColumn: "1 / -1" }}
-                >
-                  <input
+                <div className="grid-full-span">
+                  <Input
                     type="text"
                     placeholder="Country/Region"
                     defaultValue="Vietnam"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <input
+                <div>
+                  <Input
                     type="text"
                     placeholder="First Name"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <input
+                <div>
+                  <Input
                     type="text"
                     placeholder="Last Name"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div
-                  className={styles.inputGroup}
-                  style={{ gridColumn: "1 / -1" }}
-                >
-                  <input
+                <div className="grid-full-span">
+                  <Input
                     type="text"
                     placeholder="Address"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div
-                  className={styles.inputGroup}
-                  style={{ gridColumn: "1 / -1" }}
-                >
-                  <input
+                <div className="grid-full-span">
+                  <Input
                     type="text"
                     placeholder="Apartment, suite, etc. (optional)"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <input
+                <div>
+                  <Input
                     type="text"
                     placeholder="City"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <input
+                <div>
+                  <Input
                     type="text"
                     placeholder="Postal Code"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
-                <div
-                  className={styles.inputGroup}
-                  style={{ gridColumn: "1 / -1" }}
-                >
-                  <input
+                <div className="grid-full-span">
+                  <Input
                     type="tel"
                     placeholder="Phone"
-                    className={styles.input}
+                    inputSize="lg"
                   />
                 </div>
               </div>
@@ -191,121 +209,31 @@ export default function CheckoutPage() {
             {/* Shipping Method */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Shipping Method</h2>
-              <div className={styles.radioGroup}>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="standard"
-                    checked={shippingMethod === "standard"}
-                    onChange={() => setShippingMethod("standard")}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.radioLabel}>
-                    <span className={styles.radioTitle}>Standard Shipping</span>
-                    <span className={styles.radioDesc}>3-5 business days</span>
-                  </div>
-                  <span className={styles.radioTitle}>$30.00</span>
-                </label>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="express"
-                    checked={shippingMethod === "express"}
-                    onChange={() => setShippingMethod("express")}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.radioLabel}>
-                    <span className={styles.radioTitle}>Express Shipping</span>
-                    <span className={styles.radioDesc}>1-2 business days</span>
-                  </div>
-                  <span className={styles.radioTitle}>$50.00</span>
-                </label>
-              </div>
+              <RadioGroup
+                name="shipping"
+                value={shippingMethod}
+                onChange={setShippingMethod}
+                options={shippingOptions}
+              />
             </section>
 
             {/* Payment Method */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Payment Method</h2>
-              <p
-                style={{
-                  fontSize: "0.875rem",
-                  color: "var(--color-text-muted)",
-                  marginBottom: "8px",
-                }}
-              >
+              <p className={styles.sectionDesc}>
                 All transactions are secure and encrypted.
               </p>
-              <div className={styles.radioGroup}>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="cod"
-                    checked={paymentMethod === "cod"}
-                    onChange={() => setPaymentMethod("cod")}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.radioLabel}>
-                    <span className={styles.radioTitle}>
-                      Cash on Delivery (COD)
-                    </span>
-                    <span className={styles.radioDesc}>
-                      Pay with cash upon delivery.
-                    </span>
-                  </div>
-                </label>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="credit_card"
-                    checked={paymentMethod === "credit_card"}
-                    onChange={() => setPaymentMethod("credit_card")}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.radioLabel}>
-                    <span className={styles.radioTitle}>Credit Card</span>
-                    <span className={styles.radioDesc}>
-                      Visa, Mastercard, AMEX, JCB
-                    </span>
-                  </div>
-                </label>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="momo"
-                    checked={paymentMethod === "momo"}
-                    onChange={() => setPaymentMethod("momo")}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.radioLabel}>
-                    <span className={styles.radioTitle}>MoMo E-Wallet</span>
-                    <span className={styles.radioDesc}>Pay via MoMo App</span>
-                  </div>
-                </label>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="vnpay"
-                    checked={paymentMethod === "vnpay"}
-                    onChange={() => setPaymentMethod("vnpay")}
-                    className={styles.radioInput}
-                  />
-                  <div className={styles.radioLabel}>
-                    <span className={styles.radioTitle}>VNPay QR</span>
-                    <span className={styles.radioDesc}>
-                      Scan QR code with banking app
-                    </span>
-                  </div>
-                </label>
-              </div>
+              <RadioGroup
+                name="payment"
+                value={paymentMethod}
+                onChange={setPaymentMethod}
+                options={paymentOptions}
+              />
             </section>
 
-            <button className={styles.submitBtn}>Complete Order</button>
+            <Button variant="primary" size="lg" fullWidth>
+              Complete Order
+            </Button>
           </div>
 
           {/* Right Column - Order Summary */}
@@ -336,24 +264,24 @@ export default function CheckoutPage() {
             </div>
 
             <div className={styles.discountForm}>
-              <input
-                type="text"
-                placeholder="Discount code"
-                className={styles.discountInput}
-              />
-              <button className={styles.discountBtn}>Apply</button>
+              <div className={styles.discountInput}>
+                <Input placeholder="Discount code" inputSize="md" />
+              </div>
+              <Button variant="outline" size="md">
+                Apply
+              </Button>
             </div>
 
             <div className={styles.totals}>
               <div className={styles.totalRow}>
                 <span>Subtotal</span>
-                <span style={{ color: "var(--color-text)", fontWeight: 500 }}>
+                <span className={styles.totalValue}>
                   {formatPrice(subtotal)}
                 </span>
               </div>
               <div className={styles.totalRow}>
                 <span>Shipping</span>
-                <span style={{ color: "var(--color-text)", fontWeight: 500 }}>
+                <span className={styles.totalValue}>
                   {shippingFee === 0 ? "Free" : formatPrice(shippingFee)}
                 </span>
               </div>

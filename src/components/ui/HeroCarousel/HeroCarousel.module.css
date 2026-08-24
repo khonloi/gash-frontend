@@ -214,7 +214,7 @@
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #0055FF, #0022AA);
+  background: radial-gradient(circle at 30% 30%, var(--color-royal-blue), var(--color-navy));
   border: 3px solid var(--color-white);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
   display: flex;

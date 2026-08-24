@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { HeroCarousel } from "@/components/ui/HeroCarousel/HeroCarousel";
-import { CategoryCircle } from "@/components/ui/CategoryCircle/CategoryCircle";
-import { ProductCard } from "@/components/ui/ProductCard/ProductCard";
-import { PromoBanner } from "@/components/ui/PromoBanner/PromoBanner";
-import { SportCard } from "@/components/ui/SportCard/SportCard";
-import { ArticleCard } from "@/components/ui/ArticleCard/ArticleCard";
+import {
+  HeroCarousel,
+  CategoryCircle,
+  ProductCard,
+  PromoBanner,
+  SportCard,
+  ArticleCard,
+  SectionHeading,
+} from "@/components/ui";
 import { FrontendProduct } from "@/types/product";
 import { fetchProducts } from "@/services/productService";
 import {
@@ -31,7 +34,7 @@ export default function Home() {
   const [newCollections, setNewCollections] = useState<FrontendProduct[]>([]);
   const [featuredCollections, setFeaturedCollections] = useState<FrontendProduct[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function loadProducts() {
       const allProducts = await fetchProducts();
       // Display 2 rows x 5 columns = 10 products per section
@@ -57,6 +60,13 @@ export default function Home() {
           (art) => art.category.toUpperCase() === journalFilter.toUpperCase(),
         );
 
+  const viewAllAction = (
+    <Link href="/collections/all" className={styles.viewAllLink}>
+      <span>View all products</span>
+      <ArrowRight size={16} />
+    </Link>
+  );
+
   return (
     <main className={styles.main}>
       {/* 1. Hero Section Carousel */}
@@ -65,7 +75,7 @@ export default function Home() {
       {/* 2. Categories Section */}
       <section className={styles.categorySection}>
         <div className="container">
-          <h2 className="heading-section">Shop by Category</h2>
+          <SectionHeading>Shop by Category</SectionHeading>
           <div className={styles.categoryGrid}>
             {categories.map((cat, idx) => (
               <CategoryCircle
@@ -83,17 +93,9 @@ export default function Home() {
       {/* 3. Featured Deals / Hot Products (2 rows x 5 columns = 10 products) */}
       <section className={styles.productsSection}>
         <div className="container">
-          <div className={styles.sectionHeader}>
-            <div className={styles.titleWithIcon}>
-              <h2 className="heading-section" style={{ marginBottom: 0 }}>
-                Featured Deals
-              </h2>
-            </div>
-            <Link href="/collections/all" className={styles.viewAllLink}>
-              <span>View all products</span>
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+          <SectionHeading action={viewAllAction}>
+            Featured Deals
+          </SectionHeading>
 
           <div className={styles.productsGrid}>
             {featuredDeals.map((prod) => (
@@ -122,15 +124,9 @@ export default function Home() {
       {/* 5. New Collections (2 rows x 5 columns = 10 products) */}
       <section className={styles.collectionsSection}>
         <div className="container">
-          <div className={styles.sectionHeader}>
-            <h2 className="heading-section" style={{ marginBottom: 0 }}>
-              New Collections
-            </h2>
-            <Link href="/collections/all" className={styles.viewAllLink}>
-              <span>View all products</span>
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+          <SectionHeading action={viewAllAction}>
+            New Collections
+          </SectionHeading>
 
           <div className={styles.productsGrid}>
             {newCollections.map((prod) => (
@@ -147,15 +143,9 @@ export default function Home() {
       {/* 6. Featured Collections (2 rows x 5 columns = 10 products) */}
       <section className={styles.featuredGridSection}>
         <div className="container">
-          <div className={styles.sectionHeader}>
-            <h2 className="heading-section" style={{ marginBottom: 0 }}>
-              Featured Collections
-            </h2>
-            <Link href="/collections/all" className={styles.viewAllLink}>
-              <span>View all products</span>
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+          <SectionHeading action={viewAllAction}>
+            Featured Collections
+          </SectionHeading>
 
           <div className={styles.productsGrid}>
             {featuredCollections.map((prod) => (
@@ -172,7 +162,7 @@ export default function Home() {
       {/* 7. Top Brands Grid */}
       <section className={styles.brandsSection}>
         <div className="container">
-          <h2 className="heading-section">Top Featured Brands</h2>
+          <SectionHeading>Top Featured Brands</SectionHeading>
           <div className={styles.brandsGrid}>
             {brands.map((brand, idx) => (
               <div key={idx} className={styles.brandBox}>
@@ -199,7 +189,7 @@ export default function Home() {
       {/* 9. Favorite Sports (6 Athlete Lifestyle Cards) */}
       <section className={styles.sportsSection}>
         <div className="container">
-          <h2 className="heading-section">Favorite Sports</h2>
+          <SectionHeading>Favorite Sports</SectionHeading>
           <div className={styles.sportsGrid}>
             {favoriteSports.map((sport, idx) => (
               <SportCard key={idx} {...sport} />
@@ -212,9 +202,9 @@ export default function Home() {
       <section className={styles.journalSection}>
         <div className="container">
           <div className={styles.journalHeader}>
-            <h2 className="heading-section" style={{ marginBottom: "1rem" }}>
+            <SectionHeading>
               Sport & Performance Journal
-            </h2>
+            </SectionHeading>
 
             {/* Filter tabs */}
             <div className={styles.filterPills}>
@@ -222,6 +212,7 @@ export default function Home() {
                 (filter) => (
                   <button
                     key={filter}
+                    type="button"
                     className={`${styles.filterPill} ${
                       journalFilter === filter ? styles.activePill : ""
                     }`}

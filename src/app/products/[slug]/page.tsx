@@ -1,11 +1,15 @@
 'use client'
 
 import React from 'react'
-import { Breadcrumb } from '@/components/ui/Breadcrumb/Breadcrumb'
-import { ProductGallery } from '@/components/ui/ProductGallery/ProductGallery'
-import { ProductInfo } from '@/components/ui/ProductInfo/ProductInfo'
-import { ProductTabs } from '@/components/ui/ProductTabs/ProductTabs'
-import { ProductCard } from '@/components/ui/ProductCard/ProductCard'
+import {
+  Breadcrumb,
+  ProductGallery,
+  ProductInfo,
+  ProductTabs,
+  ProductCard,
+  SectionHeading,
+  Skeleton,
+} from '@/components/ui'
 import { FrontendProduct } from '@/types/product'
 import { fetchProductByHandle, fetchProducts } from '@/services/productService'
 import styles from './page.module.css'
@@ -30,7 +34,22 @@ export default function ProductDetailPage({ params }: { params: any }) {
   }, [params]);
 
   if (!product) {
-    return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Loading product...</div>;
+    return (
+      <main className={styles.pageContainer}>
+        <div className="container">
+          <div className={styles.productTopSection}>
+            <Skeleton width="100%" height="500px" borderRadius="12px" />
+            <div className={styles.skeletonContent}>
+              <Skeleton width="40%" height="24px" />
+              <Skeleton width="80%" height="36px" />
+              <Skeleton width="30%" height="32px" />
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="50px" borderRadius="8px" />
+            </div>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   const breadcrumbItems = [
@@ -69,7 +88,7 @@ export default function ProductDetailPage({ params }: { params: any }) {
         />
 
         <section className={styles.relatedSection}>
-          <h2 className="heading-section">You Might Also Like</h2>
+          <SectionHeading>You Might Also Like</SectionHeading>
           <div className={styles.relatedGrid}>
             {relatedProducts.map(p => (
               <ProductCard 

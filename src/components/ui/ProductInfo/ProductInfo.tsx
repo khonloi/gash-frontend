@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Ruler, MapPin, ShoppingBag, Plus, Minus, Zap } from 'lucide-react'
+import { Ruler, MapPin, ShoppingBag, Zap } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useToastStore } from '@/store/useToastStore'
+import { Button, QuantitySelector, Divider } from '@/components/ui'
 import styles from './ProductInfo.module.css'
 
 interface ProductInfoProps {
@@ -27,7 +28,6 @@ export function ProductInfo({
   originalPrice,
   colors,
   sizes,
-  fit,
 }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(colors[0]?.id)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
@@ -94,7 +94,7 @@ export function ProductInfo({
         )}
       </div>
 
-      <div className={styles.divider} />
+      <Divider />
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>
@@ -104,6 +104,7 @@ export function ProductInfo({
           {colors.map((color) => (
             <button
               key={color.id}
+              type="button"
               className={`${styles.colorBtn} ${selectedColor === color.id ? styles.activeColor : ''}`}
               onClick={() => setSelectedColor(color.id)}
               aria-label={`Select color ${color.name}`}
@@ -121,6 +122,7 @@ export function ProductInfo({
           {sizes.map((size) => (
             <button
               key={size.id}
+              type="button"
               className={`${styles.sizeBtn} ${selectedSize === size.id ? styles.activeSize : ''} ${!size.inStock ? styles.outOfStock : ''}`}
               onClick={() => size.inStock && setSelectedSize(size.id)}
               disabled={!size.inStock}
@@ -132,11 +134,11 @@ export function ProductInfo({
       </div>
 
       <div className={styles.helpers}>
-        <button className={styles.helperBtn}>
+        <button type="button" className={styles.helperBtn}>
           <Ruler size={16} />
           <span>Size Guide</span>
         </button>
-        <button className={styles.helperBtn}>
+        <button type="button" className={styles.helperBtn}>
           <MapPin size={16} />
           <span>Check In-Store Availability</span>
         </button>
@@ -144,7 +146,7 @@ export function ProductInfo({
 
       <div className={styles.fitScale}>
         <div className={styles.fitBar}>
-          <div className={styles.fitIndicator} style={{ left: '80%' }}></div>
+          <div className={styles.fitIndicator} />
         </div>
         <div className={styles.fitLabels}>
           <span>Tight</span>
@@ -157,46 +159,34 @@ export function ProductInfo({
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>Quantity</p>
-        <div className={styles.quantitySelector}>
-          <button
-            type="button"
-            className={styles.quantityBtn}
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            disabled={quantity <= 1}
-            aria-label="Decrease quantity"
-          >
-            <Minus size={16} />
-          </button>
-          <span className={styles.quantityValue}>{quantity}</span>
-          <button
-            type="button"
-            className={styles.quantityBtn}
-            onClick={() => setQuantity((q) => q + 1)}
-            aria-label="Increase quantity"
-          >
-            <Plus size={16} />
-          </button>
-        </div>
+        <QuantitySelector
+          value={quantity}
+          onChange={setQuantity}
+          min={1}
+          size="md"
+        />
       </div>
 
       <div className={styles.actionButtons}>
-        <button 
-          className={styles.addToCartBtn} 
+        <Button
+          variant="outline"
+          size="lg"
           onClick={handleAddToCart}
-          type="button"
+          icon={<ShoppingBag size={20} />}
+          fullWidth
         >
-          <ShoppingBag size={20} />
-          <span>ADD TO CART</span>
-        </button>
+          ADD TO CART
+        </Button>
 
-        <button 
-          className={styles.buyNowBtn} 
+        <Button
+          variant="success"
+          size="lg"
           onClick={handleBuyNow}
-          type="button"
+          icon={<Zap size={20} />}
+          fullWidth
         >
-          <Zap size={20} />
-          <span>BUY NOW</span>
-        </button>
+          BUY NOW
+        </Button>
       </div>
     </div>
   )

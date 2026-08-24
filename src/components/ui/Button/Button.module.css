@@ -82,6 +82,31 @@
   background-color: var(--color-slate-100);
 }
 
+.success {
+  background-color: var(--color-success);
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+}
+
+.success:hover {
+  background-color: var(--color-success-hover);
+  box-shadow: 0 4px 12px rgba(57, 181, 74, 0.3);
+}
+
+.destructive {
+  background-color: var(--color-sale-red);
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+}
+
+.destructive:hover {
+  background-color: var(--color-sale-red-light);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
 /* Sizes */
 .sm {
   padding: var(--space-2) var(--space-3);

@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Breadcrumb } from "@/components/ui/Breadcrumb/Breadcrumb";
-import { FilterSidebar, FilterState, FilterCategory } from "@/components/ui/FilterSidebar/FilterSidebar";
-import { CollectionControlBar } from "@/components/ui/CollectionControlBar/CollectionControlBar";
-import { ProductCard } from "@/components/ui/ProductCard/ProductCard";
-import { Pagination } from "@/components/ui/Pagination/Pagination";
+import {
+  Breadcrumb,
+  FilterSidebar,
+  CollectionControlBar,
+  ProductCard,
+  Pagination,
+  EmptyState,
+  Button,
+} from "@/components/ui";
+import { FilterState, FilterCategory } from "@/components/ui/FilterSidebar/FilterSidebar";
 import styles from "./page.module.css";
 
 import { FrontendProduct } from "@/types/product";
@@ -218,16 +223,18 @@ export default function CollectionPage({ params }: { params: any }) {
             />
 
             {sortedProducts.length === 0 ? (
-              <div className={styles.noResults}>
-                <h3>No products found</h3>
-                <p>Try adjusting your filters to see more results.</p>
-                <button 
-                  className={styles.clearBtn}
-                  onClick={() => setActiveFilters({})}
-                >
-                  Clear all filters
-                </button>
-              </div>
+              <EmptyState
+                title="No products found"
+                description="Try adjusting your filters to see more results."
+                action={
+                  <Button
+                    variant="outline"
+                    onClick={() => setActiveFilters({})}
+                  >
+                    Clear all filters
+                  </Button>
+                }
+              />
             ) : (
               <>
                 <div className={`${styles.productGrid} ${viewMode === 'list' ? styles.listMode : ''}`}>

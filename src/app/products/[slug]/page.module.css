@@ -21,6 +21,13 @@
   height: fit-content;
 }
 
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+}
+
 .relatedSection {
   margin-top: 80px;
   padding-top: 64px;

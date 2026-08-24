@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
-import { Button } from "@/components/ui/Button/Button";
+import { Button, QuantitySelector, EmptyState } from "@/components/ui";
 import styles from "./page.module.css";
 
 export default function CartPage() {
@@ -32,22 +32,21 @@ export default function CartPage() {
     <div className={styles.cartPage}>
       <div className="container">
         <Link href="/" className={styles.continueShopping}>
-          Continue to Shopping
+          ← Continue Shopping
         </Link>
         <h1 className={styles.title}>Shopping Cart</h1>
 
         {items.length === 0 ? (
-          <div className={styles.emptyState}>
-            <ShoppingBag
-              size={64}
-              style={{ color: "var(--color-border)", marginBottom: "1rem" }}
-            />
-            <h2>Your cart is empty</h2>
-            <p>Looks like you haven't added anything to your cart yet.</p>
-            <Link href="/">
-              <Button variant="primary">Shop Now</Button>
-            </Link>
-          </div>
+          <EmptyState
+            icon={<ShoppingBag size={64} />}
+            title="Your cart is empty"
+            description="Looks like you haven't added anything to your cart yet."
+            action={
+              <Button as={Link} href="/" variant="primary" size="lg">
+                Shop Now
+              </Button>
+            }
+          />
         ) : (
           <div className={styles.content}>
             {/* Left Column: Cart Items */}
@@ -78,28 +77,13 @@ export default function CartPage() {
                   </div>
 
                   <div className={styles.quantityWrapper}>
-                    <div className={styles.quantityControl}>
-                      <button
-                        className={styles.quantityBtn}
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                        aria-label="Decrease quantity"
-                      >
-                        -
-                      </button>
-                      <span className={styles.quantity}>{item.quantity}</span>
-                      <button
-                        className={styles.quantityBtn}
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                        aria-label="Increase quantity"
-                      >
-                        +
-                      </button>
-                    </div>
+                    <QuantitySelector
+                      value={item.quantity}
+                      onChange={(newQty) => updateQuantity(item.id, newQty)}
+                      size="sm"
+                    />
                     <button
+                      type="button"
                       className={styles.deleteBtn}
                       onClick={() => removeItem(item.id)}
                       title="Remove item"
@@ -138,20 +122,14 @@ export default function CartPage() {
 
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Discount</span>
-                  <span
-                    className={styles.summaryLabel}
-                    style={{ fontSize: "0.75rem" }}
-                  >
+                  <span className={styles.summaryHint}>
                     Applied at checkout
                   </span>
                 </div>
 
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Shipping fee</span>
-                  <span
-                    className={styles.summaryLabel}
-                    style={{ fontSize: "0.75rem" }}
-                  >
+                  <span className={styles.summaryHint}>
                     Calculated at checkout
                   </span>
                 </div>
@@ -163,43 +141,28 @@ export default function CartPage() {
                   </span>
                 </div>
 
-                <Link
-                  href="/checkout"
-                  style={{
-                    width: "100%",
-                    display: "block",
-                    marginTop: "var(--space-6)",
-                  }}
-                >
-                  <Button variant="primary" style={{ width: "100%" }}>
+                <div className={styles.checkoutBtnWrap}>
+                  <Button
+                    as={Link}
+                    href="/checkout"
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                  >
                     Check Out
                   </Button>
-                </Link>
+                </div>
 
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginTop: "0.5rem",
-                    fontSize: "0.75rem",
-                    color: "var(--color-sale-red)",
-                  }}
-                >
+                <div className={styles.checkoutNotice}>
                   *Shipping fee and voucher applied at checkout
                 </div>
 
                 <div className={styles.paymentMethods}>
                   <div className={styles.paymentTitle}>Fast checkout with:</div>
                   <div className={styles.paymentIcons}>
-                    {/* Placeholders for payment icons */}
-                    <span style={{ fontWeight: "bold", color: "#003087" }}>
-                      VISA
-                    </span>
-                    <span style={{ fontWeight: "bold", color: "#EB001B" }}>
-                      MasterCard
-                    </span>
-                    <span style={{ fontWeight: "bold", color: "#0079C1" }}>
-                      PayPal
-                    </span>
+                    <span className={styles.paymentVisa}>VISA</span>
+                    <span className={styles.paymentMastercard}>MasterCard</span>
+                    <span className={styles.paymentPaypal}>PayPal</span>
                   </div>
                 </div>
               </div>

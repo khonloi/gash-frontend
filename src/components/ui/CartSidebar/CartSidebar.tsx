@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
-import { Button } from "../Button/Button";
+import { Button, QuantitySelector, EmptyState } from "@/components/ui";
 import styles from "./CartSidebar.module.css";
 
 interface CartSidebarProps {
@@ -47,13 +47,16 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
         <div className={styles.content}>
           {items.length === 0 ? (
-            <div className={styles.emptyCart}>
-              <ShoppingBag size={48} className={styles.emptyCartIcon} />
-              <p>Your cart is currently empty.</p>
-              <Button onClick={onClose} variant="primary">
-                Continue Shopping
-              </Button>
-            </div>
+            <EmptyState
+              icon={<ShoppingBag size={48} />}
+              title="Your cart is empty"
+              description="Your cart is currently empty."
+              action={
+                <Button onClick={onClose} variant="primary">
+                  Continue Shopping
+                </Button>
+              }
+            />
           ) : (
             <div className={styles.itemList}>
               {items.map((item) => (
@@ -80,28 +83,13 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
                     <div className={styles.itemActions}>
                       <div className={styles.quantityWrapper}>
-                        <div className={styles.quantityControl}>
-                          <button
-                            className={styles.quantityBtn}
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                            aria-label="Decrease quantity"
-                          >
-                            -
-                          </button>
-                          <span className={styles.quantity}>{item.quantity}</span>
-                          <button
-                            className={styles.quantityBtn}
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                            aria-label="Increase quantity"
-                          >
-                            +
-                          </button>
-                        </div>
+                        <QuantitySelector
+                          value={item.quantity}
+                          onChange={(newQty) => updateQuantity(item.id, newQty)}
+                          size="sm"
+                        />
                         <button
+                          type="button"
                           className={styles.deleteBtn}
                           onClick={() => removeItem(item.id)}
                           title="Remove item"
@@ -131,20 +119,24 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             </div>
 
             <div className={styles.actions}>
-              <Link
+              <Button
+                as={Link}
                 href="/checkout"
                 onClick={onClose}
-                style={{ width: "100%" }}
+                variant="primary"
+                fullWidth
               >
-                <Button variant="primary" style={{ width: "100%" }}>
-                  Check Out
-                </Button>
-              </Link>
-              <Link href="/cart" onClick={onClose} style={{ width: "100%" }}>
-                <Button variant="outline" style={{ width: "100%" }}>
-                  View Cart
-                </Button>
-              </Link>
+                Check Out
+              </Button>
+              <Button
+                as={Link}
+                href="/cart"
+                onClick={onClose}
+                variant="outline"
+                fullWidth
+              >
+                View Cart
+              </Button>
             </div>
           </div>
         )}

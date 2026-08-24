@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui";
 import styles from "./ProductGallery.module.css";
 
 interface ProductGalleryProps {
@@ -24,7 +25,11 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
   return (
     <div className={styles.gallery}>
       <div className={styles.mainImageWrapper}>
-        {isNew && <span className={styles.badgeNew}>NEW</span>}
+        {isNew && (
+          <div className={styles.badgeNew}>
+            <Badge variant="success">NEW</Badge>
+          </div>
+        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {safeImages[activeIndex] ? (
           <img
@@ -33,7 +38,7 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
             className={styles.mainImage}
           />
         ) : (
-          <div className={styles.mainImage} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+          <div className={styles.noImage}>
             No Image Available
           </div>
         )}
@@ -41,6 +46,7 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
         {safeImages.length > 1 && (
           <>
             <button
+              type="button"
               className={`${styles.navButton} ${styles.prevButton}`}
               onClick={handlePrev}
               aria-label="Previous image"
@@ -48,6 +54,7 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
               <ChevronLeft size={24} />
             </button>
             <button
+              type="button"
               className={`${styles.navButton} ${styles.nextButton}`}
               onClick={handleNext}
               aria-label="Next image"
@@ -63,6 +70,7 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
           {images.map((img, idx) => (
             <button
               key={idx}
+              type="button"
               className={`${styles.thumbnailBtn} ${idx === activeIndex ? styles.activeThumbnail : ""}`}
               onClick={() => setActiveIndex(idx)}
               aria-label={`View image ${idx + 1}`}
