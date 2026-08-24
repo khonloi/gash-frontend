@@ -10,6 +10,7 @@ import styles from './ProductCard.module.css'
 
 export interface ProductCardProps {
   id: string
+  handle?: string
   brand: string
   title: string
   originalPrice: number
@@ -21,6 +22,7 @@ export interface ProductCardProps {
 
 export function ProductCard({
   id,
+  handle,
   brand,
   title,
   originalPrice,
@@ -29,9 +31,10 @@ export function ProductCard({
   imageUrl,
 }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
+  const productSlug = handle || id
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
   return (
@@ -40,7 +43,7 @@ export function ProductCard({
         {discountPercent && (
           <Badge variant="destructive" className={styles.discountBadge}>-{discountPercent}%</Badge>
         )}
-        <Link href={`/products/${id}`} className={styles.imageLink}>
+        <Link href={`/products/${productSlug}`} className={styles.imageLink}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={imageUrl} alt={title} className={styles.image} />
         </Link>
@@ -68,7 +71,7 @@ export function ProductCard({
 
       <div className={styles.content}>
         <span className={styles.brand}>{brand}</span>
-        <Link href={`/products/${id}`} className={styles.titleLink}>
+        <Link href={`/products/${productSlug}`} className={styles.titleLink}>
           <h3 className={styles.title}>{title}</h3>
         </Link>
 

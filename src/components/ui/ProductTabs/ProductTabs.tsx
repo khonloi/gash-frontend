@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import styles from './ProductTabs.module.css'
 
 interface ProductTabsProps {
-  description: string[]
+  description: string | string[]
   specs: Record<string, string>
 }
 
@@ -37,26 +37,35 @@ export function ProductTabs({ description, specs }: ProductTabsProps) {
       <div className={styles.tabContent}>
         {activeTab === 'desc' && (
           <div className={styles.contentPane}>
-            <ul className={styles.descList}>
-              {description.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
+            {typeof description === 'string' ? (
+              <div 
+                className={styles.htmlDescription} 
+                dangerouslySetInnerHTML={{ __html: description }} 
+              />
+            ) : Array.isArray(description) ? (
+              <ul className={styles.descList}>
+                {description.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         )}
 
         {activeTab === 'specs' && (
           <div className={styles.contentPane}>
-            <table className={styles.specsTable}>
-              <tbody>
-                {Object.entries(specs).map(([key, value]) => (
-                  <tr key={key}>
-                    <td className={styles.specKey}>{key}</td>
-                    <td className={styles.specValue}>{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className={styles.tableWrapper}>
+              <table className={styles.specsTable}>
+                <tbody>
+                  {Object.entries(specs).map(([key, value]) => (
+                    <tr key={key}>
+                      <td className={styles.specKey}>{key}</td>
+                      <td className={styles.specValue}>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

@@ -9,15 +9,16 @@ interface ProductGalleryProps {
   isNew?: boolean;
 }
 
-export function ProductGallery({ images, isNew }: ProductGalleryProps) {
+export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const safeImages = images.length > 0 ? images : [''];
 
   const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % images.length);
+    setActiveIndex((prev) => (prev + 1) % safeImages.length);
   };
 
   const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+    setActiveIndex((prev) => (prev - 1 + safeImages.length) % safeImages.length);
   };
 
   return (
@@ -25,13 +26,19 @@ export function ProductGallery({ images, isNew }: ProductGalleryProps) {
       <div className={styles.mainImageWrapper}>
         {isNew && <span className={styles.badgeNew}>NEW</span>}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={images[activeIndex]}
-          alt={`Product view ${activeIndex + 1}`}
-          className={styles.mainImage}
-        />
+        {safeImages[activeIndex] ? (
+          <img
+            src={safeImages[activeIndex]}
+            alt={`Product view ${activeIndex + 1}`}
+            className={styles.mainImage}
+          />
+        ) : (
+          <div className={styles.mainImage} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+            No Image Available
+          </div>
+        )}
 
-        {images.length > 1 && (
+        {safeImages.length > 1 && (
           <>
             <button
               className={`${styles.navButton} ${styles.prevButton}`}

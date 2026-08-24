@@ -6,13 +6,32 @@ import { ProductGallery } from '@/components/ui/ProductGallery/ProductGallery'
 import { ProductInfo } from '@/components/ui/ProductInfo/ProductInfo'
 import { ProductTabs } from '@/components/ui/ProductTabs/ProductTabs'
 import { ProductCard } from '@/components/ui/ProductCard/ProductCard'
-import { mockProductDetail, mockRelatedProducts } from '@/lib/mockData'
+import { FrontendProduct } from '@/types/product'
+import { fetchProductByHandle, fetchProducts } from '@/services/productService'
 import styles from './page.module.css'
 
 export default function ProductDetailPage({ params }: { params: any }) {
-  // Normally we would fetch the product based on params.slug.
-  // For this mock, we use the single detailed product we defined.
-  const product = mockProductDetail
+  const [product, setProduct] = React.useState<FrontendProduct | null>(null);
+  const [relatedProducts, setRelatedProducts] = React.useState<FrontendProduct[]>([]);
+
+  React.useEffect(() => {
+    const loadProduct = async () => {
+      const p = await params;
+      if (p?.slug) {
+        const data = await fetchProductByHandle(p.slug);
+        setProduct(data);
+
+        // Fetch related products (for demo, just fetch all and take first 4)
+        const allProducts = await fetchProducts();
+        setRelatedProducts(allProducts.filter(item => item.handle !== p.slug).slice(0, 4));
+      }
+    };
+    loadProduct();
+  }, [params]);
+
+  if (!product) {
+    return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Loading product...</div>;
+  }
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
@@ -37,9 +56,9 @@ export default function ProductDetailPage({ params }: { params: any }) {
               sku={product.sku}
               price={product.price}
               originalPrice={product.originalPrice}
-              colors={product.colors}
-              sizes={product.sizes}
-              fit={product.fit}
+              colors={product.colors.map((c, i) => ({ id: `color-${i}`, name: c, imageUrl: product.images[0] || '' }))}
+              sizes={product.sizes.map((s, i) => ({ id: `size-${i}`, label: s, inStock: true }))}
+              fit="Regular"
             />
           </div>
         </div>
@@ -52,15 +71,16 @@ export default function ProductDetailPage({ params }: { params: any }) {
         <section className={styles.relatedSection}>
           <h2 className="heading-section">You Might Also Like</h2>
           <div className={styles.relatedGrid}>
-            {mockRelatedProducts.map(p => (
+            {relatedProducts.map(p => (
               <ProductCard 
                 key={p.id}
                 id={p.id}
+                handle={p.handle}
                 brand={p.brand}
                 title={p.title}
                 salePrice={p.salePrice}
                 originalPrice={p.originalPrice}
-                discountPercent={p.discountPercent}
+                discountPercent={p.discountPercent ?? undefined}
                 imageUrl={p.imageUrl}
               />
             ))}

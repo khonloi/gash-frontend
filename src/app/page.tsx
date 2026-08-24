@@ -6,17 +6,11 @@ import { HeroCarousel } from "@/components/ui/HeroCarousel/HeroCarousel";
 import { CategoryCircle } from "@/components/ui/CategoryCircle/CategoryCircle";
 import { ProductCard } from "@/components/ui/ProductCard/ProductCard";
 import { PromoBanner } from "@/components/ui/PromoBanner/PromoBanner";
-import { BrandCollectionCard } from "@/components/ui/BrandCollectionCard/BrandCollectionCard";
-import { FeaturedCollectionCard } from "@/components/ui/FeaturedCollectionCard/FeaturedCollectionCard";
 import { SportCard } from "@/components/ui/SportCard/SportCard";
 import { ArticleCard } from "@/components/ui/ArticleCard/ArticleCard";
+import { FrontendProduct } from "@/types/product";
+import { fetchProducts } from "@/services/productService";
 import {
-  Sparkles,
-  Activity,
-  Dumbbell,
-  Mountain,
-  Waves,
-  Trophy,
   ArrowRight,
   ShieldCheck,
   CreditCard,
@@ -25,9 +19,6 @@ import {
 } from "lucide-react";
 import {
   categories,
-  hotProducts,
-  newCollections,
-  featuredCollections,
   favoriteSports,
   journalArticles,
   brands,
@@ -36,6 +27,28 @@ import styles from "./page.module.css";
 
 export default function Home() {
   const [journalFilter, setJournalFilter] = useState("All");
+  const [featuredDeals, setFeaturedDeals] = useState<FrontendProduct[]>([]);
+  const [newCollections, setNewCollections] = useState<FrontendProduct[]>([]);
+  const [featuredCollections, setFeaturedCollections] = useState<FrontendProduct[]>([]);
+
+  React.useEffect(() => {
+    async function loadProducts() {
+      const allProducts = await fetchProducts();
+      // Display 2 rows x 5 columns = 10 products per section
+      setFeaturedDeals(allProducts.slice(0, 10));
+      setNewCollections(
+        allProducts.slice(10, 20).length >= 10
+          ? allProducts.slice(10, 20)
+          : allProducts.slice(0, 10)
+      );
+      setFeaturedCollections(
+        allProducts.slice(20, 30).length >= 10
+          ? allProducts.slice(20, 30)
+          : allProducts.slice(0, 10)
+      );
+    }
+    loadProducts();
+  }, []);
 
   const filteredArticles =
     journalFilter === "All"
@@ -67,7 +80,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Featured Deals / Hot Products */}
+      {/* 3. Featured Deals / Hot Products (2 rows x 5 columns = 10 products) */}
       <section className={styles.productsSection}>
         <div className="container">
           <div className={styles.sectionHeader}>
@@ -83,8 +96,12 @@ export default function Home() {
           </div>
 
           <div className={styles.productsGrid}>
-            {hotProducts.map((prod) => (
-              <ProductCard key={prod.id} {...prod} />
+            {featuredDeals.map((prod) => (
+              <ProductCard
+                key={prod.id}
+                {...prod}
+                discountPercent={prod.discountPercent ?? undefined}
+              />
             ))}
           </div>
         </div>
@@ -102,7 +119,7 @@ export default function Home() {
         imageUrl="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1200&q=80"
       />
 
-      {/* 5. New Collections (Vertical Brand Spotlight Cards) */}
+      {/* 5. New Collections (2 rows x 5 columns = 10 products) */}
       <section className={styles.collectionsSection}>
         <div className="container">
           <div className={styles.sectionHeader}>
@@ -110,31 +127,43 @@ export default function Home() {
               New Collections
             </h2>
             <Link href="/collections/all" className={styles.viewAllLink}>
-              <span>View all collections</span>
+              <span>View all products</span>
               <ArrowRight size={16} />
             </Link>
           </div>
 
-          <div className={styles.collectionsGrid}>
-            {newCollections.map((col, idx) => (
-              <BrandCollectionCard key={idx} {...col} />
+          <div className={styles.productsGrid}>
+            {newCollections.map((prod) => (
+              <ProductCard
+                key={prod.id}
+                {...prod}
+                discountPercent={prod.discountPercent ?? undefined}
+              />
             ))}
           </div>
         </div>
       </section>
 
-      {/* 6. Featured Collections (4 Square Grid with athlete overlays) */}
+      {/* 6. Featured Collections (2 rows x 5 columns = 10 products) */}
       <section className={styles.featuredGridSection}>
         <div className="container">
           <div className={styles.sectionHeader}>
             <h2 className="heading-section" style={{ marginBottom: 0 }}>
               Featured Collections
             </h2>
+            <Link href="/collections/all" className={styles.viewAllLink}>
+              <span>View all products</span>
+              <ArrowRight size={16} />
+            </Link>
           </div>
 
-          <div className={styles.featuredFourGrid}>
-            {featuredCollections.map((feat, idx) => (
-              <FeaturedCollectionCard key={idx} {...feat} />
+          <div className={styles.productsGrid}>
+            {featuredCollections.map((prod) => (
+              <ProductCard
+                key={prod.id}
+                {...prod}
+                discountPercent={prod.discountPercent ?? undefined}
+              />
             ))}
           </div>
         </div>
