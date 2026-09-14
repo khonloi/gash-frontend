@@ -1,28 +1,35 @@
 export interface ProductVariant {
-  id: string;
-  productId: string;
-  title: string;
-  price: number;
-  compareAtPrice: number | null;
-  sku: string | null;
-  inventoryQuantity: number;
-  imageUrl: string | null;
-  options: any;
-  createdAt: string;
-  updatedAt: string;
+  id?: string;
+  productId?: string;
+  title?: string;
+  price?: number;
+  compareAtPrice?: number | null;
+  sku?: string | null;
+  inventoryQuantity?: number;
+  imageUrl?: string | null;
+  featuredImage?: { src?: string };
+  option1?: string;
+  option2?: string;
+  option3?: string;
+  options?: Record<string, unknown> | string[] | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Product {
   id: string;
-  handle: string;
+  handle?: string;
   title: string;
-  vendor: string;
-  tags: string[];
-  options: any; // e.g., ["Size", "Color"]
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  variants: ProductVariant[];
+  vendor?: string;
+  tags?: string[];
+  productType?: string;
+  bodyHtml?: string;
+  images?: string[];
+  options?: Record<string, unknown> | string[] | null;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  variants?: ProductVariant[];
 }
 
 export interface FrontendProduct {

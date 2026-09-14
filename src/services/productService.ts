@@ -1,19 +1,19 @@
-import { Product, FrontendProduct } from "../types/product";
+import { Product, ProductVariant, FrontendProduct } from "../types/product";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 /**
  * Maps the backend Product model to the FrontendProduct model
  */
-export function mapProductToFrontend(product: any): FrontendProduct {
+export function mapProductToFrontend(product: Product): FrontendProduct {
   // Extract images from product.images or variant featuredImage
   let images: string[] = [];
   if (Array.isArray(product.images) && product.images.length > 0) {
     images = product.images;
   } else if (Array.isArray(product.variants)) {
     images = product.variants
-      .map((v: any) => v.featuredImage?.src || v.imageUrl)
-      .filter(Boolean);
+      .map((v: ProductVariant) => v.featuredImage?.src || v.imageUrl)
+      .filter((src): src is string => Boolean(src));
   }
 
   // Pick default image
@@ -36,7 +36,7 @@ export function mapProductToFrontend(product: any): FrontendProduct {
   const sizesSet = new Set<string>();
   const colorsSet = new Set<string>();
 
-  product.variants?.forEach((v: any) => {
+  product.variants?.forEach((v: ProductVariant) => {
     if (v.option1) {
       colorsSet.add(v.option1);
     }
@@ -52,7 +52,7 @@ export function mapProductToFrontend(product: any): FrontendProduct {
   const colors = Array.from(colorsSet);
 
   // Extract category and gender from tags / productType
-  let category = product.productType || "All";
+  const category = product.productType || "All";
   let gender = "Unisex";
   
   const tags: string[] = Array.isArray(product.tags) ? product.tags : [];
@@ -85,7 +85,7 @@ export function mapProductToFrontend(product: any): FrontendProduct {
   // Extract additional technical specs from bodyHtml bullet points if available
   if (typeof product.bodyHtml === "string") {
     const liMatches = Array.from(product.bodyHtml.matchAll(/<li>(.*?)<\/li>/gi));
-    liMatches.forEach((match: any, idx: number) => {
+    liMatches.forEach((match: RegExpMatchArray, idx: number) => {
       const text = match[1].replace(/<[^>]*>/g, '').trim();
       if (text.includes(':')) {
         const [k, ...rest] = text.split(':');

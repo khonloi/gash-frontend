@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import styles from "./HeroCarousel.module.css";
 
@@ -88,9 +89,13 @@ export function HeroCarousel() {
           style={{ background: slide.bgGradient }}
         >
           {/* Background Image with Overlay */}
-          <div
+          <Image
+            src={slide.image}
+            alt={slide.title}
+            fill
+            priority={currentSlide === 0}
+            sizes="100vw"
             className={styles.bgImage}
-            style={{ backgroundImage: `url(${slide.image})` }}
           />
           <div className={styles.overlay} />
 

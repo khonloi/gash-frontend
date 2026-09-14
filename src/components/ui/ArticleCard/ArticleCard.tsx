@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, Calendar } from 'lucide-react'
 import styles from './ArticleCard.module.css'
 
@@ -23,8 +24,13 @@ export function ArticleCard({
   return (
     <Link href={href} className={styles.card}>
       <div className={styles.imageContainer}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt={title} className={styles.image} />
+        <Image
+          src={imageUrl}
+          alt={title}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className={styles.image}
+        />
         <span className={styles.category}>{category}</span>
       </div>
 

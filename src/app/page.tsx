@@ -1,17 +1,15 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   HeroCarousel,
   CategoryCircle,
   ProductCard,
   PromoBanner,
   SportCard,
-  ArticleCard,
   SectionHeading,
 } from "@/components/ui";
-import { FrontendProduct } from "@/types/product";
+import { JournalSection } from "@/components/home/JournalSection";
 import { fetchProducts } from "@/services/productService";
 import {
   ArrowRight,
@@ -23,42 +21,35 @@ import {
 import {
   categories,
   favoriteSports,
-  journalArticles,
   brands,
 } from "@/lib/mockData";
 import styles from "./page.module.css";
 
-export default function Home() {
-  const [journalFilter, setJournalFilter] = useState("All");
-  const [featuredDeals, setFeaturedDeals] = useState<FrontendProduct[]>([]);
-  const [newCollections, setNewCollections] = useState<FrontendProduct[]>([]);
-  const [featuredCollections, setFeaturedCollections] = useState<FrontendProduct[]>([]);
+export const metadata: Metadata = {
+  title: "JOCKSPORT | Official Athletic & Performance Sportswear",
+  description:
+    "Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.",
+  openGraph: {
+    title: "JOCKSPORT | Official Athletic & Performance Sportswear",
+    description:
+      "Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.",
+    type: "website",
+  },
+};
 
-  useEffect(() => {
-    async function loadProducts() {
-      const allProducts = await fetchProducts();
-      // Display 2 rows x 5 columns = 10 products per section
-      setFeaturedDeals(allProducts.slice(0, 10));
-      setNewCollections(
-        allProducts.slice(10, 20).length >= 10
-          ? allProducts.slice(10, 20)
-          : allProducts.slice(0, 10)
-      );
-      setFeaturedCollections(
-        allProducts.slice(20, 30).length >= 10
-          ? allProducts.slice(20, 30)
-          : allProducts.slice(0, 10)
-      );
-    }
-    loadProducts();
-  }, []);
+export default async function Home() {
+  const allProducts = await fetchProducts();
 
-  const filteredArticles =
-    journalFilter === "All"
-      ? journalArticles
-      : journalArticles.filter(
-          (art) => art.category.toUpperCase() === journalFilter.toUpperCase(),
-        );
+  // Display 2 rows x 5 columns = 10 products per section
+  const featuredDeals = allProducts.slice(0, 10);
+  const newCollections =
+    allProducts.slice(10, 20).length >= 10
+      ? allProducts.slice(10, 20)
+      : allProducts.slice(0, 10);
+  const featuredCollections =
+    allProducts.slice(20, 30).length >= 10
+      ? allProducts.slice(20, 30)
+      : allProducts.slice(0, 10);
 
   const viewAllAction = (
     <Link href="/collections/all" className={styles.viewAllLink}>
@@ -198,40 +189,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 10. Sport & Lifestyle Journal / News */}
-      <section className={styles.journalSection}>
-        <div className="container">
-          <div className={styles.journalHeader}>
-            <SectionHeading>
-              Sport & Performance Journal
-            </SectionHeading>
-
-            {/* Filter tabs */}
-            <div className={styles.filterPills}>
-              {["All", "Training", "Running", "Football", "Swimming"].map(
-                (filter) => (
-                  <button
-                    key={filter}
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      journalFilter === filter ? styles.activePill : ""
-                    }`}
-                    onClick={() => setJournalFilter(filter)}
-                  >
-                    {filter === "All" ? "All Stories" : filter}
-                  </button>
-                ),
-              )}
-            </div>
-          </div>
-
-          <div className={styles.articlesGrid}>
-            {filteredArticles.map((article, idx) => (
-              <ArticleCard key={idx} {...article} />
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 10. Sport & Lifestyle Journal / News (Interactive Client Island) */}
+      <JournalSection />
 
       {/* 11. Trust / Value Guarantee Features */}
       <section className={styles.trustSection}>

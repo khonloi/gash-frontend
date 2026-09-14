@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import styles from './CategoryCircle.module.css'
 
 export interface CategoryCircleProps {
@@ -13,8 +14,13 @@ export function CategoryCircle({ title, href, imageUrl, icon }: CategoryCirclePr
   return (
     <Link href={href} className={styles.categoryItem}>
       <div className={styles.circleContainer}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt={title} className={styles.image} />
+        <Image
+          src={imageUrl}
+          alt={title}
+          width={140}
+          height={140}
+          className={styles.image}
+        />
         {icon && (
           <div className={styles.iconBadge}>
             {icon}

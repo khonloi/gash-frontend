@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   Button,
   Input,
@@ -17,15 +19,11 @@ import styles from "./page.module.css";
 
 export default function CheckoutPage() {
   const { items, getTotalPrice } = useCartStore();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
 
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [keepUpdated, setKeepUpdated] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const subtotal = getTotalPrice();
   const shippingFee = subtotal > 0 && shippingMethod === "standard" ? 30 : 0;
@@ -242,10 +240,11 @@ export default function CheckoutPage() {
               {items.map((item) => (
                 <div key={item.id} className={styles.summaryItem}>
                   <div className={styles.itemImageWrap}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={item.imageUrl}
                       alt={item.title}
+                      fill
+                      sizes="64px"
                       className={styles.itemImage}
                     />
                     <span className={styles.itemBadge}>{item.quantity}</span>

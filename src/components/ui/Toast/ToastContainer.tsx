@@ -1,18 +1,14 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useToastStore } from '@/store/useToastStore'
+import { useIsMounted } from '@/hooks/useIsMounted'
 import { Toast } from './Toast'
 import styles from './Toast.module.css'
 
 export function ToastContainer() {
   const { toasts } = useToastStore()
-  const [mounted, setMounted] = useState(false)
-
-  // Avoid hydration mismatch by only rendering after mount
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useIsMounted()
 
   if (!mounted || toasts.length === 0) return null
 

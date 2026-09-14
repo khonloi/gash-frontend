@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { Badge } from '@/components/ui/Badge/Badge'
@@ -44,8 +45,13 @@ export function ProductCard({
           <Badge variant="destructive" className={styles.discountBadge}>-{discountPercent}%</Badge>
         )}
         <Link href={`/products/${productSlug}`} className={styles.imageLink}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl} alt={title} className={styles.image} />
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+            className={styles.image}
+          />
         </Link>
         <Button
           variant="primary"

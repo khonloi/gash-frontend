@@ -8,13 +8,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   fullWidth?: boolean
   children?: React.ReactNode
   icon?: React.ReactNode
-  as?: any
+  as?: React.ElementType
   href?: string
   target?: string
   rel?: string
 }
 
-export const Button = React.forwardRef<any, ButtonProps>(
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       variant = 'sharp',

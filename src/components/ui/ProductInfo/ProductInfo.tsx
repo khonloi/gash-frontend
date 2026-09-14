@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { Ruler, MapPin, ShoppingBag, Zap } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useToastStore } from '@/store/useToastStore'
@@ -109,8 +110,13 @@ export function ProductInfo({
               onClick={() => setSelectedColor(color.id)}
               aria-label={`Select color ${color.name}`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={color.imageUrl} alt={color.name} />
+              <Image
+                src={color.imageUrl}
+                alt={color.name}
+                width={56}
+                height={56}
+                className={styles.colorImg}
+              />
             </button>
           ))}
         </div>

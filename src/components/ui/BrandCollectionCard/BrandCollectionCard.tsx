@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
 import styles from './BrandCollectionCard.module.css'
 
@@ -27,8 +28,13 @@ export function BrandCollectionCard({
       </div>
 
       <div className={styles.imageContainer}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt={title} className={styles.image} />
+        <Image
+          src={imageUrl}
+          alt={title}
+          width={260}
+          height={200}
+          className={styles.image}
+        />
       </div>
 
       <div className={styles.footer}>

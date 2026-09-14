@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { CheckCircle2, XCircle, Info, X } from 'lucide-react'
 import { Toast as ToastType, useToastStore } from '@/store/useToastStore'
 import styles from './Toast.module.css'

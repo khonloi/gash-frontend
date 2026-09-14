@@ -1,6 +1,6 @@
-'use client'
-
-import React from 'react'
+import React from 'react';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import {
   Breadcrumb,
   ProductGallery,
@@ -8,55 +8,62 @@ import {
   ProductTabs,
   ProductCard,
   SectionHeading,
-  Skeleton,
-} from '@/components/ui'
-import { FrontendProduct } from '@/types/product'
-import { fetchProductByHandle, fetchProducts } from '@/services/productService'
-import styles from './page.module.css'
+} from '@/components/ui';
+import { fetchProductByHandle, fetchProducts } from '@/services/productService';
+import styles from './page.module.css';
 
-export default function ProductDetailPage({ params }: { params: any }) {
-  const [product, setProduct] = React.useState<FrontendProduct | null>(null);
-  const [relatedProducts, setRelatedProducts] = React.useState<FrontendProduct[]>([]);
+interface ProductDetailPageProps {
+  params: Promise<{ slug: string }>;
+}
 
-  React.useEffect(() => {
-    const loadProduct = async () => {
-      const p = await params;
-      if (p?.slug) {
-        const data = await fetchProductByHandle(p.slug);
-        setProduct(data);
-
-        // Fetch related products (for demo, just fetch all and take first 4)
-        const allProducts = await fetchProducts();
-        setRelatedProducts(allProducts.filter(item => item.handle !== p.slug).slice(0, 4));
-      }
-    };
-    loadProduct();
-  }, [params]);
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await fetchProductByHandle(slug);
 
   if (!product) {
-    return (
-      <main className={styles.pageContainer}>
-        <div className="container">
-          <div className={styles.productTopSection}>
-            <Skeleton width="100%" height="500px" borderRadius="12px" />
-            <div className={styles.skeletonContent}>
-              <Skeleton width="40%" height="24px" />
-              <Skeleton width="80%" height="36px" />
-              <Skeleton width="30%" height="32px" />
-              <Skeleton width="100%" height="80px" />
-              <Skeleton width="100%" height="50px" borderRadius="8px" />
-            </div>
-          </div>
-        </div>
-      </main>
-    );
+    return {
+      title: 'Product Not Found | JOCKSPORT',
+      description: 'The requested product could not be found.',
+    };
   }
+
+  const plainDescription = product.description
+    ? product.description.replace(/<[^>]*>/g, '').slice(0, 160)
+    : `Shop the authentic ${product.title} by ${product.brand} at JOCKSPORT.`;
+
+  return {
+    title: `${product.title} | ${product.brand} - JOCKSPORT`,
+    description: plainDescription,
+    openGraph: {
+      title: `${product.title} | ${product.brand} - JOCKSPORT`,
+      description: plainDescription,
+      images: product.imageUrl ? [{ url: product.imageUrl }] : [],
+    },
+  };
+}
+
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
+  const { slug } = await params;
+  const product = await fetchProductByHandle(slug);
+
+  if (!product) {
+    notFound();
+  }
+
+  const allProducts = await fetchProducts();
+  const relatedProducts = allProducts
+    .filter((item) => item.handle !== slug && item.id !== product.id)
+    .slice(0, 4);
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
     { label: 'Products', href: '/collections/all' },
     { label: product.title },
-  ]
+  ];
 
   return (
     <main className={styles.pageContainer}>
@@ -68,21 +75,29 @@ export default function ProductDetailPage({ params }: { params: any }) {
             <ProductGallery images={product.images} isNew={product.isNew} />
           </div>
           <div className={styles.infoWrapper}>
-            <ProductInfo 
+            <ProductInfo
               brand={product.brand}
               title={product.title}
               category={product.category}
               sku={product.sku}
               price={product.price}
               originalPrice={product.originalPrice}
-              colors={product.colors.map((c, i) => ({ id: `color-${i}`, name: c, imageUrl: product.images[0] || '' }))}
-              sizes={product.sizes.map((s, i) => ({ id: `size-${i}`, label: s, inStock: true }))}
+              colors={product.colors.map((c, i) => ({
+                id: `color-${i}`,
+                name: c,
+                imageUrl: product.images[0] || '',
+              }))}
+              sizes={product.sizes.map((s, i) => ({
+                id: `size-${i}`,
+                label: s,
+                inStock: true,
+              }))}
               fit="Regular"
             />
           </div>
         </div>
 
-        <ProductTabs 
+        <ProductTabs
           description={product.description}
           specs={product.specs}
         />
@@ -90,8 +105,8 @@ export default function ProductDetailPage({ params }: { params: any }) {
         <section className={styles.relatedSection}>
           <SectionHeading>You Might Also Like</SectionHeading>
           <div className={styles.relatedGrid}>
-            {relatedProducts.map(p => (
-              <ProductCard 
+            {relatedProducts.map((p) => (
+              <ProductCard
                 key={p.id}
                 id={p.id}
                 handle={p.handle}
@@ -107,5 +122,5 @@ export default function ProductDetailPage({ params }: { params: any }) {
         </section>
       </div>
     </main>
-  )
+  );
 }

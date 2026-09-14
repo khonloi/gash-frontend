@@ -34,9 +34,9 @@
 }
 
 .image {
-  width: 90%;
-  height: 90%;
   object-fit: contain;
+  padding: 5%;
+  box-sizing: border-box;
   transition: transform 0.4s ease;
 }
 

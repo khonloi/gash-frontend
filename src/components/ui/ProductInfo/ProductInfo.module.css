@@ -97,7 +97,8 @@
   overflow: hidden;
 }
 
-.colorBtn img {
+.colorBtn img,
+.colorImg {
   width: 100%;
   height: 100%;
   object-fit: cover;

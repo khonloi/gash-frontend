@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Play } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge/Badge'
 import { Button } from '@/components/ui/Button/Button'
@@ -36,9 +37,12 @@ export function PromoBanner({
           style={{ background: bgGradient }}
         >
           {imageUrl && (
-            <div
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              sizes="100vw"
               className={styles.bgImage}
-              style={{ backgroundImage: `url(${imageUrl})` }}
             />
           )}
           <div className={styles.overlay} />

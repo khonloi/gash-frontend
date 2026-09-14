@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui";
 import styles from "./ProductGallery.module.css";
@@ -30,11 +31,13 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
             <Badge variant="success">NEW</Badge>
           </div>
         )}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {safeImages[activeIndex] ? (
-          <img
+          <Image
             src={safeImages[activeIndex]}
             alt={`Product view ${activeIndex + 1}`}
+            fill
+            priority={activeIndex === 0}
+            sizes="(max-width: 768px) 100vw, 50vw"
             className={styles.mainImage}
           />
         ) : (
@@ -75,10 +78,11 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
               onClick={() => setActiveIndex(idx)}
               aria-label={`View image ${idx + 1}`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={img}
                 alt={`Thumbnail ${idx + 1}`}
+                fill
+                sizes="76px"
                 className={styles.thumbnailImg}
               />
             </button>

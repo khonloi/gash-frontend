@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
+import { useIsMounted } from '@/hooks/useIsMounted'
 import { CartSidebar } from '@/components/ui/CartSidebar/CartSidebar'
 import styles from './MainNavbar.module.css'
 
@@ -22,11 +23,7 @@ export function MainNavbar() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useIsMounted()
 
   // Prevent background scrolling when mobile drawer is open
   useEffect(() => {

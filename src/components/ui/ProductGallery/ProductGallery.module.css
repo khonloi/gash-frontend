@@ -89,6 +89,7 @@
 }
 
 .thumbnailBtn {
+  position: relative;
   flex-shrink: 0;
   width: 76px;
   height: 76px;
