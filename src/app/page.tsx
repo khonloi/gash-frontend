@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import {
   HeroCarousel,
   CategoryCircle,
@@ -9,7 +10,6 @@ import {
   SportCard,
   SectionHeading,
 } from "@/components/ui";
-import { JournalSection } from "@/components/home/JournalSection";
 import { fetchProducts } from "@/services/productService";
 import {
   ArrowRight,
@@ -24,6 +24,27 @@ import {
   brands,
 } from "@/lib/mockData";
 import styles from "./page.module.css";
+
+const JournalSection = dynamic(
+  () =>
+    import("@/components/home/JournalSection").then(
+      (mod) => mod.JournalSection
+    ),
+  {
+    loading: () => (
+      <div
+        style={{
+          minHeight: "400px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div className="skeleton" style={{ width: "100%", height: "400px" }} />
+      </div>
+    ),
+  }
+);
 
 export const metadata: Metadata = {
   title: "JOCKSPORT | Official Athletic & Performance Sportswear",
@@ -68,9 +89,9 @@ export default async function Home() {
         <div className="container">
           <SectionHeading>Shop by Category</SectionHeading>
           <div className={styles.categoryGrid}>
-            {categories.map((cat, idx) => (
+            {categories.map((cat) => (
               <CategoryCircle
-                key={idx}
+                key={cat.title}
                 title={cat.title}
                 href={cat.href}
                 imageUrl={cat.imageUrl}
@@ -155,8 +176,8 @@ export default async function Home() {
         <div className="container">
           <SectionHeading>Top Featured Brands</SectionHeading>
           <div className={styles.brandsGrid}>
-            {brands.map((brand, idx) => (
-              <div key={idx} className={styles.brandBox}>
+            {brands.map((brand) => (
+              <div key={brand} className={styles.brandBox}>
                 <span className={styles.brandName}>{brand}</span>
               </div>
             ))}
@@ -182,8 +203,8 @@ export default async function Home() {
         <div className="container">
           <SectionHeading>Favorite Sports</SectionHeading>
           <div className={styles.sportsGrid}>
-            {favoriteSports.map((sport, idx) => (
-              <SportCard key={idx} {...sport} />
+            {favoriteSports.map((sport) => (
+              <SportCard key={sport.title} {...sport} />
             ))}
           </div>
         </div>

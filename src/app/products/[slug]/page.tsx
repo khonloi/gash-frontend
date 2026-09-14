@@ -65,8 +65,34 @@ export default async function ProductDetailPage({
     { label: product.title },
   ];
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    image: product.images?.length > 0 ? product.images : [product.imageUrl],
+    description: product.description
+      ? product.description.replace(/<[^>]*>/g, '').slice(0, 300)
+      : undefined,
+    sku: product.sku,
+    brand: {
+      '@type': 'Brand',
+      name: product.brand,
+    },
+    offers: {
+      '@type': 'Offer',
+      price: product.price.toFixed(2),
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: `https://jocksport.com/products/${product.handle}`,
+    },
+  };
+
   return (
     <main className={styles.pageContainer}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container">
         <Breadcrumb items={breadcrumbItems} />
 

@@ -17,8 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JOCKSPORTS | Premium Athletic Footwear, Apparel & Accessories",
-  description: "Leading sports retail destination - 100% authentic athletic gear from Nike, Adidas, Puma, Under Armour, Asics and more.",
+  title: {
+    default: "JOCKSPORT | Official Athletic Footwear & Sportswear",
+    template: "%s | JOCKSPORT",
+  },
+  description:
+    "Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment from Nike, Adidas, Puma, Under Armour, Asics and more.",
 };
 
 export default function RootLayout({

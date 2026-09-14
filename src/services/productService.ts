@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Product, ProductVariant, FrontendProduct } from "../types/product";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -127,7 +128,7 @@ export function mapProductToFrontend(product: Product): FrontendProduct {
   };
 }
 
-export async function fetchProducts(): Promise<FrontendProduct[]> {
+export const fetchProducts = cache(async (): Promise<FrontendProduct[]> => {
   try {
     const res = await fetch(`${API_URL}/products`);
     if (!res.ok) throw new Error("Failed to fetch products");
@@ -137,9 +138,9 @@ export async function fetchProducts(): Promise<FrontendProduct[]> {
     console.error("Error fetching products:", error);
     return [];
   }
-}
+});
 
-export async function fetchProductByHandle(handleOrId: string): Promise<FrontendProduct | null> {
+export const fetchProductByHandle = cache(async (handleOrId: string): Promise<FrontendProduct | null> => {
   try {
     // Try by handle first
     let res = await fetch(`${API_URL}/products/handle/${encodeURIComponent(handleOrId)}`);
@@ -157,4 +158,4 @@ export async function fetchProductByHandle(handleOrId: string): Promise<Frontend
     console.error(`Error fetching product ${handleOrId}:`, error);
     return null;
   }
-}
+});

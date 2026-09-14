@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
@@ -68,11 +68,26 @@ export function HeroCarousel() {
   }, []);
 
   useEffect(() => {
-    if (isPaused) return;
+    // Check if user prefers reduced motion
+    const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    if (mediaQuery?.matches || isPaused) return;
+
     const timer = setInterval(() => {
       nextSlide();
     }, 5000);
-    return () => clearInterval(timer);
+
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        clearInterval(timer);
+      }
+    };
+
+    mediaQuery?.addEventListener('change', handleMotionChange);
+
+    return () => {
+      clearInterval(timer);
+      mediaQuery?.removeEventListener('change', handleMotionChange);
+    };
   }, [nextSlide, isPaused]);
 
   const slide = slides[currentSlide];

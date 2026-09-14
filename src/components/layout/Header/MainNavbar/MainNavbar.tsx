@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useIsMounted } from '@/hooks/useIsMounted'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { CartSidebar } from '@/components/ui/CartSidebar/CartSidebar'
 import styles from './MainNavbar.module.css'
 
@@ -24,6 +25,7 @@ export function MainNavbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false)
   const mounted = useIsMounted()
+  const drawerRef = useFocusTrap<HTMLElement>(isDrawerOpen, () => setIsDrawerOpen(false))
 
   // Prevent background scrolling when mobile drawer is open
   useEffect(() => {
@@ -130,7 +132,13 @@ export function MainNavbar() {
       />
 
       {/* Mobile Navigation Drawer */}
-      <aside className={`${styles.mobileDrawer} ${isDrawerOpen ? styles.drawerOpen : ''}`}>
+      <aside
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile Navigation Drawer"
+        className={`${styles.mobileDrawer} ${isDrawerOpen ? styles.drawerOpen : ''}`}
+      >
         {/* Drawer Header */}
         <div className={styles.drawerHeader}>
           <Link href="/" className={styles.logo} onClick={closeDrawer}>

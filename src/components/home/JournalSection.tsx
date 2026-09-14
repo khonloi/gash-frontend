@@ -41,8 +41,8 @@ export function JournalSection() {
         </div>
 
         <div className={styles.articlesGrid}>
-          {filteredArticles.map((article, idx) => (
-            <ArticleCard key={idx} {...article} />
+          {filteredArticles.map((article) => (
+            <ArticleCard key={article.title} {...article} />
           ))}
         </div>
       </div>

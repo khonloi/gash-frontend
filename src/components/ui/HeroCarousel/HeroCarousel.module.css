@@ -333,3 +333,12 @@
     padding: 0.45rem 1.15rem;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .bgImage,
+  .slideCard:hover .bgImage {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+

@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import React from "react";
 import Image from "next/image";
@@ -6,6 +6,7 @@ import Link from "next/link";
 import { X, ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useIsMounted } from "@/hooks/useIsMounted";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { Button, QuantitySelector, EmptyState } from "@/components/ui";
 import styles from "./CartSidebar.module.css";
 
@@ -17,6 +18,7 @@ interface CartSidebarProps {
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
   const mounted = useIsMounted();
+  const sidebarRef = useFocusTrap<HTMLElement>(isOpen, onClose);
 
   if (!mounted) return null;
 
@@ -28,6 +30,10 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       />
 
       <aside
+        ref={sidebarRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Shopping Cart Drawer"
         className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}
       >
         <div className={styles.header}>
