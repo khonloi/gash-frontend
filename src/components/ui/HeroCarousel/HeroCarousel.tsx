@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import styles from "./HeroCarousel.module.css";
 
@@ -12,6 +13,7 @@ interface SlideData {
   subtitle: string;
   dateRange: string;
   ctaText: string;
+  href: string;
   bgGradient: string;
   image: string;
 }
@@ -25,6 +27,7 @@ const slides: SlideData[] = [
       "Exclusive for new members - Get $15 off on your first order over $100",
     dateRange: "Aug 6 - 19 (*Terms & conditions apply)",
     ctaText: "SHOP NOW",
+    href: "/collections/all",
     bgGradient: "linear-gradient(135deg, #003CD6 0%, #001B6B 100%)",
     image:
       "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80",
@@ -37,6 +40,7 @@ const slides: SlideData[] = [
       "Elevate your speed and endurance with pinnacle energy-return technology",
     dateRange: "Applied on selected styles only",
     ctaText: "EXPLORE NOW",
+    href: "/collections/running",
     bgGradient: "linear-gradient(135deg, #0C1C30 0%, #1A365D 100%)",
     image:
       "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80",
@@ -49,6 +53,7 @@ const slides: SlideData[] = [
       "4-way stretch, ultra-breathable athletic apparel engineered for peak performance",
     dateRange: "Buy 2 get 1 training accessory free",
     ctaText: "VIEW COLLECTION",
+    href: "/collections/training",
     bgGradient: "linear-gradient(135deg, #005F73 0%, #0A9396 100%)",
     image:
       "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
@@ -93,14 +98,22 @@ export function HeroCarousel() {
   const slide = slides[currentSlide];
 
   return (
-    <div
+    <section
       className={styles.heroSection}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured promotions"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={() => setIsPaused(false)}
     >
-      <div className={styles.carouselContainer}>
+      <div className={styles.carouselContainer} aria-live={isPaused ? "polite" : "off"}>
         <div
           className={styles.slideCard}
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`Slide ${currentSlide + 1} of ${slides.length}: ${slide.title}`}
           style={{ background: slide.bgGradient }}
         >
           {/* Background Image with Overlay */}
@@ -126,10 +139,10 @@ export function HeroCarousel() {
               <span className={styles.dateRange}>{slide.dateRange}</span>
 
               <div className={styles.ctaWrapper}>
-                <button className={styles.sharpCta}>
+                <Link href={slide.href} className={styles.sharpCta}>
                   <span>{slide.ctaText}</span>
                   <Play size={14} fill="currentColor" />
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -139,6 +152,7 @@ export function HeroCarousel() {
             onClick={prevSlide}
             className={`${styles.arrowBtn} ${styles.prevBtn}`}
             aria-label="Previous slide"
+            type="button"
           >
             <ChevronLeft size={26} />
           </button>
@@ -146,15 +160,19 @@ export function HeroCarousel() {
             onClick={nextSlide}
             className={`${styles.arrowBtn} ${styles.nextBtn}`}
             aria-label="Next slide"
+            type="button"
           >
             <ChevronRight size={26} />
           </button>
 
           {/* Dot Indicators */}
-          <div className={styles.dots}>
+          <div className={styles.dots} role="tablist" aria-label="Carousel slides">
             {slides.map((_, index) => (
               <button
                 key={index}
+                type="button"
+                role="tab"
+                aria-selected={index === currentSlide}
                 onClick={() => setCurrentSlide(index)}
                 className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ""}`}
                 aria-label={`Go to slide ${index + 1}`}
@@ -165,7 +183,11 @@ export function HeroCarousel() {
 
         {/* Floating Best Price Circular Badge */}
         <div className={styles.badgeWrapper}>
-          <div className={styles.floatingPromoBadge}>
+          <Link
+            href="/collections/all"
+            className={styles.floatingPromoBadge}
+            aria-label="Shop best deals collection"
+          >
             <div className={styles.badgeCircle}>
               <span className={styles.badgeTop}>Best</span>
               <span className={styles.badgeBottom}>Deals</span>
@@ -174,9 +196,9 @@ export function HeroCarousel() {
                 <Play size={10} fill="currentColor" />
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

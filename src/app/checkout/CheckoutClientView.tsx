@@ -326,7 +326,9 @@ export function CheckoutClientView() {
                 </span>
               </div>
               <div className={styles.inputGroup}>
+                <label htmlFor="contact" className="sr-only">Email or mobile phone number</label>
                 <Input
+                  id="contact"
                   type="text"
                   placeholder="Email or mobile phone number"
                   inputSize="lg"
@@ -350,7 +352,9 @@ export function CheckoutClientView() {
               <h2 className={styles.sectionTitle}>Shipping Address</h2>
               <div className={styles.formGrid}>
                 <div className="grid-full-span">
+                  <label htmlFor="country" className="sr-only">Country or Region</label>
                   <Input
+                    id="country"
                     type="text"
                     placeholder="Country/Region"
                     value={formData.country}
@@ -359,7 +363,9 @@ export function CheckoutClientView() {
                   />
                 </div>
                 <div>
+                  <label htmlFor="firstName" className="sr-only">First Name</label>
                   <Input
+                    id="firstName"
                     type="text"
                     placeholder="First Name"
                     inputSize="lg"
@@ -370,7 +376,9 @@ export function CheckoutClientView() {
                   {errors.firstName && <span className={styles.fieldError}>{errors.firstName}</span>}
                 </div>
                 <div>
+                  <label htmlFor="lastName" className="sr-only">Last Name</label>
                   <Input
+                    id="lastName"
                     type="text"
                     placeholder="Last Name"
                     inputSize="lg"
@@ -381,7 +389,9 @@ export function CheckoutClientView() {
                   {errors.lastName && <span className={styles.fieldError}>{errors.lastName}</span>}
                 </div>
                 <div className="grid-full-span">
+                  <label htmlFor="address" className="sr-only">Address</label>
                   <Input
+                    id="address"
                     type="text"
                     placeholder="Address (Street name, house number)"
                     inputSize="lg"
@@ -392,7 +402,9 @@ export function CheckoutClientView() {
                   {errors.address && <span className={styles.fieldError}>{errors.address}</span>}
                 </div>
                 <div className="grid-full-span">
+                  <label htmlFor="apartment" className="sr-only">Apartment, suite, etc. (optional)</label>
                   <Input
+                    id="apartment"
                     type="text"
                     placeholder="Apartment, suite, etc. (optional)"
                     inputSize="lg"
@@ -401,7 +413,9 @@ export function CheckoutClientView() {
                   />
                 </div>
                 <div>
+                  <label htmlFor="city" className="sr-only">City</label>
                   <Input
+                    id="city"
                     type="text"
                     placeholder="City"
                     inputSize="lg"
@@ -412,7 +426,9 @@ export function CheckoutClientView() {
                   {errors.city && <span className={styles.fieldError}>{errors.city}</span>}
                 </div>
                 <div>
+                  <label htmlFor="postalCode" className="sr-only">Postal Code</label>
                   <Input
+                    id="postalCode"
                     type="text"
                     placeholder="Postal Code (optional)"
                     inputSize="lg"
@@ -421,7 +437,9 @@ export function CheckoutClientView() {
                   />
                 </div>
                 <div className="grid-full-span">
+                  <label htmlFor="phone" className="sr-only">Phone</label>
                   <Input
+                    id="phone"
                     type="tel"
                     placeholder="Phone"
                     inputSize="lg"
@@ -504,7 +522,9 @@ export function CheckoutClientView() {
 
             {/* Discount Code */}
             <div className={styles.discountForm}>
+              <label htmlFor="discount" className="sr-only">Discount code</label>
               <Input
+                id="discount"
                 type="text"
                 placeholder="Discount code"
                 inputSize="md"

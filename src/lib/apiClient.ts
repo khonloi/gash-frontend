@@ -15,7 +15,11 @@ export type QueryParams = Record<string, string | number | boolean | undefined |
 export interface RequestOptions extends RequestInit {
   token?: string | null;
   params?: QueryParams;
+  timeoutMs?: number;
+  retries?: number;
 }
+
+const DEFAULT_TIMEOUT_MS = 15000;
 
 function getBaseUrl(): string {
   if (typeof window === 'undefined') {
@@ -51,7 +55,14 @@ export async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { token, params, headers, ...customConfig } = options;
+  const {
+    token,
+    params,
+    headers,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    retries,
+    ...customConfig
+  } = options;
   const baseUrl = getBaseUrl().replace(/\/$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
@@ -84,35 +95,104 @@ export async function request<T>(
     reqHeaders['Authorization'] = `Bearer ${activeToken}`;
   }
 
-  const config: RequestInit = {
-    ...customConfig,
-    headers: reqHeaders,
-  };
+  const method = (customConfig.method || 'GET').toUpperCase();
+  const maxRetries = retries !== undefined ? retries : (method === 'GET' ? 1 : 0);
 
-  const response = await fetch(url.toString(), config);
+  let lastError: unknown;
 
-  // If response has no content (204)
-  if (response.status === 204) {
-    return null as unknown as T;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    let timedOut = false;
+
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
+
+    let removeAbortListener: (() => void) | undefined;
+    if (customConfig.signal) {
+      if (customConfig.signal.aborted) {
+        controller.abort();
+      } else {
+        const onUserAbort = () => controller.abort();
+        customConfig.signal.addEventListener('abort', onUserAbort, { once: true });
+        removeAbortListener = () => customConfig.signal?.removeEventListener('abort', onUserAbort);
+      }
+    }
+
+    try {
+      const response = await fetch(url.toString(), {
+        ...customConfig,
+        headers: reqHeaders,
+        signal: controller.signal,
+      });
+
+      // If response has no content (204)
+      if (response.status === 204) {
+        return null as unknown as T;
+      }
+
+      let data: Record<string, unknown> | null = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        // Retry on 5xx server errors for GET requests
+        if (response.status >= 500 && method === 'GET' && attempt < maxRetries) {
+          lastError = new ApiError(`Server error (${response.status})`, response.status, data);
+          await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+          continue;
+        }
+
+        const errorData = data?.error as Record<string, unknown> | undefined;
+        const errorMessage =
+          (data?.message as string | undefined) ||
+          (errorData?.message as string | undefined) ||
+          `Request failed with status ${response.status}`;
+        throw new ApiError(errorMessage, response.status, data);
+      }
+
+      return data as T;
+    } catch (err: unknown) {
+      if (timedOut) {
+        lastError = new ApiError(`Request timed out after ${timeoutMs}ms`, 408);
+      } else if (err instanceof ApiError) {
+        throw err;
+      } else {
+        lastError = err;
+      }
+
+      // If caller explicitly aborted, do not retry
+      if (customConfig.signal?.aborted) {
+        throw lastError;
+      }
+
+      // Retry for GET requests on network/timeout errors
+      if (method === 'GET' && attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+        continue;
+      }
+
+      if (lastError instanceof ApiError) {
+        throw lastError;
+      }
+      const message = lastError instanceof Error ? lastError.message : 'Network request failed';
+      throw new ApiError(message, 0);
+    } finally {
+      clearTimeout(timer);
+      if (removeAbortListener) {
+        removeAbortListener();
+      }
+    }
   }
 
-  let data: Record<string, unknown> | null = null;
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
+  if (lastError instanceof ApiError) {
+    throw lastError;
   }
-
-  if (!response.ok) {
-    const errorData = data?.error as Record<string, unknown> | undefined;
-    const errorMessage =
-      (data?.message as string | undefined) ||
-      (errorData?.message as string | undefined) ||
-      `Request failed with status ${response.status}`;
-    throw new ApiError(errorMessage, response.status, data);
-  }
-
-  return data as T;
+  throw new ApiError('Request failed after retries', 0);
 }
 
 export const apiClient = {

@@ -18,7 +18,7 @@ export interface ProductCardProps {
   originalPrice: number
   salePrice: number
   discountPercent?: number
-  imageUrl: string
+  imageUrl?: string
   category?: string
 }
 
@@ -35,7 +35,6 @@ export function ProductCard({
   const addItem = useCartStore((state) => state.addItem)
   const productSlug = handle || id
 
-
   return (
     <div className={styles.card}>
       <div className={styles.imageWrapper}>
@@ -43,13 +42,17 @@ export function ProductCard({
           <Badge variant="destructive" className={styles.discountBadge}>-{discountPercent}%</Badge>
         )}
         <Link href={`/products/${productSlug}`} className={styles.imageLink}>
-          <Image
-            src={imageUrl}
-            alt={title}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-            className={styles.image}
-          />
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+              className={styles.image}
+            />
+          ) : (
+            <div className={styles.imagePlaceholder} />
+          )}
         </Link>
         <Button
           variant="primary"
@@ -62,7 +65,7 @@ export function ProductCard({
               title,
               brand,
               price: salePrice || originalPrice,
-              imageUrl,
+              imageUrl: imageUrl || '',
               quantity: 1,
             })
           }}

@@ -1,25 +1,26 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import Image from 'next/image'
-import { Ruler, MapPin, ShoppingBag, Zap } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
-import { useToastStore } from '@/store/useToastStore'
-import { Button, QuantitySelector, Divider } from '@/components/ui'
-import { formatPrice } from '@/lib/format'
-import styles from './ProductInfo.module.css'
+import React, { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Ruler, MapPin, ShoppingBag, Zap } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+import { useToastStore } from "@/store/useToastStore";
+import { Button, QuantitySelector, Divider } from "@/components/ui";
+import { formatPrice } from "@/lib/format";
+import styles from "./ProductInfo.module.css";
 
 interface ProductInfoProps {
-  brand: string
-  title: string
-  category: string
-  sku: string
-  price: number
-  originalPrice?: number
-  colors: { id: string; name: string; imageUrl: string }[]
-  sizes: { id: string; label: string; inStock: boolean }[]
-  fit: string
-  id: string
+  brand: string;
+  title: string;
+  category: string;
+  sku: string;
+  price: number;
+  originalPrice?: number;
+  colors: { id: string; name: string; imageUrl: string }[];
+  sizes: { id: string; label: string; inStock: boolean }[];
+  fit: string;
+  id: string;
 }
 
 export function ProductInfo({
@@ -33,55 +34,57 @@ export function ProductInfo({
   sizes,
   id,
 }: ProductInfoProps) {
-  const [selectedColor, setSelectedColor] = useState(colors[0]?.id)
-  const [selectedSize, setSelectedSize] = useState<string | null>(null)
-  const [quantity, setQuantity] = useState(1)
-  const addItem = useCartStore((state) => state.addItem)
-  const { addToast } = useToastStore()
+  const router = useRouter();
+  const [selectedColor, setSelectedColor] = useState(colors[0]?.id);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const addItem = useCartStore((state) => state.addItem);
+  const { addToast } = useToastStore();
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      addToast("Please select a size first.", "error")
-      return
+      addToast("Please select a size first.", "error");
+      return;
     }
-    const colorObj = colors.find((c) => c.id === selectedColor)
+    const colorObj = colors.find((c) => c.id === selectedColor);
     addItem({
       productId: id,
       title,
       brand,
       price: price,
-      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
+      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || "",
       quantity,
       size: selectedSize,
       color: colorObj?.name,
-    })
-    addToast(`Added ${quantity} item(s) to cart successfully!`, "success")
-  }
+    });
+    addToast(`Added ${quantity} item(s) to cart successfully!`, "success");
+  };
 
   const handleBuyNow = () => {
     if (!selectedSize) {
-      addToast("Please select a size first.", "error")
-      return
+      addToast("Please select a size first.", "error");
+      return;
     }
-    const colorObj = colors.find((c) => c.id === selectedColor)
+    const colorObj = colors.find((c) => c.id === selectedColor);
     addItem({
       productId: id,
       title,
       brand,
       price: price,
-      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
+      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || "",
       quantity,
       size: selectedSize,
       color: colorObj?.name,
-    })
-    addToast(`Proceeding to checkout with ${quantity} item(s)...`, "info")
-  }
+    });
+    addToast(`Proceeding to checkout with ${quantity} item(s)...`, "info");
+    router.push("/checkout");
+  };
 
   return (
     <div className={styles.container}>
       <h2 className={styles.brand}>{brand}</h2>
       <h1 className={styles.title}>{title}</h1>
-      
+
       <div className={styles.metaInfo}>
         <span className={styles.category}>{category}</span>
         <span className={styles.sku}>SKU {sku}</span>
@@ -90,7 +93,9 @@ export function ProductInfo({
       <div className={styles.pricing}>
         <span className={styles.price}>{formatPrice(price)}</span>
         {originalPrice && originalPrice > price && (
-          <span className={styles.originalPrice}>{formatPrice(originalPrice)}</span>
+          <span className={styles.originalPrice}>
+            {formatPrice(originalPrice)}
+          </span>
         )}
       </div>
 
@@ -98,14 +103,14 @@ export function ProductInfo({
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>
-          Color: <span>{colors.find(c => c.id === selectedColor)?.name}</span>
+          Color: <span>{colors.find((c) => c.id === selectedColor)?.name}</span>
         </p>
         <div className={styles.colorGrid}>
           {colors.map((color) => (
             <button
               key={color.id}
               type="button"
-              className={`${styles.colorBtn} ${selectedColor === color.id ? styles.activeColor : ''}`}
+              className={`${styles.colorBtn} ${selectedColor === color.id ? styles.activeColor : ""}`}
               onClick={() => setSelectedColor(color.id)}
               aria-label={`Select color ${color.name}`}
             >
@@ -128,7 +133,7 @@ export function ProductInfo({
             <button
               key={size.id}
               type="button"
-              className={`${styles.sizeBtn} ${selectedSize === size.id ? styles.activeSize : ''} ${!size.inStock ? styles.outOfStock : ''}`}
+              className={`${styles.sizeBtn} ${selectedSize === size.id ? styles.activeSize : ""} ${!size.inStock ? styles.outOfStock : ""}`}
               onClick={() => size.inStock && setSelectedSize(size.id)}
               disabled={!size.inStock}
             >
@@ -139,11 +144,19 @@ export function ProductInfo({
       </div>
 
       <div className={styles.helpers}>
-        <button type="button" className={styles.helperBtn}>
+        <button 
+          type="button" 
+          className={styles.helperBtn}
+          onClick={() => addToast("Size guide is coming soon.", "info")}
+        >
           <Ruler size={16} />
           <span>Size Guide</span>
         </button>
-        <button type="button" className={styles.helperBtn}>
+        <button 
+          type="button" 
+          className={styles.helperBtn}
+          onClick={() => addToast("In-store availability check is coming soon.", "info")}
+        >
           <MapPin size={16} />
           <span>Check In-Store Availability</span>
         </button>
@@ -194,5 +207,5 @@ export function ProductInfo({
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
@@ -59,10 +59,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Home() {
-  const allProducts = await fetchProducts();
-  const stats = await fetchProductStats();
+function CategorySectionSkeleton() {
+  return (
+    <section className={styles.categorySection}>
+      <div className="container">
+        <SectionHeading>Shop by Category</SectionHeading>
+        <div className={styles.categoryGrid}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+              <div className="skeleton" style={{ width: '120px', height: '120px', borderRadius: '50%' }} />
+              <div className="skeleton" style={{ width: '80px', height: '20px' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
+async function DynamicCategorySection() {
+  const stats = await fetchProductStats();
   const dynamicCategories = stats.map((s) => ({
     title: (s.category as string) || "Other",
     href: `/collections/${(s.category as string)?.toLowerCase().replace(/\s+/g, '-') || 'all'}`,
@@ -71,21 +87,64 @@ export default async function Home() {
     icon: <Sparkles size={18} />,
   }));
 
-  const dynamicBrands = Array.from(new Set(allProducts.map(p => p.brand))).filter(Boolean).slice(0, 11);
-  if (dynamicBrands.length > 0 && dynamicBrands.length < 12) {
-    dynamicBrands.push('+ MORE BRANDS');
-  }
+  return (
+    <section className={styles.categorySection}>
+      <div className="container">
+        <SectionHeading>Shop by Category</SectionHeading>
+        <div className={styles.categoryGrid}>
+          {(dynamicCategories.length > 0 ? dynamicCategories : categories).map((cat) => (
+            <CategoryCircle
+              key={cat.title}
+              title={cat.title}
+              href={cat.href}
+              imageUrl={cat.imageUrl}
+              icon={cat.icon}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-  // Display 2 rows x 5 columns = 10 products per section
-  const featuredDeals = allProducts.slice(0, 10);
-  const newCollections =
-    allProducts.slice(10, 20).length >= 10
-      ? allProducts.slice(10, 20)
-      : allProducts.slice(0, 10);
-  const featuredCollections =
-    allProducts.slice(20, 30).length >= 10
-      ? allProducts.slice(20, 30)
-      : allProducts.slice(0, 10);
+function ProductShelfSkeleton({ title, className }: { title: string, className: string }) {
+  return (
+    <section className={className}>
+      <div className="container">
+        <SectionHeading>{title}</SectionHeading>
+        <div className={styles.productsGrid}>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div className="skeleton" style={{ width: '100%', aspectRatio: '4/5', borderRadius: '4px' }} />
+              <div className="skeleton" style={{ width: '60%', height: '16px', marginTop: '0.5rem' }} />
+              <div className="skeleton" style={{ width: '40%', height: '16px' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function DynamicProductsSection({ 
+  type, 
+  title, 
+  className 
+}: { 
+  type: 'featured' | 'new' | 'collections', 
+  title: string,
+  className: string
+}) {
+  const allProducts = await fetchProducts();
+  
+  let products = [];
+  if (type === 'featured') {
+    products = allProducts.slice(0, 10);
+  } else if (type === 'new') {
+    products = allProducts.slice(10, 20).length >= 10 ? allProducts.slice(10, 20) : allProducts.slice(0, 10);
+  } else {
+    products = allProducts.slice(20, 30).length >= 10 ? allProducts.slice(20, 30) : allProducts.slice(0, 10);
+  }
 
   const viewAllAction = (
     <Link href="/collections/all" className={styles.viewAllLink}>
@@ -95,46 +154,79 @@ export default async function Home() {
   );
 
   return (
+    <section className={className}>
+      <div className="container">
+        <SectionHeading action={viewAllAction}>
+          {title}
+        </SectionHeading>
+
+        <div className={styles.productsGrid}>
+          {products.map((prod) => (
+            <ProductCard
+              key={prod.id}
+              {...prod}
+              discountPercent={prod.discountPercent ?? undefined}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BrandsSectionSkeleton() {
+  return (
+    <section className={styles.brandsSection}>
+      <div className="container">
+        <SectionHeading>Top Featured Brands</SectionHeading>
+        <div className={styles.brandsGrid}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className={`skeleton ${styles.brandBox}`} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function DynamicBrandsSection() {
+  const allProducts = await fetchProducts();
+  const dynamicBrands = Array.from(new Set(allProducts.map(p => p.brand))).filter(Boolean).slice(0, 11);
+  if (dynamicBrands.length > 0 && dynamicBrands.length < 12) {
+    dynamicBrands.push('+ MORE BRANDS');
+  }
+
+  return (
+    <section className={styles.brandsSection}>
+      <div className="container">
+        <SectionHeading>Top Featured Brands</SectionHeading>
+        <div className={styles.brandsGrid}>
+          {(dynamicBrands.length > 0 ? dynamicBrands : brands).map((brand: string) => (
+            <div key={brand} className={styles.brandBox}>
+              <span className={styles.brandName}>{brand}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function Home() {
+  return (
     <main className={styles.main}>
       {/* 1. Hero Section Carousel */}
       <HeroCarousel />
 
       {/* 2. Categories Section */}
-      <section className={styles.categorySection}>
-        <div className="container">
-          <SectionHeading>Shop by Category</SectionHeading>
-          <div className={styles.categoryGrid}>
-            {(dynamicCategories.length > 0 ? dynamicCategories : categories).map((cat) => (
-              <CategoryCircle
-                key={cat.title}
-                title={cat.title}
-                href={cat.href}
-                imageUrl={cat.imageUrl}
-                icon={cat.icon}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<CategorySectionSkeleton />}>
+        <DynamicCategorySection />
+      </Suspense>
 
       {/* 3. Featured Deals / Hot Products (2 rows x 5 columns = 10 products) */}
-      <section className={styles.productsSection}>
-        <div className="container">
-          <SectionHeading action={viewAllAction}>
-            Featured Deals
-          </SectionHeading>
-
-          <div className={styles.productsGrid}>
-            {featuredDeals.map((prod) => (
-              <ProductCard
-                key={prod.id}
-                {...prod}
-                discountPercent={prod.discountPercent ?? undefined}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<ProductShelfSkeleton title="Featured Deals" className={styles.productsSection} />}>
+        <DynamicProductsSection type="featured" title="Featured Deals" className={styles.productsSection} />
+      </Suspense>
 
       {/* 4. Wide Campaign Banner 1 (Speedo Summer Splash) */}
       <PromoBanner
@@ -149,56 +241,19 @@ export default async function Home() {
       />
 
       {/* 5. New Collections (2 rows x 5 columns = 10 products) */}
-      <section className={styles.collectionsSection}>
-        <div className="container">
-          <SectionHeading action={viewAllAction}>
-            New Collections
-          </SectionHeading>
-
-          <div className={styles.productsGrid}>
-            {newCollections.map((prod) => (
-              <ProductCard
-                key={prod.id}
-                {...prod}
-                discountPercent={prod.discountPercent ?? undefined}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<ProductShelfSkeleton title="New Collections" className={styles.collectionsSection} />}>
+        <DynamicProductsSection type="new" title="New Collections" className={styles.collectionsSection} />
+      </Suspense>
 
       {/* 6. Featured Collections (2 rows x 5 columns = 10 products) */}
-      <section className={styles.featuredGridSection}>
-        <div className="container">
-          <SectionHeading action={viewAllAction}>
-            Featured Collections
-          </SectionHeading>
-
-          <div className={styles.productsGrid}>
-            {featuredCollections.map((prod) => (
-              <ProductCard
-                key={prod.id}
-                {...prod}
-                discountPercent={prod.discountPercent ?? undefined}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<ProductShelfSkeleton title="Featured Collections" className={styles.featuredGridSection} />}>
+        <DynamicProductsSection type="collections" title="Featured Collections" className={styles.featuredGridSection} />
+      </Suspense>
 
       {/* 7. Top Brands Grid */}
-      <section className={styles.brandsSection}>
-        <div className="container">
-          <SectionHeading>Top Featured Brands</SectionHeading>
-          <div className={styles.brandsGrid}>
-            {(dynamicBrands.length > 0 ? dynamicBrands : brands).map((brand: string) => (
-              <div key={brand} className={styles.brandBox}>
-                <span className={styles.brandName}>{brand}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<BrandsSectionSkeleton />}>
+        <DynamicBrandsSection />
+      </Suspense>
 
       {/* 8. Wide Campaign Banner 2 (Football Club Kits) */}
       <PromoBanner

@@ -33,6 +33,12 @@
   justify-content: center;
 }
 
+.imagePlaceholder {
+  background: var(--color-slate-100, #eaeaea);
+  width: 100%;
+  height: 100%;
+}
+
 .image {
   object-fit: contain;
   padding: 5%;

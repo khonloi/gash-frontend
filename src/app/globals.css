@@ -152,12 +152,31 @@ button {
   border: none;
   background: none;
   font-family: inherit;
-  outline: none;
 }
 
 input {
   font-family: inherit;
-  outline: none;
+}
+
+/* Keyboard accessibility: visible, high-contrast focus rings for interactive elements */
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-primary-green);
+  outline-offset: 2px;
+}
+
+/* Skeleton Loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-bg-gray) 25%, var(--color-border) 50%, var(--color-bg-gray) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite linear;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* Layout & Sizing Utilities */
