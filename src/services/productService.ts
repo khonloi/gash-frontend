@@ -1,91 +1,183 @@
-import { cache } from "react";
-import { Product, ProductVariant, FrontendProduct } from "../types/product";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+import { cache } from 'react';
+import { apiClient, QueryParams } from '@/lib/apiClient';
+import {
+  FrontendProduct,
+  BackendProduct,
+  BackendProductImage,
+} from '@/types/product';
+import { ApiResponse, PaginatedApiResponse } from '@/types/api';
 
 /**
- * Maps the backend Product model to the FrontendProduct model
+ * Maps the backend Product model (or legacy product) to the FrontendProduct model
  */
-export function mapProductToFrontend(product: Product): FrontendProduct {
-  // Extract images from product.images or variant featuredImage
+export function mapProductToFrontend(
+  raw: Record<string, unknown>
+): FrontendProduct {
+  if (!raw) {
+    throw new Error('Cannot map empty product data');
+  }
+
+  const id = String(raw._id || raw.id || '');
+  const title = String(raw.name || raw.title || '');
+  const handle = String(raw.slug || raw.handle || id);
+  const brand = String(raw.brand || raw.vendor || 'JOCKSPORTS');
+  const category = String(raw.category || raw.productType || 'Sportswear');
+
+  // Extract images
   let images: string[] = [];
-  if (Array.isArray(product.images) && product.images.length > 0) {
-    images = product.images;
-  } else if (Array.isArray(product.variants)) {
-    images = product.variants
-      .map((v: ProductVariant) => v.featuredImage?.src || v.imageUrl)
-      .filter((src): src is string => Boolean(src));
+  if (Array.isArray(raw.images) && raw.images.length > 0) {
+    images = raw.images
+      .map((img: unknown) => {
+        if (typeof img === 'string') return img;
+        if (img && typeof img === 'object' && 'url' in img && typeof (img as BackendProductImage).url === 'string') {
+          return (img as BackendProductImage).url;
+        }
+        return '';
+      })
+      .filter((src: string): src is string => Boolean(src));
+  } else if (Array.isArray(raw.variants)) {
+    images = raw.variants
+      .map((variant: unknown) => {
+        if (!variant || typeof variant !== 'object') return '';
+        const v = variant as Record<string, unknown>;
+        const featured = v.featuredImage as { src?: string } | undefined;
+        if (featured?.src && typeof featured.src === 'string') return featured.src;
+        if (typeof v.imageUrl === 'string') return v.imageUrl;
+        return '';
+      })
+      .filter((src: string): src is string => Boolean(src));
   }
 
-  // Pick default image
-  const defaultImage = images.length > 0 ? images[0] : "";
-
-  // Calculate pricing based on the first variant (or lowest price variant)
-  const defaultVariant = product.variants?.[0];
-  const salePrice = defaultVariant?.price ?? 0;
-  const originalPrice = (defaultVariant?.compareAtPrice && defaultVariant.compareAtPrice > 0)
-    ? defaultVariant.compareAtPrice 
-    : salePrice;
-
-  // Calculate discount percentage
-  let discountPercent = null;
-  if (originalPrice > salePrice) {
-    discountPercent = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+  // Find primary image if available
+  let primaryImg = '';
+  if (Array.isArray(raw.images)) {
+    const primaryObj = raw.images.find(
+      (img: unknown) => typeof img === 'object' && img !== null && Boolean((img as Record<string, unknown>).isPrimary)
+    ) as Record<string, unknown> | undefined;
+    if (primaryObj && typeof primaryObj.url === 'string') {
+      primaryImg = primaryObj.url;
+    }
   }
 
-  // Extract sizes and colors from variants' option1, option2, option3
+  const defaultImage = primaryImg || (images.length > 0 ? images[0] : '');
+
+  // Calculate pricing
+  const salePrice = typeof raw.price === 'number' ? raw.price : Number(raw.price || 0);
+  const compareAtPrice = typeof raw.compareAtPrice === 'number' ? raw.compareAtPrice : Number(raw.compareAtPrice || 0);
+  const originalPrice = compareAtPrice > salePrice ? compareAtPrice : salePrice;
+
+  let discountPercent: number | null = null;
+  if (typeof raw.discountPercentage === 'number' && raw.discountPercentage > 0) {
+    discountPercent = raw.discountPercentage;
+  } else if (originalPrice > salePrice) {
+    discountPercent = Math.round(
+      ((originalPrice - salePrice) / originalPrice) * 100
+    );
+  }
+
+  // Extract sizes and colors from backend variants or legacy variants
   const sizesSet = new Set<string>();
   const colorsSet = new Set<string>();
 
-  product.variants?.forEach((v: ProductVariant) => {
-    if (v.option1) {
-      colorsSet.add(v.option1);
-    }
-    if (v.option2) {
-      sizesSet.add(v.option2);
-    }
-    if (v.option3) {
-      sizesSet.add(v.option3);
-    }
-  });
+  if (Array.isArray(raw.variants)) {
+    raw.variants.forEach((variant: unknown) => {
+      if (!variant || typeof variant !== 'object') return;
+      const v = variant as Record<string, unknown>;
+
+      // Backend structured format: variant.name = "Size" | "Color" and variant.options = ["S", "M", ...]
+      if (typeof v.name === 'string' && Array.isArray(v.options)) {
+        const lowerName = v.name.toLowerCase();
+        if (lowerName.includes('size') || lowerName.includes('kích')) {
+          v.options.forEach((opt: unknown) => {
+            if (typeof opt === 'string') sizesSet.add(opt);
+          });
+        } else if (lowerName.includes('color') || lowerName.includes('màu')) {
+          v.options.forEach((opt: unknown) => {
+            if (typeof opt === 'string') colorsSet.add(opt);
+          });
+        } else {
+          // Other variant dimensions
+          v.options.forEach((opt: unknown) => {
+            if (typeof opt === 'string') sizesSet.add(opt);
+          });
+        }
+      }
+
+      // Legacy Shopify-compatible format: option1, option2, option3
+      if (typeof v.option1 === 'string') colorsSet.add(v.option1);
+      if (typeof v.option2 === 'string') sizesSet.add(v.option2);
+      if (typeof v.option3 === 'string') sizesSet.add(v.option3);
+    });
+  }
 
   const sizes = Array.from(sizesSet);
   const colors = Array.from(colorsSet);
 
-  // Extract category and gender from tags / productType
-  const category = product.productType || "All";
-  let gender = "Unisex";
-  
-  const tags: string[] = Array.isArray(product.tags) ? product.tags : [];
+  // Determine gender from tags or category
+  let gender = 'Unisex';
+  const tags: string[] = Array.isArray(raw.tags)
+    ? raw.tags.filter((t: unknown): t is string => typeof t === 'string')
+    : [];
   const lowerTags = tags.map((t: string) => t.toLowerCase());
-  
-  if (lowerTags.includes("nam") || lowerTags.includes("men")) {
-    gender = "Men";
-  } else if (lowerTags.includes("nữ") || lowerTags.includes("women")) {
-    gender = "Women";
-  } else if (lowerTags.includes("trẻ em") || lowerTags.includes("kids")) {
-    gender = "Kids";
+
+  if (
+    lowerTags.includes('nam') ||
+    lowerTags.includes('men') ||
+    lowerTags.includes("men's")
+  ) {
+    gender = 'Men';
+  } else if (
+    lowerTags.includes('nữ') ||
+    lowerTags.includes('women') ||
+    lowerTags.includes("women's")
+  ) {
+    gender = 'Women';
+  } else if (
+    lowerTags.includes('trẻ em') ||
+    lowerTags.includes('kids') ||
+    lowerTags.includes('kid')
+  ) {
+    gender = 'Kids';
   }
 
-  // Build structured key-value specifications
+  const sku = typeof raw.sku === 'string' ? raw.sku : '';
+  const desc = typeof raw.description === 'string'
+    ? raw.description
+    : typeof raw.bodyHtml === 'string'
+      ? raw.bodyHtml
+      : '';
+
+  // Build structured specifications
   const structuredSpecs: Record<string, string> = {
-    "Brand": product.vendor || "JOCKSPORTS",
-    "Product Type": product.productType || "Sportswear",
-    "Category": category,
-    "Gender": gender,
-    "SKU / Style Code": defaultVariant?.sku || product.id,
+    Brand: brand,
+    'Product Type': category,
+    Category: category,
+    Gender: gender,
+    'SKU / Style Code': sku || id,
   };
 
   if (colors.length > 0) {
-    structuredSpecs["Colorway"] = colors.join(", ");
+    structuredSpecs['Colorway'] = colors.join(', ');
   }
   if (sizes.length > 0) {
-    structuredSpecs["Available Sizes"] = sizes.join(", ");
+    structuredSpecs['Available Sizes'] = sizes.join(', ');
+  }
+  if (typeof raw.ratingsAverage === 'number') {
+    structuredSpecs['Rating'] = `${raw.ratingsAverage} / 5.0`;
   }
 
-  // Extract additional technical specs from bodyHtml bullet points if available
-  if (typeof product.bodyHtml === "string") {
-    const liMatches = Array.from(product.bodyHtml.matchAll(/<li>(.*?)<\/li>/gi));
+  // Add backend attributes map if provided
+  if (raw.attributes && typeof raw.attributes === 'object') {
+    Object.entries(raw.attributes as Record<string, unknown>).forEach(([key, val]) => {
+      if (typeof val === 'string') {
+        structuredSpecs[key] = val;
+      }
+    });
+  }
+
+  // Extract specs from HTML description if present
+  if (desc.includes('<li>')) {
+    const liMatches = Array.from(desc.matchAll(/<li>(.*?)<\/li>/gi));
     liMatches.forEach((match: RegExpMatchArray, idx: number) => {
       const text = match[1].replace(/<[^>]*>/g, '').trim();
       if (text.includes(':')) {
@@ -101,61 +193,148 @@ export function mapProductToFrontend(product: Product): FrontendProduct {
     });
   }
 
-  structuredSpecs["Authenticity"] = "100% Genuine & Authentic Partner";
-  structuredSpecs["Exchange Policy"] = "30-Day Hassle-Free Exchange Policy";
+  structuredSpecs['Authenticity'] = '100% Genuine & Authentic Partner';
+  structuredSpecs['Exchange Policy'] = '30-Day Hassle-Free Exchange Policy';
+
+  const rawCreatedAt = typeof raw.createdAt === 'string' || typeof raw.createdAt === 'number'
+    ? raw.createdAt
+    : null;
+  const isNew = Boolean(
+    raw.isFeatured ||
+      (rawCreatedAt &&
+        Date.now() - new Date(rawCreatedAt).getTime() <
+          30 * 24 * 60 * 60 * 1000)
+  );
 
   return {
-    id: product.id,
-    handle: product.handle || product.id,
-    brand: product.vendor || "JOCKSPORTS",
-    title: product.title,
+    id,
+    handle,
+    brand,
+    title,
     price: salePrice,
-    salePrice: salePrice,
-    originalPrice: originalPrice,
-    discountPercent: discountPercent,
+    salePrice,
+    originalPrice,
+    discountPercent,
     imageUrl: defaultImage,
-    category: category,
-    gender: gender,
-    size: sizes.length > 0 ? sizes[0] : "",
-    sizes: sizes,
-    color: colors.length > 0 ? colors[0] : "",
-    colors: colors,
-    sku: defaultVariant?.sku || "",
-    description: product.bodyHtml || "",
+    category,
+    gender,
+    size: sizes.length > 0 ? sizes[0] : '',
+    sizes,
+    color: colors.length > 0 ? colors[0] : '',
+    colors,
+    sku,
+    description: desc,
     specs: structuredSpecs,
-    images: images,
-    isNew: false
+    images: images.length > 0 ? images : [defaultImage].filter(Boolean),
+    isNew,
   };
 }
 
-export const fetchProducts = cache(async (): Promise<FrontendProduct[]> => {
-  try {
-    const res = await fetch(`${API_URL}/products`);
-    if (!res.ok) throw new Error("Failed to fetch products");
-    const data: Product[] = await res.json();
-    return data.map(mapProductToFrontend);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return [];
-  }
-});
+/**
+ * Fetch all products from backend with optional filters and search
+ */
+export const fetchProducts = cache(
+  async (
+    params?: QueryParams
+  ): Promise<FrontendProduct[]> => {
+    try {
+      const response = await apiClient.get<
+        PaginatedApiResponse<{ products: BackendProduct[] }> | BackendProduct[]
+      >('/products', { params });
 
-export const fetchProductByHandle = cache(async (handleOrId: string): Promise<FrontendProduct | null> => {
-  try {
-    // Try by handle first
-    let res = await fetch(`${API_URL}/products/handle/${encodeURIComponent(handleOrId)}`);
-    if (!res.ok) {
-      // If not found by handle, fallback to try by ID
-      res = await fetch(`${API_URL}/products/${encodeURIComponent(handleOrId)}`);
+      let products: BackendProduct[] = [];
+      const resp = response as unknown as Record<string, unknown>;
+      if (resp && (resp.data as Record<string, unknown>)?.products) {
+        products = (resp.data as Record<string, unknown>).products as BackendProduct[];
+      } else if (Array.isArray(response)) {
+        products = response;
+      } else if (Array.isArray(resp?.data)) {
+        products = resp.data as BackendProduct[];
+      }
+
+      return products.map((p: BackendProduct) => mapProductToFrontend(p as unknown as Record<string, unknown>));
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
     }
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error("Failed to fetch product");
-    }
-    const data: Product = await res.json();
-    return mapProductToFrontend(data);
-  } catch (error) {
-    console.error(`Error fetching product ${handleOrId}:`, error);
-    return null;
   }
-});
+);
+
+/**
+ * Fetch a single product by its slug or MongoDB ID
+ */
+export const fetchProductByHandle = cache(
+  async (handleOrId: string): Promise<FrontendProduct | null> => {
+    try {
+      // 1) Try fetching by slug first
+      try {
+        const res = await apiClient.get<
+          ApiResponse<{ product: BackendProduct }>
+        >(`/products/slug/${encodeURIComponent(handleOrId)}`);
+
+        if (res?.data?.product) {
+          return mapProductToFrontend(res.data.product as unknown as Record<string, unknown>);
+        }
+      } catch (slugError: unknown) {
+        // If 404, fallback to ID lookup
+        const status = (slugError as { status?: number })?.status;
+        if (status !== 404) {
+          console.warn(
+            `Slug lookup failed for ${handleOrId}, trying ID lookup...`
+          );
+        }
+      }
+
+      // 2) Fallback to fetching by ID
+      const resById = await apiClient.get<
+        ApiResponse<{ product: BackendProduct }>
+      >(`/products/${encodeURIComponent(handleOrId)}`);
+
+      if (resById?.data?.product) {
+        return mapProductToFrontend(resById.data.product as unknown as Record<string, unknown>);
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Error fetching product ${handleOrId}:`, error);
+      return null;
+    }
+  }
+);
+
+/**
+ * Fetch featured products from backend
+ */
+export const fetchFeaturedProducts = cache(
+  async (limit = 10): Promise<FrontendProduct[]> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<{ products: BackendProduct[] }>
+      >('/products/featured', { params: { limit } });
+
+      const products = response?.data?.products || [];
+      return products.map(p => mapProductToFrontend(p as unknown as Record<string, unknown>));
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+      return [];
+    }
+  }
+);
+
+/**
+ * Fetch product statistics (categories, counts, etc.)
+ */
+export const fetchProductStats = cache(
+  async (): Promise<Record<string, unknown>[]> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<{ stats: Record<string, unknown>[] }>
+      >('/products/stats');
+
+      return response?.data?.stats || [];
+    } catch (error) {
+      console.error('Error fetching product stats:', error);
+      return [];
+    }
+  }
+);

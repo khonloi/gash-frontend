@@ -10,13 +10,14 @@ import {
   SportCard,
   SectionHeading,
 } from "@/components/ui";
-import { fetchProducts } from "@/services/productService";
+import { fetchProducts, fetchProductStats } from "@/services/productService";
 import {
   ArrowRight,
   ShieldCheck,
   CreditCard,
   Headphones,
   RotateCcw,
+  Sparkles,
 } from "lucide-react";
 import {
   categories,
@@ -60,6 +61,20 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const allProducts = await fetchProducts();
+  const stats = await fetchProductStats();
+
+  const dynamicCategories = stats.map((s) => ({
+    title: (s.category as string) || "Other",
+    href: `/collections/${(s.category as string)?.toLowerCase().replace(/\s+/g, '-') || 'all'}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80",
+    icon: <Sparkles size={18} />,
+  }));
+
+  const dynamicBrands = Array.from(new Set(allProducts.map(p => p.brand))).filter(Boolean).slice(0, 11);
+  if (dynamicBrands.length > 0 && dynamicBrands.length < 12) {
+    dynamicBrands.push('+ MORE BRANDS');
+  }
 
   // Display 2 rows x 5 columns = 10 products per section
   const featuredDeals = allProducts.slice(0, 10);
@@ -89,7 +104,7 @@ export default async function Home() {
         <div className="container">
           <SectionHeading>Shop by Category</SectionHeading>
           <div className={styles.categoryGrid}>
-            {categories.map((cat) => (
+            {(dynamicCategories.length > 0 ? dynamicCategories : categories).map((cat) => (
               <CategoryCircle
                 key={cat.title}
                 title={cat.title}
@@ -176,7 +191,7 @@ export default async function Home() {
         <div className="container">
           <SectionHeading>Top Featured Brands</SectionHeading>
           <div className={styles.brandsGrid}>
-            {brands.map((brand) => (
+            {(dynamicBrands.length > 0 ? dynamicBrands : brands).map((brand: string) => (
               <div key={brand} className={styles.brandBox}>
                 <span className={styles.brandName}>{brand}</span>
               </div>

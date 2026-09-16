@@ -7,6 +7,7 @@ import { ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { Badge } from '@/components/ui/Badge/Badge'
 import { Button } from '@/components/ui/Button/Button'
+import { formatPrice } from '@/lib/format'
 import styles from './ProductCard.module.css'
 
 export interface ProductCardProps {
@@ -34,9 +35,6 @@ export function ProductCard({
   const addItem = useCartStore((state) => state.addItem)
   const productSlug = handle || id
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
-  }
 
   return (
     <div className={styles.card}>

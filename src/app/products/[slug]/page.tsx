@@ -102,6 +102,7 @@ export default async function ProductDetailPage({
           </div>
           <div className={styles.infoWrapper}>
             <ProductInfo
+              id={product.id}
               brand={product.brand}
               title={product.title}
               category={product.category}

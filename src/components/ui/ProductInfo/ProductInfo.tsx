@@ -6,6 +6,7 @@ import { Ruler, MapPin, ShoppingBag, Zap } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useToastStore } from '@/store/useToastStore'
 import { Button, QuantitySelector, Divider } from '@/components/ui'
+import { formatPrice } from '@/lib/format'
 import styles from './ProductInfo.module.css'
 
 interface ProductInfoProps {
@@ -18,6 +19,7 @@ interface ProductInfoProps {
   colors: { id: string; name: string; imageUrl: string }[]
   sizes: { id: string; label: string; inStock: boolean }[]
   fit: string
+  id: string
 }
 
 export function ProductInfo({
@@ -29,16 +31,13 @@ export function ProductInfo({
   originalPrice,
   colors,
   sizes,
+  id,
 }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(colors[0]?.id)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const addItem = useCartStore((state) => state.addItem)
   const { addToast } = useToastStore()
-
-  const formatPrice = (p: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p)
-  }
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -47,7 +46,7 @@ export function ProductInfo({
     }
     const colorObj = colors.find((c) => c.id === selectedColor)
     addItem({
-      productId: sku,
+      productId: id,
       title,
       brand,
       price: price,
@@ -66,7 +65,7 @@ export function ProductInfo({
     }
     const colorObj = colors.find((c) => c.id === selectedColor)
     addItem({
-      productId: sku,
+      productId: id,
       title,
       brand,
       price: price,

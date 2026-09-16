@@ -8,6 +8,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { Button, QuantitySelector, EmptyState } from "@/components/ui";
+import { formatPrice } from "@/lib/format";
 import styles from "./CartSidebar.module.css";
 
 interface CartSidebarProps {
@@ -65,12 +66,16 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               {items.map((item) => (
                 <div key={item.id} className={styles.item}>
                   <div className={styles.itemImage}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      sizes="80px"
-                    />
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        sizes="80px"
+                      />
+                    ) : (
+                      <div className={styles.imagePlaceholder} />
+                    )}
                   </div>
 
                   <div className={styles.itemDetails}>
@@ -102,7 +107,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                         </button>
                       </div>
                       <div className={styles.itemPrice}>
-                        ${item.price.toFixed(2)}
+                        {formatPrice(item.price)}
                       </div>
                     </div>
                   </div>
@@ -117,7 +122,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <div className={styles.subtotalRow}>
               <span className={styles.subtotalLabel}>Subtotal</span>
               <span className={styles.subtotalValue}>
-                ${getTotalPrice().toFixed(2)}
+                {formatPrice(getTotalPrice())}
               </span>
             </div>
 

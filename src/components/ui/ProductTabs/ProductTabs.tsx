@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import DOMPurify from 'isomorphic-dompurify'
 import styles from './ProductTabs.module.css'
 
 interface ProductTabsProps {
@@ -40,7 +41,7 @@ export function ProductTabs({ description, specs }: ProductTabsProps) {
             {typeof description === 'string' ? (
               <div 
                 className={styles.htmlDescription} 
-                dangerouslySetInnerHTML={{ __html: description }} 
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} 
               />
             ) : Array.isArray(description) ? (
               <ul className={styles.descList}>

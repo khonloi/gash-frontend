@@ -7,6 +7,7 @@ import { ShoppingBag, Trash2 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { Button, QuantitySelector, EmptyState, Skeleton } from '@/components/ui';
+import { formatPrice } from '@/lib/format';
 import styles from './page.module.css';
 
 export function CartClientView() {
@@ -79,12 +80,16 @@ export function CartClientView() {
               {items.map((item) => (
                 <div key={item.id} className={styles.item}>
                   <div className={styles.itemImage}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      sizes="120px"
-                    />
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        sizes="120px"
+                      />
+                    ) : (
+                      <div className={styles.imagePlaceholder} />
+                    )}
                   </div>
 
                   <div className={styles.itemDetails}>
@@ -98,7 +103,7 @@ export function CartClientView() {
                   </div>
 
                   <div className={styles.itemUnitPrice}>
-                    ${item.price.toFixed(2)}
+                    {formatPrice(item.price)}
                   </div>
 
                   <div className={styles.quantityWrapper}>
@@ -119,7 +124,7 @@ export function CartClientView() {
                   </div>
 
                   <div className={styles.itemTotal}>
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity)}
                   </div>
                 </div>
               ))}
@@ -141,7 +146,7 @@ export function CartClientView() {
                     ({totalItems}) items
                   </span>
                   <span className={styles.summaryValue}>
-                    ${subtotal.toFixed(2)}
+                    {formatPrice(subtotal)}
                   </span>
                 </div>
 
@@ -162,7 +167,7 @@ export function CartClientView() {
                 <div className={`${styles.summaryRow} ${styles.totalRow}`}>
                   <span className={styles.totalLabel}>Total:</span>
                   <span className={styles.totalValue}>
-                    ${subtotal.toFixed(2)}
+                    {formatPrice(subtotal)}
                   </span>
                 </div>
 

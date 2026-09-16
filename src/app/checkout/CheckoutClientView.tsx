@@ -17,6 +17,7 @@ import {
   RadioOption,
   Skeleton,
 } from '@/components/ui';
+import { formatPrice } from '@/lib/format';
 import styles from './page.module.css';
 
 interface FormData {
@@ -78,13 +79,6 @@ export function CheckoutClientView() {
   const subtotal = getTotalPrice();
   const shippingFee = subtotal > 0 && shippingMethod === 'standard' ? 30 : shippingMethod === 'express' ? 50 : 0;
   const total = subtotal + shippingFee;
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
-  };
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -482,13 +476,17 @@ export function CheckoutClientView() {
               {items.map((item) => (
                 <div key={item.id} className={styles.summaryItem}>
                   <div className={styles.itemImageWrap}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      sizes="64px"
-                      className={styles.itemImage}
-                    />
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        sizes="64px"
+                        className={styles.itemImage}
+                      />
+                    ) : (
+                      <div className={styles.imagePlaceholder} />
+                    )}
                     <span className={styles.itemBadge}>{item.quantity}</span>
                   </div>
                   <div className={styles.itemDetails}>
