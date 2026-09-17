@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import {
   HeroCarousel,
   CategoryCircle,
@@ -19,33 +18,7 @@ import {
   RotateCcw,
   Sparkles,
 } from "lucide-react";
-import {
-  categories,
-  favoriteSports,
-  brands,
-} from "@/lib/mockData";
 import styles from "./page.module.css";
-
-const JournalSection = dynamic(
-  () =>
-    import("@/components/home/JournalSection").then(
-      (mod) => mod.JournalSection
-    ),
-  {
-    loading: () => (
-      <div
-        style={{
-          minHeight: "400px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div className="skeleton" style={{ width: "100%", height: "400px" }} />
-      </div>
-    ),
-  }
-);
 
 export const metadata: Metadata = {
   title: "JOCKSPORT | Official Athletic & Performance Sportswear",
@@ -87,12 +60,16 @@ async function DynamicCategorySection() {
     icon: <Sparkles size={18} />,
   }));
 
+  if (dynamicCategories.length === 0) {
+    return null;
+  }
+
   return (
     <section className={styles.categorySection}>
       <div className="container">
         <SectionHeading>Shop by Category</SectionHeading>
         <div className={styles.categoryGrid}>
-          {(dynamicCategories.length > 0 ? dynamicCategories : categories).map((cat) => (
+          {dynamicCategories.map((cat) => (
             <CategoryCircle
               key={cat.title}
               title={cat.title}
@@ -146,6 +123,10 @@ async function DynamicProductsSection({
     products = allProducts.slice(20, 30).length >= 10 ? allProducts.slice(20, 30) : allProducts.slice(0, 10);
   }
 
+  if (products.length === 0) {
+    return null;
+  }
+
   const viewAllAction = (
     <Link href="/collections/all" className={styles.viewAllLink}>
       <span>View all products</span>
@@ -196,15 +177,46 @@ async function DynamicBrandsSection() {
     dynamicBrands.push('+ MORE BRANDS');
   }
 
+  if (dynamicBrands.length === 0) {
+    return null;
+  }
+
   return (
     <section className={styles.brandsSection}>
       <div className="container">
         <SectionHeading>Top Featured Brands</SectionHeading>
         <div className={styles.brandsGrid}>
-          {(dynamicBrands.length > 0 ? dynamicBrands : brands).map((brand: string) => (
+          {dynamicBrands.map((brand: string) => (
             <div key={brand} className={styles.brandBox}>
               <span className={styles.brandName}>{brand}</span>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function DynamicSportsSection() {
+  const stats = await fetchProductStats();
+  const sports = stats
+    .map((s) => ({
+      title: ((s.category as string) || "").toUpperCase(),
+      href: `/collections/${(s.category as string)?.toLowerCase().replace(/\s+/g, '-') || 'all'}`,
+    }))
+    .filter((s) => Boolean(s.title));
+
+  if (sports.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className={styles.sportsSection}>
+      <div className="container">
+        <SectionHeading>Favorite Sports</SectionHeading>
+        <div className={styles.sportsGrid}>
+          {sports.map((sport) => (
+            <SportCard key={sport.title} title={sport.title} href={sport.href} imageUrl="" />
           ))}
         </div>
       </div>
@@ -223,12 +235,12 @@ export default function Home() {
         <DynamicCategorySection />
       </Suspense>
 
-      {/* 3. Featured Deals / Hot Products (2 rows x 5 columns = 10 products) */}
+      {/* 3. Featured Deals / Hot Products */}
       <Suspense fallback={<ProductShelfSkeleton title="Featured Deals" className={styles.productsSection} />}>
         <DynamicProductsSection type="featured" title="Featured Deals" className={styles.productsSection} />
       </Suspense>
 
-      {/* 4. Wide Campaign Banner 1 (Speedo Summer Splash) */}
+      {/* 4. Wide Campaign Banner 1 */}
       <PromoBanner
         badge="SUMMER SPLASH 2026"
         title="AQUATIC GEAR & CASHBACK VOUCHER"
@@ -240,12 +252,12 @@ export default function Home() {
         imageUrl="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1200&q=80"
       />
 
-      {/* 5. New Collections (2 rows x 5 columns = 10 products) */}
+      {/* 5. New Collections */}
       <Suspense fallback={<ProductShelfSkeleton title="New Collections" className={styles.collectionsSection} />}>
         <DynamicProductsSection type="new" title="New Collections" className={styles.collectionsSection} />
       </Suspense>
 
-      {/* 6. Featured Collections (2 rows x 5 columns = 10 products) */}
+      {/* 6. Featured Collections */}
       <Suspense fallback={<ProductShelfSkeleton title="Featured Collections" className={styles.featuredGridSection} />}>
         <DynamicProductsSection type="collections" title="Featured Collections" className={styles.featuredGridSection} />
       </Suspense>
@@ -255,7 +267,7 @@ export default function Home() {
         <DynamicBrandsSection />
       </Suspense>
 
-      {/* 8. Wide Campaign Banner 2 (Football Club Kits) */}
+      {/* 8. Wide Campaign Banner 2 */}
       <PromoBanner
         badge="SEASON 26/27 DROPS"
         title="OFFICIAL CLUB KITS & CUSTOM PRINTING"
@@ -268,22 +280,12 @@ export default function Home() {
         imageUrl="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80"
       />
 
-      {/* 9. Favorite Sports (6 Athlete Lifestyle Cards) */}
-      <section className={styles.sportsSection}>
-        <div className="container">
-          <SectionHeading>Favorite Sports</SectionHeading>
-          <div className={styles.sportsGrid}>
-            {favoriteSports.map((sport) => (
-              <SportCard key={sport.title} {...sport} />
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 9. Favorite Sports */}
+      <Suspense fallback={null}>
+        <DynamicSportsSection />
+      </Suspense>
 
-      {/* 10. Sport & Lifestyle Journal / News (Interactive Client Island) */}
-      <JournalSection />
-
-      {/* 11. Trust / Value Guarantee Features */}
+      {/* 10. Trust / Value Guarantee Features */}
       <section className={styles.trustSection}>
         <div className={`container ${styles.trustGrid}`}>
           <div className={styles.trustItem}>

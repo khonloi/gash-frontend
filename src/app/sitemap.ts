@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     // Fetch top products for the sitemap
     // Note: We use a larger limit to capture the catalog, but Next.js sitemaps can paginate if needed.
-    const products = await fetchProducts({ limit: 500 })
+    const products = await fetchProducts({ limit: 100 })
 
     const productUrls: MetadataRoute.Sitemap = products.map((product: FrontendProduct) => ({
       url: `${baseUrl}/products/${product.handle || product.id}`,
