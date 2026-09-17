@@ -254,7 +254,7 @@ export const fetchProducts = cache(
 
       return products.map((p: BackendProduct) => mapProductToFrontend(p as unknown as Record<string, unknown>));
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.warn('Could not fetch products from backend:', error instanceof Error ? error.message : error);
       return [];
     }
   }
@@ -296,7 +296,7 @@ export const fetchProductByHandle = cache(
 
       return null;
     } catch (error) {
-      console.error(`Error fetching product ${handleOrId}:`, error);
+      console.warn(`Could not fetch product ${handleOrId} from backend:`, error instanceof Error ? error.message : error);
       return null;
     }
   }
@@ -315,7 +315,7 @@ export const fetchFeaturedProducts = cache(
       const products = response?.data?.products || [];
       return products.map(p => mapProductToFrontend(p as unknown as Record<string, unknown>));
     } catch (error) {
-      console.error('Error fetching featured products:', error);
+      console.warn('Could not fetch featured products from backend:', error instanceof Error ? error.message : error);
       return [];
     }
   }
@@ -333,7 +333,7 @@ export const fetchProductStats = cache(
 
       return response?.data?.stats || [];
     } catch (error) {
-      console.error('Error fetching product stats:', error);
+      console.warn('Could not fetch product stats from backend:', error instanceof Error ? error.message : error);
       return [];
     }
   }

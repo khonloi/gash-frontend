@@ -23,37 +23,57 @@ const ITEMS_PER_PAGE = 30;
 interface CollectionClientViewProps {
   initialProducts: FrontendProduct[];
   slug: string;
+  initialQuery?: string;
 }
 
 export function CollectionClientView({
   initialProducts,
   slug,
+  initialQuery = '',
 }: CollectionClientViewProps) {
   const { data: products = initialProducts } = useProductsQuery(initialProducts);
 
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [activeFilters, setActiveFilters] = useState<FilterState>({});
   const [sortValue, setSortValue] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   // Capitalize slug for display
-  const displayTitle = slug
-    ? slug.charAt(0).toUpperCase() + slug.slice(1)
-    : 'Collection';
+  const displayTitle = searchQuery
+    ? `Search: "${searchQuery}"`
+    : slug
+      ? slug.charAt(0).toUpperCase() + slug.slice(1)
+      : 'Collection';
 
-  // Pre-filter products based on collection slug
+  // Pre-filter products based on collection slug and search query
   const collectionProducts = useMemo(() => {
-    if (!slug || slug.toLowerCase() === 'all' || slug.toLowerCase() === 'collection') {
-      return products;
+    let result = products;
+
+    if (slug && slug.toLowerCase() !== 'all' && slug.toLowerCase() !== 'collection') {
+      const s = slug.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.category.toLowerCase().includes(s) ||
+          p.gender.toLowerCase() === s ||
+          p.brand.toLowerCase().replace(/\s+/g, '-') === s
+      );
     }
-    const s = slug.toLowerCase();
-    return products.filter(
-      (p) =>
-        p.category.toLowerCase().includes(s) ||
-        p.gender.toLowerCase() === s ||
-        p.brand.toLowerCase().replace(' ', '-') === s
-    );
-  }, [products, slug]);
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(query) ||
+          p.brand.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
+  }, [products, slug, searchQuery]);
+
 
   // Dynamically generate filter categories based on the current collection's products
   const dynamicFilterCategories = useMemo<FilterCategory[]>(() => {
@@ -124,6 +144,7 @@ export function CollectionClientView({
 
   const handleClearFilters = () => {
     setActiveFilters({});
+    setSearchQuery('');
     setCurrentPage(1);
   };
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Search,
   ShoppingBag,
@@ -20,6 +21,7 @@ import { CartSidebar } from '@/components/ui/CartSidebar/CartSidebar'
 import styles from './MainNavbar.module.css'
 
 export function MainNavbar() {
+  const router = useRouter()
   const items = useCartStore((state) => state.getTotalItems())
   const [searchQuery, setSearchQuery] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -40,16 +42,24 @@ export function MainNavbar() {
   }, [isDrawerOpen])
 
   const navLinks = [
-    { name: 'Trending', href: '#', hasDropdown: true },
-    { name: 'Men', href: '#', hasDropdown: true },
-    { name: 'Women', href: '#', hasDropdown: true },
-    { name: 'Kids', href: '#', hasDropdown: true },
-    { name: 'Accessories', href: '#', hasDropdown: true },
-    { name: 'Brands', href: '#', hasDropdown: true },
-    { name: 'Sale', href: '#', hasDropdown: true, isHighlight: true },
+    { name: 'Trending', href: '/collections/all', hasDropdown: true },
+    { name: 'Men', href: '/collections/men', hasDropdown: true },
+    { name: 'Women', href: '/collections/women', hasDropdown: true },
+    { name: 'Kids', href: '/collections/kids', hasDropdown: true },
+    { name: 'Accessories', href: '/collections/accessories', hasDropdown: true },
+    { name: 'Brands', href: '/collections/all', hasDropdown: true },
+    { name: 'Sale', href: '/collections/sale', hasDropdown: true, isHighlight: true },
   ]
 
   const closeDrawer = () => setIsDrawerOpen(false)
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (searchQuery.trim()) {
+      closeDrawer()
+      router.push(`/collections/all?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
 
   return (
     <>
@@ -76,18 +86,19 @@ export function MainNavbar() {
           </nav>
 
           {/* Desktop Search Input Bar */}
-          <div className={styles.searchWrapper}>
+          <form className={styles.searchWrapper} onSubmit={handleSearch} role="search">
             <input
-              type="text"
+              type="search"
               placeholder="Search products, brands..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={styles.searchInput}
+              aria-label="Search catalog"
             />
-            <button className={styles.searchBtn} aria-label="Search">
+            <button type="submit" className={styles.searchBtn} aria-label="Search">
               <Search size={18} />
             </button>
-          </div>
+          </form>
 
           {/* Desktop Action Icons */}
           <div className={styles.actions}>
@@ -151,18 +162,19 @@ export function MainNavbar() {
         </div>
 
         {/* Drawer Search */}
-        <div className={styles.drawerSearch}>
+        <form className={styles.drawerSearch} onSubmit={handleSearch} role="search">
           <input
-            type="text"
+            type="search"
             placeholder="Search products, brands..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.drawerSearchInput}
+            aria-label="Search catalog on mobile"
           />
-          <button className={styles.drawerSearchBtn} aria-label="Search">
+          <button type="submit" className={styles.drawerSearchBtn} aria-label="Search">
             <Search size={18} />
           </button>
-        </div>
+        </form>
 
         {/* Drawer Links */}
         <nav className={styles.drawerNav}>

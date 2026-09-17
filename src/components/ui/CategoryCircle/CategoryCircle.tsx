@@ -12,7 +12,7 @@ export interface CategoryCircleProps {
 
 export function CategoryCircle({ title, href, imageUrl, icon }: CategoryCircleProps) {
   return (
-    <Link href={href} className={styles.categoryItem}>
+    <Link href={href} className={styles.categoryItem} aria-label={`Shop ${title} category`}>
       <div className={styles.circleContainer}>
         <Image
           src={imageUrl}
@@ -31,3 +31,4 @@ export function CategoryCircle({ title, href, imageUrl, icon }: CategoryCirclePr
     </Link>
   )
 }
+

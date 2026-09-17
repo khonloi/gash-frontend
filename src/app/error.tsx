@@ -7,18 +7,18 @@ import { Button } from '@/components/ui';
 
 interface ErrorProps {
   error: Error & { digest?: string };
-  retry: () => void;
+  reset: () => void;
 }
 
-export default function RootError({ error, retry }: ErrorProps) {
+export default function RootError({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log runtime error to console (or telemetry service)
     console.error('App runtime error boundary caught:', error);
   }, [error]);
 
   const handleRetry = () => {
-    if (typeof retry === 'function') {
-      retry();
+    if (typeof reset === 'function') {
+      reset();
     }
   };
 

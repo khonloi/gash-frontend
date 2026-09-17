@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
+import { useToastStore } from '@/store/useToastStore'
 import { Badge } from '@/components/ui/Badge/Badge'
 import { Button } from '@/components/ui/Button/Button'
 import { formatPrice } from '@/lib/format'
@@ -33,6 +34,7 @@ export function ProductCard({
   imageUrl,
 }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
+  const addToast = useToastStore((state) => state.addToast)
   const productSlug = handle || id
 
   return (
@@ -41,7 +43,7 @@ export function ProductCard({
         {discountPercent && (
           <Badge variant="destructive" className={styles.discountBadge}>-{discountPercent}%</Badge>
         )}
-        <Link href={`/products/${productSlug}`} className={styles.imageLink}>
+        <Link href={`/products/${productSlug}`} className={styles.imageLink} aria-label={`View ${title}`}>
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -68,8 +70,10 @@ export function ProductCard({
               imageUrl: imageUrl || '',
               quantity: 1,
             })
+            addToast(`Added "${title}" to your cart`, 'success')
           }}
           title="Add to Cart"
+          aria-label={`Add ${title} to Cart`}
           icon={<ShoppingBag size={15} />}
         >
           Add to Cart

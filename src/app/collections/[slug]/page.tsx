@@ -5,6 +5,7 @@ import { CollectionClientView } from '@/components/collection/CollectionClientVi
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ q?: string }>;
 }
 
 export async function generateMetadata({
@@ -23,15 +24,22 @@ export async function generateMetadata({
   };
 }
 
-export default async function CollectionPage({ params }: CollectionPageProps) {
+export default async function CollectionPage({
+  params,
+  searchParams,
+}: CollectionPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const initialQuery = resolvedSearchParams?.q || '';
   const initialProducts = await fetchProducts();
 
   return (
     <CollectionClientView
-      key={slug}
+      key={`${slug}-${initialQuery}`}
       initialProducts={initialProducts}
       slug={slug}
+      initialQuery={initialQuery}
     />
   );
 }
+

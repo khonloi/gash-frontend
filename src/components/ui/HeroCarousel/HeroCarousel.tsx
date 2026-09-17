@@ -77,25 +77,52 @@ export function HeroCarousel() {
     const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     if (mediaQuery?.matches || isPaused) return;
 
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 5000);
+    let timer: NodeJS.Timeout | null = null;
+
+    const startTimer = () => {
+      if (document.hidden) return;
+      timer = setInterval(() => {
+        nextSlide();
+      }, 5000);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (timer) clearInterval(timer);
+      } else {
+        startTimer();
+      }
+    };
+
+    startTimer();
 
     const handleMotionChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
+      if (e.matches && timer) {
         clearInterval(timer);
       }
     };
 
     mediaQuery?.addEventListener('change', handleMotionChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      clearInterval(timer);
+      if (timer) clearInterval(timer);
       mediaQuery?.removeEventListener('change', handleMotionChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [nextSlide, isPaused]);
 
   const slide = slides[currentSlide];
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prevSlide();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      nextSlide();
+    }
+  };
 
   return (
     <section
@@ -103,6 +130,8 @@ export function HeroCarousel() {
       role="region"
       aria-roledescription="carousel"
       aria-label="Featured promotions"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
@@ -173,6 +202,7 @@ export function HeroCarousel() {
                 type="button"
                 role="tab"
                 aria-selected={index === currentSlide}
+                aria-current={index === currentSlide ? "true" : undefined}
                 onClick={() => setCurrentSlide(index)}
                 className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ""}`}
                 aria-label={`Go to slide ${index + 1}`}
