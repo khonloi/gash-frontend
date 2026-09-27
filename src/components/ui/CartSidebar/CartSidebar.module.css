@@ -245,7 +245,7 @@
 .subtotalValue {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-navy);
+  color: var(--color-sale-red);
 }
 
 .actions {

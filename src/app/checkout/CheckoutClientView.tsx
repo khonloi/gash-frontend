@@ -12,7 +12,6 @@ import {
   Input,
   Checkbox,
   RadioGroup,
-  Breadcrumb,
   EmptyState,
   RadioOption,
   Skeleton,
@@ -172,9 +171,6 @@ export function CheckoutClientView() {
     return (
       <div className={styles.checkoutPage}>
         <div className="container">
-          <div style={{ marginBottom: '2rem', width: '220px' }}>
-            <Skeleton width="220px" height="32px" />
-          </div>
           <div className={styles.checkoutContainer}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <Skeleton width="100%" height="200px" borderRadius="8px" />
@@ -271,13 +267,6 @@ export function CheckoutClientView() {
     );
   }
 
-  const breadcrumbItems = [
-    { label: 'Cart', href: '/cart' },
-    { label: 'Information' },
-    { label: 'Shipping' },
-    { label: 'Payment' },
-  ];
-
   const shippingOptions: RadioOption[] = [
     {
       value: 'standard',
@@ -322,8 +311,6 @@ export function CheckoutClientView() {
         <form onSubmit={handleOrderSubmit} className={styles.checkoutContainer}>
           {/* Left Column - Forms */}
           <div className={styles.leftColumn}>
-            <Breadcrumb items={breadcrumbItems} />
-
             {/* Contact Information */}
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
