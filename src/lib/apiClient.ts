@@ -1,3 +1,5 @@
+import type { AuthTokens } from '@/types/user';
+
 export class ApiError extends Error {
   status: number;
   data?: unknown;
@@ -21,7 +23,7 @@ export interface RequestOptions extends RequestInit {
 
 const DEFAULT_TIMEOUT_MS = 15000;
 
-let refreshPromise: Promise<any> | null = null;
+let refreshPromise: Promise<AuthTokens> | null = null;
 
 function getBaseUrl(): string {
   if (typeof window === 'undefined') {
@@ -164,7 +166,7 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
                 continue; // Retry the original request
               }
             }
-          } catch (refreshErr) {
+          } catch {
             // Refresh failed, clear auth
             const { useAuthStore } = await import('@/store/useAuthStore');
             useAuthStore.getState().clearAuth();
