@@ -84,8 +84,8 @@ export default function RootError({ error, reset }: ErrorProps) {
             margin: '0',
           }}
         >
-          We encountered an unexpected glitch while loading this athletic gear.
-          Please try again or head back to the store.
+          We encountered an unexpected glitch while loading this athletic gear. Please try again or
+          head back to the store.
         </p>
 
         {error.digest && (
@@ -113,19 +113,12 @@ export default function RootError({ error, reset }: ErrorProps) {
             flexWrap: 'wrap',
           }}
         >
-          <Button
-            variant="primary"
-            onClick={handleRetry}
-            icon={<RotateCcw size={16} />}
-          >
+          <Button variant="primary" onClick={handleRetry} icon={<RotateCcw size={16} />}>
             Try Again
           </Button>
 
           <Link href="/" style={{ textDecoration: 'none' }}>
-            <Button
-              variant="outline"
-              icon={<Home size={16} />}
-            >
+            <Button variant="outline" icon={<Home size={16} />}>
               Back to Home
             </Button>
           </Link>

@@ -1,15 +1,15 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { ChevronRight } from 'lucide-react'
-import styles from './BrandCollectionCard.module.css'
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ChevronRight } from 'lucide-react';
+import styles from './BrandCollectionCard.module.css';
 
 export interface BrandCollectionCardProps {
-  brand: string
-  title: string
-  imageUrl: string
-  href?: string
-  badgeText?: string
+  brand: string;
+  title: string;
+  imageUrl: string;
+  href?: string;
+  badgeText?: string;
 }
 
 export function BrandCollectionCard({
@@ -28,13 +28,7 @@ export function BrandCollectionCard({
       </div>
 
       <div className={styles.imageContainer}>
-        <Image
-          src={imageUrl}
-          alt={title}
-          width={260}
-          height={200}
-          className={styles.image}
-        />
+        <Image src={imageUrl} alt={title} width={260} height={200} className={styles.image} />
       </div>
 
       <div className={styles.footer}>
@@ -42,5 +36,5 @@ export function BrandCollectionCard({
         <ChevronRight size={16} className={styles.chevron} />
       </div>
     </Link>
-  )
+  );
 }

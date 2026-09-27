@@ -1,18 +1,12 @@
 import { cache } from 'react';
 import { apiClient, QueryParams } from '@/lib/apiClient';
-import {
-  FrontendProduct,
-  BackendProduct,
-  BackendProductImage,
-} from '@/types/product';
+import { FrontendProduct, BackendProduct, BackendProductImage } from '@/types/product';
 import { ApiResponse, PaginatedApiResponse } from '@/types/api';
 
 /**
  * Maps the backend Product model (or legacy product) to the FrontendProduct model
  */
-export function mapProductToFrontend(
-  raw: Record<string, unknown>
-): FrontendProduct {
+export function mapProductToFrontend(raw: Record<string, unknown>): FrontendProduct {
   if (!raw) {
     throw new Error('Cannot map empty product data');
   }
@@ -29,7 +23,12 @@ export function mapProductToFrontend(
     images = raw.images
       .map((img: unknown) => {
         if (typeof img === 'string') return img;
-        if (img && typeof img === 'object' && 'url' in img && typeof (img as BackendProductImage).url === 'string') {
+        if (
+          img &&
+          typeof img === 'object' &&
+          'url' in img &&
+          typeof (img as BackendProductImage).url === 'string'
+        ) {
           return (img as BackendProductImage).url;
         }
         return '';
@@ -52,7 +51,10 @@ export function mapProductToFrontend(
   let primaryImg = '';
   if (Array.isArray(raw.images)) {
     const primaryObj = raw.images.find(
-      (img: unknown) => typeof img === 'object' && img !== null && Boolean((img as Record<string, unknown>).isPrimary)
+      (img: unknown) =>
+        typeof img === 'object' &&
+        img !== null &&
+        Boolean((img as Record<string, unknown>).isPrimary)
     ) as Record<string, unknown> | undefined;
     if (primaryObj && typeof primaryObj.url === 'string') {
       primaryImg = primaryObj.url;
@@ -63,16 +65,15 @@ export function mapProductToFrontend(
 
   // Calculate pricing
   const salePrice = typeof raw.price === 'number' ? raw.price : Number(raw.price || 0);
-  const compareAtPrice = typeof raw.compareAtPrice === 'number' ? raw.compareAtPrice : Number(raw.compareAtPrice || 0);
+  const compareAtPrice =
+    typeof raw.compareAtPrice === 'number' ? raw.compareAtPrice : Number(raw.compareAtPrice || 0);
   const originalPrice = compareAtPrice > salePrice ? compareAtPrice : salePrice;
 
   let discountPercent: number | null = null;
   if (typeof raw.discountPercentage === 'number' && raw.discountPercentage > 0) {
     discountPercent = raw.discountPercentage;
   } else if (originalPrice > salePrice) {
-    discountPercent = Math.round(
-      ((originalPrice - salePrice) / originalPrice) * 100
-    );
+    discountPercent = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
   }
 
   // Extract sizes and colors from backend variants or legacy variants
@@ -120,11 +121,7 @@ export function mapProductToFrontend(
     : [];
   const lowerTags = tags.map((t: string) => t.toLowerCase());
 
-  if (
-    lowerTags.includes('nam') ||
-    lowerTags.includes('men') ||
-    lowerTags.includes("men's")
-  ) {
+  if (lowerTags.includes('nam') || lowerTags.includes('men') || lowerTags.includes("men's")) {
     gender = 'Men';
   } else if (
     lowerTags.includes('nữ') ||
@@ -141,11 +138,12 @@ export function mapProductToFrontend(
   }
 
   const sku = typeof raw.sku === 'string' ? raw.sku : '';
-  const desc = typeof raw.description === 'string'
-    ? raw.description
-    : typeof raw.bodyHtml === 'string'
-      ? raw.bodyHtml
-      : '';
+  const desc =
+    typeof raw.description === 'string'
+      ? raw.description
+      : typeof raw.bodyHtml === 'string'
+        ? raw.bodyHtml
+        : '';
 
   // Build structured specifications
   const structuredSpecs: Record<string, string> = {
@@ -196,14 +194,11 @@ export function mapProductToFrontend(
   structuredSpecs['Authenticity'] = '100% Genuine & Authentic Partner';
   structuredSpecs['Exchange Policy'] = '30-Day Hassle-Free Exchange Policy';
 
-  const rawCreatedAt = typeof raw.createdAt === 'string' || typeof raw.createdAt === 'number'
-    ? raw.createdAt
-    : null;
+  const rawCreatedAt =
+    typeof raw.createdAt === 'string' || typeof raw.createdAt === 'number' ? raw.createdAt : null;
   const isNew = Boolean(
     raw.isFeatured ||
-      (rawCreatedAt &&
-        Date.now() - new Date(rawCreatedAt).getTime() <
-          30 * 24 * 60 * 60 * 1000)
+    (rawCreatedAt && Date.now() - new Date(rawCreatedAt).getTime() < 30 * 24 * 60 * 60 * 1000)
   );
 
   return {
@@ -233,32 +228,33 @@ export function mapProductToFrontend(
 /**
  * Fetch all products from backend with optional filters and search
  */
-export const fetchProducts = cache(
-  async (
-    params?: QueryParams
-  ): Promise<FrontendProduct[]> => {
-    try {
-      const response = await apiClient.get<
-        PaginatedApiResponse<{ products: BackendProduct[] }> | BackendProduct[]
-      >('/products', { params });
+export const fetchProducts = cache(async (params?: QueryParams): Promise<FrontendProduct[]> => {
+  try {
+    const response = await apiClient.get<
+      PaginatedApiResponse<{ products: BackendProduct[] }> | BackendProduct[]
+    >('/products', { params });
 
-      let products: BackendProduct[] = [];
-      const resp = response as unknown as Record<string, unknown>;
-      if (resp && (resp.data as Record<string, unknown>)?.products) {
-        products = (resp.data as Record<string, unknown>).products as BackendProduct[];
-      } else if (Array.isArray(response)) {
-        products = response;
-      } else if (Array.isArray(resp?.data)) {
-        products = resp.data as BackendProduct[];
-      }
-
-      return products.map((p: BackendProduct) => mapProductToFrontend(p as unknown as Record<string, unknown>));
-    } catch (error) {
-      console.warn('Could not fetch products from backend:', error instanceof Error ? error.message : error);
-      return [];
+    let products: BackendProduct[] = [];
+    const resp = response as unknown as Record<string, unknown>;
+    if (resp && (resp.data as Record<string, unknown>)?.products) {
+      products = (resp.data as Record<string, unknown>).products as BackendProduct[];
+    } else if (Array.isArray(response)) {
+      products = response;
+    } else if (Array.isArray(resp?.data)) {
+      products = resp.data as BackendProduct[];
     }
+
+    return products.map((p: BackendProduct) =>
+      mapProductToFrontend(p as unknown as Record<string, unknown>)
+    );
+  } catch (error) {
+    console.warn(
+      'Could not fetch products from backend:',
+      error instanceof Error ? error.message : error
+    );
+    return [];
   }
-);
+});
 
 /**
  * Fetch a single product by its slug or MongoDB ID
@@ -268,9 +264,9 @@ export const fetchProductByHandle = cache(
     try {
       // 1) Try fetching by slug first
       try {
-        const res = await apiClient.get<
-          ApiResponse<{ product: BackendProduct }>
-        >(`/products/slug/${encodeURIComponent(handleOrId)}`);
+        const res = await apiClient.get<ApiResponse<{ product: BackendProduct }>>(
+          `/products/slug/${encodeURIComponent(handleOrId)}`
+        );
 
         if (res?.data?.product) {
           return mapProductToFrontend(res.data.product as unknown as Record<string, unknown>);
@@ -279,16 +275,14 @@ export const fetchProductByHandle = cache(
         // If 404, fallback to ID lookup
         const status = (slugError as { status?: number })?.status;
         if (status !== 404) {
-          console.warn(
-            `Slug lookup failed for ${handleOrId}, trying ID lookup...`
-          );
+          console.warn(`Slug lookup failed for ${handleOrId}, trying ID lookup...`);
         }
       }
 
       // 2) Fallback to fetching by ID
-      const resById = await apiClient.get<
-        ApiResponse<{ product: BackendProduct }>
-      >(`/products/${encodeURIComponent(handleOrId)}`);
+      const resById = await apiClient.get<ApiResponse<{ product: BackendProduct }>>(
+        `/products/${encodeURIComponent(handleOrId)}`
+      );
 
       if (resById?.data?.product) {
         return mapProductToFrontend(resById.data.product as unknown as Record<string, unknown>);
@@ -296,7 +290,10 @@ export const fetchProductByHandle = cache(
 
       return null;
     } catch (error) {
-      console.warn(`Could not fetch product ${handleOrId} from backend:`, error instanceof Error ? error.message : error);
+      console.warn(
+        `Could not fetch product ${handleOrId} from backend:`,
+        error instanceof Error ? error.message : error
+      );
       return null;
     }
   }
@@ -305,36 +302,38 @@ export const fetchProductByHandle = cache(
 /**
  * Fetch featured products from backend
  */
-export const fetchFeaturedProducts = cache(
-  async (limit = 10): Promise<FrontendProduct[]> => {
-    try {
-      const response = await apiClient.get<
-        ApiResponse<{ products: BackendProduct[] }>
-      >('/products/featured', { params: { limit } });
+export const fetchFeaturedProducts = cache(async (limit = 10): Promise<FrontendProduct[]> => {
+  try {
+    const response = await apiClient.get<ApiResponse<{ products: BackendProduct[] }>>(
+      '/products/featured',
+      { params: { limit } }
+    );
 
-      const products = response?.data?.products || [];
-      return products.map(p => mapProductToFrontend(p as unknown as Record<string, unknown>));
-    } catch (error) {
-      console.warn('Could not fetch featured products from backend:', error instanceof Error ? error.message : error);
-      return [];
-    }
+    const products = response?.data?.products || [];
+    return products.map((p) => mapProductToFrontend(p as unknown as Record<string, unknown>));
+  } catch (error) {
+    console.warn(
+      'Could not fetch featured products from backend:',
+      error instanceof Error ? error.message : error
+    );
+    return [];
   }
-);
+});
 
 /**
  * Fetch product statistics (categories, counts, etc.)
  */
-export const fetchProductStats = cache(
-  async (): Promise<Record<string, unknown>[]> => {
-    try {
-      const response = await apiClient.get<
-        ApiResponse<{ stats: Record<string, unknown>[] }>
-      >('/products/stats');
+export const fetchProductStats = cache(async (): Promise<Record<string, unknown>[]> => {
+  try {
+    const response =
+      await apiClient.get<ApiResponse<{ stats: Record<string, unknown>[] }>>('/products/stats');
 
-      return response?.data?.stats || [];
-    } catch (error) {
-      console.warn('Could not fetch product stats from backend:', error instanceof Error ? error.message : error);
-      return [];
-    }
+    return response?.data?.stats || [];
+  } catch (error) {
+    console.warn(
+      'Could not fetch product stats from backend:',
+      error instanceof Error ? error.message : error
+    );
+    return [];
   }
-);
+});

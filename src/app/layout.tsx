@@ -1,21 +1,21 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
-import { Header } from "@/components/layout/Header/Header";
-import { Footer } from "@/components/layout/Footer/Footer";
-import { ToastContainer } from "@/components/ui/Toast/ToastContainer";
+import type { Metadata, Viewport } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import ReactQueryProvider from '@/components/providers/ReactQueryProvider';
+import { Header } from '@/components/layout/Header/Header';
+import { Footer } from '@/components/layout/Footer/Footer';
+import { ToastContainer } from '@/components/ui/Toast/ToastContainer';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jocksport.com';
@@ -30,25 +30,25 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "JOCKSPORT | Official Athletic Footwear & Sportswear",
-    template: "%s | JOCKSPORT",
+    default: 'JOCKSPORT | Official Athletic Footwear & Sportswear',
+    template: '%s | JOCKSPORT',
   },
   description:
-    "Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment from Nike, Adidas, Puma, Under Armour, Asics and more.",
+    'Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment from Nike, Adidas, Puma, Under Armour, Asics and more.',
   keywords: [
-    "sportswear",
-    "running shoes",
-    "athletic footwear",
-    "gym gear",
-    "football boots",
-    "Nike",
-    "Adidas",
-    "Puma",
-    "Asics",
+    'sportswear',
+    'running shoes',
+    'athletic footwear',
+    'gym gear',
+    'football boots',
+    'Nike',
+    'Adidas',
+    'Puma',
+    'Asics',
   ],
-  authors: [{ name: "JOCKSPORT" }],
-  creator: "JOCKSPORT",
-  publisher: "JOCKSPORT",
+  authors: [{ name: 'JOCKSPORT' }],
+  creator: 'JOCKSPORT',
+  publisher: 'JOCKSPORT',
   robots: {
     index: true,
     follow: true,
@@ -61,20 +61,20 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    type: 'website',
+    locale: 'en_US',
     url: siteUrl,
-    siteName: "JOCKSPORT",
-    title: "JOCKSPORT | Official Athletic Footwear & Sportswear",
+    siteName: 'JOCKSPORT',
+    title: 'JOCKSPORT | Official Athletic Footwear & Sportswear',
     description:
-      "Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment from Nike, Adidas, Puma, Under Armour, Asics and more.",
+      'Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment from Nike, Adidas, Puma, Under Armour, Asics and more.',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "JOCKSPORT | Official Athletic Footwear & Sportswear",
+    card: 'summary_large_image',
+    title: 'JOCKSPORT | Official Athletic Footwear & Sportswear',
     description:
-      "Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment.",
-    creator: "@jocksport",
+      'Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment.',
+    creator: '@jocksport',
   },
 };
 
@@ -84,45 +84,45 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
+    '@context': 'https://schema.org',
+    '@graph': [
       {
-        "@type": "Organization",
-        "@id": `${siteUrl}/#organization`,
-        name: "JOCKSPORT",
+        '@type': 'Organization',
+        '@id': `${siteUrl}/#organization`,
+        name: 'JOCKSPORT',
         url: siteUrl,
         logo: `${siteUrl}/favicon.ico`,
         sameAs: [
-          "https://facebook.com/jocksport",
-          "https://instagram.com/jocksport",
-          "https://twitter.com/jocksport"
+          'https://facebook.com/jocksport',
+          'https://instagram.com/jocksport',
+          'https://twitter.com/jocksport',
         ],
         contactPoint: {
-          "@type": "ContactPoint",
-          contactType: "customer support",
-          telephone: "+1-800-555-JOCK",
-          areaServed: "US",
-          availableLanguage: ["English"]
-        }
+          '@type': 'ContactPoint',
+          contactType: 'customer support',
+          telephone: '+1-800-555-JOCK',
+          areaServed: 'US',
+          availableLanguage: ['English'],
+        },
       },
       {
-        "@type": "WebSite",
-        "@id": `${siteUrl}/#website`,
+        '@type': 'WebSite',
+        '@id': `${siteUrl}/#website`,
         url: siteUrl,
-        name: "JOCKSPORT",
+        name: 'JOCKSPORT',
         publisher: {
-          "@id": `${siteUrl}/#organization`
+          '@id': `${siteUrl}/#organization`,
         },
         potentialAction: {
-          "@type": "SearchAction",
+          '@type': 'SearchAction',
           target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${siteUrl}/collections/all?q={search_term_string}`
+            '@type': 'EntryPoint',
+            urlTemplate: `${siteUrl}/collections/all?q={search_term_string}`,
           },
-          "query-input": "required name=search_term_string"
-        }
-      }
-    ]
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
   };
 
   return (
@@ -134,6 +134,9 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <a href="#main-content" className="skip-to-content">
+          Skip to main content
+        </a>
         <ReactQueryProvider>
           <Header />
           {children}
@@ -144,4 +147,3 @@ export default function RootLayout({
     </html>
   );
 }
-

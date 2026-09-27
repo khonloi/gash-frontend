@@ -1,51 +1,51 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import DOMPurify from 'isomorphic-dompurify'
-import styles from './ProductTabs.module.css'
+import React, { useState } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
+import styles from './ProductTabs.module.css';
 
 interface ProductTabsProps {
-  description: string | string[]
-  specs: Record<string, string>
+  description: string | string[];
+  specs: Record<string, string>;
 }
 
-type TabKey = 'desc' | 'specs' | 'policy'
+type TabKey = 'desc' | 'specs' | 'policy';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'desc', label: 'Description' },
   { key: 'specs', label: 'Specifications' },
   { key: 'policy', label: 'Return Policy' },
-]
+];
 
 export function ProductTabs({ description, specs }: ProductTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabKey>('desc')
+  const [activeTab, setActiveTab] = useState<TabKey>('desc');
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
-    let nextIndex = currentIndex
+    let nextIndex = currentIndex;
     if (e.key === 'ArrowRight') {
-      nextIndex = (currentIndex + 1) % TABS.length
+      nextIndex = (currentIndex + 1) % TABS.length;
     } else if (e.key === 'ArrowLeft') {
-      nextIndex = (currentIndex - 1 + TABS.length) % TABS.length
+      nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
     } else if (e.key === 'Home') {
-      nextIndex = 0
+      nextIndex = 0;
     } else if (e.key === 'End') {
-      nextIndex = TABS.length - 1
+      nextIndex = TABS.length - 1;
     } else {
-      return
+      return;
     }
 
-    e.preventDefault()
-    const nextTab = TABS[nextIndex]
-    setActiveTab(nextTab.key)
-    const targetBtn = document.getElementById(`tab-${nextTab.key}`)
-    targetBtn?.focus()
-  }
+    e.preventDefault();
+    const nextTab = TABS[nextIndex];
+    setActiveTab(nextTab.key);
+    const targetBtn = document.getElementById(`tab-${nextTab.key}`);
+    targetBtn?.focus();
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.tabList} role="tablist" aria-label="Product Information">
         {TABS.map((tab, idx) => {
-          const isSelected = activeTab === tab.key
+          const isSelected = activeTab === tab.key;
           return (
             <button
               key={tab.key}
@@ -61,7 +61,7 @@ export function ProductTabs({ description, specs }: ProductTabsProps) {
             >
               {tab.label}
             </button>
-          )
+          );
         })}
       </div>
 
@@ -75,9 +75,9 @@ export function ProductTabs({ description, specs }: ProductTabsProps) {
             className={styles.contentPane}
           >
             {typeof description === 'string' ? (
-              <div 
-                className={styles.htmlDescription} 
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} 
+              <div
+                className={styles.htmlDescription}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
               />
             ) : Array.isArray(description) ? (
               <ul className={styles.descList}>
@@ -120,13 +120,22 @@ export function ProductTabs({ description, specs }: ProductTabsProps) {
             tabIndex={0}
             className={styles.contentPane}
           >
-            <p><strong>1. Return Conditions:</strong> Products must be unwashed, unworn, and have original tags and packaging intact.</p>
-            <p><strong>2. Timeframe:</strong> Returns are accepted within 30 days of successful delivery.</p>
-            <p><strong>3. Shipping Fees:</strong> Free return shipping for items with manufacturing defects or incorrect deliveries.</p>
+            <p>
+              <strong>1. Return Conditions:</strong> Products must be unwashed, unworn, and have
+              original tags and packaging intact.
+            </p>
+            <p>
+              <strong>2. Timeframe:</strong> Returns are accepted within 30 days of successful
+              delivery.
+            </p>
+            <p>
+              <strong>3. Shipping Fees:</strong> Free return shipping for items with manufacturing
+              defects or incorrect deliveries.
+            </p>
             <p>Please contact customer support for further assistance.</p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

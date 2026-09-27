@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Check } from 'lucide-react'
-import { cn } from '@/lib/cn'
-import styles from './Checkbox.module.css'
+import React from 'react';
+import { Check } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import styles from './Checkbox.module.css';
 
 export interface CheckboxProps {
-  checked: boolean
-  onChange: (checked: boolean) => void
-  label?: React.ReactNode
-  count?: number
-  disabled?: boolean
-  className?: string
-  id?: string
-  name?: string
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label?: React.ReactNode;
+  count?: number;
+  disabled?: boolean;
+  className?: string;
+  id?: string;
+  name?: string;
 }
 
 export function Checkbox({
@@ -43,5 +43,5 @@ export function Checkbox({
       {label && <span className={styles.text}>{label}</span>}
       {count !== undefined && <span className={styles.count}>({count})</span>}
     </label>
-  )
+  );
 }

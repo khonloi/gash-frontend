@@ -16,7 +16,9 @@
   padding: 4px;
   background: linear-gradient(135deg, var(--color-border), var(--color-white));
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
 }
 
 .categoryItem:hover .circleContainer {

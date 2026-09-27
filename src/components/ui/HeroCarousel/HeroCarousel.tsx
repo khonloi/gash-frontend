@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import styles from "./HeroCarousel.module.css";
+import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import styles from './HeroCarousel.module.css';
 
 interface SlideData {
   id: number;
@@ -21,42 +21,39 @@ interface SlideData {
 const slides: SlideData[] = [
   {
     id: 1,
-    badge: "EXTRA 15% OFF*",
-    title: "BACK TO YOUR ROUTINE",
-    subtitle:
-      "Exclusive for new members - Get $15 off on your first order over $100",
-    dateRange: "Aug 6 - 19 (*Terms & conditions apply)",
-    ctaText: "SHOP NOW",
-    href: "/collections/all",
-    bgGradient: "linear-gradient(135deg, #003CD6 0%, #001B6B 100%)",
+    badge: 'EXTRA 15% OFF*',
+    title: 'BACK TO YOUR ROUTINE',
+    subtitle: 'Exclusive for new members - Get $15 off on your first order over $100',
+    dateRange: 'Aug 6 - 19 (*Terms & conditions apply)',
+    ctaText: 'SHOP NOW',
+    href: '/collections/all',
+    bgGradient: 'linear-gradient(135deg, #003CD6 0%, #001B6B 100%)',
     image:
-      "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80",
+      'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 2,
-    badge: "ADIDAS SPECIAL SALE",
-    title: "ULTRA BOOST & RUNNING",
-    subtitle:
-      "Elevate your speed and endurance with pinnacle energy-return technology",
-    dateRange: "Applied on selected styles only",
-    ctaText: "EXPLORE NOW",
-    href: "/collections/running",
-    bgGradient: "linear-gradient(135deg, #0C1C30 0%, #1A365D 100%)",
+    badge: 'ADIDAS SPECIAL SALE',
+    title: 'ULTRA BOOST & RUNNING',
+    subtitle: 'Elevate your speed and endurance with pinnacle energy-return technology',
+    dateRange: 'Applied on selected styles only',
+    ctaText: 'EXPLORE NOW',
+    href: '/collections/running',
+    bgGradient: 'linear-gradient(135deg, #0C1C30 0%, #1A365D 100%)',
     image:
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80",
+      'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 3,
-    badge: "NEW ARRIVALS 2026",
-    title: "SUMMER TRAINING GEAR",
-    subtitle:
-      "4-way stretch, ultra-breathable athletic apparel engineered for peak performance",
-    dateRange: "Buy 2 get 1 training accessory free",
-    ctaText: "VIEW COLLECTION",
-    href: "/collections/training",
-    bgGradient: "linear-gradient(135deg, #005F73 0%, #0A9396 100%)",
+    badge: 'NEW ARRIVALS 2026',
+    title: 'SUMMER TRAINING GEAR',
+    subtitle: '4-way stretch, ultra-breathable athletic apparel engineered for peak performance',
+    dateRange: 'Buy 2 get 1 training accessory free',
+    ctaText: 'VIEW COLLECTION',
+    href: '/collections/training',
+    bgGradient: 'linear-gradient(135deg, #005F73 0%, #0A9396 100%)',
     image:
-      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
   },
 ];
 
@@ -74,7 +71,8 @@ export function HeroCarousel() {
 
   useEffect(() => {
     // Check if user prefers reduced motion
-    const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    const mediaQuery =
+      typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     if (mediaQuery?.matches || isPaused) return;
 
     let timer: NodeJS.Timeout | null = null;
@@ -137,7 +135,7 @@ export function HeroCarousel() {
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
-      <div className={styles.carouselContainer} aria-live={isPaused ? "polite" : "off"}>
+      <div className={styles.carouselContainer} aria-live={isPaused ? 'polite' : 'off'}>
         <div
           className={styles.slideCard}
           role="group"
@@ -202,9 +200,9 @@ export function HeroCarousel() {
                 type="button"
                 role="tab"
                 aria-selected={index === currentSlide}
-                aria-current={index === currentSlide ? "true" : undefined}
+                aria-current={index === currentSlide ? 'true' : undefined}
                 onClick={() => setCurrentSlide(index)}
-                className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ""}`}
+                className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ''}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

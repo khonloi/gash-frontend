@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Minus, Plus } from 'lucide-react'
-import { cn } from '@/lib/cn'
-import styles from './QuantitySelector.module.css'
+import React from 'react';
+import { Minus, Plus } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import styles from './QuantitySelector.module.css';
 
 export interface QuantitySelectorProps {
-  value: number
-  onChange: (value: number) => void
-  min?: number
-  max?: number
-  size?: 'sm' | 'md' | 'lg'
-  disabled?: boolean
-  className?: string
-  ariaLabel?: string
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  className?: string;
+  ariaLabel?: string;
 }
 
 export function QuantitySelector({
@@ -26,22 +26,22 @@ export function QuantitySelector({
   className = '',
   ariaLabel = 'Quantity selector',
 }: QuantitySelectorProps) {
-  const isMinDisabled = disabled || value <= min
-  const isMaxDisabled = disabled || (max !== undefined && value >= max)
+  const isMinDisabled = disabled || value <= min;
+  const isMaxDisabled = disabled || (max !== undefined && value >= max);
 
   const handleDecrease = () => {
     if (!isMinDisabled) {
-      onChange(Math.max(min, value - 1))
+      onChange(Math.max(min, value - 1));
     }
-  }
+  };
 
   const handleIncrease = () => {
     if (!isMaxDisabled) {
-      onChange(max !== undefined ? Math.min(max, value + 1) : value + 1)
+      onChange(max !== undefined ? Math.min(max, value + 1) : value + 1);
     }
-  }
+  };
 
-  const iconSize = size === 'sm' ? 14 : size === 'lg' ? 18 : 16
+  const iconSize = size === 'sm' ? 14 : size === 'lg' ? 18 : 16;
 
   return (
     <div
@@ -71,5 +71,5 @@ export function QuantitySelector({
         <Plus size={iconSize} />
       </button>
     </div>
-  )
+  );
 }

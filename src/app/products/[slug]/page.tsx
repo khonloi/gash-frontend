@@ -16,9 +16,14 @@ interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: ProductDetailPageProps): Promise<Metadata> {
+export const revalidate = 3600; // 1 hour ISR
+
+export async function generateStaticParams() {
+  const products = await fetchProducts({ limit: 50 });
+  return products.map((p) => ({ slug: p.handle || p.id }));
+}
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await fetchProductByHandle(slug);
 
@@ -36,6 +41,9 @@ export async function generateMetadata({
   return {
     title: `${product.title} | ${product.brand} - JOCKSPORT`,
     description: plainDescription,
+    alternates: {
+      canonical: `/products/${product.handle || product.id}`,
+    },
     openGraph: {
       title: `${product.title} | ${product.brand} - JOCKSPORT`,
       description: plainDescription,
@@ -44,9 +52,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductDetailPage({
-  params,
-}: ProductDetailPageProps) {
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { slug } = await params;
   const product = await fetchProductByHandle(slug);
 
@@ -88,7 +94,7 @@ export default async function ProductDetailPage({
   };
 
   return (
-    <main className={styles.pageContainer}>
+    <main id="main-content" className={styles.pageContainer}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -124,10 +130,7 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        <ProductTabs
-          description={product.description}
-          specs={product.specs}
-        />
+        <ProductTabs description={product.description} specs={product.specs} />
 
         <section className={styles.relatedSection}>
           <SectionHeading>You Might Also Like</SectionHeading>

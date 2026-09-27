@@ -1,17 +1,25 @@
-import React from 'react'
-import { cn } from '@/lib/cn'
-import styles from './Button.module.css'
+import React from 'react';
+import { cn } from '@/lib/cn';
+import styles from './Button.module.css';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'sharp' | 'pill-green' | 'pill-navy' | 'outline' | 'ghost' | 'primary' | 'success' | 'destructive'
-  size?: 'sm' | 'md' | 'lg' | 'icon'
-  fullWidth?: boolean
-  children?: React.ReactNode
-  icon?: React.ReactNode
-  as?: React.ElementType
-  href?: string
-  target?: string
-  rel?: string
+  variant?:
+    | 'sharp'
+    | 'pill-green'
+    | 'pill-navy'
+    | 'outline'
+    | 'ghost'
+    | 'primary'
+    | 'success'
+    | 'destructive';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
+  fullWidth?: boolean;
+  children?: React.ReactNode;
+  icon?: React.ReactNode;
+  as?: React.ElementType;
+  href?: string;
+  target?: string;
+  rel?: string;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -43,8 +51,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {children && <span>{children}</span>}
         {icon && <span className={styles.icon}>{icon}</span>}
       </Component>
-    )
+    );
   }
-)
+);
 
-Button.displayName = 'Button'
+Button.displayName = 'Button';

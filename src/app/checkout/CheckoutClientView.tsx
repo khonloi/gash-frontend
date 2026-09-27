@@ -77,7 +77,8 @@ export function CheckoutClientView() {
   const [completedOrder, setCompletedOrder] = useState<OrderConfirmation | null>(null);
 
   const subtotal = getTotalPrice();
-  const shippingFee = subtotal > 0 && shippingMethod === 'standard' ? 30 : shippingMethod === 'express' ? 50 : 0;
+  const shippingFee =
+    subtotal > 0 && shippingMethod === 'standard' ? 30 : shippingMethod === 'express' ? 50 : 0;
   const total = subtotal + shippingFee;
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
@@ -202,12 +203,11 @@ export function CheckoutClientView() {
               Order Confirmed!
             </h1>
 
-            <span className={styles.orderNumber}>
-              Order Ref: {completedOrder.orderId}
-            </span>
+            <span className={styles.orderNumber}>Order Ref: {completedOrder.orderId}</span>
 
             <p className={styles.sectionDesc} style={{ maxWidth: '440px' }}>
-              Thank you, <strong>{completedOrder.customerName}</strong>. Your order has been placed and is being prepared for shipment.
+              Thank you, <strong>{completedOrder.customerName}</strong>. Your order has been placed
+              and is being prepared for shipment.
             </p>
 
             <div className={styles.orderSummaryBox}>
@@ -223,7 +223,14 @@ export function CheckoutClientView() {
                 <span style={{ color: 'var(--color-text-muted)' }}>Items:</span>
                 <strong>{completedOrder.itemCount} items</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--color-border)', paddingTop: '0.5rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  borderTop: '1px solid var(--color-border)',
+                  paddingTop: '0.5rem',
+                }}
+              >
                 <span style={{ fontWeight: 700 }}>Total Paid:</span>
                 <strong style={{ color: 'var(--color-sale-red)', fontSize: '1.1rem' }}>
                   {formatPrice(completedOrder.total)}
@@ -326,7 +333,9 @@ export function CheckoutClientView() {
                 </span>
               </div>
               <div className={styles.inputGroup}>
-                <label htmlFor="contact" className="sr-only">Email or mobile phone number</label>
+                <label htmlFor="contact" className="sr-only">
+                  Email or mobile phone number
+                </label>
                 <Input
                   id="contact"
                   type="text"
@@ -352,7 +361,9 @@ export function CheckoutClientView() {
               <h2 className={styles.sectionTitle}>Shipping Address</h2>
               <div className={styles.formGrid}>
                 <div className="grid-full-span">
-                  <label htmlFor="country" className="sr-only">Country or Region</label>
+                  <label htmlFor="country" className="sr-only">
+                    Country or Region
+                  </label>
                   <Input
                     id="country"
                     type="text"
@@ -363,7 +374,9 @@ export function CheckoutClientView() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="firstName" className="sr-only">First Name</label>
+                  <label htmlFor="firstName" className="sr-only">
+                    First Name
+                  </label>
                   <Input
                     id="firstName"
                     type="text"
@@ -373,10 +386,14 @@ export function CheckoutClientView() {
                     onChange={(e) => handleInputChange('firstName', e.target.value)}
                     hasError={Boolean(errors.firstName)}
                   />
-                  {errors.firstName && <span className={styles.fieldError}>{errors.firstName}</span>}
+                  {errors.firstName && (
+                    <span className={styles.fieldError}>{errors.firstName}</span>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="sr-only">Last Name</label>
+                  <label htmlFor="lastName" className="sr-only">
+                    Last Name
+                  </label>
                   <Input
                     id="lastName"
                     type="text"
@@ -389,7 +406,9 @@ export function CheckoutClientView() {
                   {errors.lastName && <span className={styles.fieldError}>{errors.lastName}</span>}
                 </div>
                 <div className="grid-full-span">
-                  <label htmlFor="address" className="sr-only">Address</label>
+                  <label htmlFor="address" className="sr-only">
+                    Address
+                  </label>
                   <Input
                     id="address"
                     type="text"
@@ -402,7 +421,9 @@ export function CheckoutClientView() {
                   {errors.address && <span className={styles.fieldError}>{errors.address}</span>}
                 </div>
                 <div className="grid-full-span">
-                  <label htmlFor="apartment" className="sr-only">Apartment, suite, etc. (optional)</label>
+                  <label htmlFor="apartment" className="sr-only">
+                    Apartment, suite, etc. (optional)
+                  </label>
                   <Input
                     id="apartment"
                     type="text"
@@ -413,7 +434,9 @@ export function CheckoutClientView() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="city" className="sr-only">City</label>
+                  <label htmlFor="city" className="sr-only">
+                    City
+                  </label>
                   <Input
                     id="city"
                     type="text"
@@ -426,7 +449,9 @@ export function CheckoutClientView() {
                   {errors.city && <span className={styles.fieldError}>{errors.city}</span>}
                 </div>
                 <div>
-                  <label htmlFor="postalCode" className="sr-only">Postal Code</label>
+                  <label htmlFor="postalCode" className="sr-only">
+                    Postal Code
+                  </label>
                   <Input
                     id="postalCode"
                     type="text"
@@ -437,7 +462,9 @@ export function CheckoutClientView() {
                   />
                 </div>
                 <div className="grid-full-span">
-                  <label htmlFor="phone" className="sr-only">Phone</label>
+                  <label htmlFor="phone" className="sr-only">
+                    Phone
+                  </label>
                   <Input
                     id="phone"
                     type="tel"
@@ -466,9 +493,7 @@ export function CheckoutClientView() {
             {/* Payment Method */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Payment Method</h2>
-              <p className={styles.sectionDesc}>
-                All transactions are secure and encrypted.
-              </p>
+              <p className={styles.sectionDesc}>All transactions are secure and encrypted.</p>
               <RadioGroup
                 name="payment"
                 value={paymentMethod}
@@ -477,13 +502,7 @@ export function CheckoutClientView() {
               />
             </section>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              disabled={isSubmitting}
-            >
+            <Button type="submit" variant="primary" size="lg" fullWidth disabled={isSubmitting}>
               {isSubmitting ? 'Processing Order...' : `Complete Order • ${formatPrice(total)}`}
             </Button>
           </div>
@@ -522,7 +541,9 @@ export function CheckoutClientView() {
 
             {/* Discount Code */}
             <div className={styles.discountForm}>
-              <label htmlFor="discount" className="sr-only">Discount code</label>
+              <label htmlFor="discount" className="sr-only">
+                Discount code
+              </label>
               <Input
                 id="discount"
                 type="text"

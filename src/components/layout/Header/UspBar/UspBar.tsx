@@ -1,6 +1,6 @@
-import React from 'react'
-import { Truck, RotateCcw, ShieldCheck, Ticket } from 'lucide-react'
-import styles from './UspBar.module.css'
+import React from 'react';
+import { Truck, RotateCcw, ShieldCheck, Ticket } from 'lucide-react';
+import styles from './UspBar.module.css';
 
 export function UspBar() {
   const usps = [
@@ -20,7 +20,7 @@ export function UspBar() {
       icon: <Ticket size={20} className={styles.icon} />,
       text: 'Sign up & get $10 voucher',
     },
-  ]
+  ];
 
   return (
     <div className={styles.uspSection}>
@@ -33,5 +33,5 @@ export function UspBar() {
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -15,9 +15,11 @@
   gap: 12px;
   padding: 16px;
   border-radius: 8px;
-  background-color: var(--color-white, #FFFFFF);
-  border: 1px solid var(--color-border, #E2E8F0);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: var(--color-white, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   pointer-events: auto;
   min-width: 300px;
   max-width: 400px;
@@ -34,15 +36,15 @@
 }
 
 .icon.success {
-  color: var(--color-primary-green, #00E5C9);
+  color: var(--color-primary-green, #00e5c9);
 }
 
 .icon.error {
-  color: var(--color-sale-red, #FF3366);
+  color: var(--color-sale-red, #ff3366);
 }
 
 .icon.info {
-  color: var(--color-royal-blue, #003CD6);
+  color: var(--color-royal-blue, #003cd6);
 }
 
 .content {
@@ -52,7 +54,7 @@
 .message {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-main, #0C1C30);
+  color: var(--color-text-main, #0c1c30);
   margin: 0;
 }
 
@@ -61,15 +63,15 @@
   align-items: center;
   justify-content: center;
   padding: 4px;
-  color: var(--color-text-muted, #707A8A);
+  color: var(--color-text-muted, #707a8a);
   border-radius: 4px;
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .closeBtn:hover {
-  background-color: var(--color-bg-gray, #F1F5F9);
-  color: var(--color-text-main, #0C1C30);
+  background-color: var(--color-bg-gray, #f1f5f9);
+  color: var(--color-text-main, #0c1c30);
 }
 
 @keyframes slideIn {

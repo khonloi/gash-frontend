@@ -33,9 +33,7 @@ export const userService = {
    * Get current authenticated user profile
    */
   getMe: async (): Promise<UserProfile> => {
-    const res = await apiClient.get<ApiResponse<{ user: UserProfile }>>(
-      '/users/me'
-    );
+    const res = await apiClient.get<ApiResponse<{ user: UserProfile }>>('/users/me');
     return res.data.user;
   },
 
@@ -43,23 +41,15 @@ export const userService = {
    * Update profile information
    */
   updateMe: async (payload: UpdateMePayload): Promise<UserProfile> => {
-    const res = await apiClient.patch<ApiResponse<{ user: UserProfile }>>(
-      '/users/me',
-      payload
-    );
+    const res = await apiClient.patch<ApiResponse<{ user: UserProfile }>>('/users/me', payload);
     return res.data.user;
   },
 
   /**
    * Change current account password
    */
-  changePassword: async (
-    payload: ChangePasswordPayload
-  ): Promise<{ message: string }> => {
-    const res = await apiClient.patch<ApiResponse<null>>(
-      '/users/me/password',
-      payload
-    );
+  changePassword: async (payload: ChangePasswordPayload): Promise<{ message: string }> => {
+    const res = await apiClient.patch<ApiResponse<null>>('/users/me/password', payload);
     return { message: res.message || 'Password changed successfully' };
   },
 
@@ -67,9 +57,8 @@ export const userService = {
    * Get user saved addresses
    */
   getAddresses: async (): Promise<UserAddress[]> => {
-    const res = await apiClient.get<ApiResponse<{ addresses: UserAddress[] }>>(
-      '/users/me/addresses'
-    );
+    const res =
+      await apiClient.get<ApiResponse<{ addresses: UserAddress[] }>>('/users/me/addresses');
     return res.data.addresses;
   },
 

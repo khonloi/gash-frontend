@@ -20,7 +20,7 @@
 }
 
 .heading::before {
-  content: "";
+  content: '';
   display: inline-block;
   width: 6px;
   height: 24px;

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Ruler, MapPin, ShoppingBag, Zap } from "lucide-react";
-import { useCartStore } from "@/store/useCartStore";
-import { useToastStore } from "@/store/useToastStore";
-import { Button, QuantitySelector, Divider } from "@/components/ui";
-import { formatPrice } from "@/lib/format";
-import styles from "./ProductInfo.module.css";
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { Ruler, MapPin, ShoppingBag, Zap } from 'lucide-react';
+import { useCartStore } from '@/store/useCartStore';
+import { useToastStore } from '@/store/useToastStore';
+import { Button, QuantitySelector, Divider } from '@/components/ui';
+import { formatPrice } from '@/lib/format';
+import styles from './ProductInfo.module.css';
 
 interface ProductInfoProps {
   brand: string;
@@ -43,7 +43,7 @@ export function ProductInfo({
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      addToast("Please select a size first.", "error");
+      addToast('Please select a size first.', 'error');
       return;
     }
     const colorObj = colors.find((c) => c.id === selectedColor);
@@ -52,17 +52,17 @@ export function ProductInfo({
       title,
       brand,
       price: price,
-      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || "",
+      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
       quantity,
       size: selectedSize,
       color: colorObj?.name,
     });
-    addToast(`Added ${quantity} item(s) to cart successfully!`, "success");
+    addToast(`Added ${quantity} item(s) to cart successfully!`, 'success');
   };
 
   const handleBuyNow = () => {
     if (!selectedSize) {
-      addToast("Please select a size first.", "error");
+      addToast('Please select a size first.', 'error');
       return;
     }
     const colorObj = colors.find((c) => c.id === selectedColor);
@@ -71,13 +71,13 @@ export function ProductInfo({
       title,
       brand,
       price: price,
-      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || "",
+      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
       quantity,
       size: selectedSize,
       color: colorObj?.name,
     });
-    addToast(`Proceeding to checkout with ${quantity} item(s)...`, "info");
-    router.push("/checkout");
+    addToast(`Proceeding to checkout with ${quantity} item(s)...`, 'info');
+    router.push('/checkout');
   };
 
   return (
@@ -93,9 +93,7 @@ export function ProductInfo({
       <div className={styles.pricing}>
         <span className={styles.price}>{formatPrice(price)}</span>
         {originalPrice && originalPrice > price && (
-          <span className={styles.originalPrice}>
-            {formatPrice(originalPrice)}
-          </span>
+          <span className={styles.originalPrice}>{formatPrice(originalPrice)}</span>
         )}
       </div>
 
@@ -110,7 +108,7 @@ export function ProductInfo({
             <button
               key={color.id}
               type="button"
-              className={`${styles.colorBtn} ${selectedColor === color.id ? styles.activeColor : ""}`}
+              className={`${styles.colorBtn} ${selectedColor === color.id ? styles.activeColor : ''}`}
               onClick={() => setSelectedColor(color.id)}
               aria-label={`Select color ${color.name}`}
             >
@@ -133,7 +131,7 @@ export function ProductInfo({
             <button
               key={size.id}
               type="button"
-              className={`${styles.sizeBtn} ${selectedSize === size.id ? styles.activeSize : ""} ${!size.inStock ? styles.outOfStock : ""}`}
+              className={`${styles.sizeBtn} ${selectedSize === size.id ? styles.activeSize : ''} ${!size.inStock ? styles.outOfStock : ''}`}
               onClick={() => size.inStock && setSelectedSize(size.id)}
               disabled={!size.inStock}
             >
@@ -144,18 +142,18 @@ export function ProductInfo({
       </div>
 
       <div className={styles.helpers}>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className={styles.helperBtn}
-          onClick={() => addToast("Size guide is coming soon.", "info")}
+          onClick={() => addToast('Size guide is coming soon.', 'info')}
         >
           <Ruler size={16} />
           <span>Size Guide</span>
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className={styles.helperBtn}
-          onClick={() => addToast("In-store availability check is coming soon.", "info")}
+          onClick={() => addToast('In-store availability check is coming soon.', 'info')}
         >
           <MapPin size={16} />
           <span>Check In-Store Availability</span>
@@ -177,12 +175,7 @@ export function ProductInfo({
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>Quantity</p>
-        <QuantitySelector
-          value={quantity}
-          onChange={setQuantity}
-          min={1}
-          size="md"
-        />
+        <QuantitySelector value={quantity} onChange={setQuantity} min={1} size="md" />
       </div>
 
       <div className={styles.actionButtons}>

@@ -10,11 +10,11 @@ describe('mapProductToFrontend', () => {
       price: 100,
       brand: 'Test Brand',
       category: 'Shoes',
-      images: [{ url: 'https://example.com/img1.jpg', isPrimary: true }]
+      images: [{ url: 'https://example.com/img1.jpg', isPrimary: true }],
     };
-    
+
     const result = mapProductToFrontend(raw);
-    
+
     expect(result.id).toBe('123');
     expect(result.title).toBe('Test Product');
     expect(result.handle).toBe('test-product');
@@ -28,7 +28,7 @@ describe('mapProductToFrontend', () => {
   it('infers gender from tags', () => {
     const rawMen = { _id: '1', tags: ['nam', 'running'] };
     const rawWomen = { _id: '2', tags: ["women's", 'shoes'] };
-    
+
     expect(mapProductToFrontend(rawMen).gender).toBe('Men');
     expect(mapProductToFrontend(rawWomen).gender).toBe('Women');
   });
@@ -37,9 +37,9 @@ describe('mapProductToFrontend', () => {
     const raw = {
       _id: '1',
       price: 80,
-      compareAtPrice: 100
+      compareAtPrice: 100,
     };
-    
+
     const result = mapProductToFrontend(raw);
     expect(result.originalPrice).toBe(100);
     expect(result.discountPercent).toBe(20);
@@ -50,10 +50,10 @@ describe('mapProductToFrontend', () => {
       _id: '1',
       variants: [
         { name: 'Size', options: ['S', 'M'] },
-        { name: 'Color', options: ['Red', 'Blue'] }
-      ]
+        { name: 'Color', options: ['Red', 'Blue'] },
+      ],
     };
-    
+
     const result = mapProductToFrontend(raw);
     expect(result.sizes).toEqual(['S', 'M']);
     expect(result.colors).toEqual(['Red', 'Blue']);
@@ -64,10 +64,10 @@ describe('mapProductToFrontend', () => {
       _id: '1',
       variants: [
         { option1: 'Black', option2: 'L' },
-        { option1: 'White', option2: 'XL' }
-      ]
+        { option1: 'White', option2: 'XL' },
+      ],
     };
-    
+
     const result = mapProductToFrontend(raw);
     expect(result.colors).toContain('Black');
     expect(result.colors).toContain('White');
@@ -78,9 +78,9 @@ describe('mapProductToFrontend', () => {
   it('extracts specs from HTML description', () => {
     const raw = {
       _id: '1',
-      description: '<ul><li>Material: Cotton</li><li>Weight: 200g</li></ul>'
+      description: '<ul><li>Material: Cotton</li><li>Weight: 200g</li></ul>',
     };
-    
+
     const result = mapProductToFrontend(raw);
     expect(result.specs['Material']).toBe('Cotton');
     expect(result.specs['Weight']).toBe('200g');

@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { ShoppingBag } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
-import { useToastStore } from '@/store/useToastStore'
-import { Badge } from '@/components/ui/Badge/Badge'
-import { Button } from '@/components/ui/Button/Button'
-import { formatPrice } from '@/lib/format'
-import styles from './ProductCard.module.css'
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ShoppingBag } from 'lucide-react';
+import { useCartStore } from '@/store/useCartStore';
+import { useToastStore } from '@/store/useToastStore';
+import { Badge } from '@/components/ui/Badge/Badge';
+import { Button } from '@/components/ui/Button/Button';
+import { formatPrice } from '@/lib/format';
+import styles from './ProductCard.module.css';
 
 export interface ProductCardProps {
-  id: string
-  handle?: string
-  brand: string
-  title: string
-  originalPrice: number
-  salePrice: number
-  discountPercent?: number
-  imageUrl?: string
-  category?: string
+  id: string;
+  handle?: string;
+  brand: string;
+  title: string;
+  originalPrice: number;
+  salePrice: number;
+  discountPercent?: number;
+  imageUrl?: string;
+  category?: string;
 }
 
 export function ProductCard({
@@ -33,17 +33,23 @@ export function ProductCard({
   discountPercent,
   imageUrl,
 }: ProductCardProps) {
-  const addItem = useCartStore((state) => state.addItem)
-  const addToast = useToastStore((state) => state.addToast)
-  const productSlug = handle || id
+  const addItem = useCartStore((state) => state.addItem);
+  const addToast = useToastStore((state) => state.addToast);
+  const productSlug = handle || id;
 
   return (
     <div className={styles.card}>
       <div className={styles.imageWrapper}>
         {discountPercent && (
-          <Badge variant="destructive" className={styles.discountBadge}>-{discountPercent}%</Badge>
+          <Badge variant="destructive" className={styles.discountBadge}>
+            -{discountPercent}%
+          </Badge>
         )}
-        <Link href={`/products/${productSlug}`} className={styles.imageLink} aria-label={`View ${title}`}>
+        <Link
+          href={`/products/${productSlug}`}
+          className={styles.imageLink}
+          aria-label={`View ${title}`}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -61,7 +67,7 @@ export function ProductCard({
           size="sm"
           className={styles.quickAddBtn}
           onClick={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             addItem({
               productId: id,
               title,
@@ -69,8 +75,8 @@ export function ProductCard({
               price: salePrice || originalPrice,
               imageUrl: imageUrl || '',
               quantity: 1,
-            })
-            addToast(`Added "${title}" to your cart`, 'success')
+            });
+            addToast(`Added "${title}" to your cart`, 'success');
           }}
           title="Add to Cart"
           aria-label={`Add ${title} to Cart`}
@@ -94,5 +100,5 @@ export function ProductCard({
         </div>
       </div>
     </div>
-  )
+  );
 }

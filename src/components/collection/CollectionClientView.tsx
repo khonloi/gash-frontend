@@ -10,10 +10,7 @@ import {
   EmptyState,
   Button,
 } from '@/components/ui';
-import {
-  FilterState,
-  FilterCategory,
-} from '@/components/ui/FilterSidebar/FilterSidebar';
+import { FilterState, FilterCategory } from '@/components/ui/FilterSidebar/FilterSidebar';
 import { FrontendProduct } from '@/types/product';
 import { useProductsQuery } from '@/hooks/useProducts';
 import styles from '@/app/collections/[slug]/page.module.css';
@@ -74,11 +71,12 @@ export function CollectionClientView({
     return result;
   }, [products, slug, searchQuery]);
 
-
   // Dynamically generate filter categories based on the current collection's products
   const dynamicFilterCategories = useMemo<FilterCategory[]>(() => {
     const brands = Array.from(new Set(collectionProducts.map((p) => p.brand))).filter(Boolean);
-    const categories = Array.from(new Set(collectionProducts.map((p) => p.category))).filter(Boolean);
+    const categories = Array.from(new Set(collectionProducts.map((p) => p.category))).filter(
+      Boolean
+    );
     const genders = Array.from(new Set(collectionProducts.map((p) => p.gender))).filter(Boolean);
     const sizes = Array.from(new Set(collectionProducts.flatMap((p) => p.sizes))).filter(Boolean);
     const colors = Array.from(new Set(collectionProducts.flatMap((p) => p.colors))).filter(Boolean);
@@ -160,12 +158,10 @@ export function CollectionClientView({
       if (!activeFilters.category.includes(product.category)) return false;
     }
     if (activeFilters.size?.length) {
-      if (!activeFilters.size.some((size) => product.sizes.includes(size)))
-        return false;
+      if (!activeFilters.size.some((size) => product.sizes.includes(size))) return false;
     }
     if (activeFilters.color?.length) {
-      if (!activeFilters.color.some((color) => product.colors.includes(color)))
-        return false;
+      if (!activeFilters.color.some((color) => product.colors.includes(color))) return false;
     }
     return true;
   });
@@ -204,7 +200,7 @@ export function CollectionClientView({
   ];
 
   return (
-    <main className={styles.pageContainer}>
+    <main id="main-content" className={styles.pageContainer}>
       <div className="container">
         <Breadcrumb items={breadcrumbItems} />
 
@@ -212,8 +208,9 @@ export function CollectionClientView({
         <div className={styles.hero}>
           <h1 className={styles.heroTitle}>{displayTitle}</h1>
           <p className={styles.heroDescription}>
-            Discover our curated {displayTitle.toLowerCase()} collection. Everything you need to focus, breathe, and flow comfortably.
-            From high-performance gear to breathable activewear.
+            Discover our curated {displayTitle.toLowerCase()} collection. Everything you need to
+            focus, breathe, and flow comfortably. From high-performance gear to breathable
+            activewear.
           </p>
         </div>
 
@@ -240,10 +237,7 @@ export function CollectionClientView({
                 title="No products found"
                 description="Try adjusting your filters to see more results."
                 action={
-                  <Button
-                    variant="outline"
-                    onClick={handleClearFilters}
-                  >
+                  <Button variant="outline" onClick={handleClearFilters}>
                     Clear all filters
                   </Button>
                 }
@@ -251,9 +245,7 @@ export function CollectionClientView({
             ) : (
               <>
                 <div
-                  className={`${styles.productGrid} ${
-                    viewMode === 'list' ? styles.listMode : ''
-                  }`}
+                  className={`${styles.productGrid} ${viewMode === 'list' ? styles.listMode : ''}`}
                 >
                   {paginatedProducts.map((product) => (
                     <ProductCard

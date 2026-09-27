@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
-import Link from "next/link";
-import type { Metadata } from "next";
+import React, { Suspense } from 'react';
+import Link from 'next/link';
+import type { Metadata } from 'next';
 import {
   HeroCarousel,
   CategoryCircle,
@@ -8,40 +8,32 @@ import {
   PromoBanner,
   SportCard,
   SectionHeading,
-} from "@/components/ui";
-import { fetchProducts, fetchProductStats } from "@/services/productService";
-import {
-  ArrowRight,
-  ShieldCheck,
-  CreditCard,
-  Headphones,
-  RotateCcw,
-  Sparkles,
-} from "lucide-react";
-import styles from "./page.module.css";
+} from '@/components/ui';
+import { fetchProducts, fetchProductStats, fetchFeaturedProducts } from '@/services/productService';
+import { ArrowRight, ShieldCheck, CreditCard, Headphones, RotateCcw, Sparkles } from 'lucide-react';
+import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: "JOCKSPORT | Official Athletic & Performance Sportswear",
+  title: 'JOCKSPORT | Official Athletic & Performance Sportswear',
   description:
-    "Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.",
+    'Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.',
   alternates: {
-    canonical: "/",
+    canonical: '/',
   },
   openGraph: {
-    title: "JOCKSPORT | Official Athletic & Performance Sportswear",
+    title: 'JOCKSPORT | Official Athletic & Performance Sportswear',
     description:
-      "Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.",
-    type: "website",
-    url: "/",
+      'Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.',
+    type: 'website',
+    url: '/',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "JOCKSPORT | Official Athletic & Performance Sportswear",
+    card: 'summary_large_image',
+    title: 'JOCKSPORT | Official Athletic & Performance Sportswear',
     description:
-      "Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.",
+      'Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.',
   },
 };
-
 
 function CategorySectionSkeleton() {
   return (
@@ -50,8 +42,19 @@ function CategorySectionSkeleton() {
         <SectionHeading>Shop by Category</SectionHeading>
         <div className={styles.categoryGrid}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <div className="skeleton" style={{ width: '120px', height: '120px', borderRadius: '50%' }} />
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem',
+              }}
+            >
+              <div
+                className="skeleton"
+                style={{ width: '120px', height: '120px', borderRadius: '50%' }}
+              />
               <div className="skeleton" style={{ width: '80px', height: '20px' }} />
             </div>
           ))}
@@ -62,39 +65,89 @@ function CategorySectionSkeleton() {
 }
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  running: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=400&q=80",
-  footwear: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80",
-  shoes: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80",
-  apparel: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80",
-  training: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80",
-  accessories: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=400&q=80",
-  football: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=400&q=80",
-  basketball: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=400&q=80",
-  tennis: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=400&q=80",
-  swimming: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80",
+  running:
+    'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=400&q=80',
+  footwear:
+    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80',
+  shoes:
+    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80',
+  apparel:
+    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80',
+  training:
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80',
+  accessories:
+    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=400&q=80',
+  football:
+    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=400&q=80',
+  basketball:
+    'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=400&q=80',
+  tennis:
+    'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=400&q=80',
+  swimming:
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
 };
 
 const DEFAULT_CATEGORIES = [
-  { title: "Running", href: "/collections/running", imageUrl: CATEGORY_IMAGES.running },
-  { title: "Footwear", href: "/collections/footwear", imageUrl: CATEGORY_IMAGES.footwear },
-  { title: "Apparel", href: "/collections/apparel", imageUrl: CATEGORY_IMAGES.apparel },
-  { title: "Training", href: "/collections/training", imageUrl: CATEGORY_IMAGES.training },
-  { title: "Accessories", href: "/collections/accessories", imageUrl: CATEGORY_IMAGES.accessories },
-  { title: "Football", href: "/collections/football", imageUrl: CATEGORY_IMAGES.football },
+  { title: 'Running', href: '/collections/running', imageUrl: CATEGORY_IMAGES.running },
+  { title: 'Footwear', href: '/collections/footwear', imageUrl: CATEGORY_IMAGES.footwear },
+  { title: 'Apparel', href: '/collections/apparel', imageUrl: CATEGORY_IMAGES.apparel },
+  { title: 'Training', href: '/collections/training', imageUrl: CATEGORY_IMAGES.training },
+  { title: 'Accessories', href: '/collections/accessories', imageUrl: CATEGORY_IMAGES.accessories },
+  { title: 'Football', href: '/collections/football', imageUrl: CATEGORY_IMAGES.football },
 ];
 
 const DEFAULT_BRANDS = [
-  'NIKE', 'ADIDAS', 'PUMA', 'UNDER ARMOUR', 'ASICS', 'NEW BALANCE',
-  'REEBOK', 'JORDAN', 'MIZUNO', 'SPEEDO', 'WILSON', '+ MORE BRANDS'
+  'NIKE',
+  'ADIDAS',
+  'PUMA',
+  'UNDER ARMOUR',
+  'ASICS',
+  'NEW BALANCE',
+  'REEBOK',
+  'JORDAN',
+  'MIZUNO',
+  'SPEEDO',
+  'WILSON',
+  '+ MORE BRANDS',
 ];
 
 const DEFAULT_SPORTS = [
-  { title: 'RUNNING', href: '/collections/running', imageUrl: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=600&q=80' },
-  { title: 'FOOTBALL', href: '/collections/football', imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80' },
-  { title: 'BASKETBALL', href: '/collections/basketball', imageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80' },
-  { title: 'TRAINING', href: '/collections/training', imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80' },
-  { title: 'TENNIS', href: '/collections/tennis', imageUrl: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80' },
-  { title: 'SWIMMING', href: '/collections/swimming', imageUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80' },
+  {
+    title: 'RUNNING',
+    href: '/collections/running',
+    imageUrl:
+      'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    title: 'FOOTBALL',
+    href: '/collections/football',
+    imageUrl:
+      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    title: 'BASKETBALL',
+    href: '/collections/basketball',
+    imageUrl:
+      'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    title: 'TRAINING',
+    href: '/collections/training',
+    imageUrl:
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    title: 'TENNIS',
+    href: '/collections/tennis',
+    imageUrl:
+      'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    title: 'SWIMMING',
+    href: '/collections/swimming',
+    imageUrl:
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+  },
 ];
 
 async function DynamicCategorySection() {
@@ -138,7 +191,7 @@ async function DynamicCategorySection() {
   );
 }
 
-function ProductShelfSkeleton({ title, className }: { title: string, className: string }) {
+function ProductShelfSkeleton({ title, className }: { title: string; className: string }) {
   return (
     <section className={className}>
       <div className="container">
@@ -146,8 +199,14 @@ function ProductShelfSkeleton({ title, className }: { title: string, className: 
         <div className={styles.productsGrid}>
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <div className="skeleton" style={{ width: '100%', aspectRatio: '4/5', borderRadius: '4px' }} />
-              <div className="skeleton" style={{ width: '60%', height: '16px', marginTop: '0.5rem' }} />
+              <div
+                className="skeleton"
+                style={{ width: '100%', aspectRatio: '4/5', borderRadius: '4px' }}
+              />
+              <div
+                className="skeleton"
+                style={{ width: '60%', height: '16px', marginTop: '0.5rem' }}
+              />
               <div className="skeleton" style={{ width: '40%', height: '16px' }} />
             </div>
           ))}
@@ -157,24 +216,34 @@ function ProductShelfSkeleton({ title, className }: { title: string, className: 
   );
 }
 
-async function DynamicProductsSection({ 
-  type, 
-  title, 
-  className 
-}: { 
-  type: 'featured' | 'new' | 'collections', 
-  title: string,
-  className: string
+async function DynamicProductsSection({
+  type,
+  title,
+  className,
+}: {
+  type: 'featured' | 'new' | 'collections';
+  title: string;
+  className: string;
 }) {
-  const allProducts = await fetchProducts();
-  
   let products = [];
+
   if (type === 'featured') {
-    products = allProducts.slice(0, 10);
-  } else if (type === 'new') {
-    products = allProducts.slice(10, 20).length >= 10 ? allProducts.slice(10, 20) : allProducts.slice(0, 10);
+    products = await fetchFeaturedProducts(10);
   } else {
-    products = allProducts.slice(20, 30).length >= 10 ? allProducts.slice(20, 30) : allProducts.slice(0, 10);
+    // In a real app, these would be separate API endpoints (e.g. /products/new)
+    // For now, we fetch all (deduplicated by react/cache) and slice
+    const allProducts = await fetchProducts();
+    if (type === 'new') {
+      products =
+        allProducts.slice(10, 20).length >= 10
+          ? allProducts.slice(10, 20)
+          : allProducts.slice(0, 10);
+    } else {
+      products =
+        allProducts.slice(20, 30).length >= 10
+          ? allProducts.slice(20, 30)
+          : allProducts.slice(0, 10);
+    }
   }
 
   if (products.length === 0) {
@@ -191,9 +260,7 @@ async function DynamicProductsSection({
   return (
     <section className={className}>
       <div className="container">
-        <SectionHeading action={viewAllAction}>
-          {title}
-        </SectionHeading>
+        <SectionHeading action={viewAllAction}>{title}</SectionHeading>
 
         <div className={styles.productsGrid}>
           {products.map((prod) => (
@@ -226,8 +293,8 @@ function BrandsSectionSkeleton() {
 
 async function DynamicBrandsSection() {
   const allProducts = await fetchProducts();
-  const dbBrands = Array.from(new Set(allProducts.map(p => p.brand))).filter(Boolean);
-  
+  const dbBrands = Array.from(new Set(allProducts.map((p) => p.brand))).filter(Boolean);
+
   let dynamicBrands = dbBrands.slice(0, 11);
   if (dynamicBrands.length === 0) {
     dynamicBrands = DEFAULT_BRANDS;
@@ -243,7 +310,11 @@ async function DynamicBrandsSection() {
           {dynamicBrands.map((brand: string) => (
             <Link
               key={brand}
-              href={brand === '+ MORE BRANDS' ? '/collections/all' : `/collections/all?brand=${encodeURIComponent(brand)}`}
+              href={
+                brand === '+ MORE BRANDS'
+                  ? '/collections/all'
+                  : `/collections/all?brand=${encodeURIComponent(brand)}`
+              }
               className={styles.brandBox}
               aria-label={`Shop ${brand} products`}
             >
@@ -260,9 +331,9 @@ async function DynamicSportsSection() {
   const stats = await fetchProductStats();
   let sports = stats
     .map((s) => {
-      const title = ((s.category as string) || "").toUpperCase();
+      const title = ((s.category as string) || '').toUpperCase();
       const slug = (s.category as string)?.toLowerCase().replace(/\s+/g, '-') || 'all';
-      const defaultMatch = DEFAULT_SPORTS.find(d => d.title === title);
+      const defaultMatch = DEFAULT_SPORTS.find((d) => d.title === title);
       return {
         title,
         href: `/collections/${slug}`,
@@ -296,44 +367,44 @@ async function DynamicSportsSection() {
 
 export default function Home() {
   const homeJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "JOCKSPORT | Official Athletic Footwear & Sportswear",
-    "description":
-      "Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.",
-    "mainEntity": {
-      "@type": "ItemList",
-      "itemListElement": [
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'JOCKSPORT | Official Athletic Footwear & Sportswear',
+    description:
+      'Explore authentic sportswear, high-performance running shoes, and premium training gear from top global athletic brands at JOCKSPORT.',
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: [
         {
-          "@type": "SiteNavigationElement",
-          "position": 1,
-          "name": "Running Collection",
-          "url": "https://jocksport.com/collections/running"
+          '@type': 'SiteNavigationElement',
+          position: 1,
+          name: 'Running Collection',
+          url: 'https://jocksport.com/collections/running',
         },
         {
-          "@type": "SiteNavigationElement",
-          "position": 2,
-          "name": "Footwear Collection",
-          "url": "https://jocksport.com/collections/footwear"
+          '@type': 'SiteNavigationElement',
+          position: 2,
+          name: 'Footwear Collection',
+          url: 'https://jocksport.com/collections/footwear',
         },
         {
-          "@type": "SiteNavigationElement",
-          "position": 3,
-          "name": "Apparel Collection",
-          "url": "https://jocksport.com/collections/apparel"
+          '@type': 'SiteNavigationElement',
+          position: 3,
+          name: 'Apparel Collection',
+          url: 'https://jocksport.com/collections/apparel',
         },
         {
-          "@type": "SiteNavigationElement",
-          "position": 4,
-          "name": "Training Collection",
-          "url": "https://jocksport.com/collections/training"
-        }
-      ]
-    }
+          '@type': 'SiteNavigationElement',
+          position: 4,
+          name: 'Training Collection',
+          url: 'https://jocksport.com/collections/training',
+        },
+      ],
+    },
   };
 
   return (
-    <main className={styles.main}>
+    <main id="main-content" className={styles.main}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
@@ -347,8 +418,16 @@ export default function Home() {
       </Suspense>
 
       {/* 3. Featured Deals / Hot Products */}
-      <Suspense fallback={<ProductShelfSkeleton title="Featured Deals" className={styles.productsSection} />}>
-        <DynamicProductsSection type="featured" title="Featured Deals" className={styles.productsSection} />
+      <Suspense
+        fallback={
+          <ProductShelfSkeleton title="Featured Deals" className={styles.productsSection} />
+        }
+      >
+        <DynamicProductsSection
+          type="featured"
+          title="Featured Deals"
+          className={styles.productsSection}
+        />
       </Suspense>
 
       {/* 4. Wide Campaign Banner 1 */}
@@ -364,13 +443,32 @@ export default function Home() {
       />
 
       {/* 5. New Collections */}
-      <Suspense fallback={<ProductShelfSkeleton title="New Collections" className={styles.collectionsSection} />}>
-        <DynamicProductsSection type="new" title="New Collections" className={styles.collectionsSection} />
+      <Suspense
+        fallback={
+          <ProductShelfSkeleton title="New Collections" className={styles.collectionsSection} />
+        }
+      >
+        <DynamicProductsSection
+          type="new"
+          title="New Collections"
+          className={styles.collectionsSection}
+        />
       </Suspense>
 
       {/* 6. Featured Collections */}
-      <Suspense fallback={<ProductShelfSkeleton title="Featured Collections" className={styles.featuredGridSection} />}>
-        <DynamicProductsSection type="collections" title="Featured Collections" className={styles.featuredGridSection} />
+      <Suspense
+        fallback={
+          <ProductShelfSkeleton
+            title="Featured Collections"
+            className={styles.featuredGridSection}
+          />
+        }
+      >
+        <DynamicProductsSection
+          type="collections"
+          title="Featured Collections"
+          className={styles.featuredGridSection}
+        />
       </Suspense>
 
       {/* 7. Top Brands Grid */}

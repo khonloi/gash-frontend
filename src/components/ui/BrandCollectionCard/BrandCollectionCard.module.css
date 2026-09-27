@@ -86,7 +86,9 @@
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.05em;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .card:hover .footer {

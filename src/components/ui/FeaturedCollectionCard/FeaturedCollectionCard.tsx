@@ -1,15 +1,15 @@
-import React from 'react'
-import Link from 'next/link'
-import { Play } from 'lucide-react'
-import styles from './FeaturedCollectionCard.module.css'
+import React from 'react';
+import Link from 'next/link';
+import { Play } from 'lucide-react';
+import styles from './FeaturedCollectionCard.module.css';
 
 export interface FeaturedCollectionCardProps {
-  category: string
-  title: string
-  subtitle?: string
-  imageUrl: string
-  href?: string
-  brandsText?: string
+  category: string;
+  title: string;
+  subtitle?: string;
+  imageUrl: string;
+  href?: string;
+  brandsText?: string;
 }
 
 export function FeaturedCollectionCard({
@@ -22,10 +22,7 @@ export function FeaturedCollectionCard({
 }: FeaturedCollectionCardProps) {
   return (
     <Link href={href} className={styles.card}>
-      <div
-        className={styles.bgImage}
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      />
+      <div className={styles.bgImage} style={{ backgroundImage: `url(${imageUrl})` }} />
       <div className={styles.overlay} />
 
       <div className={styles.content}>
@@ -42,5 +39,5 @@ export function FeaturedCollectionCard({
         </div>
       </div>
     </Link>
-  )
+  );
 }

@@ -102,9 +102,7 @@ describe('apiClient', () => {
       });
     });
 
-    await expect(
-      apiClient.get('/slow', { timeoutMs: 50, retries: 0 })
-    ).rejects.toThrow(ApiError);
+    await expect(apiClient.get('/slow', { timeoutMs: 50, retries: 0 })).rejects.toThrow(ApiError);
 
     try {
       await apiClient.get('/slow', { timeoutMs: 50, retries: 0 });

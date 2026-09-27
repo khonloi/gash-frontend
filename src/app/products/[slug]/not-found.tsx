@@ -66,7 +66,8 @@ export default function ProductNotFound() {
               margin: '0',
             }}
           >
-            The athletic product or edition you were looking for could not be found or has been discontinued.
+            The athletic product or edition you were looking for could not be found or has been
+            discontinued.
           </p>
 
           <div

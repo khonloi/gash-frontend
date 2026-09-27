@@ -16,7 +16,10 @@ export default function CollectionLoading() {
         </div>
 
         {/* Collection Hero Skeleton */}
-        <div className={styles.hero} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div
+          className={styles.hero}
+          style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+        >
           <Skeleton width="260px" height="40px" />
           <Skeleton width="60%" height="20px" />
         </div>
@@ -24,7 +27,10 @@ export default function CollectionLoading() {
         {/* Content Layout */}
         <div className={styles.contentLayout}>
           {/* Sidebar Skeleton */}
-          <div className={styles.sidebarWrapper} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div
+            className={styles.sidebarWrapper}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+          >
             <Skeleton width="100%" height="40px" borderRadius="4px" />
             <Skeleton width="100%" height="180px" borderRadius="6px" />
             <Skeleton width="100%" height="180px" borderRadius="6px" />
@@ -34,7 +40,9 @@ export default function CollectionLoading() {
           {/* Main Content Skeleton */}
           <div className={styles.mainContent}>
             {/* Control Bar Skeleton */}
-            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
+            <div
+              style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}
+            >
               <Skeleton width="140px" height="36px" borderRadius="4px" />
               <Skeleton width="180px" height="36px" borderRadius="4px" />
             </div>

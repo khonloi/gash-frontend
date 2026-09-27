@@ -45,7 +45,12 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(12, 28, 48, 0.95) 0%, rgba(12, 28, 48, 0.7) 50%, rgba(0, 0, 0, 0.25) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(12, 28, 48, 0.95) 0%,
+    rgba(12, 28, 48, 0.7) 50%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
 }
 
 .contentContainer {
@@ -341,4 +346,3 @@
     transform: none !important;
   }
 }
-

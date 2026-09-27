@@ -11,7 +11,9 @@ export default function RootLoading() {
 
       <div className="container" style={{ marginTop: '3rem' }}>
         {/* Section Heading Skeleton */}
-        <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div
+          style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+        >
           <Skeleton width="220px" height="32px" />
           <Skeleton width="160px" height="18px" />
         </div>

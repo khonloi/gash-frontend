@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { LayoutGrid, List } from 'lucide-react'
-import styles from './CollectionControlBar.module.css'
+import React from 'react';
+import { LayoutGrid, List } from 'lucide-react';
+import styles from './CollectionControlBar.module.css';
 
 interface CollectionControlBarProps {
-  totalCount: number
-  sortValue: string
-  onSortChange: (value: string) => void
-  viewMode: 'grid' | 'list'
-  onViewModeChange: (mode: 'grid' | 'list') => void
+  totalCount: number;
+  sortValue: string;
+  onSortChange: (value: string) => void;
+  viewMode: 'grid' | 'list';
+  onViewModeChange: (mode: 'grid' | 'list') => void;
 }
 
 export function CollectionControlBar({
@@ -17,18 +17,20 @@ export function CollectionControlBar({
   sortValue,
   onSortChange,
   viewMode,
-  onViewModeChange
+  onViewModeChange,
 }: CollectionControlBarProps) {
   return (
     <div className={styles.controlBar}>
       <div className={styles.left}>
         <span className={styles.productCount}>{totalCount} Products</span>
       </div>
-      
+
       <div className={styles.right}>
         <div className={styles.sortWrapper}>
-          <label htmlFor="sort-select" className={styles.sortLabel}>Sort by:</label>
-          <select 
+          <label htmlFor="sort-select" className={styles.sortLabel}>
+            Sort by:
+          </label>
+          <select
             id="sort-select"
             className={styles.sortSelect}
             value={sortValue}
@@ -43,14 +45,14 @@ export function CollectionControlBar({
         </div>
 
         <div className={styles.viewToggle}>
-          <button 
+          <button
             className={`${styles.viewBtn} ${viewMode === 'grid' ? styles.active : ''}`}
             onClick={() => onViewModeChange('grid')}
             aria-label="Grid view"
           >
             <LayoutGrid size={20} />
           </button>
-          <button 
+          <button
             className={`${styles.viewBtn} ${viewMode === 'list' ? styles.active : ''}`}
             onClick={() => onViewModeChange('list')}
             aria-label="List view"
@@ -60,5 +62,5 @@ export function CollectionControlBar({
         </div>
       </div>
     </div>
-  )
+  );
 }

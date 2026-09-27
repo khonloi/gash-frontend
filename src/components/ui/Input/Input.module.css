@@ -5,7 +5,9 @@
   border: 1px solid var(--color-border);
   background-color: var(--color-white);
   color: var(--color-text-main);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   outline: none;
 }
 

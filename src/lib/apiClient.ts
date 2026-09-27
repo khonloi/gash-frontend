@@ -21,6 +21,8 @@ export interface RequestOptions extends RequestInit {
 
 const DEFAULT_TIMEOUT_MS = 15000;
 
+let refreshPromise: Promise<any> | null = null;
+
 function getBaseUrl(): string {
   if (typeof window === 'undefined') {
     // Server-side: use internal backend URL or Next rewrite target
@@ -31,10 +33,7 @@ function getBaseUrl(): string {
     );
   }
   // Client-side: can call direct backend URL or relative proxy path
-  return (
-    process.env.NEXT_PUBLIC_API_URL ||
-    'http://localhost:5000/api/v1'
-  );
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 }
 
 function getAuthToken(): string | null {
@@ -51,10 +50,7 @@ function getAuthToken(): string | null {
   return null;
 }
 
-export async function request<T>(
-  endpoint: string,
-  options: RequestOptions = {}
-): Promise<T> {
+export async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const {
     token,
     params,
@@ -96,7 +92,7 @@ export async function request<T>(
   }
 
   const method = (customConfig.method || 'GET').toUpperCase();
-  const maxRetries = retries !== undefined ? retries : (method === 'GET' ? 1 : 0);
+  const maxRetries = retries !== undefined ? retries : method === 'GET' ? 1 : 0;
 
   let lastError: unknown;
 
@@ -140,6 +136,41 @@ export async function request<T>(
       }
 
       if (!response.ok) {
+        // Handle 401 Token Refresh
+        if (
+          response.status === 401 &&
+          activeToken &&
+          attempt === 0 &&
+          !url.pathname.includes('/auth/refresh-token')
+        ) {
+          try {
+            const { useAuthStore } = await import('@/store/useAuthStore');
+            const { authService } = await import('@/services/authService');
+
+            const authState = useAuthStore.getState();
+            const refreshTokenStr = authState.refreshToken;
+
+            if (refreshTokenStr) {
+              if (!refreshPromise) {
+                refreshPromise = authService.refreshToken(refreshTokenStr).finally(() => {
+                  refreshPromise = null;
+                });
+              }
+
+              const newTokens = await refreshPromise;
+              if (newTokens && newTokens.accessToken) {
+                authState.setTokens(newTokens);
+                reqHeaders['Authorization'] = `Bearer ${newTokens.accessToken}`;
+                continue; // Retry the original request
+              }
+            }
+          } catch (refreshErr) {
+            // Refresh failed, clear auth
+            const { useAuthStore } = await import('@/store/useAuthStore');
+            useAuthStore.getState().clearAuth();
+          }
+        }
+
         // Retry on 5xx server errors for GET requests
         if (response.status >= 500 && method === 'GET' && attempt < maxRetries) {
           lastError = new ApiError(`Server error (${response.status})`, response.status, data);

@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchProducts, fetchProductByHandle, fetchFeaturedProducts } from '@/services/productService';
+import {
+  fetchProducts,
+  fetchProductByHandle,
+  fetchFeaturedProducts,
+} from '@/services/productService';
 import { FrontendProduct } from '@/types/product';
 import { QueryParams } from '@/lib/apiClient';
 
@@ -47,10 +51,7 @@ export function useFeaturedProductsQuery(limit = 10, initialData?: FrontendProdu
 /**
  * Hook to fetch a single product by handle or ID using TanStack Query
  */
-export function useProductByHandleQuery(
-  handleOrId: string,
-  initialData?: FrontendProduct | null
-) {
+export function useProductByHandleQuery(handleOrId: string, initialData?: FrontendProduct | null) {
   return useQuery({
     queryKey: productKeys.detail(handleOrId),
     queryFn: () => fetchProductByHandle(handleOrId),

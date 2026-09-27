@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui";
-import styles from "./ProductGallery.module.css";
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Badge } from '@/components/ui';
+import styles from './ProductGallery.module.css';
 
 interface ProductGalleryProps {
   images: string[];
@@ -41,9 +41,7 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
             className={styles.mainImage}
           />
         ) : (
-          <div className={styles.noImage}>
-            No Image Available
-          </div>
+          <div className={styles.noImage}>No Image Available</div>
         )}
 
         {safeImages.length > 1 && (
@@ -74,7 +72,7 @@ export function ProductGallery({ images = [], isNew }: ProductGalleryProps) {
             <button
               key={idx}
               type="button"
-              className={`${styles.thumbnailBtn} ${idx === activeIndex ? styles.activeThumbnail : ""}`}
+              className={`${styles.thumbnailBtn} ${idx === activeIndex ? styles.activeThumbnail : ''}`}
               onClick={() => setActiveIndex(idx)}
               aria-label={`View image ${idx + 1}`}
             >

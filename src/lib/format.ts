@@ -5,7 +5,11 @@
  * @param locale The locale to use for formatting (default: en-US)
  * @returns Formatted currency string
  */
-export function formatPrice(value: number, currency: string = 'USD', locale: string = 'en-US'): string {
+export function formatPrice(
+  value: number,
+  currency: string = 'USD',
+  locale: string = 'en-US'
+): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,

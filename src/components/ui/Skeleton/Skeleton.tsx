@@ -1,12 +1,12 @@
-import React from 'react'
-import { cn } from '@/lib/cn'
-import styles from './Skeleton.module.css'
+import React from 'react';
+import { cn } from '@/lib/cn';
+import styles from './Skeleton.module.css';
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'text' | 'rectangular' | 'circular'
-  width?: string | number
-  height?: string | number
-  borderRadius?: string | number
+  variant?: 'text' | 'rectangular' | 'circular';
+  width?: string | number;
+  height?: string | number;
+  borderRadius?: string | number;
 }
 
 export function Skeleton({
@@ -23,7 +23,7 @@ export function Skeleton({
     height: typeof height === 'number' ? `${height}px` : height,
     borderRadius: typeof borderRadius === 'number' ? `${borderRadius}px` : borderRadius,
     ...style,
-  }
+  };
 
   return (
     <div
@@ -32,5 +32,5 @@ export function Skeleton({
       aria-hidden="true"
       {...props}
     />
-  )
+  );
 }

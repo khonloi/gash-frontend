@@ -1,23 +1,23 @@
 :root {
   /* Electric Turquoise Athletic Brand Colors (Option 1) */
-  --color-primary-green: #00E5C9;
-  --color-primary-green-hover: #00CCAE;
-  --color-primary-turquoise: #00E5C9;
-  --color-primary-turquoise-hover: #00CCAE;
+  --color-primary-green: #00e5c9;
+  --color-primary-green-hover: #00ccae;
+  --color-primary-turquoise: #00e5c9;
+  --color-primary-turquoise-hover: #00ccae;
 
-  --color-navy: #0C1C30;
-  --color-navy-light: #162B45;
+  --color-navy: #0c1c30;
+  --color-navy-light: #162b45;
   --color-navy-dark: #07111e;
-  --color-royal-blue: #003CD6;
-  --color-sale-red: #FF3366;
-  --color-sale-red-light: #FF5C85;
+  --color-royal-blue: #003cd6;
+  --color-sale-red: #ff3366;
+  --color-sale-red-light: #ff5c85;
 
   /* Neutrals & Surfaces */
-  --color-white: #FFFFFF;
+  --color-white: #ffffff;
   --color-black: #000000;
-  --color-bg-light: #F8FAFC;
-  --color-bg-gray: #F1F5F9;
-  --color-card-bg: #F1F5F9;
+  --color-bg-light: #f8fafc;
+  --color-bg-gray: #f1f5f9;
+  --color-card-bg: #f1f5f9;
 
   /* Slate Scale (Extended Neutrals) */
   --color-slate-50: #f8fafc;
@@ -32,14 +32,15 @@
   --color-slate-900: #0f172a;
 
   /* Text & Border */
-  --color-text-main: #0C1C30;
-  --color-text-body: #333F48;
-  --color-text-muted: #707A8A;
-  --color-border: #E2E8F0;
-  --color-border-dark: #2B384A;
+  --color-text-main: #0c1c30;
+  --color-text-body: #333f48;
+  --color-text-muted: #707a8a;
+  --color-border: #e2e8f0;
+  --color-border-dark: #2b384a;
 
   /* Typography */
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 
   /* Spacing Scale (4px increments mostly) */
@@ -168,15 +169,24 @@ a:focus-visible {
 
 /* Skeleton Loader */
 .skeleton {
-  background: linear-gradient(90deg, var(--color-bg-gray) 25%, var(--color-border) 50%, var(--color-bg-gray) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-gray) 25%,
+    var(--color-border) 50%,
+    var(--color-bg-gray) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s infinite linear;
   border-radius: var(--radius-md);
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Layout & Sizing Utilities */
@@ -205,6 +215,31 @@ a:focus-visible {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Skip Navigation Link for Accessibility (WCAG 2.4.1) */
+.skip-to-content {
+  position: fixed;
+  top: -120px;
+  left: 1.5rem;
+  background-color: var(--color-navy);
+  color: var(--color-primary-green);
+  padding: 0.75rem 1.5rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-primary-green);
+  z-index: 9999;
+  transition: top 0.2s ease-in-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  text-decoration: none;
+}
+
+.skip-to-content:focus {
+  top: 1rem;
+  outline: none;
 }
 
 /* Typography Utilities */
@@ -255,7 +290,7 @@ h6 {
 }
 
 .heading-section::before {
-  content: "";
+  content: '';
   display: inline-block;
   width: 6px;
   height: 24px;
@@ -398,11 +433,9 @@ h6 {
  * ------------------------------------- */
 
 .mica-dark {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  ), rgba(12, 28, 48, 0.96);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%),
+    rgba(12, 28, 48, 0.96);
   backdrop-filter: blur(40px) saturate(200%) brightness(98%);
   -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(98%);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -410,11 +443,7 @@ h6 {
 }
 
 .mica {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.96) 0%,
-    rgba(255, 255, 255, 0.92) 100%
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
   backdrop-filter: blur(36px) saturate(190%);
   -webkit-backdrop-filter: blur(36px) saturate(190%);
   border-top: 1px solid rgba(255, 255, 255, 0.7);

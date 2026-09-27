@@ -1,21 +1,21 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Play } from 'lucide-react'
-import { Badge } from '@/components/ui/Badge/Badge'
-import { Button } from '@/components/ui/Button/Button'
-import styles from './PromoBanner.module.css'
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Play } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge/Badge';
+import { Button } from '@/components/ui/Button/Button';
+import styles from './PromoBanner.module.css';
 
 export interface PromoBannerProps {
-  badge?: string
-  title: string
-  subtitle: string
-  dateRange?: string
-  ctaText?: string
-  href?: string
-  bgGradient?: string
-  imageUrl?: string
-  reverse?: boolean
+  badge?: string;
+  title: string;
+  subtitle: string;
+  dateRange?: string;
+  ctaText?: string;
+  href?: string;
+  bgGradient?: string;
+  imageUrl?: string;
+  reverse?: boolean;
 }
 
 export function PromoBanner({
@@ -37,18 +37,16 @@ export function PromoBanner({
           style={{ background: bgGradient }}
         >
           {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              fill
-              sizes="100vw"
-              className={styles.bgImage}
-            />
+            <Image src={imageUrl} alt={title} fill sizes="100vw" className={styles.bgImage} />
           )}
           <div className={styles.overlay} />
 
           <div className={`${styles.content} animate-fade-in`}>
-            {badge && <Badge variant="primary" className={styles.badge}>{badge}</Badge>}
+            {badge && (
+              <Badge variant="primary" className={styles.badge}>
+                {badge}
+              </Badge>
+            )}
             <h2 className={styles.title}>{title}</h2>
             <p className={styles.subtitle}>{subtitle}</p>
             {dateRange && <span className={styles.dateRange}>{dateRange}</span>}
@@ -64,5 +62,5 @@ export function PromoBanner({
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -4,10 +4,12 @@ import { CartClientView } from './CartClientView';
 
 export const metadata: Metadata = {
   title: 'Shopping Cart | JOCKSPORT',
-  description: 'Review your selected performance sportswear, shoes, and training apparel at JOCKSPORT.',
+  description:
+    'Review your selected performance sportswear, shoes, and training apparel at JOCKSPORT.',
   openGraph: {
     title: 'Shopping Cart | JOCKSPORT',
-    description: 'Review your selected performance sportswear, shoes, and training apparel at JOCKSPORT.',
+    description:
+      'Review your selected performance sportswear, shoes, and training apparel at JOCKSPORT.',
   },
 };
 

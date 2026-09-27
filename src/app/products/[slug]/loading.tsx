@@ -26,7 +26,10 @@ export default function ProductDetailLoading() {
             </div>
           </div>
 
-          <div className={styles.infoWrapper} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div
+            className={styles.infoWrapper}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+          >
             <Skeleton width="120px" height="16px" />
             <Skeleton width="85%" height="38px" />
             <Skeleton width="35%" height="32px" />

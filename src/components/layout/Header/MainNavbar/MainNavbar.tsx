@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   ShoppingBag,
@@ -12,34 +12,38 @@ import {
   User,
   Zap,
   Menu,
-  X
-} from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
-import { useIsMounted } from '@/hooks/useIsMounted'
-import { useFocusTrap } from '@/hooks/useFocusTrap'
-import { CartSidebar } from '@/components/ui/CartSidebar/CartSidebar'
-import styles from './MainNavbar.module.css'
+  X,
+} from 'lucide-react';
+import { useCartStore } from '@/store/useCartStore';
+import { useIsMounted } from '@/hooks/useIsMounted';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import dynamic from 'next/dynamic';
+const CartSidebar = dynamic(
+  () => import('@/components/ui/CartSidebar/CartSidebar').then((m) => m.CartSidebar),
+  { ssr: false }
+);
+import styles from './MainNavbar.module.css';
 
 export function MainNavbar() {
-  const router = useRouter()
-  const items = useCartStore((state) => state.getTotalItems())
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false)
-  const mounted = useIsMounted()
-  const drawerRef = useFocusTrap<HTMLElement>(isDrawerOpen, () => setIsDrawerOpen(false))
+  const router = useRouter();
+  const items = useCartStore((state) => state.getTotalItems());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false);
+  const mounted = useIsMounted();
+  const drawerRef = useFocusTrap<HTMLElement>(isDrawerOpen, () => setIsDrawerOpen(false));
 
   // Prevent background scrolling when mobile drawer is open
   useEffect(() => {
     if (isDrawerOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = 'unset';
     }
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isDrawerOpen])
+      document.body.style.overflow = 'unset';
+    };
+  }, [isDrawerOpen]);
 
   const navLinks = [
     { name: 'Trending', href: '/collections/all', hasDropdown: true },
@@ -49,17 +53,17 @@ export function MainNavbar() {
     { name: 'Accessories', href: '/collections/accessories', hasDropdown: true },
     { name: 'Brands', href: '/collections/all', hasDropdown: true },
     { name: 'Sale', href: '/collections/sale', hasDropdown: true, isHighlight: true },
-  ]
+  ];
 
-  const closeDrawer = () => setIsDrawerOpen(false)
+  const closeDrawer = () => setIsDrawerOpen(false);
 
   const handleSearch = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
+    if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      closeDrawer()
-      router.push(`/collections/all?q=${encodeURIComponent(searchQuery.trim())}`)
+      closeDrawer();
+      router.push(`/collections/all?q=${encodeURIComponent(searchQuery.trim())}`);
     }
-  }
+  };
 
   return (
     <>
@@ -68,7 +72,9 @@ export function MainNavbar() {
           {/* Brand Logo */}
           <Link href="/" className={styles.logo} onClick={closeDrawer}>
             <Zap className={styles.logoIcon} fill="var(--color-primary-green)" size={28} />
-            <span className={styles.logoText}>JOCK<span className={styles.logoGreen}>SPORTS</span></span>
+            <span className={styles.logoText}>
+              JOCK<span className={styles.logoGreen}>SPORTS</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation Categories */}
@@ -113,7 +119,11 @@ export function MainNavbar() {
             </Link>
 
             {/* Cart Bag */}
-            <button className={styles.cartIconWrapper} onClick={() => setIsCartSidebarOpen(true)} aria-label="Open cart">
+            <button
+              className={styles.cartIconWrapper}
+              onClick={() => setIsCartSidebarOpen(true)}
+              aria-label="Open cart"
+            >
               <ShoppingBag size={22} className={styles.icon} />
               {mounted && items > 0 && <span className={styles.cartBadge}>{items}</span>}
             </button>
@@ -154,7 +164,9 @@ export function MainNavbar() {
         <div className={styles.drawerHeader}>
           <Link href="/" className={styles.logo} onClick={closeDrawer}>
             <Zap className={styles.logoIcon} fill="var(--color-primary-green)" size={24} />
-            <span className={styles.logoText}>JOCK<span className={styles.logoGreen}>SPORTS</span></span>
+            <span className={styles.logoText}>
+              JOCK<span className={styles.logoGreen}>SPORTS</span>
+            </span>
           </Link>
           <button className={styles.closeBtn} onClick={closeDrawer} aria-label="Close menu">
             <X size={24} />
@@ -193,18 +205,20 @@ export function MainNavbar() {
 
         {/* Drawer Actions */}
         <div className={styles.drawerFooter}>
-          <button 
-            className={styles.drawerActionItem} 
+          <button
+            className={styles.drawerActionItem}
             onClick={() => {
-              closeDrawer()
-              setIsCartSidebarOpen(true)
+              closeDrawer();
+              setIsCartSidebarOpen(true);
             }}
           >
             <div className={styles.drawerActionIconWrap}>
               <ShoppingBag size={20} />
               {mounted && items > 0 && <span className={styles.drawerCartBadge}>{items}</span>}
             </div>
-            <span>Shopping Cart ({mounted ? items : 0} {(mounted ? items : 0) === 1 ? 'item' : 'items'})</span>
+            <span>
+              Shopping Cart ({mounted ? items : 0} {(mounted ? items : 0) === 1 ? 'item' : 'items'})
+            </span>
           </button>
 
           <Link href="#" className={styles.drawerActionItem} onClick={closeDrawer}>
@@ -224,10 +238,7 @@ export function MainNavbar() {
         </div>
       </aside>
 
-      <CartSidebar 
-        isOpen={isCartSidebarOpen} 
-        onClose={() => setIsCartSidebarOpen(false)} 
-      />
+      <CartSidebar isOpen={isCartSidebarOpen} onClose={() => setIsCartSidebarOpen(false)} />
     </>
-  )
+  );
 }

@@ -1,16 +1,16 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, Calendar } from 'lucide-react'
-import styles from './ArticleCard.module.css'
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight, Calendar } from 'lucide-react';
+import styles from './ArticleCard.module.css';
 
 export interface ArticleCardProps {
-  title: string
-  category: string
-  date: string
-  imageUrl: string
-  href?: string
-  readTime?: string
+  title: string;
+  category: string;
+  date: string;
+  imageUrl: string;
+  href?: string;
+  readTime?: string;
 }
 
 export function ArticleCard({
@@ -52,5 +52,5 @@ export function ArticleCard({
         </div>
       </div>
     </Link>
-  )
+  );
 }

@@ -11,8 +11,7 @@ import { formatPrice } from '@/lib/format';
 import styles from './page.module.css';
 
 export function CartClientView() {
-  const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } =
-    useCartStore();
+  const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } = useCartStore();
   const mounted = useIsMounted();
 
   // SSR & Hydration Loading Skeleton
@@ -32,7 +31,9 @@ export function CartClientView() {
               {[1, 2].map((i) => (
                 <div key={i} className={styles.item} style={{ gap: '1.5rem' }}>
                   <Skeleton width="120px" height="120px" borderRadius="8px" />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+                  >
                     <Skeleton width="100px" height="16px" />
                     <Skeleton width="80%" height="22px" />
                     <Skeleton width="60px" height="16px" />
@@ -81,12 +82,7 @@ export function CartClientView() {
                 <div key={item.id} className={styles.item}>
                   <div className={styles.itemImage}>
                     {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.title}
-                        fill
-                        sizes="120px"
-                      />
+                      <Image src={item.imageUrl} alt={item.title} fill sizes="120px" />
                     ) : (
                       <div className={styles.imagePlaceholder} />
                     )}
@@ -102,9 +98,7 @@ export function CartClientView() {
                     </div>
                   </div>
 
-                  <div className={styles.itemUnitPrice}>
-                    {formatPrice(item.price)}
-                  </div>
+                  <div className={styles.itemUnitPrice}>{formatPrice(item.price)}</div>
 
                   <div className={styles.quantityWrapper}>
                     <QuantitySelector
@@ -123,9 +117,7 @@ export function CartClientView() {
                     </button>
                   </div>
 
-                  <div className={styles.itemTotal}>
-                    {formatPrice(item.price * item.quantity)}
-                  </div>
+                  <div className={styles.itemTotal}>{formatPrice(item.price * item.quantity)}</div>
                 </div>
               ))}
             </div>
@@ -135,40 +127,29 @@ export function CartClientView() {
               <div className={styles.promoBanner}>
                 <h3>REGISTER NOW | RECEIVE</h3>
                 <p>
-                  A <span className={styles.promoHighlight}>$10 VOUCHER</span>{' '}
-                  FOR YOUR FIRST ORDER
+                  A <span className={styles.promoHighlight}>$10 VOUCHER</span> FOR YOUR FIRST ORDER
                 </p>
               </div>
 
               <div className={styles.summaryContent}>
                 <div className={styles.summaryRow}>
-                  <span className={styles.summaryLabel}>
-                    ({totalItems}) items
-                  </span>
-                  <span className={styles.summaryValue}>
-                    {formatPrice(subtotal)}
-                  </span>
+                  <span className={styles.summaryLabel}>({totalItems}) items</span>
+                  <span className={styles.summaryValue}>{formatPrice(subtotal)}</span>
                 </div>
 
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Discount</span>
-                  <span className={styles.summaryHint}>
-                    Applied at checkout
-                  </span>
+                  <span className={styles.summaryHint}>Applied at checkout</span>
                 </div>
 
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Shipping fee</span>
-                  <span className={styles.summaryHint}>
-                    Calculated at checkout
-                  </span>
+                  <span className={styles.summaryHint}>Calculated at checkout</span>
                 </div>
 
                 <div className={`${styles.summaryRow} ${styles.totalRow}`}>
                   <span className={styles.totalLabel}>Total:</span>
-                  <span className={styles.totalValue}>
-                    {formatPrice(subtotal)}
-                  </span>
+                  <span className={styles.totalValue}>{formatPrice(subtotal)}</span>
                 </div>
 
                 <Link href="/checkout" className={styles.checkoutLink}>

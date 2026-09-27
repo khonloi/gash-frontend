@@ -64,7 +64,8 @@ export default function RootNotFound() {
             margin: '0',
           }}
         >
-          The page or product you are looking for might have been moved, sold out, or does not exist in our catalog.
+          The page or product you are looking for might have been moved, sold out, or does not exist
+          in our catalog.
         </p>
 
         <div

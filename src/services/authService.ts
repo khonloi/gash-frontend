@@ -24,10 +24,7 @@ export const authService = {
    * Register a new account
    */
   register: async (payload: RegisterPayload): Promise<AuthResponseData> => {
-    const res = await apiClient.post<ApiResponse<AuthResponseData>>(
-      '/auth/register',
-      payload
-    );
+    const res = await apiClient.post<ApiResponse<AuthResponseData>>('/auth/register', payload);
     return res.data;
   },
 
@@ -35,10 +32,7 @@ export const authService = {
    * Log into an existing account
    */
   login: async (payload: LoginPayload): Promise<AuthResponseData> => {
-    const res = await apiClient.post<ApiResponse<AuthResponseData>>(
-      '/auth/login',
-      payload
-    );
+    const res = await apiClient.post<ApiResponse<AuthResponseData>>('/auth/login', payload);
     return res.data;
   },
 
@@ -46,10 +40,9 @@ export const authService = {
    * Refresh JWT access token using refresh token
    */
   refreshToken: async (refreshToken: string): Promise<AuthTokens> => {
-    const res = await apiClient.post<ApiResponse<{ tokens: AuthTokens }>>(
-      '/auth/refresh-token',
-      { refreshToken }
-    );
+    const res = await apiClient.post<ApiResponse<{ tokens: AuthTokens }>>('/auth/refresh-token', {
+      refreshToken,
+    });
     return res.data.tokens;
   },
 

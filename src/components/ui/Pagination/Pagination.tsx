@@ -72,7 +72,8 @@ export function Pagination({
     <div className={styles.paginationContainer} aria-label="Pagination Navigation">
       {totalCount !== undefined && totalCount > 0 && (
         <div className={styles.info}>
-          Showing <span className={styles.highlight}>{startItem}</span>–<span className={styles.highlight}>{endItem}</span> of{' '}
+          Showing <span className={styles.highlight}>{startItem}</span>–
+          <span className={styles.highlight}>{endItem}</span> of{' '}
           <span className={styles.highlight}>{totalCount}</span> products
         </div>
       )}

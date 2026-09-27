@@ -108,7 +108,9 @@
   color: var(--color-text-muted);
   cursor: pointer;
   border-radius: var(--radius-md);
-  transition: color var(--transition-fast), background-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .deleteBtn:hover {
@@ -277,4 +279,10 @@
   .itemTotal {
     margin-left: auto;
   }
-}.imagePlaceholder { background: #eaeaea; width: 100%; height: 100%; border-radius: 4px; }
+}
+.imagePlaceholder {
+  background: #eaeaea;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}

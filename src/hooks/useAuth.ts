@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService, LoginPayload, RegisterPayload } from '@/services/authService';
 import { userService } from '@/services/userService';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 
 export const authKeys = {
   me: ['auth', 'me'] as const,
@@ -16,6 +17,7 @@ export function useLoginMutation() {
     onSuccess: (data) => {
       setAuth(data.user, data.tokens);
       queryClient.setQueryData(authKeys.me, data.user);
+      useCartStore.getState().mergeAndSync();
     },
   });
 }
@@ -29,6 +31,7 @@ export function useRegisterMutation() {
     onSuccess: (data) => {
       setAuth(data.user, data.tokens);
       queryClient.setQueryData(authKeys.me, data.user);
+      useCartStore.getState().mergeAndSync();
     },
   });
 }
