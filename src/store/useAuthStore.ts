@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { UserProfile, AuthTokens } from '@/types/user';
+import '@/lib/tokenRefresher';
 
 interface AuthState {
   user: UserProfile | null;

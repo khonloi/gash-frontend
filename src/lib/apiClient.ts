@@ -1,5 +1,3 @@
-import type { AuthTokens } from '@/types/user';
-
 export class ApiError extends Error {
   status: number;
   data?: unknown;
@@ -21,9 +19,15 @@ export interface RequestOptions extends RequestInit {
   retries?: number;
 }
 
-const DEFAULT_TIMEOUT_MS = 15000;
+export type TokenRefreshHandler = () => Promise<string | null>;
 
-let refreshPromise: Promise<AuthTokens> | null = null;
+let tokenRefreshHandler: TokenRefreshHandler | null = null;
+
+export function setTokenRefreshHandler(handler: TokenRefreshHandler | null): void {
+  tokenRefreshHandler = handler;
+}
+
+const DEFAULT_TIMEOUT_MS = 15000;
 
 function getBaseUrl(): string {
   if (typeof window === 'undefined') {
@@ -143,33 +147,17 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
           response.status === 401 &&
           activeToken &&
           attempt === 0 &&
+          tokenRefreshHandler &&
           !url.pathname.includes('/auth/refresh-token')
         ) {
           try {
-            const { useAuthStore } = await import('@/store/useAuthStore');
-            const { authService } = await import('@/services/authService');
-
-            const authState = useAuthStore.getState();
-            const refreshTokenStr = authState.refreshToken;
-
-            if (refreshTokenStr) {
-              if (!refreshPromise) {
-                refreshPromise = authService.refreshToken(refreshTokenStr).finally(() => {
-                  refreshPromise = null;
-                });
-              }
-
-              const newTokens = await refreshPromise;
-              if (newTokens && newTokens.accessToken) {
-                authState.setTokens(newTokens);
-                reqHeaders['Authorization'] = `Bearer ${newTokens.accessToken}`;
-                continue; // Retry the original request
-              }
+            const newAccessToken = await tokenRefreshHandler();
+            if (newAccessToken) {
+              reqHeaders['Authorization'] = `Bearer ${newAccessToken}`;
+              continue; // Retry the original request
             }
           } catch {
-            // Refresh failed, clear auth
-            const { useAuthStore } = await import('@/store/useAuthStore');
-            useAuthStore.getState().clearAuth();
+            // Token refresh failed, continue to standard error throwing
           }
         }
 

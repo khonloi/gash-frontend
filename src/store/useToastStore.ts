@@ -14,10 +14,17 @@ interface ToastState {
   removeToast: (id: string) => void;
 }
 
+function generateToastId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+}
+
 export const useToastStore = create<ToastState>((set) => ({
   toasts: [],
   addToast: (message, type = 'info') => {
-    const id = Math.random().toString(36).substring(2, 9);
+    const id = generateToastId();
     set((state) => ({
       toasts: [...state.toasts, { id, message, type }],
     }));

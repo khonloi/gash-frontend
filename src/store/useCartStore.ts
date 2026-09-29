@@ -3,11 +3,7 @@ import { persist } from 'zustand/middleware';
 import { cartApiService } from '@/services/cartService';
 import { useAuthStore } from './useAuthStore';
 import { ServerCartItem, CartItemPayload } from '@/types/cart';
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
-}
+import { getErrorMessage } from '@/lib/errors';
 
 export interface CartItem {
   id: string; // Unique identifier (productId + size + color)
@@ -66,6 +62,7 @@ export const useCartStore = create<CartState>()(
 
       addItem: async (item) => {
         const id = `${item.productId}-${item.size || 'default'}-${item.color || 'default'}`;
+        const prevItems = get().items;
 
         // Optimistic UI update
         set((state) => {
@@ -93,13 +90,18 @@ export const useCartStore = create<CartState>()(
             });
             set({ items: mapServerToLocal(serverCart.items), syncing: false });
           } catch (error: unknown) {
-            set({ syncError: getErrorMessage(error) || 'Failed to sync cart', syncing: false });
+            set({
+              items: prevItems,
+              syncError: getErrorMessage(error) || 'Failed to sync cart',
+              syncing: false,
+            });
           }
         }
       },
 
       removeItem: async (id) => {
-        const itemToRemove = get().items.find((i) => i.id === id);
+        const prevItems = get().items;
+        const itemToRemove = prevItems.find((i) => i.id === id);
         if (!itemToRemove) return;
 
         // Optimistic UI update
@@ -115,6 +117,7 @@ export const useCartStore = create<CartState>()(
             set({ items: mapServerToLocal(serverCart.items), syncing: false });
           } catch (error: unknown) {
             set({
+              items: prevItems,
               syncError: getErrorMessage(error) || 'Failed to remove item on server',
               syncing: false,
             });
@@ -123,7 +126,8 @@ export const useCartStore = create<CartState>()(
       },
 
       updateQuantity: async (id, quantity) => {
-        const itemToUpdate = get().items.find((i) => i.id === id);
+        const prevItems = get().items;
+        const itemToUpdate = prevItems.find((i) => i.id === id);
         if (!itemToUpdate) return;
         const validQty = Math.max(1, quantity);
 
@@ -144,6 +148,7 @@ export const useCartStore = create<CartState>()(
             set({ items: mapServerToLocal(serverCart.items), syncing: false });
           } catch (error: unknown) {
             set({
+              items: prevItems,
               syncError: getErrorMessage(error) || 'Failed to update quantity on server',
               syncing: false,
             });
@@ -152,6 +157,7 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: async () => {
+        const prevItems = get().items;
         set({ items: [] });
         const auth = useAuthStore.getState();
         if (auth.isAuthenticated) {
@@ -161,6 +167,7 @@ export const useCartStore = create<CartState>()(
             set({ syncing: false });
           } catch (error: unknown) {
             set({
+              items: prevItems,
               syncError: getErrorMessage(error) || 'Failed to clear server cart',
               syncing: false,
             });

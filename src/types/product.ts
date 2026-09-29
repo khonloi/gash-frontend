@@ -8,11 +8,17 @@ export interface BackendProductImage {
 }
 
 export interface BackendProductVariant {
-  name: string;
-  options: string[];
+  name?: string;
+  options?: string[];
   sku?: string;
   priceModifier?: number;
   stock?: number;
+  // Legacy Shopify-compatible variant fields
+  option1?: string;
+  option2?: string;
+  option3?: string;
+  imageUrl?: string | null;
+  featuredImage?: { src?: string };
 }
 
 export interface BackendProductDimensions {
@@ -31,73 +37,45 @@ export interface BackendProduct {
   price: number;
   compareAtPrice?: number;
   costPrice?: number;
-  sku: string;
+  sku?: string;
   barcode?: string;
-  quantity: number;
-  lowStockThreshold: number;
+  quantity?: number;
+  lowStockThreshold?: number;
   category: string;
   subcategory?: string;
   brand?: string;
-  tags: string[];
-  images: BackendProductImage[];
-  variants: BackendProductVariant[];
+  tags?: string[];
+  images?: (BackendProductImage | string)[];
+  variants?: BackendProductVariant[];
   attributes?: Record<string, string>;
-  status: ProductStatus;
-  isFeatured: boolean;
+  status?: ProductStatus;
+  isFeatured?: boolean;
   weight?: number;
   dimensions?: BackendProductDimensions;
-  ratingsAverage: number;
-  ratingsQuantity: number;
+  ratingsAverage?: number;
+  ratingsQuantity?: number;
   createdAt?: string;
   updatedAt?: string;
   isLowStock?: boolean;
   isOnSale?: boolean;
   discountPercentage?: number;
-}
 
-// Legacy Shopify-compatible format (retained for backward compatibility)
-export interface ProductVariant {
-  id?: string;
-  productId?: string;
+  // Legacy fallback fields for backward compatibility
   title?: string;
-  price?: number;
-  compareAtPrice?: number | null;
-  sku?: string | null;
-  inventoryQuantity?: number;
-  imageUrl?: string | null;
-  featuredImage?: { src?: string };
-  option1?: string;
-  option2?: string;
-  option3?: string;
-  options?: Record<string, unknown> | string[] | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-// Legacy Product interface or BackendProduct union
-export interface Product {
-  id: string;
-  _id?: string;
   handle?: string;
-  slug?: string;
-  title?: string;
-  name?: string;
   vendor?: string;
-  brand?: string;
-  tags?: string[];
   productType?: string;
-  category?: string;
   bodyHtml?: string;
-  description?: string;
-  price?: number;
-  compareAtPrice?: number;
-  images?: string[] | BackendProductImage[];
-  options?: Record<string, unknown> | string[] | null;
-  status?: string;
-  sku?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  variants?: ProductVariant[] | BackendProductVariant[];
+}
+
+export interface ProductCategoryStats {
+  category: string;
+  numProducts: number;
+  avgPrice: number;
+  minPrice: number;
+  maxPrice: number;
+  totalQuantity: number;
+  avgRating: number;
 }
 
 // Unified model consumed across the UI components (ProductCard, PDP, collections, etc.)

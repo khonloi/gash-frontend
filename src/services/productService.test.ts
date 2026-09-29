@@ -85,4 +85,25 @@ describe('mapProductToFrontend', () => {
     expect(result.specs['Material']).toBe('Cotton');
     expect(result.specs['Weight']).toBe('200g');
   });
+
+  it('maps custom attributes and rating correctly', () => {
+    const raw = {
+      _id: '1',
+      ratingsAverage: 4.8,
+      attributes: {
+        Closure: 'Lace-Up',
+        Origin: 'Vietnam',
+      },
+    };
+
+    const result = mapProductToFrontend(raw);
+    expect(result.specs['Rating']).toBe('4.8 / 5.0');
+    expect(result.specs['Closure']).toBe('Lace-Up');
+    expect(result.specs['Origin']).toBe('Vietnam');
+  });
+
+  it('throws error when null or empty product data is passed', () => {
+    // @ts-expect-error Testing runtime guard against null
+    expect(() => mapProductToFrontend(null)).toThrow('Cannot map empty product data');
+  });
 });

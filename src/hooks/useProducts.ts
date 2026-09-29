@@ -6,6 +6,7 @@ import {
 } from '@/services/productService';
 import { FrontendProduct } from '@/types/product';
 import { QueryParams } from '@/lib/apiClient';
+import { STALE_TIME } from '@/lib/queryDefaults';
 
 export const productKeys = {
   all: ['products'] as const,
@@ -32,7 +33,7 @@ export function useProductsQuery(
     queryKey: params ? productKeys.list(params) : productKeys.all,
     queryFn: () => fetchProducts(params),
     initialData,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: STALE_TIME.STANDARD,
   });
 }
 
@@ -44,7 +45,7 @@ export function useFeaturedProductsQuery(limit = 10, initialData?: FrontendProdu
     queryKey: productKeys.featured(limit),
     queryFn: () => fetchFeaturedProducts(limit),
     initialData,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: STALE_TIME.STANDARD,
   });
 }
 
@@ -57,6 +58,6 @@ export function useProductByHandleQuery(handleOrId: string, initialData?: Fronte
     queryFn: () => fetchProductByHandle(handleOrId),
     initialData: initialData ?? undefined,
     enabled: Boolean(handleOrId),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: STALE_TIME.STANDARD,
   });
 }

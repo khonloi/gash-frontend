@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { apiClient, ApiError } from './apiClient';
+import { apiClient, ApiError, setTokenRefreshHandler } from './apiClient';
 
 describe('apiClient', () => {
   const originalFetch = globalThis.fetch;
@@ -111,5 +111,61 @@ describe('apiClient', () => {
       expect((e as ApiError).status).toBe(408);
       expect((e as ApiError).message).toContain('timed out');
     }
+  });
+
+  it('retries with new token when 401 occurs and tokenRefreshHandler succeeds', async () => {
+    const unauthorizedResponse = new Response(JSON.stringify({ message: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const successResponse = new Response(JSON.stringify({ data: 'authorized data' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce(unauthorizedResponse)
+      .mockResolvedValueOnce(successResponse);
+
+    const mockRefresh = vi.fn().mockResolvedValue('new-refreshed-token');
+    setTokenRefreshHandler(mockRefresh);
+
+    const result = await apiClient.get<{ data: string }>('/protected', {
+      token: 'expired-token',
+    });
+
+    expect(result).toEqual({ data: 'authorized data' });
+    expect(mockRefresh).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+
+    // Verify retry header had the new token
+    const retryConfig = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[1][1] as RequestInit;
+    const retryHeaders = retryConfig.headers as Record<string, string>;
+    expect(retryHeaders['Authorization']).toBe('Bearer new-refreshed-token');
+
+    setTokenRefreshHandler(null);
+  });
+
+  it('throws 401 ApiError when tokenRefreshHandler returns null', async () => {
+    const unauthorizedResponse = new Response(JSON.stringify({ message: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    globalThis.fetch = vi.fn().mockResolvedValueOnce(unauthorizedResponse);
+
+    const mockRefresh = vi.fn().mockResolvedValue(null);
+    setTokenRefreshHandler(mockRefresh);
+
+    await expect(
+      apiClient.get('/protected', { token: 'expired-token' })
+    ).rejects.toThrow(ApiError);
+
+    expect(mockRefresh).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+
+    setTokenRefreshHandler(null);
   });
 });

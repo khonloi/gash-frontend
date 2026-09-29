@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useTransition } from 'react';
 import {
   Breadcrumb,
   FilterSidebar,
@@ -28,7 +28,14 @@ export function CollectionClientView({
   slug,
   initialQuery = '',
 }: CollectionClientViewProps) {
-  const { data: products = initialProducts } = useProductsQuery(initialProducts);
+  const {
+    data: products = initialProducts,
+    isError,
+    error,
+    refetch,
+  } = useProductsQuery(initialProducts);
+
+  const [isPending, startTransition] = useTransition();
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [activeFilters, setActiveFilters] = useState<FilterState>({});
@@ -116,34 +123,40 @@ export function CollectionClientView({
   }, [collectionProducts]);
 
   const handleFilterChange = (categoryId: string, optionId: string) => {
-    setCurrentPage(1);
-    setActiveFilters((prev) => {
-      const currentCategoryFilters = prev[categoryId] || [];
-      const isSelected = currentCategoryFilters.includes(optionId);
+    startTransition(() => {
+      setCurrentPage(1);
+      setActiveFilters((prev) => {
+        const currentCategoryFilters = prev[categoryId] || [];
+        const isSelected = currentCategoryFilters.includes(optionId);
 
-      let newFilters;
-      if (isSelected) {
-        newFilters = currentCategoryFilters.filter((id) => id !== optionId);
-      } else {
-        newFilters = [...currentCategoryFilters, optionId];
-      }
+        let newFilters;
+        if (isSelected) {
+          newFilters = currentCategoryFilters.filter((id) => id !== optionId);
+        } else {
+          newFilters = [...currentCategoryFilters, optionId];
+        }
 
-      return {
-        ...prev,
-        [categoryId]: newFilters,
-      };
+        return {
+          ...prev,
+          [categoryId]: newFilters,
+        };
+      });
     });
   };
 
   const handleSortChange = (value: string) => {
-    setSortValue(value);
-    setCurrentPage(1);
+    startTransition(() => {
+      setSortValue(value);
+      setCurrentPage(1);
+    });
   };
 
   const handleClearFilters = () => {
-    setActiveFilters({});
-    setSearchQuery('');
-    setCurrentPage(1);
+    startTransition(() => {
+      setActiveFilters({});
+      setSearchQuery('');
+      setCurrentPage(1);
+    });
   };
 
   // Filter products based on active filters
@@ -187,7 +200,9 @@ export function CollectionClientView({
   );
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    startTransition(() => {
+      setCurrentPage(page);
+    });
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 280, behavior: 'smooth' });
     }
@@ -232,7 +247,21 @@ export function CollectionClientView({
               onViewModeChange={setViewMode}
             />
 
-            {sortedProducts.length === 0 ? (
+            {isError && products.length === 0 ? (
+              <EmptyState
+                title="Failed to load collection"
+                description={
+                  error instanceof Error
+                    ? error.message
+                    : 'We could not load the products for this collection. Please check your connection.'
+                }
+                action={
+                  <Button variant="primary" onClick={() => refetch()}>
+                    Retry Loading
+                  </Button>
+                }
+              />
+            ) : sortedProducts.length === 0 ? (
               <EmptyState
                 title="No products found"
                 description="Try adjusting your filters to see more results."
@@ -245,7 +274,9 @@ export function CollectionClientView({
             ) : (
               <>
                 <div
-                  className={`${styles.productGrid} ${viewMode === 'list' ? styles.listMode : ''}`}
+                  className={`${styles.productGrid} ${viewMode === 'list' ? styles.listMode : ''} ${
+                    isPending ? styles.isPending : ''
+                  }`}
                 >
                   {paginatedProducts.map((product) => (
                     <ProductCard

@@ -298,3 +298,56 @@
   height: 100%;
   border-radius: 4px;
 }
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.summaryLabel {
+  color: var(--color-text-muted);
+}
+
+.summaryTotalRow {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.5rem;
+}
+
+.summaryTotalLabel {
+  font-weight: 700;
+}
+
+.summaryTotalValue {
+  color: var(--color-sale-red);
+  font-size: 1.1rem;
+}
+
+.confirmationActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.confirmationTitle {
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.confirmationDesc {
+  max-width: 440px;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.skeletonColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+

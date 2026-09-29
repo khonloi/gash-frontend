@@ -7,11 +7,7 @@ import {
   CreateOrderPayload,
   OrderQueryParams,
 } from '@/types/order';
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
-}
+import { getErrorMessage } from '@/lib/errors';
 
 interface OrderPagination {
   page: number;

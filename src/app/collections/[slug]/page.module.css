@@ -51,6 +51,12 @@
   grid-template-columns: 1fr;
 }
 
+.isPending {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
 .noResults {
   text-align: center;
   padding: 64px 0;

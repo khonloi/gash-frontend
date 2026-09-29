@@ -3,6 +3,7 @@ import { authService, LoginPayload, RegisterPayload } from '@/services/authServi
 import { userService } from '@/services/userService';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
+import { STALE_TIME } from '@/lib/queryDefaults';
 
 export const authKeys = {
   me: ['auth', 'me'] as const,
@@ -69,6 +70,6 @@ export function useMeQuery() {
       return user;
     },
     enabled: isAuthenticated,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: STALE_TIME.STANDARD,
   });
 }
