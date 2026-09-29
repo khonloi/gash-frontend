@@ -11,7 +11,7 @@ export interface SportCardProps {
 }
 
 const DEFAULT_SPORT_IMAGE =
-  'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80';
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80';
 
 export function SportCard({ title, imageUrl, href = '#' }: SportCardProps) {
   const safeImage = imageUrl && imageUrl.trim().length > 0 ? imageUrl : DEFAULT_SPORT_IMAGE;

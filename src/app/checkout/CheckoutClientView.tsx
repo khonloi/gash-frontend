@@ -3,10 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingBag, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShoppingBag, CheckCircle2, ArrowRight, Package } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { useOrderStore } from '@/store/useOrderStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useToastStore } from '@/store/useToastStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
+import { PaymentMethod, ShippingMethod } from '@/types/order';
 import {
   Button,
   Input,
@@ -52,22 +55,27 @@ interface OrderConfirmation {
 }
 
 export function CheckoutClientView() {
-  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice } = useCartStore();
   const { addToast } = useToastStore();
+  const { placeOrder } = useOrderStore();
+  const { user, isAuthenticated } = useAuthStore();
   const mounted = useIsMounted();
 
-  const [formData, setFormData] = useState<FormData>({
-    contact: '',
-    country: 'Vietnam',
-    firstName: '',
-    lastName: '',
-    address: '',
-    apartment: '',
-    city: '',
-    postalCode: '',
-    phone: '',
+  const [formData, setFormData] = useState<FormData>(() => ({
+    contact: user?.email || user?.phone || '',
+    country: user?.addresses?.find((a) => a.isDefault)?.country || 'Vietnam',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    address:
+      user?.addresses?.find((a) => a.isDefault)?.addressLine1 || '',
+    apartment:
+      user?.addresses?.find((a) => a.isDefault)?.addressLine2 || '',
+    city: user?.addresses?.find((a) => a.isDefault)?.city || '',
+    postalCode:
+      user?.addresses?.find((a) => a.isDefault)?.postalCode || '',
+    phone: user?.phone || '',
     keepUpdated: false,
-  });
+  }));
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [shippingMethod, setShippingMethod] = useState('standard');
@@ -129,6 +137,8 @@ export function CheckoutClientView() {
   const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Removed authentication requirement for guest checkout
+
     if (!validateForm()) {
       addToast('Please correct the errors in the form before continuing.', 'error');
       return;
@@ -137,30 +147,57 @@ export function CheckoutClientView() {
     setIsSubmitting(true);
 
     try {
-      // Simulate order processing API call
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isEmail = emailRegex.test(formData.contact.trim());
 
-      const orderNumber = `JS-${Math.floor(100000 + Math.random() * 900000)}`;
-      const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+      const createdOrder = await placeOrder({
+        shippingAddress: {
+          fullName: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+          phone: formData.phone.trim(),
+          addressLine1: formData.address.trim(),
+          addressLine2: formData.apartment.trim() || undefined,
+          city: formData.city.trim(),
+          postalCode: formData.postalCode.trim() || undefined,
+          country: formData.country.trim() || 'Vietnam',
+        },
+        shippingMethod: shippingMethod as ShippingMethod,
+        paymentMethod: paymentMethod as PaymentMethod,
+        contactEmail: isEmail ? formData.contact.trim() : user?.email,
+        contactPhone: !isEmail ? formData.contact.trim() : formData.phone.trim(),
+        items: items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+          size: i.size,
+          color: i.color,
+        })),
+      });
 
       const confirmedOrder: OrderConfirmation = {
-        orderId: orderNumber,
-        date: new Date().toLocaleDateString('en-US', {
+        orderId: createdOrder.orderNumber,
+        date: new Date(createdOrder.createdAt).toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
         }),
-        customerName: `${formData.firstName} ${formData.lastName}`,
-        shippingAddress: `${formData.address}${formData.apartment ? ', ' + formData.apartment : ''}, ${formData.city}, ${formData.country}`,
-        total: total,
-        itemCount: itemCount,
+        customerName: createdOrder.shippingAddress.fullName,
+        shippingAddress: `${createdOrder.shippingAddress.addressLine1}${
+          createdOrder.shippingAddress.addressLine2
+            ? ', ' + createdOrder.shippingAddress.addressLine2
+            : ''
+        }, ${createdOrder.shippingAddress.city}, ${createdOrder.shippingAddress.country}`,
+        total: createdOrder.total,
+        itemCount:
+          createdOrder.itemCount || items.reduce((sum, i) => sum + i.quantity, 0),
       };
 
-      clearCart();
       setCompletedOrder(confirmedOrder);
-      addToast(`Order ${orderNumber} placed successfully!`, 'success');
-    } catch {
-      addToast('An error occurred while placing your order. Please try again.', 'error');
+      addToast(`Order ${createdOrder.orderNumber} placed successfully!`, 'success');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'An error occurred while placing your order. Please try again.';
+      addToast(message, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -234,10 +271,30 @@ export function CheckoutClientView() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                marginTop: '1rem',
+                flexWrap: 'wrap',
+              }}
+            >
               <Link href="/" style={{ textDecoration: 'none' }}>
-                <Button variant="primary" size="lg" icon={<ArrowRight size={16} />}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  icon={<ArrowRight size={16} />}
+                >
                   Continue Shopping
+                </Button>
+              </Link>
+              <Link href="/orders" style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  icon={<Package size={16} />}
+                >
+                  View My Orders
                 </Button>
               </Link>
             </div>
@@ -315,9 +372,11 @@ export function CheckoutClientView() {
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>Contact Information</h2>
-                <span className={styles.sectionSubtitle}>
-                  Already have an account? <Link href="/login">Log in</Link>
-                </span>
+                {!isAuthenticated && (
+                  <span className={styles.sectionSubtitle}>
+                    Already have an account? <Link href="/login">Log in</Link>
+                  </span>
+                )}
               </div>
               <div className={styles.inputGroup}>
                 <label htmlFor="contact" className="sr-only">

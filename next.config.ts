@@ -27,7 +27,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://cdn.shopify.com https://res.cloudinary.com; font-src 'self'; connect-src 'self' http://localhost:* https://*; frame-ancestors 'none';",
+    value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://cdn.shopify.com https://res.cloudinary.com https://example.com; font-src 'self'; connect-src 'self' http://localhost:* https://*; frame-ancestors 'none';",
   },
 ];
 
@@ -37,6 +37,10 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
