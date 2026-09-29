@@ -101,18 +101,13 @@ export function mapProductToFrontend(
   const lowerTags = tags.map((t) => t.toLowerCase());
 
   if (
-    lowerTags.some(
-      (t) => t === 'nữ' || t === 'women' || t === "women's" || t.includes('women')
-    )
+    lowerTags.some((t) => t === 'nữ' || t === 'women' || t === "women's" || t.includes('women'))
   ) {
     gender = 'Women';
   } else if (
     lowerTags.some(
       (t) =>
-        t === 'nam' ||
-        t === 'men' ||
-        t === "men's" ||
-        (t.includes('men') && !t.includes('women'))
+        t === 'nam' || t === 'men' || t === "men's" || (t.includes('men') && !t.includes('women'))
     )
   ) {
     gender = 'Men';
@@ -177,7 +172,7 @@ export function mapProductToFrontend(
   const rawCreatedAt = raw.createdAt ?? null;
   const isNew = Boolean(
     raw.isFeatured ||
-      (rawCreatedAt && Date.now() - new Date(rawCreatedAt).getTime() < 30 * 24 * 60 * 60 * 1000)
+    (rawCreatedAt && Date.now() - new Date(rawCreatedAt).getTime() < 30 * 24 * 60 * 60 * 1000)
   );
 
   return {

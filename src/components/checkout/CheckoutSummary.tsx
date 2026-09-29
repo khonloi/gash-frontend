@@ -12,12 +12,7 @@ export interface CheckoutSummaryProps {
   total: number;
 }
 
-export function CheckoutSummary({
-  items,
-  subtotal,
-  shippingFee,
-  total,
-}: CheckoutSummaryProps) {
+export function CheckoutSummary({ items, subtotal, shippingFee, total }: CheckoutSummaryProps) {
   return (
     <div className={styles.rightColumn}>
       <div className={styles.summaryItems}>
@@ -43,9 +38,7 @@ export function CheckoutSummary({
                 {item.color} {item.size && `/ ${item.size}`}
               </span>
             </div>
-            <span className={styles.itemPrice}>
-              {formatPrice(item.price * item.quantity)}
-            </span>
+            <span className={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</span>
           </div>
         ))}
       </div>

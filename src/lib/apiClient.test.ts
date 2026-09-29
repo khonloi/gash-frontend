@@ -141,7 +141,8 @@ describe('apiClient', () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(2);
 
     // Verify retry header had the new token
-    const retryConfig = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[1][1] as RequestInit;
+    const retryConfig = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
+      .calls[1][1] as RequestInit;
     const retryHeaders = retryConfig.headers as Record<string, string>;
     expect(retryHeaders['Authorization']).toBe('Bearer new-refreshed-token');
 
@@ -159,9 +160,7 @@ describe('apiClient', () => {
     const mockRefresh = vi.fn().mockResolvedValue(null);
     setTokenRefreshHandler(mockRefresh);
 
-    await expect(
-      apiClient.get('/protected', { token: 'expired-token' })
-    ).rejects.toThrow(ApiError);
+    await expect(apiClient.get('/protected', { token: 'expired-token' })).rejects.toThrow(ApiError);
 
     expect(mockRefresh).toHaveBeenCalledTimes(1);
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);

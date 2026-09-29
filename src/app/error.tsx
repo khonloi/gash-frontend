@@ -30,20 +30,14 @@ export default function RootError({ error, reset }: ErrorProps) {
           <AlertTriangle size={32} />
         </div>
 
-        <h1 className={styles.errorTitle}>
-          Something went wrong
-        </h1>
+        <h1 className={styles.errorTitle}>Something went wrong</h1>
 
         <p className={styles.errorDescription}>
           We encountered an unexpected glitch while loading this athletic gear. Please try again or
           head back to the store.
         </p>
 
-        {error.digest && (
-          <p className={styles.errorDigest}>
-            Error ID: {error.digest}
-          </p>
-        )}
+        {error.digest && <p className={styles.errorDigest}>Error ID: {error.digest}</p>}
 
         <div className={styles.errorActions}>
           <Button variant="primary" onClick={handleRetry} icon={<RotateCcw size={16} />}>

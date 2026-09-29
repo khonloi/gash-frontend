@@ -216,9 +216,7 @@ describe('useCartStore', () => {
     });
 
     mockIsAuthenticated = true;
-    vi.mocked(cartApiService.removeCartItem).mockRejectedValueOnce(
-      new Error('Delete error')
-    );
+    vi.mocked(cartApiService.removeCartItem).mockRejectedValueOnce(new Error('Delete error'));
 
     await useCartStore.getState().removeItem('p1-M-Red');
 
@@ -245,9 +243,7 @@ describe('useCartStore', () => {
     useCartStore.setState({ items: [item] });
 
     mockIsAuthenticated = true;
-    vi.mocked(cartApiService.updateCartItem).mockRejectedValueOnce(
-      new Error('Update error')
-    );
+    vi.mocked(cartApiService.updateCartItem).mockRejectedValueOnce(new Error('Update error'));
 
     await useCartStore.getState().updateQuantity('p1-M-Red', 5);
 

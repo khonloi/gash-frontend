@@ -10,17 +10,9 @@ import { useToastStore } from '@/store/useToastStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { PaymentMethod, ShippingMethod } from '@/types/order';
 import { Button, EmptyState, Skeleton } from '@/components/ui';
-import {
-  CheckoutFormData,
-  CheckoutFormErrors,
-  OrderConfirmationData,
-} from '@/constants/checkout';
+import { CheckoutFormData, CheckoutFormErrors, OrderConfirmationData } from '@/constants/checkout';
 import { validateCheckoutForm } from '@/lib/validation';
-import {
-  CheckoutForm,
-  CheckoutSummary,
-  OrderConfirmation,
-} from '@/components/checkout';
+import { CheckoutForm, CheckoutSummary, OrderConfirmation } from '@/components/checkout';
 import styles from './page.module.css';
 
 export function CheckoutClientView() {
@@ -114,8 +106,7 @@ export function CheckoutClientView() {
             : ''
         }, ${createdOrder.shippingAddress.city}, ${createdOrder.shippingAddress.country}`,
         total: createdOrder.total,
-        itemCount:
-          createdOrder.itemCount || items.reduce((sum, i) => sum + i.quantity, 0),
+        itemCount: createdOrder.itemCount || items.reduce((sum, i) => sum + i.quantity, 0),
       };
 
       setCompletedOrder(confirmedOrder);

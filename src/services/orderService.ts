@@ -1,11 +1,6 @@
 import { apiClient } from '@/lib/apiClient';
 import { ApiResponse, PaginatedApiResponse } from '@/types/api';
-import {
-  Order,
-  CreateOrderPayload,
-  OrderQueryParams,
-  OrderStatus,
-} from '@/types/order';
+import { Order, CreateOrderPayload, OrderQueryParams, OrderStatus } from '@/types/order';
 
 export interface OrdersResult {
   orders: Order[];
@@ -23,10 +18,7 @@ export const orderApiService = {
    * Place a new order
    */
   createOrder: async (payload: CreateOrderPayload): Promise<Order> => {
-    const res = await apiClient.post<ApiResponse<{ order: Order }>>(
-      '/orders',
-      payload
-    );
+    const res = await apiClient.post<ApiResponse<{ order: Order }>>('/orders', payload);
     return res.data.order;
   },
 
@@ -34,9 +26,7 @@ export const orderApiService = {
    * Get the current user's order history
    */
   getMyOrders: async (params?: OrderQueryParams): Promise<OrdersResult> => {
-    const res = await apiClient.get<
-      PaginatedApiResponse<{ orders: Order[] }>
-    >('/orders/my', {
+    const res = await apiClient.get<PaginatedApiResponse<{ orders: Order[] }>>('/orders/my', {
       params: params as Record<string, string | number | boolean>,
     });
     return {
@@ -50,9 +40,7 @@ export const orderApiService = {
    * Get an order by ID or orderNumber
    */
   getOrderById: async (orderId: string): Promise<Order> => {
-    const res = await apiClient.get<ApiResponse<{ order: Order }>>(
-      `/orders/${orderId}`
-    );
+    const res = await apiClient.get<ApiResponse<{ order: Order }>>(`/orders/${orderId}`);
     return res.data.order;
   },
 
@@ -60,10 +48,9 @@ export const orderApiService = {
    * Cancel an order
    */
   cancelOrder: async (orderId: string, reason?: string): Promise<Order> => {
-    const res = await apiClient.patch<ApiResponse<{ order: Order }>>(
-      `/orders/${orderId}/cancel`,
-      { reason }
-    );
+    const res = await apiClient.patch<ApiResponse<{ order: Order }>>(`/orders/${orderId}/cancel`, {
+      reason,
+    });
     return res.data.order;
   },
 
@@ -71,9 +58,7 @@ export const orderApiService = {
    * Admin: Get all orders across the store
    */
   getAllOrders: async (params?: OrderQueryParams): Promise<OrdersResult> => {
-    const res = await apiClient.get<
-      PaginatedApiResponse<{ orders: Order[] }>
-    >('/orders', {
+    const res = await apiClient.get<PaginatedApiResponse<{ orders: Order[] }>>('/orders', {
       params: params as Record<string, string | number | boolean>,
     });
     return {
@@ -86,14 +71,10 @@ export const orderApiService = {
   /**
    * Admin: Update order status
    */
-  updateOrderStatus: async (
-    orderId: string,
-    status: OrderStatus
-  ): Promise<Order> => {
-    const res = await apiClient.patch<ApiResponse<{ order: Order }>>(
-      `/orders/${orderId}/status`,
-      { status }
-    );
+  updateOrderStatus: async (orderId: string, status: OrderStatus): Promise<Order> => {
+    const res = await apiClient.patch<ApiResponse<{ order: Order }>>(`/orders/${orderId}/status`, {
+      status,
+    });
     return res.data.order;
   },
 };

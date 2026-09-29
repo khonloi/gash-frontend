@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   },
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jocksport.com';
+
 export default function Home() {
   const homeJsonLd = {
     '@context': 'https://schema.org',
@@ -49,25 +51,25 @@ export default function Home() {
           '@type': 'SiteNavigationElement',
           position: 1,
           name: 'Running Collection',
-          url: 'https://jocksport.com/collections/running',
+          url: `${siteUrl}/collections/running`,
         },
         {
           '@type': 'SiteNavigationElement',
           position: 2,
           name: 'Footwear Collection',
-          url: 'https://jocksport.com/collections/footwear',
+          url: `${siteUrl}/collections/footwear`,
         },
         {
           '@type': 'SiteNavigationElement',
           position: 3,
           name: 'Apparel Collection',
-          url: 'https://jocksport.com/collections/apparel',
+          url: `${siteUrl}/collections/apparel`,
         },
         {
           '@type': 'SiteNavigationElement',
           position: 4,
           name: 'Training Collection',
-          url: 'https://jocksport.com/collections/training',
+          url: `${siteUrl}/collections/training`,
         },
       ],
     },

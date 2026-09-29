@@ -3,14 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useOrderStore } from '@/store/useOrderStore';
-import {
-  SectionHeading,
-  Button,
-  Badge,
-  BadgeProps,
-  EmptyState,
-  Skeleton,
-} from '@/components/ui';
+import { SectionHeading, Button, Badge, BadgeProps, EmptyState, Skeleton } from '@/components/ui';
 import { Order } from '@/types/order';
 
 export default function OrdersClientView() {

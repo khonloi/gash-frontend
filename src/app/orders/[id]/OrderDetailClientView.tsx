@@ -110,11 +110,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
               stroke="currentColor"
               strokeWidth={2}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Orders
           </Link>
@@ -130,11 +126,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
         </div>
 
         {canCancel && (
-          <Button
-            variant="destructive"
-            onClick={handleCancelOrder}
-            disabled={isCancelling}
-          >
+          <Button variant="destructive" onClick={handleCancelOrder} disabled={isCancelling}>
             {isCancelling ? 'Cancelling...' : 'Cancel Order'}
           </Button>
         )}
@@ -150,12 +142,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
                 <div key={idx} className="flex gap-4 border-b last:border-0 pb-6 last:pb-0">
                   <div className="w-24 h-24 bg-muted rounded-md overflow-hidden relative flex-shrink-0">
                     {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                      />
+                      <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                         No Img
@@ -240,8 +227,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
               <h2 className="font-semibold mb-2">Payment Details</h2>
               <div className="text-sm text-muted-foreground space-y-1">
                 <p>
-                  Method:{' '}
-                  <span className="uppercase">{order.paymentMethod.replace('_', ' ')}</span>
+                  Method: <span className="uppercase">{order.paymentMethod.replace('_', ' ')}</span>
                 </p>
                 <p>
                   Status: <span className="capitalize">{order.paymentStatus}</span>

@@ -2,11 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { orderApiService } from '@/services/orderService';
 import { useCartStore } from './useCartStore';
-import {
-  Order,
-  CreateOrderPayload,
-  OrderQueryParams,
-} from '@/types/order';
+import { Order, CreateOrderPayload, OrderQueryParams } from '@/types/order';
 import { getErrorMessage } from '@/lib/errors';
 
 interface OrderPagination {

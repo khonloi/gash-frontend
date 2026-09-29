@@ -16,6 +16,8 @@ interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jocksport.com';
+
 export const revalidate = 3600; // 1 hour ISR
 
 export async function generateStaticParams() {
@@ -89,7 +91,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       price: product.price.toFixed(2),
       priceCurrency: 'USD',
       availability: 'https://schema.org/InStock',
-      url: `https://jocksport.com/products/${product.handle}`,
+      url: `${siteUrl}/products/${product.handle || product.id}`,
     },
   };
 

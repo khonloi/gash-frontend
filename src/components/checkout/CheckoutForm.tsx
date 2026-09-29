@@ -1,11 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import {
-  Button,
-  Input,
-  Checkbox,
-  RadioGroup,
-} from '@/components/ui';
+import { Button, Input, Checkbox, RadioGroup } from '@/components/ui';
 import { formatPrice } from '@/lib/format';
 import {
   CheckoutFormData,
@@ -108,9 +103,7 @@ export function CheckoutForm({
               onChange={(e) => onInputChange('firstName', e.target.value)}
               hasError={Boolean(errors.firstName)}
             />
-            {errors.firstName && (
-              <span className={styles.fieldError}>{errors.firstName}</span>
-            )}
+            {errors.firstName && <span className={styles.fieldError}>{errors.firstName}</span>}
           </div>
           <div>
             <label htmlFor="lastName" className="sr-only">

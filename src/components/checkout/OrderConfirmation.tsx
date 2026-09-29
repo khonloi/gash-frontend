@@ -19,15 +19,13 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
             <CheckCircle2 size={36} />
           </div>
 
-          <h1 className={styles.confirmationTitle}>
-            Order Confirmed!
-          </h1>
+          <h1 className={styles.confirmationTitle}>Order Confirmed!</h1>
 
           <span className={styles.orderNumber}>Order Ref: {order.orderId}</span>
 
           <p className={styles.confirmationDesc}>
-            Thank you, <strong>{order.customerName}</strong>. Your order has been placed
-            and is being prepared for shipment.
+            Thank you, <strong>{order.customerName}</strong>. Your order has been placed and is
+            being prepared for shipment.
           </p>
 
           <div className={styles.orderSummaryBox}>
@@ -45,28 +43,18 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
             </div>
             <div className={styles.summaryTotalRow}>
               <span className={styles.summaryTotalLabel}>Total Paid:</span>
-              <strong className={styles.summaryTotalValue}>
-                {formatPrice(order.total)}
-              </strong>
+              <strong className={styles.summaryTotalValue}>{formatPrice(order.total)}</strong>
             </div>
           </div>
 
           <div className={styles.confirmationActions}>
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <Button
-                variant="primary"
-                size="lg"
-                icon={<ArrowRight size={16} />}
-              >
+              <Button variant="primary" size="lg" icon={<ArrowRight size={16} />}>
                 Continue Shopping
               </Button>
             </Link>
             <Link href="/orders" style={{ textDecoration: 'none' }}>
-              <Button
-                variant="outline"
-                size="lg"
-                icon={<Package size={16} />}
-              >
+              <Button variant="outline" size="lg" icon={<Package size={16} />}>
                 View My Orders
               </Button>
             </Link>
