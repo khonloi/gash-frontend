@@ -331,6 +331,10 @@
   flex-wrap: wrap;
 }
 
+.confirmationActions a {
+  text-decoration: none;
+}
+
 .confirmationTitle {
   font-size: 2rem;
   margin: 0;
@@ -349,4 +353,67 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+/* Checkout Skeleton Styles */
+.formSkeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.twoColRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.summarySkeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.dividerSkeleton {
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+.formTitleSkeleton {
+  width: 180px;
+  height: 32px;
+}
+
+.inputFieldSkeleton {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-sm);
+}
+
+.buttonSkeleton {
+  width: 100%;
+  height: 56px;
+  border-radius: var(--radius-md);
+}
+
+.summaryTitleSkeleton {
+  width: 160px;
+  height: 28px;
+}
+
+.summaryItemSkeleton {
+  width: 100%;
+  height: 70px;
+  border-radius: var(--radius-sm);
+}
+
+.summaryRowSkeleton {
+  width: 100%;
+  height: 24px;
+}
+
+.summaryTotalSkeleton {
+  width: 100%;
+  height: 32px;
 }

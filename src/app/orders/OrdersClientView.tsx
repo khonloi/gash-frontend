@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useOrderStore } from '@/store/useOrderStore';
 import { SectionHeading, Button, Badge, BadgeProps, EmptyState, Skeleton } from '@/components/ui';
 import { Order } from '@/types/order';
+import styles from './page.module.css';
 
 export default function OrdersClientView() {
   const { orders, loading, fetchMyOrders } = useOrderStore();
@@ -35,13 +36,13 @@ export default function OrdersClientView() {
 
   if (loading && !isInitialized) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className={`container ${styles.ordersPage}`}>
         <SectionHeading as="h1">My Orders</SectionHeading>
-        <p className="text-muted-foreground -mt-4 mb-8">View and track your recent orders.</p>
-        <div className="space-y-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
+        <Skeleton className={styles.subtitleSkeleton} />
+        <div className={styles.orderListSkeleton}>
+          <Skeleton className={styles.orderCardSkeleton} />
+          <Skeleton className={styles.orderCardSkeleton} />
+          <Skeleton className={styles.orderCardSkeleton} />
         </div>
       </div>
     );

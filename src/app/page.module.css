@@ -346,3 +346,52 @@
     gap: 1.5rem;
   }
 }
+
+/* Home Skeletons */
+.categorySkeletonBox {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-full);
+}
+
+@media (max-width: 768px) {
+  .categorySkeletonBox {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+.shelfCardSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.shelfImageSkeleton {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-sm);
+}
+
+.shelfTitleSkeleton {
+  width: 60%;
+  height: 16px;
+  margin-top: var(--space-2);
+}
+
+.shelfPriceSkeleton {
+  width: 40%;
+  height: 16px;
+}
+
+.categoryItemSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.categoryTitleSkeleton {
+  width: 80px;
+  height: 20px;
+}

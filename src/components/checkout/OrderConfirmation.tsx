@@ -48,12 +48,12 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
           </div>
 
           <div className={styles.confirmationActions}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
+            <Link href="/">
               <Button variant="primary" size="lg" icon={<ArrowRight size={16} />}>
                 Continue Shopping
               </Button>
             </Link>
-            <Link href="/orders" style={{ textDecoration: 'none' }}>
+            <Link href="/orders">
               <Button variant="outline" size="lg" icon={<Package size={16} />}>
                 View My Orders
               </Button>

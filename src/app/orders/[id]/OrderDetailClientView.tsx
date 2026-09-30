@@ -8,6 +8,7 @@ import { useOrderStore } from '@/store/useOrderStore';
 import { useToastStore } from '@/store/useToastStore';
 import { Button, Badge, BadgeProps, Skeleton } from '@/components/ui';
 import { Order } from '@/types/order';
+import styles from './page.module.css';
 
 export default function OrderDetailClientView({ orderId }: { orderId: string }) {
   const router = useRouter();
@@ -64,15 +65,15 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
 
   if (isInitializing || loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <Skeleton className="h-10 w-48 mb-6" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-6">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-48 w-full" />
+      <div className={`container ${styles.orderDetailPage}`}>
+        <Skeleton className={styles.headerSkeleton} />
+        <div className={styles.detailsGrid}>
+          <div className={styles.mainColumn}>
+            <Skeleton className={styles.orderHeaderSkeleton} />
+            <Skeleton className={styles.orderItemsSkeleton} />
           </div>
-          <div className="space-y-6">
-            <Skeleton className="h-80 w-full" />
+          <div>
+            <Skeleton className={styles.orderSummarySkeleton} />
           </div>
         </div>
       </div>

@@ -2,10 +2,11 @@ import { Metadata } from 'next';
 import OrderDetailClientView from './OrderDetailClientView';
 
 export const metadata: Metadata = {
-  title: 'Order Details | Gash',
-  description: 'View details of your order',
+  title: 'Order Details | JOCKSPORT',
+  description: 'View details of your athletic gear order at JOCKSPORT.',
 };
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
-  return <OrderDetailClientView orderId={params.id} />;
+export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <OrderDetailClientView orderId={id} />;
 }

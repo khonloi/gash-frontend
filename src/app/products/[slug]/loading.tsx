@@ -7,49 +7,46 @@ export default function ProductDetailLoading() {
     <main className={styles.pageContainer}>
       <div className="container">
         {/* Breadcrumb skeleton */}
-        <div style={{ margin: '1.5rem 0', display: 'flex', gap: '0.5rem' }}>
-          <Skeleton width="60px" height="16px" />
-          <Skeleton width="10px" height="16px" />
-          <Skeleton width="80px" height="16px" />
-          <Skeleton width="10px" height="16px" />
-          <Skeleton width="180px" height="16px" />
+        <div className={styles.breadcrumbSkeleton}>
+          <Skeleton className={styles.breadcrumbItemSmall} />
+          <Skeleton className={styles.breadcrumbSeparator} />
+          <Skeleton className={styles.breadcrumbItemMedium} />
+          <Skeleton className={styles.breadcrumbSeparator} />
+          <Skeleton className={styles.breadcrumbItemLarge} />
         </div>
 
         {/* 2-column top section */}
         <div className={styles.productTopSection}>
           <div className={styles.galleryWrapper}>
-            <Skeleton width="100%" height="520px" borderRadius="12px" />
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
-              <Skeleton width="76px" height="76px" borderRadius="6px" />
-              <Skeleton width="76px" height="76px" borderRadius="6px" />
-              <Skeleton width="76px" height="76px" borderRadius="6px" />
+            <Skeleton className={styles.galleryMainImageSkeleton} />
+            <div className={styles.galleryThumbnailsSkeleton}>
+              <Skeleton className={styles.galleryThumbnailItemSkeleton} />
+              <Skeleton className={styles.galleryThumbnailItemSkeleton} />
+              <Skeleton className={styles.galleryThumbnailItemSkeleton} />
             </div>
           </div>
 
-          <div
-            className={styles.infoWrapper}
-            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
-          >
-            <Skeleton width="120px" height="16px" />
-            <Skeleton width="85%" height="38px" />
-            <Skeleton width="35%" height="32px" />
-            <div style={{ display: 'flex', gap: '0.75rem', margin: '0.5rem 0' }}>
-              <Skeleton width="56px" height="56px" borderRadius="6px" />
-              <Skeleton width="56px" height="56px" borderRadius="6px" />
-              <Skeleton width="56px" height="56px" borderRadius="6px" />
+          <div className={`${styles.infoWrapper} ${styles.infoSkeleton}`}>
+            <Skeleton className={styles.infoCategorySkeleton} />
+            <Skeleton className={styles.infoTitleSkeleton} />
+            <Skeleton className={styles.infoPriceSkeleton} />
+            <div className={styles.swatchesSkeleton}>
+              <Skeleton className={styles.infoSwatchItemSkeleton} />
+              <Skeleton className={styles.infoSwatchItemSkeleton} />
+              <Skeleton className={styles.infoSwatchItemSkeleton} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem' }}>
+            <div className={styles.sizesGridSkeleton}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} width="100%" height="44px" borderRadius="6px" />
+                <Skeleton key={i} className={styles.infoSizeItemSkeleton} />
               ))}
             </div>
-            <Skeleton width="100%" height="54px" borderRadius="8px" />
+            <Skeleton className={styles.infoButtonSkeleton} />
           </div>
         </div>
 
         {/* Tabs skeleton */}
-        <div style={{ marginTop: '3rem' }}>
-          <Skeleton width="100%" height="240px" borderRadius="8px" />
+        <div className={styles.tabsSkeleton}>
+          <Skeleton className={styles.tabsContentSkeleton} />
         </div>
       </div>
     </main>

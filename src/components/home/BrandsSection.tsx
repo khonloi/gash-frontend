@@ -35,7 +35,7 @@ export function BrandsSectionSkeleton() {
 }
 
 export async function DynamicBrandsSection() {
-  const allProducts = await fetchProducts();
+  const allProducts = await fetchProducts({ limit: 50 });
   const dbBrands = Array.from(new Set(allProducts.map((p) => p.brand))).filter(Boolean);
 
   let dynamicBrands = dbBrands.slice(0, 11);

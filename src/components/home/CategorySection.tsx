@@ -43,20 +43,9 @@ export function CategorySectionSkeleton() {
         <SectionHeading>Shop by Category</SectionHeading>
         <div className={styles.categoryGrid}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '1rem',
-              }}
-            >
-              <div
-                className="skeleton"
-                style={{ width: '120px', height: '120px', borderRadius: '50%' }}
-              />
-              <div className="skeleton" style={{ width: '80px', height: '20px' }} />
+            <div key={i} className={styles.categoryItemSkeleton}>
+              <div className={`skeleton ${styles.categorySkeletonBox}`} />
+              <div className={`skeleton ${styles.categoryTitleSkeleton}`} />
             </div>
           ))}
         </div>

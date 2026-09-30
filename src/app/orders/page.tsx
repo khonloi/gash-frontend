@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import OrdersClientView from './OrdersClientView';
 
 export const metadata: Metadata = {
-  title: 'My Orders | Gash',
-  description: 'View your order history',
+  title: 'My Orders | JOCKSPORT',
+  description: 'View and track your athletic gear order history at JOCKSPORT.',
 };
 
 export default function OrdersPage() {

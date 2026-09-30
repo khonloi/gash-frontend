@@ -1,0 +1,41 @@
+.orderDetailPage {
+  padding: var(--space-8) var(--space-4);
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.headerSkeleton {
+  margin-bottom: var(--space-6);
+  width: 180px;
+  height: 36px;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-8);
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.orderHeaderSkeleton {
+  width: 100%;
+  height: 240px;
+  border-radius: var(--radius-lg);
+}
+
+.orderItemsSkeleton {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-lg);
+}
+
+.orderSummarySkeleton {
+  width: 100%;
+  height: 320px;
+  border-radius: var(--radius-lg);
+}

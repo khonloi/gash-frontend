@@ -19,32 +19,26 @@ export function CartClientView() {
     return (
       <div className={styles.cartPage}>
         <div className="container">
-          <div style={{ marginBottom: '1.5rem', width: '160px' }}>
-            <Skeleton width="160px" height="20px" />
-          </div>
-          <div style={{ marginBottom: '2rem', width: '220px' }}>
-            <Skeleton width="220px" height="36px" />
-          </div>
+          <Skeleton className={styles.breadcrumbSkeleton} />
+          <Skeleton className={styles.titleSkeleton} />
 
           <div className={styles.content}>
             <div className={styles.itemList}>
               {[1, 2].map((i) => (
-                <div key={i} className={styles.item} style={{ gap: '1.5rem' }}>
-                  <Skeleton width="120px" height="120px" borderRadius="8px" />
-                  <div
-                    style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
-                  >
-                    <Skeleton width="100px" height="16px" />
-                    <Skeleton width="80%" height="22px" />
-                    <Skeleton width="60px" height="16px" />
+                <div key={i} className={styles.itemSkeleton}>
+                  <Skeleton className={styles.itemImageSkeleton} />
+                  <div className={styles.itemDetailsSkeleton}>
+                    <Skeleton className={styles.itemCategorySkeleton} />
+                    <Skeleton className={styles.itemTitleSkeleton} />
+                    <Skeleton className={styles.itemPriceSkeleton} />
                   </div>
-                  <Skeleton width="80px" height="24px" />
+                  <Skeleton className={styles.itemActionSkeleton} />
                 </div>
               ))}
             </div>
 
             <div className={styles.summary}>
-              <Skeleton width="100%" height="320px" borderRadius="10px" />
+              <Skeleton className={styles.summarySkeleton} />
             </div>
           </div>
         </div>
