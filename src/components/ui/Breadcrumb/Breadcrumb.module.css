@@ -1,7 +1,7 @@
 .breadcrumb {
-  padding: 16px 0;
-  margin-bottom: 16px;
-  font-size: 14px;
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
@@ -22,12 +22,18 @@
 .link {
   color: var(--color-text-muted);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition-fast);
+  border-radius: var(--radius-xs);
 }
 
 .link:hover {
-  color: var(--color-primary-turquoise);
+  color: var(--color-primary);
   text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .text {
@@ -35,12 +41,14 @@
 }
 
 .active {
-  color: var(--color-text-main);
-  font-weight: 500;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .separator {
-  margin: 0 8px;
-  color: var(--color-text-muted);
-  opacity: 0.5;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 var(--space-2);
+  color: var(--color-text-subtle);
+  user-select: none;
 }

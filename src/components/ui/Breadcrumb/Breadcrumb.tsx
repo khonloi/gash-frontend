@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/cn';
 import styles from './Breadcrumb.module.css';
 
 export interface BreadcrumbItem {
@@ -8,13 +9,15 @@ export interface BreadcrumbItem {
   href?: string;
 }
 
-interface BreadcrumbProps {
+export interface BreadcrumbProps {
   items: BreadcrumbItem[];
+  separator?: React.ReactNode;
+  className?: string;
 }
 
-export function Breadcrumb({ items }: BreadcrumbProps) {
+export function Breadcrumb({ items, separator, className = '' }: BreadcrumbProps) {
   return (
-    <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+    <nav className={cn(styles.breadcrumb, className)} aria-label="Breadcrumb">
       <ol className={styles.list}>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
@@ -32,7 +35,11 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
                   {item.label}
                 </span>
               )}
-              {!isLast && <ChevronRight className={styles.separator} size={14} />}
+              {!isLast && (
+                <span className={styles.separator} aria-hidden="true">
+                  {separator || <ChevronRight size={14} />}
+                </span>
+              )}
             </li>
           );
         })}

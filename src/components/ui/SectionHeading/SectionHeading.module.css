@@ -7,6 +7,22 @@
   gap: var(--space-4);
 }
 
+.wrapperCentered {
+  justify-content: center;
+  text-align: center;
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.textGroup.centered {
+  align-items: center;
+  text-align: center;
+}
+
 .heading {
   font-size: var(--text-3xl);
   font-weight: var(--font-weight-bold);
@@ -26,6 +42,21 @@
   height: 24px;
   background-color: var(--color-primary);
   border-radius: var(--radius-xs);
+}
+
+.centeredHeading {
+  justify-content: center;
+}
+
+.centeredHeading::before {
+  display: none;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--leading-normal);
 }
 
 .noMargin {

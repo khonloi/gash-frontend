@@ -67,3 +67,7 @@
 .disabled:hover .box {
   border-color: var(--color-border-default);
 }
+
+.errorBox {
+  border-color: var(--color-danger) !important;
+}

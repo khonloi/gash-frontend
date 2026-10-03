@@ -7,14 +7,24 @@ export interface EmptyStateProps {
   title: string;
   description?: string;
   action?: React.ReactNode;
+  variant?: 'dashed' | 'card' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export function EmptyState({ icon, title, description, action, className = '' }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  variant = 'dashed',
+  size = 'md',
+  className = '',
+}: EmptyStateProps) {
   return (
-    <div className={cn(styles.container, className)}>
+    <div className={cn(styles.container, styles[variant], styles[size], className)}>
       {icon && <div className={styles.iconWrapper}>{icon}</div>}
-      <h2 className={styles.title}>{title}</h2>
+      <h3 className={styles.title}>{title}</h3>
       {description && <p className={styles.description}>{description}</p>}
       {action && <div className={styles.action}>{action}</div>}
     </div>
