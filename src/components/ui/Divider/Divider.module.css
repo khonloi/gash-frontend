@@ -1,5 +1,5 @@
 .divider {
-  background-color: var(--color-border);
+  background-color: var(--color-border-default);
   flex-shrink: 0;
 }
 

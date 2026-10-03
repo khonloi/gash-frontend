@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -6,7 +6,7 @@ const cspDirectives = [
   "default-src 'self'",
   `script-src 'self' ${isProd ? '' : "'unsafe-eval'"} 'unsafe-inline'`.trim(),
   "style-src 'self' 'unsafe-inline'",
-  'img-src \'self\' data: https://images.unsplash.com https://plus.unsplash.com https://cdn.shopify.com https://res.cloudinary.com',
+  "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://cdn.shopify.com https://res.cloudinary.com https://example.com http://example.com https://*.example.com https://via.placeholder.com https://placehold.co",
   "font-src 'self'",
   "connect-src 'self' http://localhost:* https://*",
   "frame-ancestors 'none'",
@@ -66,6 +66,26 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
       },
       {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.example.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'example.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
       },
@@ -88,7 +108,7 @@ const nextConfig: NextConfig = {
       process.env.INTERNAL_API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
       'http://localhost:5000/api/v1';
-    
+
     // Normalize root url without /api/v1 trailing segment
     const backendRoot = rawBackendUrl.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
 
@@ -102,4 +122,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-

@@ -5,31 +5,31 @@
   cursor: pointer;
   user-select: none;
   font-size: var(--text-sm);
-  color: var(--color-text-main);
+  color: var(--color-text-primary);
   transition: color var(--transition-fast);
 }
 
 .label:hover .box {
-  border-color: var(--color-navy);
+  border-color: var(--color-primary);
 }
 
 .box {
   width: 18px;
   height: 18px;
   border-radius: var(--radius-sm);
-  border: 1.5px solid var(--color-border);
-  background-color: var(--color-white);
+  border: 1.5px solid var(--color-border-default);
+  background-color: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-white);
+  color: var(--color-on-secondary);
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
 
 .checked {
-  background-color: var(--color-navy);
-  border-color: var(--color-navy);
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .hiddenInput {
@@ -45,12 +45,12 @@
 }
 
 .hiddenInput:focus-visible + .box {
-  outline: 2px solid var(--color-primary-turquoise);
-  outline-offset: 2px;
+  outline: var(--focus-ring-style);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .text {
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .count {
@@ -65,5 +65,5 @@
 }
 
 .disabled:hover .box {
-  border-color: var(--color-border);
+  border-color: var(--color-border-default);
 }
