@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, ChevronUp, SlidersHorizontal, Check, RotateCcw } from 'lucide-react';
 import { Checkbox } from '@/components/ui/Checkbox/Checkbox';
+import { Badge } from '@/components/ui/Badge/Badge';
+import { Button } from '@/components/ui/Button/Button';
 import styles from './FilterSidebar.module.css';
 
 export type FilterOption = {
@@ -28,7 +30,12 @@ interface FilterSidebarProps {
   onClearFilters?: () => void;
 }
 
-export function FilterSidebar({ categories, activeFilters, onFilterChange }: FilterSidebarProps) {
+export function FilterSidebar({
+  categories,
+  activeFilters,
+  onFilterChange,
+  onClearFilters,
+}: FilterSidebarProps) {
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(
     categories.reduce((acc, cat) => ({ ...acc, [cat.id]: true }), {})
@@ -49,35 +56,66 @@ export function FilterSidebar({ categories, activeFilters, onFilterChange }: Fil
   return (
     <aside className={styles.sidebar}>
       {/* Mobile Accordion Header Button */}
-      <button
-        type="button"
-        className={styles.mobileToggleBtn}
-        onClick={() => setIsMobileExpanded((prev) => !prev)}
-        aria-expanded={isMobileExpanded}
-      >
-        <div className={styles.mobileToggleLeft}>
-          <SlidersHorizontal size={18} />
-          <span className={styles.title}>Filter Products</span>
-          {totalActiveFilters > 0 && (
-            <span className={styles.activeBadge}>{totalActiveFilters}</span>
-          )}
-        </div>
-        <div className={styles.mobileToggleRight}>
-          <span className={styles.toggleStatus}>{isMobileExpanded ? 'Hide' : 'Show'}</span>
-          <ChevronDown
-            size={18}
-            className={`${styles.mobileChevron} ${isMobileExpanded ? styles.chevronRotated : ''}`}
-          />
-        </div>
-      </button>
+      <div className={styles.mobileHeaderWrapper}>
+        <button
+          type="button"
+          className={styles.mobileToggleBtn}
+          onClick={() => setIsMobileExpanded((prev) => !prev)}
+          aria-expanded={isMobileExpanded}
+        >
+          <div className={styles.mobileToggleLeft}>
+            <SlidersHorizontal size={18} />
+            <span className={styles.title}>Filter Products</span>
+            {totalActiveFilters > 0 && (
+              <Badge variant="primary" size="sm">
+                {totalActiveFilters}
+              </Badge>
+            )}
+          </div>
+          <div className={styles.mobileToggleRight}>
+            <span className={styles.toggleStatus}>{isMobileExpanded ? 'Hide' : 'Show'}</span>
+            <ChevronDown
+              size={18}
+              className={`${styles.mobileChevron} ${isMobileExpanded ? styles.chevronRotated : ''}`}
+            />
+          </div>
+        </button>
+
+        {onClearFilters && totalActiveFilters > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className={styles.clearBtnMobile}
+            leftIcon={<RotateCcw size={14} />}
+          >
+            Clear ({totalActiveFilters})
+          </Button>
+        )}
+      </div>
 
       {/* Desktop Static Header */}
       <div className={styles.desktopHeader}>
         <div className={styles.desktopHeaderContent}>
           <SlidersHorizontal size={18} />
           <h2 className={styles.title}>Filter</h2>
+          {totalActiveFilters > 0 && (
+            <Badge variant="primary" size="sm">
+              {totalActiveFilters}
+            </Badge>
+          )}
         </div>
-        {totalActiveFilters > 0 && <span className={styles.activeBadge}>{totalActiveFilters}</span>}
+        {onClearFilters && totalActiveFilters > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className={styles.clearBtn}
+            leftIcon={<RotateCcw size={14} />}
+          >
+            Clear all
+          </Button>
+        )}
       </div>
 
       {/* Categories Accordion */}
@@ -128,11 +166,16 @@ export function FilterSidebar({ categories, activeFilters, onFilterChange }: Fil
                               onClick={() => onFilterChange(category.id, option.id)}
                               title={option.label}
                               aria-label={`Select color ${option.label}`}
+                              aria-pressed={isActive}
                             >
                               <span
                                 className={styles.colorSwatch}
                                 style={{ backgroundColor: option.colorCode || '#ccc' }}
-                              />
+                              >
+                                {isActive && (
+                                  <Check size={14} className={styles.checkIcon} strokeWidth={3} />
+                                )}
+                              </span>
                             </button>
                           );
                         })}

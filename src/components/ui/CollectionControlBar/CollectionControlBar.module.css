@@ -2,9 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 24px;
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border-default);
+  margin-bottom: var(--space-6);
 }
 
 .left {
@@ -13,85 +13,113 @@
 }
 
 .productCount {
-  font-size: 14px;
-  color: var(--color-text-body);
-  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.countNumber {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
 }
 
 .right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-6);
 }
 
 .sortWrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .sortLabel {
-  font-size: 14px;
-  color: var(--color-text-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.selectWrapper {
+  position: relative;
+  display: inline-block;
 }
 
 .sortSelect {
-  padding: 8px 32px 8px 12px;
-  font-size: 14px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background-color: var(--color-white);
-  color: var(--color-text-main);
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
   outline: none;
   cursor: pointer;
   appearance: none;
-  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23666%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');
   background-repeat: no-repeat;
-  background-position: right 12px top 50%;
-  background-size: 10px auto;
-  transition: border-color 0.2s ease;
+  background-position: right 10px center;
+  background-size: 14px auto;
+  transition: all var(--transition-fast);
 }
 
-.sortSelect:focus {
-  border-color: var(--color-primary-turquoise);
+.sortSelect:hover {
+  border-color: var(--color-border-strong);
+}
+
+.sortSelect:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: var(--focus-ring-offset);
+  border-color: var(--color-primary);
 }
 
 .viewToggle {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
+  background-color: var(--color-surface-subtle);
+  padding: 2px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .viewBtn {
   background: none;
   border: none;
-  padding: 6px;
+  padding: var(--space-2);
   color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .viewBtn:hover {
-  color: var(--color-primary-turquoise);
-  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+}
+
+.viewBtn:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: 1px;
 }
 
 .viewBtn.active {
-  color: var(--color-white);
-  background: var(--color-primary-turquoise);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
 }
 
 @media (max-width: 768px) {
   .controlBar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    padding: 10px 0;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    margin-bottom: var(--space-4);
   }
 
   .right {

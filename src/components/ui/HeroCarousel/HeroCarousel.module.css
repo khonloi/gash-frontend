@@ -11,16 +11,37 @@
   width: 100%;
 }
 
-.slideCard {
+.slidesViewport {
   position: relative;
   width: 100%;
   height: 480px;
+  overflow: hidden;
+}
+
+.slideCard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   box-shadow: none;
-  transition: all 0.5s ease-in-out;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.6s ease-in-out,
+    visibility 0.6s ease-in-out;
+  pointer-events: none;
+}
+
+.activeSlide {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .bgImage {
@@ -35,7 +56,7 @@
   transition: transform 6s ease;
 }
 
-.slideCard:hover .bgImage {
+.activeSlide .bgImage {
   transform: scale(1.04);
 }
 
@@ -59,84 +80,91 @@
   width: 100%;
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--space-6);
   display: flex;
   align-items: center;
 }
 
 .content {
   max-width: 650px;
-  color: var(--color-white);
+  color: var(--color-surface);
   display: flex;
   flex-direction: column;
-  gap: 0.95rem;
+  gap: var(--space-4);
 }
 
 .discountCallout {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .highlightBadge {
-  background-color: var(--color-primary-green);
-  color: var(--color-navy);
-  font-weight: 900;
-  font-size: 1.25rem;
-  padding: 0.35rem 1rem;
-  border-radius: 4px;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  font-weight: var(--font-weight-extrabold);
+  font-size: var(--text-lg);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-sm);
   letter-spacing: -0.02em;
   display: inline-block;
+  box-shadow: var(--shadow-sm);
 }
 
 .title {
-  font-size: 2.8rem;
-  font-weight: 900;
-  line-height: 1.22;
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-extrabold);
+  line-height: var(--leading-tight);
   text-transform: uppercase;
-  letter-spacing: -0.02em;
-  color: var(--color-white);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-surface);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .subtitle {
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
   color: rgba(255, 255, 255, 0.9);
   max-width: 520px;
 }
 
 .dateRange {
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
-  margin-top: -0.1rem;
+  margin-top: calc(-1 * var(--space-1));
 }
 
 .ctaWrapper {
-  margin-top: 0.75rem;
+  margin-top: var(--space-2);
 }
 
 .sharpCta {
-  background-color: var(--color-white);
-  color: var(--color-navy);
-  font-size: 1.1rem;
-  font-weight: 900;
+  background-color: var(--color-surface);
+  color: var(--color-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.85rem 2.25rem;
+  letter-spacing: var(--tracking-wider);
+  padding: var(--space-3) var(--space-8);
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  gap: var(--space-3);
+  box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
+  border-radius: var(--radius-xs);
 }
 
 .sharpCta:hover {
-  background-color: var(--color-primary-green);
-  color: var(--color-navy);
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
   transform: translateX(4px);
-  box-shadow: 0 6px 20px rgba(115, 209, 0, 0.5);
+  box-shadow: 0 6px 20px rgba(115, 209, 0, 0.4);
+}
+
+.sharpCta:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* Arrows */
@@ -144,67 +172,82 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  background-color: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
-  color: var(--color-white);
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--color-surface);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .arrowBtn:hover {
-  background-color: var(--color-white);
-  color: var(--color-navy);
+  background-color: var(--color-surface);
+  color: var(--color-secondary);
   transform: translateY(-50%) scale(1.08);
 }
 
+.arrowBtn:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: var(--focus-ring-offset);
+}
+
 .prevBtn {
-  left: 1.5rem;
+  left: var(--space-6);
 }
 
 .nextBtn {
-  right: 1.5rem;
+  right: var(--space-6);
 }
 
 /* Dots */
 .dots {
   position: absolute;
-  bottom: 1.5rem;
+  bottom: var(--space-6);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-2);
   z-index: 10;
 }
 
 .dot {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background-color: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
+}
+
+.dot:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: 2px;
 }
 
 .activeDot {
   width: 28px;
-  border-radius: 9999px;
-  background-color: var(--color-primary-green);
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
 }
 
 /* Floating Badge Wrapper */
 .badgeWrapper {
   position: absolute;
-  bottom: 1.5rem;
+  bottom: var(--space-6);
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
   max-width: var(--container-max-width);
-  padding: 0 1.5rem;
+  padding: 0 var(--space-6);
   display: flex;
   justify-content: flex-end;
   pointer-events: none;
@@ -213,22 +256,29 @@
 
 .floatingPromoBadge {
   pointer-events: auto;
+  text-decoration: none;
+}
+
+.floatingPromoBadge:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-full);
 }
 
 .badgeCircle {
   width: 110px;
   height: 110px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, var(--color-royal-blue), var(--color-navy));
-  border: 3px solid var(--color-white);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at 30% 30%, #0056b3, var(--color-secondary));
+  border: 3px solid var(--color-surface);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary-green);
+  color: var(--color-primary);
   text-align: center;
-  font-weight: 900;
+  font-weight: var(--font-weight-extrabold);
   line-height: 1;
   cursor: pointer;
   transition: transform var(--transition-normal);
@@ -239,25 +289,25 @@
 }
 
 .badgeTop {
-  font-size: 1.2rem;
+  font-size: var(--text-lg);
   letter-spacing: -0.03em;
 }
 
 .badgeBottom {
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-1);
 }
 
 .badgePill {
-  background-color: var(--color-primary-green);
-  color: var(--color-navy);
-  font-size: 0.65rem;
-  font-weight: 900;
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-extrabold);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 2px;
 }
 
 @media (max-width: 768px) {

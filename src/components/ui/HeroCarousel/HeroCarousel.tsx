@@ -72,7 +72,9 @@ export function HeroCarousel() {
   useEffect(() => {
     // Check if user prefers reduced motion
     const mediaQuery =
-      typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
     if (mediaQuery?.matches || isPaused) return;
 
     let timer: NodeJS.Timeout | null = null;
@@ -110,8 +112,6 @@ export function HeroCarousel() {
     };
   }, [nextSlide, isPaused]);
 
-  const slide = slides[currentSlide];
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
@@ -136,77 +136,86 @@ export function HeroCarousel() {
       onBlur={() => setIsPaused(false)}
     >
       <div className={styles.carouselContainer} aria-live={isPaused ? 'polite' : 'off'}>
-        <div
-          className={styles.slideCard}
-          role="group"
-          aria-roledescription="slide"
-          aria-label={`Slide ${currentSlide + 1} of ${slides.length}: ${slide.title}`}
-          style={{ background: slide.bgGradient }}
+        <div className={styles.slidesViewport}>
+          {slides.map((s, index) => {
+            const isActive = index === currentSlide;
+            return (
+              <div
+                key={s.id}
+                className={`${styles.slideCard} ${isActive ? styles.activeSlide : ''}`}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`Slide ${index + 1} of ${slides.length}: ${s.title}`}
+                aria-hidden={!isActive}
+                style={{ background: s.bgGradient }}
+              >
+                {/* Background Image with Overlay */}
+                <Image
+                  src={s.image}
+                  alt={s.title}
+                  fill
+                  priority={index === 0}
+                  sizes="100vw"
+                  className={styles.bgImage}
+                />
+                <div className={styles.overlay} />
+
+                {/* Slide Content constrained to container width */}
+                <div className={styles.contentContainer}>
+                  <div className={styles.content}>
+                    <div className={styles.discountCallout}>
+                      <span className={styles.highlightBadge}>{s.badge}</span>
+                    </div>
+
+                    <h1 className={styles.title}>{s.title}</h1>
+                    <p className={styles.subtitle}>{s.subtitle}</p>
+                    <span className={styles.dateRange}>{s.dateRange}</span>
+
+                    <div className={styles.ctaWrapper}>
+                      <Link href={s.href} className={styles.sharpCta} tabIndex={isActive ? 0 : -1}>
+                        <span>{s.ctaText}</span>
+                        <Play size={14} fill="currentColor" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Prev / Next Arrows */}
+        <button
+          onClick={prevSlide}
+          className={`${styles.arrowBtn} ${styles.prevBtn}`}
+          aria-label="Previous slide"
+          type="button"
         >
-          {/* Background Image with Overlay */}
-          <Image
-            src={slide.image}
-            alt={slide.title}
-            fill
-            priority={currentSlide === 0}
-            sizes="100vw"
-            className={styles.bgImage}
-          />
-          <div className={styles.overlay} />
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          onClick={nextSlide}
+          className={`${styles.arrowBtn} ${styles.nextBtn}`}
+          aria-label="Next slide"
+          type="button"
+        >
+          <ChevronRight size={24} />
+        </button>
 
-          {/* Slide Content constrained to container width */}
-          <div className={styles.contentContainer}>
-            <div className={styles.content}>
-              <div className={styles.discountCallout}>
-                <span className={styles.highlightBadge}>{slide.badge}</span>
-              </div>
-
-              <h1 className={styles.title}>{slide.title}</h1>
-              <p className={styles.subtitle}>{slide.subtitle}</p>
-              <span className={styles.dateRange}>{slide.dateRange}</span>
-
-              <div className={styles.ctaWrapper}>
-                <Link href={slide.href} className={styles.sharpCta}>
-                  <span>{slide.ctaText}</span>
-                  <Play size={14} fill="currentColor" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Prev / Next Arrows */}
-          <button
-            onClick={prevSlide}
-            className={`${styles.arrowBtn} ${styles.prevBtn}`}
-            aria-label="Previous slide"
-            type="button"
-          >
-            <ChevronLeft size={26} />
-          </button>
-          <button
-            onClick={nextSlide}
-            className={`${styles.arrowBtn} ${styles.nextBtn}`}
-            aria-label="Next slide"
-            type="button"
-          >
-            <ChevronRight size={26} />
-          </button>
-
-          {/* Dot Indicators */}
-          <div className={styles.dots} role="tablist" aria-label="Carousel slides">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                role="tab"
-                aria-selected={index === currentSlide}
-                aria-current={index === currentSlide ? 'true' : undefined}
-                onClick={() => setCurrentSlide(index)}
-                className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ''}`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
+        {/* Dot Indicators */}
+        <div className={styles.dots} role="tablist" aria-label="Carousel slides">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              role="tab"
+              aria-selected={index === currentSlide}
+              aria-current={index === currentSlide ? 'true' : undefined}
+              onClick={() => setCurrentSlide(index)}
+              className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ''}`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
 
         {/* Floating Best Price Circular Badge */}

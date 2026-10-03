@@ -50,4 +50,10 @@ describe('ProductCard', () => {
     expect(toasts[toasts.length - 1].message).toContain('Air Zoom Pegasus 40');
     expect(toasts[toasts.length - 1].type).toBe('success');
   });
+
+  it('renders placeholder icon when imageUrl is not provided', () => {
+    const { container } = render(<ProductCard {...mockProduct} imageUrl="" />);
+    const placeholder = container.querySelector('.imagePlaceholder');
+    expect(placeholder).toBeDefined();
+  });
 });

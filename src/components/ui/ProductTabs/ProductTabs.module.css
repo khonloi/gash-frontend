@@ -1,32 +1,38 @@
 .container {
   width: 100%;
-  margin-top: 64px;
+  margin-top: var(--space-16);
 }
 
 .tabList {
   display: flex;
-  border-bottom: 1px solid var(--color-border);
-  gap: 32px;
+  border-bottom: 1px solid var(--color-border-default);
+  gap: var(--space-8);
 }
 
 .tabBtn {
   background: none;
   border: none;
-  padding: 16px 0;
-  font-size: 16px;
-  font-weight: 600;
+  padding: var(--space-4) 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-muted);
   cursor: pointer;
   position: relative;
-  transition: color 0.2s ease;
+  transition: color var(--transition-fast);
 }
 
 .tabBtn:hover {
-  color: var(--color-text-main);
+  color: var(--color-text-primary);
+}
+
+.tabBtn:focus-visible {
+  outline: var(--focus-ring-style);
+  outline-offset: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .activeTab {
-  color: var(--color-text-main);
+  color: var(--color-text-primary);
 }
 
 .activeTab::after {
@@ -36,38 +42,38 @@
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: var(--color-text-main);
+  background-color: var(--color-secondary);
 }
 
 .tabContent {
-  padding: 32px 0;
+  padding: var(--space-8) 0;
 }
 
 .contentPane {
-  color: var(--color-text-body);
-  line-height: 1.6;
-  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-sm);
 }
 
 .contentPane p {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .htmlDescription {
-  color: var(--color-text-body);
-  line-height: 1.75;
-  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-sm);
 }
 
 .htmlDescription h4,
 .htmlDescription h3,
 .htmlDescription h2 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text-main);
-  margin-top: 24px;
-  margin-bottom: 12px;
-  letter-spacing: -0.01em;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-3);
+  letter-spacing: var(--tracking-tight);
 }
 
 .htmlDescription h4:first-child,
@@ -77,43 +83,43 @@
 }
 
 .htmlDescription p {
-  margin-bottom: 14px;
-  color: var(--color-text-body);
+  margin-bottom: var(--space-3);
+  color: var(--color-text-secondary);
 }
 
 .htmlDescription ul {
   list-style-type: disc;
-  padding-left: 24px;
-  margin-top: 8px;
-  margin-bottom: 20px;
+  padding-left: var(--space-6);
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-5);
 }
 
 .htmlDescription li {
-  margin-bottom: 8px;
-  color: var(--color-text-body);
-  line-height: 1.6;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
 }
 
 .htmlDescription strong {
-  color: var(--color-text-main);
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .descList {
   list-style-type: disc;
-  padding-left: 20px;
+  padding-left: var(--space-5);
 }
 
 .descList li {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .tableWrapper {
   width: 100%;
   overflow-x: auto;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-surface);
 }
 
 .specsTable {
@@ -123,42 +129,42 @@
 }
 
 .specsTable tr:not(:last-child) td {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .specsTable tr:nth-child(even) {
-  background-color: rgba(0, 0, 0, 0.015);
+  background-color: var(--color-surface-subtle);
 }
 
 .specsTable td {
-  padding: 14px 20px;
-  font-size: 14px;
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
   vertical-align: middle;
 }
 
 .specKey {
-  font-weight: 600;
-  color: var(--color-text-main);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
   width: 30%;
   min-width: 160px;
-  background-color: var(--color-bg-light);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--color-surface-subtle);
+  border-right: 1px solid var(--color-border-subtle);
 }
 
 .specValue {
-  color: var(--color-text-body);
+  color: var(--color-text-secondary);
   width: 70%;
-  line-height: 1.5;
+  line-height: var(--leading-normal);
 }
 
 @media (max-width: 576px) {
   .tabList {
-    gap: 16px;
+    gap: var(--space-4);
     overflow-x: auto;
     white-space: nowrap;
   }
 
   .tabBtn {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 }

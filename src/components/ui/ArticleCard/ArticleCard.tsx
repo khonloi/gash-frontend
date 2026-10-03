@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Calendar } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge/Badge';
 import styles from './ArticleCard.module.css';
 
 export interface ArticleCardProps {
@@ -31,7 +32,9 @@ export function ArticleCard({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className={styles.image}
         />
-        <span className={styles.category}>{category}</span>
+        <Badge variant="secondary" size="sm" className={styles.categoryBadge}>
+          {category}
+        </Badge>
       </div>
 
       <div className={styles.content}>

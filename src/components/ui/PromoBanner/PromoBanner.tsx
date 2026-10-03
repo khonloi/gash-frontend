@@ -52,11 +52,15 @@ export function PromoBanner({
             {dateRange && <span className={styles.dateRange}>{dateRange}</span>}
 
             <div className={styles.ctaWrapper}>
-              <Link href={href}>
-                <Button variant="sharp" icon={<Play size={14} fill="currentColor" />}>
-                  {ctaText}
-                </Button>
-              </Link>
+              <Button
+                as={Link}
+                href={href}
+                variant="primary"
+                shape="sharp"
+                rightIcon={<Play size={14} fill="currentColor" />}
+              >
+                {ctaText}
+              </Button>
             </div>
           </div>
         </div>

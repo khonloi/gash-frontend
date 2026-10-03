@@ -20,6 +20,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
   const mounted = useIsMounted();
   const sidebarRef = useFocusTrap<HTMLElement>(isOpen, onClose);
+  const totalItemCount = items.reduce((acc, i) => acc + i.quantity, 0);
 
   useEffect(() => {
     if (isOpen) {
@@ -34,7 +35,11 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
   return (
     <>
-      <div className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ''}`} onClick={onClose} />
+      <div
+        className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ''}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
       <aside
         ref={sidebarRef}
@@ -44,33 +49,58 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}
       >
         <div className={styles.header}>
-          <h2>Shopping Cart</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close cart">
-            <X size={24} />
+          <div className={styles.headerTitleGroup}>
+            <h2 className={styles.title}>Shopping Cart</h2>
+            {totalItemCount > 0 && (
+              <span className={styles.countBadge} aria-label={`${totalItemCount} items in cart`}>
+                {totalItemCount}
+              </span>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Close cart"
+            className={styles.closeBtn}
+          >
+            <X size={20} />
           </Button>
         </div>
 
         <div className={styles.content}>
           {items.length === 0 ? (
-            <EmptyState
-              icon={<ShoppingBag size={48} />}
-              title="Your cart is empty"
-              description="Your cart is currently empty."
-              action={
-                <Button onClick={onClose} variant="primary">
-                  Continue Shopping
-                </Button>
-              }
-            />
+            <div className={styles.emptyContainer}>
+              <EmptyState
+                variant="ghost"
+                size="sm"
+                icon={<ShoppingBag size={48} className={styles.emptyIcon} />}
+                title="Your cart is empty"
+                description="Looks like you haven't added any gear to your cart yet."
+                action={
+                  <Button onClick={onClose} variant="primary" shape="rounded">
+                    Continue Shopping
+                  </Button>
+                }
+              />
+            </div>
           ) : (
             <div className={styles.itemList}>
               {items.map((item) => (
                 <div key={item.id} className={styles.item}>
                   <div className={styles.itemImage}>
                     {item.imageUrl ? (
-                      <Image src={item.imageUrl} alt={item.title} fill sizes="80px" />
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        sizes="80px"
+                        className={styles.thumbImage}
+                      />
                     ) : (
-                      <div className={styles.imagePlaceholder} />
+                      <div className={styles.imagePlaceholder} aria-hidden="true">
+                        <ShoppingBag size={24} className={styles.placeholderIcon} />
+                      </div>
                     )}
                   </div>
 
@@ -97,7 +127,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                           className={styles.deleteBtn}
                           onClick={() => removeItem(item.id)}
                           title="Remove item"
-                          aria-label="Remove item"
+                          aria-label={`Remove ${item.title} from cart`}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -119,10 +149,24 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             </div>
 
             <div className={styles.actions}>
-              <Button as={Link} href="/checkout" onClick={onClose} variant="primary" fullWidth>
+              <Button
+                as={Link}
+                href="/checkout"
+                onClick={onClose}
+                variant="primary"
+                shape="rounded"
+                fullWidth
+              >
                 Check Out
               </Button>
-              <Button as={Link} href="/cart" onClick={onClose} variant="outline" fullWidth>
+              <Button
+                as={Link}
+                href="/cart"
+                onClick={onClose}
+                variant="outline"
+                shape="rounded"
+                fullWidth
+              >
                 View Cart
               </Button>
             </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge/Badge';
 import styles from './FeaturedCollectionCard.module.css';
 
 export interface FeaturedCollectionCardProps {
@@ -27,7 +28,9 @@ export function FeaturedCollectionCard({
 
       <div className={styles.content}>
         {brandsText && <span className={styles.brandsText}>{brandsText}</span>}
-        <span className={styles.categoryBadge}>{category}</span>
+        <Badge variant="outline" size="sm" className={styles.categoryBadge}>
+          {category}
+        </Badge>
         <h3 className={styles.title}>{title}</h3>
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>

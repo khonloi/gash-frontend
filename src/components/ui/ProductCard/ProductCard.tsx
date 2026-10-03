@@ -35,52 +35,68 @@ export function ProductCard({
 }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const addToast = useToastStore((state) => state.addToast);
+  const [imageError, setImageError] = React.useState(false);
+  const [isAdding, setIsAdding] = React.useState(false);
   const productSlug = handle || id;
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAdding(true);
+    addItem({
+      productId: id,
+      title,
+      brand,
+      price: salePrice || originalPrice,
+      imageUrl: imageUrl || '',
+      quantity: 1,
+    });
+    addToast(`Added "${title}" to your cart`, 'success');
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 450);
+  };
 
   return (
     <div className={styles.card}>
       <div className={styles.imageWrapper}>
-        {discountPercent && (
-          <Badge variant="destructive" className={styles.discountBadge}>
+        {discountPercent ? (
+          <Badge variant="destructive" size="sm" className={styles.discountBadge}>
             -{discountPercent}%
           </Badge>
-        )}
+        ) : null}
+
         <Link
           href={`/products/${productSlug}`}
           className={styles.imageLink}
           aria-label={`View ${title}`}
         >
-          {imageUrl ? (
+          {imageUrl && !imageError ? (
             <Image
               src={imageUrl}
               alt={title}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
               className={styles.image}
+              onError={() => setImageError(true)}
             />
           ) : (
-            <div className={styles.imagePlaceholder} />
+            <div className={styles.imagePlaceholder} aria-hidden="true">
+              <ShoppingBag size={32} className={styles.placeholderIcon} />
+            </div>
           )}
         </Link>
+
         <Button
           variant="primary"
           size="sm"
+          shape="sharp"
+          isLoading={isAdding}
           className={styles.quickAddBtn}
-          onClick={(e) => {
-            e.preventDefault();
-            addItem({
-              productId: id,
-              title,
-              brand,
-              price: salePrice || originalPrice,
-              imageUrl: imageUrl || '',
-              quantity: 1,
-            });
-            addToast(`Added "${title}" to your cart`, 'success');
-          }}
+          onClick={handleQuickAdd}
           title="Add to Cart"
           aria-label={`Add ${title} to Cart`}
-          icon={<ShoppingBag size={15} />}
+          leftIcon={<ShoppingBag size={15} />}
         >
           Add to Cart
         </Button>

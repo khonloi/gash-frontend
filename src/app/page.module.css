@@ -325,6 +325,7 @@
   font-size: 0.95rem;
   font-weight: 800;
   margin-bottom: 0.2rem;
+  color: var(--color-text-inverse);
 }
 
 .trustItem p {

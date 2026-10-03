@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge/Badge';
 import styles from './BrandCollectionCard.module.css';
 
 export interface BrandCollectionCardProps {
@@ -22,7 +23,11 @@ export function BrandCollectionCard({
   return (
     <Link href={href} className={styles.card}>
       <div className={styles.header}>
-        {badgeText && <span className={styles.badge}>{badgeText}</span>}
+        {badgeText && (
+          <Badge variant="destructive" size="sm" className={styles.badge}>
+            {badgeText}
+          </Badge>
+        )}
         <span className={styles.brand}>{brand}</span>
         <h3 className={styles.title}>{title}</h3>
       </div>

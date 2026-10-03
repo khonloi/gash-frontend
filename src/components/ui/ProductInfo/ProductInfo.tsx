@@ -103,7 +103,7 @@ export function ProductInfo({
         <p className={styles.sectionTitle}>
           Color: <span>{colors.find((c) => c.id === selectedColor)?.name}</span>
         </p>
-        <div className={styles.colorGrid}>
+        <div className={styles.colorGrid} role="group" aria-label="Available colors">
           {colors.map((color) => (
             <button
               key={color.id}
@@ -111,6 +111,7 @@ export function ProductInfo({
               className={`${styles.colorBtn} ${selectedColor === color.id ? styles.activeColor : ''}`}
               onClick={() => setSelectedColor(color.id)}
               aria-label={`Select color ${color.name}`}
+              aria-pressed={selectedColor === color.id}
             >
               <Image
                 src={color.imageUrl}
@@ -126,7 +127,7 @@ export function ProductInfo({
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>Size</p>
-        <div className={styles.sizeGrid}>
+        <div className={styles.sizeGrid} role="group" aria-label="Available sizes">
           {sizes.map((size) => (
             <button
               key={size.id}
@@ -134,6 +135,7 @@ export function ProductInfo({
               className={`${styles.sizeBtn} ${selectedSize === size.id ? styles.activeSize : ''} ${!size.inStock ? styles.outOfStock : ''}`}
               onClick={() => size.inStock && setSelectedSize(size.id)}
               disabled={!size.inStock}
+              aria-pressed={selectedSize === size.id}
             >
               {size.label}
             </button>
@@ -181,19 +183,21 @@ export function ProductInfo({
       <div className={styles.actionButtons}>
         <Button
           variant="outline"
+          shape="rounded"
           size="lg"
           onClick={handleAddToCart}
-          icon={<ShoppingBag size={20} />}
+          leftIcon={<ShoppingBag size={18} />}
           fullWidth
         >
           ADD TO CART
         </Button>
 
         <Button
-          variant="success"
+          variant="primary"
+          shape="rounded"
           size="lg"
           onClick={handleBuyNow}
-          icon={<Zap size={20} />}
+          leftIcon={<Zap size={18} />}
           fullWidth
         >
           BUY NOW
