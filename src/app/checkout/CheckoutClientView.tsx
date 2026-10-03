@@ -125,7 +125,7 @@ export function CheckoutClientView() {
   // SSR Loading Skeleton
   if (!mounted) {
     return (
-      <div className={styles.checkoutPage}>
+      <main id="main-content" className={styles.checkoutPage}>
         <div className="container">
           <div className={styles.checkoutContainer}>
             <div className={styles.leftColumn}>
@@ -158,7 +158,7 @@ export function CheckoutClientView() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -170,7 +170,7 @@ export function CheckoutClientView() {
   // Empty cart fallback
   if (items.length === 0) {
     return (
-      <div className={styles.checkoutPage}>
+      <main id="main-content" className={styles.checkoutPage}>
         <div className="container">
           <EmptyState
             icon={<ShoppingBag size={64} />}
@@ -183,12 +183,12 @@ export function CheckoutClientView() {
             }
           />
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className={styles.checkoutPage}>
+    <main id="main-content" className={styles.checkoutPage}>
       <div className="container">
         <form onSubmit={handleOrderSubmit} className={styles.checkoutContainer}>
           <CheckoutForm
@@ -213,6 +213,6 @@ export function CheckoutClientView() {
           />
         </form>
       </div>
-    </div>
+    </main>
   );
 }

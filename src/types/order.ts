@@ -1,7 +1,7 @@
 export type OrderStatus =
   'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
 
-export type PaymentMethod = 'cod' | 'credit_card' | 'momo' | 'vnpay';
+export type PaymentMethod = 'cod' | 'credit_card' | 'apple_pay' | 'paypal' | 'momo' | 'vnpay';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 

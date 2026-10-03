@@ -1,0 +1,28 @@
+.logoImg {
+  display: block;
+  object-fit: contain;
+  height: auto;
+  max-width: 100%;
+  user-select: none;
+  pointer-events: none;
+}
+
+.moreBrands {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--color-navy, #0c1c30);
+  text-transform: uppercase;
+}
+
+.fallbackBrand {
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--color-navy, #0c1c30);
+  text-transform: uppercase;
+  text-align: center;
+}

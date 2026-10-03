@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { SectionHeading } from '@/components/ui';
+import { SectionHeading, BrandLogo } from '@/components/ui';
 import { fetchProducts } from '@/services/productService';
 import styles from '@/app/page.module.css';
 
@@ -61,7 +61,7 @@ export async function DynamicBrandsSection() {
               className={styles.brandBox}
               aria-label={`Shop ${brand} products`}
             >
-              <span className={styles.brandName}>{brand}</span>
+              <BrandLogo brand={brand} size={30} />
             </Link>
           ))}
         </div>

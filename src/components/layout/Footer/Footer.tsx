@@ -1,6 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, PhoneCall, MapPin, Building2, FileText, CheckCircle2 } from 'lucide-react';
+import {
+  VisaLogo,
+  MastercardLogo,
+  AmexLogo,
+  ApplePayLogo,
+  PayPalLogo,
+  CodLogo,
+} from '@/components/ui';
 import styles from './Footer.module.css';
 
 export function Footer() {
@@ -174,23 +182,23 @@ export function Footer() {
 
             {/* Payment Badges Grid */}
             <div className={styles.paymentGrid}>
-              <div className={styles.paymentCard}>
-                <span className={styles.payVisa}>VISA</span>
+              <div className={styles.paymentCard} title="Visa">
+                <VisaLogo size={14} />
               </div>
-              <div className={styles.paymentCard}>
-                <span className={styles.payMaster}>Mastercard</span>
+              <div className={styles.paymentCard} title="Mastercard">
+                <MastercardLogo size={20} />
               </div>
-              <div className={styles.paymentCard}>
-                <span className={styles.payAmex}>AMEX</span>
+              <div className={styles.paymentCard} title="American Express">
+                <AmexLogo size={18} />
               </div>
-              <div className={styles.paymentCard}>
-                <span className={styles.payApple}>Apple Pay</span>
+              <div className={styles.paymentCard} title="Apple Pay">
+                <ApplePayLogo size={16} />
               </div>
-              <div className={styles.paymentCard}>
-                <span className={styles.payPaypal}>PayPal</span>
+              <div className={styles.paymentCard} title="PayPal">
+                <PayPalLogo size={15} />
               </div>
-              <div className={styles.paymentCard}>
-                <span className={styles.payCod}>COD</span>
+              <div className={styles.paymentCard} title="Cash on Delivery">
+                <CodLogo size={15} />
               </div>
             </div>
 

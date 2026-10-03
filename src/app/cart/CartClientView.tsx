@@ -50,7 +50,7 @@ export function CartClientView() {
   const totalItems = getTotalItems();
 
   return (
-    <div className={styles.cartPage}>
+    <main id="main-content" className={styles.cartPage}>
       <div className="container">
         <Link href="/" className={styles.continueShopping}>
           ← Continue Shopping
@@ -165,6 +165,6 @@ export function CartClientView() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

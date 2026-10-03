@@ -44,8 +44,8 @@
   --color-on-accent: #ffffff;
 
   /* Feedback / Status Tokens */
-  --color-success: #10b981;
-  --color-success-hover: #059669;
+  --color-success: #059669;
+  --color-success-hover: #047857;
   --color-success-subtle: #ecfdf5;
   --color-on-success: #ffffff;
 
@@ -732,4 +732,16 @@ h6 {
   background-image:
     radial-gradient(at 0% 0%, var(--color-primary-subtle) 0px, transparent 50%),
     radial-gradient(at 100% 100%, var(--color-accent-subtle) 0px, transparent 50%);
+}
+
+/* Accessibility: Reduced Motion (WCAG 2.1 - 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
