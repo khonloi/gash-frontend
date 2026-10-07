@@ -2,27 +2,27 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-white);
+  background-color: var(--color-surface);
 }
 
 /* Category Section */
 .categorySection {
-  padding: 3.5rem 0 2rem 0;
-  background-color: var(--color-white);
+  padding: var(--space-12) 0 var(--space-8) 0;
+  background-color: var(--color-surface);
 }
 
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1.5rem;
+  gap: var(--space-6);
   justify-items: center;
-  margin-top: 1.5rem;
+  margin-top: var(--space-6);
 }
 
 @media (max-width: 1024px) {
   .categoryGrid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    gap: var(--space-8);
   }
 }
 
@@ -32,61 +32,41 @@
   }
 }
 
-/* Products Section */
-.productsSection {
-  padding: 3rem 0;
-  background-color: var(--color-bg-light);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+/* Products Shelves (Featured, New Collections, Featured Grid) */
+.productsSection,
+.collectionsSection,
+.featuredGridSection {
+  padding: var(--space-12) 0;
+  background-color: var(--color-surface-subtle);
+  border-top: 1px solid var(--color-border-default);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
-.sectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.titleWithIcon {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.flameIcon {
-  color: var(--color-sale-red);
-  animation: pulse 2s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
+.collectionsSection {
+  background-color: var(--color-surface);
+  border-top: none;
+  border-bottom: none;
 }
 
 .viewAllLink {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--color-navy);
+  gap: var(--space-1);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-sm);
+  color: var(--color-secondary);
   transition: all var(--transition-fast);
 }
 
 .viewAllLink:hover {
-  color: var(--color-royal-blue);
+  color: var(--color-accent);
   transform: translateX(3px);
 }
 
 .productsGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 1.25rem;
+  gap: var(--space-5);
 }
 
 @media (max-width: 1200px) {
@@ -98,50 +78,42 @@
 @media (max-width: 768px) {
   .productsGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: var(--space-3);
   }
 }
 
 /* Brands Section */
 .brandsSection {
-  padding: 3.5rem 0;
-  background-color: var(--color-white);
+  padding: var(--space-12) 0;
+  background-color: var(--color-surface);
 }
 
 .brandsGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
 }
 
 .brandBox {
   height: 80px;
-  background-color: var(--color-bg-gray);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: var(--space-4);
   cursor: pointer;
   text-decoration: none;
   transition: all var(--transition-fast);
 }
 
 .brandBox:hover {
-  border-color: var(--color-navy);
-  background-color: var(--color-white);
-  box-shadow: 0 6px 18px rgba(12, 28, 48, 0.08);
+  border-color: var(--color-secondary);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-}
-
-.brandName {
-  font-weight: 900;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  color: var(--color-navy);
-  text-align: center;
 }
 
 @media (max-width: 1024px) {
@@ -156,195 +128,81 @@
   }
 }
 
-/* New Collections Section */
-.collectionsSection {
-  padding: 3.5rem 0;
-  background-color: var(--color-white);
-}
-
-.collectionsGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.25rem;
-}
-
-@media (max-width: 1200px) {
-  .collectionsGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .collectionsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-}
-
-/* Featured 4-Grid Section */
-.featuredGridSection {
-  padding: 3.5rem 0;
-  background-color: var(--color-bg-light);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.featuredFourGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-}
-
-@media (max-width: 1024px) {
-  .featuredFourGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .featuredFourGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Sports Section (6 Lifestyle Athlete Cards) */
+/* Sports Section */
 .sportsSection {
-  padding: 3.5rem 0;
-  background-color: var(--color-white);
+  padding: var(--space-12) 0;
+  background-color: var(--color-surface);
 }
 
 .sportsGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
 }
 
 @media (max-width: 1200px) {
   .sportsGrid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+    gap: var(--space-5);
   }
 }
 
 @media (max-width: 600px) {
   .sportsGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-}
-
-/* Sport & Lifestyle Journal Section */
-.journalSection {
-  padding: 4rem 0;
-  background-color: var(--color-bg-light);
-  border-top: 1px solid var(--color-border);
-}
-
-.journalHeader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.filterPills {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.filterPill {
-  background-color: var(--color-white);
-  color: var(--color-navy);
-  border: 1px solid var(--color-border);
-  padding: 0.5rem 1.4rem;
-  border-radius: 9999px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.filterPill:hover {
-  border-color: var(--color-navy);
-  color: var(--color-navy-dark);
-}
-
-.activePill {
-  background-color: var(--color-navy);
-  color: var(--color-white);
-  border-color: var(--color-navy);
-}
-
-.articlesGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-}
-
-@media (max-width: 1024px) {
-  .articlesGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .articlesGrid {
-    grid-template-columns: 1fr;
+    gap: var(--space-3);
   }
 }
 
 /* Trust Section */
 .trustSection {
-  padding: 3.5rem 0;
-  background-color: var(--color-navy);
-  color: var(--color-white);
+  padding: var(--space-12) 0;
+  background-color: var(--color-secondary);
+  color: var(--color-surface);
 }
 
 .trustGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
+  gap: var(--space-8);
 }
 
 .trustItem {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .trustIcon {
-  color: var(--color-primary-turquoise);
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
 .trustItem h4 {
-  font-size: 0.95rem;
-  font-weight: 800;
-  margin-bottom: 0.2rem;
-  color: var(--color-text-inverse);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-extrabold);
+  margin-bottom: var(--space-1);
+  color: var(--color-surface);
 }
 
 .trustItem p {
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.7);
-  line-height: 1.4;
+  line-height: var(--leading-normal);
 }
 
 @media (max-width: 1024px) {
   .trustGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.75rem;
+    gap: var(--space-6);
   }
 }
 
 @media (max-width: 600px) {
   .trustGrid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: var(--space-6);
   }
 }
 

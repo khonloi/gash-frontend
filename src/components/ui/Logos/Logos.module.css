@@ -14,7 +14,7 @@
   font-weight: 800;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
-  color: var(--color-navy, #0c1c30);
+  color: var(--color-secondary);
   text-transform: uppercase;
 }
 
@@ -22,7 +22,7 @@
   font-weight: 800;
   font-size: 0.85rem;
   letter-spacing: 0.06em;
-  color: var(--color-navy, #0c1c30);
+  color: var(--color-secondary);
   text-transform: uppercase;
   text-align: center;
 }

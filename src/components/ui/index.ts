@@ -6,6 +6,8 @@ export { Breadcrumb } from './Breadcrumb/Breadcrumb';
 export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb/Breadcrumb';
 export { Button } from './Button/Button';
 export type { ButtonProps } from './Button/Button';
+export { Card } from './Card';
+export type { CardProps } from './Card';
 export { CartSidebar } from './CartSidebar/CartSidebar';
 export { CategoryCircle } from './CategoryCircle/CategoryCircle';
 export { Checkbox } from './Checkbox/Checkbox';

@@ -8,6 +8,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { useToastStore } from '@/store/useToastStore';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Button } from '@/components/ui/Button/Button';
+import { Card } from '@/components/ui/Card';
 import { formatPrice } from '@/lib/format';
 import styles from './ProductCard.module.css';
 
@@ -58,7 +59,7 @@ export function ProductCard({
   };
 
   return (
-    <div className={styles.card}>
+    <Card variant="default" className={styles.card}>
       <div className={styles.imageWrapper}>
         {discountPercent ? (
           <Badge variant="destructive" size="sm" className={styles.discountBadge}>
@@ -115,6 +116,6 @@ export function ProductCard({
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

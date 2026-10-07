@@ -1,7 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
+import { Card } from '@/components/ui/Card';
 import styles from './SportCard.module.css';
 
 export interface SportCardProps {
@@ -17,7 +17,7 @@ export function SportCard({ title, imageUrl, href = '#' }: SportCardProps) {
   const safeImage = imageUrl && imageUrl.trim().length > 0 ? imageUrl : DEFAULT_SPORT_IMAGE;
 
   return (
-    <Link href={href} className={styles.card} aria-label={`Explore ${title} gear`}>
+    <Card href={href} variant="plain" className={styles.card} aria-label={`Explore ${title} gear`}>
       <Image
         src={safeImage}
         alt={title}
@@ -31,6 +31,6 @@ export function SportCard({ title, imageUrl, href = '#' }: SportCardProps) {
         <span className={styles.title}>{title}</span>
         <Play size={10} fill="currentColor" className={styles.icon} />
       </div>
-    </Link>
+    </Card>
   );
 }

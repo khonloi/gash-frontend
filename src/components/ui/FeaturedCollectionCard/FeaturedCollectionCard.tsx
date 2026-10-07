@@ -1,7 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
 import { Play } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge/Badge';
+import { Card } from '@/components/ui/Card';
 import styles from './FeaturedCollectionCard.module.css';
 
 export interface FeaturedCollectionCardProps {
@@ -22,7 +22,7 @@ export function FeaturedCollectionCard({
   brandsText,
 }: FeaturedCollectionCardProps) {
   return (
-    <Link href={href} className={styles.card}>
+    <Card href={href} variant="plain" className={styles.card}>
       <div className={styles.bgImage} style={{ backgroundImage: `url(${imageUrl})` }} />
       <div className={styles.overlay} />
 
@@ -41,6 +41,6 @@ export function FeaturedCollectionCard({
           <Play size={12} fill="currentColor" />
         </div>
       </div>
-    </Link>
+    </Card>
   );
 }

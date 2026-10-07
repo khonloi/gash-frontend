@@ -1,8 +1,8 @@
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge/Badge';
+import { Card } from '@/components/ui/Card';
 import styles from './ArticleCard.module.css';
 
 export interface ArticleCardProps {
@@ -23,7 +23,7 @@ export function ArticleCard({
   readTime = '4 min read',
 }: ArticleCardProps) {
   return (
-    <Link href={href} className={styles.card}>
+    <Card href={href} variant="default" className={styles.card}>
       <div className={styles.imageContainer}>
         <Image
           src={imageUrl}
@@ -54,6 +54,6 @@ export function ArticleCard({
           <ArrowRight size={14} className={styles.arrow} />
         </div>
       </div>
-    </Link>
+    </Card>
   );
 }
