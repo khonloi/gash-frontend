@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { orderApiService, OrdersResult } from '@/services/orderService';
 import { Order, CreateOrderPayload, OrderQueryParams } from '@/types/order';
 import { useCartStore } from '@/store/useCartStore';
+import { cartKeys } from '@/hooks/useCart';
 import { STALE_TIME } from '@/lib/queryDefaults';
 
 export const orderKeys = {
@@ -61,7 +62,8 @@ export function usePlaceOrderMutation() {
 
       // Clear the cart
       try {
-        await useCartStore.getState().clearCart();
+        useCartStore.getState().clearCart();
+        queryClient.setQueryData(cartKeys.server(), null);
       } catch (err) {
         console.warn('Cart clearance failed after placing order:', err);
       }

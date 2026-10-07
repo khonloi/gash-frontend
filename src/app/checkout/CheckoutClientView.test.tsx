@@ -57,7 +57,7 @@ describe('CheckoutClientView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuthStore.getState().clearAuth();
-    useCartStore.setState({ items: [], syncing: false, syncError: null });
+    useCartStore.setState({ items: [] });
   });
 
   it('renders empty cart state when cart is empty', () => {
@@ -80,8 +80,6 @@ describe('CheckoutClientView', () => {
           imageUrl: 'https://example.com/shorts.jpg',
         },
       ],
-      syncing: false,
-      syncError: null,
     });
 
     renderWithClient(<CheckoutClientView />);
@@ -112,8 +110,6 @@ describe('CheckoutClientView', () => {
           imageUrl: 'https://example.com/shorts.jpg',
         },
       ],
-      syncing: false,
-      syncError: null,
     });
 
     renderWithClient(<CheckoutClientView />);

@@ -77,7 +77,7 @@ describe('useCart hooks', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuthStore.getState().clearAuth();
-    useCartStore.setState({ items: [], syncing: false, syncError: null });
+    useCartStore.setState({ items: [] });
   });
 
   describe('useServerCartQuery', () => {

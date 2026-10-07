@@ -7,7 +7,7 @@ import { useCartStore } from '@/store/useCartStore';
 describe('CartClientView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useCartStore.setState({ items: [], syncing: false, syncError: null });
+    useCartStore.setState({ items: [] });
   });
 
   it('renders empty cart message when no items in cart', () => {
@@ -33,8 +33,6 @@ describe('CartClientView', () => {
           imageUrl: 'https://example.com/jordan.jpg',
         },
       ],
-      syncing: false,
-      syncError: null,
     });
 
     render(<CartClientView />);

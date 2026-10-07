@@ -1,36 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useCartStore } from './useCartStore';
-import { cartApiService } from '@/services/cartService';
-
-let mockIsAuthenticated = false;
-
-// Mock the cart API service to avoid real API calls during tests
-vi.mock('@/services/cartService', () => ({
-  cartApiService: {
-    addCartItem: vi.fn(),
-    removeCartItem: vi.fn(),
-    updateCartItem: vi.fn(),
-    clearCart: vi.fn(),
-    getCart: vi.fn(),
-    mergeCart: vi.fn(),
-  },
-}));
-
-// Mock the auth store — default to unauthenticated so tests stay local-only
-vi.mock('./useAuthStore', () => ({
-  useAuthStore: {
-    getState: () => ({ isAuthenticated: mockIsAuthenticated, accessToken: null }),
-  },
-}));
+import { describe, it, expect, beforeEach } from 'vitest';
+import { useCartStore, mapServerToLocal } from './useCartStore';
+import { ServerCartItem } from '@/types/cart';
 
 describe('useCartStore', () => {
   beforeEach(() => {
-    mockIsAuthenticated = false;
-    vi.clearAllMocks();
     useCartStore.getState().clearCart();
   });
 
-  it('adds new items to cart', async () => {
+  it('adds new items to cart', () => {
     const item = {
       productId: 'p1',
       title: 'Shoe',
@@ -42,7 +19,7 @@ describe('useCartStore', () => {
       color: 'Red',
     };
 
-    await useCartStore.getState().addItem(item);
+    useCartStore.getState().addItem(item);
 
     const state = useCartStore.getState();
     expect(state.items.length).toBe(1);
@@ -50,7 +27,7 @@ describe('useCartStore', () => {
     expect(state.items[0].quantity).toBe(1);
   });
 
-  it('combines quantities for identical items', async () => {
+  it('combines quantities for identical items', () => {
     const item = {
       productId: 'p1',
       title: 'Shoe',
@@ -62,15 +39,15 @@ describe('useCartStore', () => {
       color: 'Red',
     };
 
-    await useCartStore.getState().addItem(item);
-    await useCartStore.getState().addItem(item);
+    useCartStore.getState().addItem(item);
+    useCartStore.getState().addItem(item);
 
     const state = useCartStore.getState();
     expect(state.items.length).toBe(1);
     expect(state.items[0].quantity).toBe(2);
   });
 
-  it('adds items with different sizes/colors as separate entries', async () => {
+  it('adds items with different sizes/colors as separate entries', () => {
     const baseItem = {
       productId: 'p1',
       title: 'Shoe',
@@ -80,14 +57,14 @@ describe('useCartStore', () => {
       quantity: 1,
     };
 
-    await useCartStore.getState().addItem({ ...baseItem, size: 'M', color: 'Red' });
-    await useCartStore.getState().addItem({ ...baseItem, size: 'L', color: 'Red' });
+    useCartStore.getState().addItem({ ...baseItem, size: 'M', color: 'Red' });
+    useCartStore.getState().addItem({ ...baseItem, size: 'L', color: 'Red' });
 
     const state = useCartStore.getState();
     expect(state.items.length).toBe(2);
   });
 
-  it('removes item by ID', async () => {
+  it('removes item by ID', () => {
     const item = {
       productId: 'p1',
       title: 'Shoe',
@@ -99,13 +76,13 @@ describe('useCartStore', () => {
       color: 'Red',
     };
 
-    await useCartStore.getState().addItem(item);
-    await useCartStore.getState().removeItem('p1-M-Red');
+    useCartStore.getState().addItem(item);
+    useCartStore.getState().removeItem('p1-M-Red');
 
     expect(useCartStore.getState().items.length).toBe(0);
   });
 
-  it('updates item quantity', async () => {
+  it('updates item quantity', () => {
     const item = {
       productId: 'p1',
       title: 'Shoe',
@@ -117,13 +94,13 @@ describe('useCartStore', () => {
       color: 'Red',
     };
 
-    await useCartStore.getState().addItem(item);
-    await useCartStore.getState().updateQuantity('p1-M-Red', 5);
+    useCartStore.getState().addItem(item);
+    useCartStore.getState().updateQuantity('p1-M-Red', 5);
 
     expect(useCartStore.getState().items[0].quantity).toBe(5);
   });
 
-  it('prevents quantity from going below 1', async () => {
+  it('prevents quantity from going below 1', () => {
     const item = {
       productId: 'p1',
       title: 'Shoe',
@@ -135,14 +112,47 @@ describe('useCartStore', () => {
       color: 'Red',
     };
 
-    await useCartStore.getState().addItem(item);
-    await useCartStore.getState().updateQuantity('p1-M-Red', 0);
-    await useCartStore.getState().updateQuantity('p1-M-Red', -5);
+    useCartStore.getState().addItem(item);
+    useCartStore.getState().updateQuantity('p1-M-Red', 0);
+    expect(useCartStore.getState().items[0].quantity).toBe(1);
 
+    useCartStore.getState().updateQuantity('p1-M-Red', -5);
     expect(useCartStore.getState().items[0].quantity).toBe(1);
   });
 
-  it('calculates totals correctly', async () => {
+  it('clears all items from cart', () => {
+    useCartStore.getState().addItem({
+      productId: 'p1',
+      title: 'Shoe',
+      brand: 'Brand',
+      price: 100,
+      imageUrl: 'img.jpg',
+      quantity: 1,
+    });
+    expect(useCartStore.getState().items.length).toBe(1);
+
+    useCartStore.getState().clearCart();
+    expect(useCartStore.getState().items.length).toBe(0);
+  });
+
+  it('sets items directly via setItems', () => {
+    const customItems = [
+      {
+        id: 'c1',
+        productId: 'p1',
+        title: 'Custom 1',
+        brand: 'Nike',
+        price: 50,
+        imageUrl: '',
+        quantity: 3,
+      },
+    ];
+
+    useCartStore.getState().setItems(customItems);
+    expect(useCartStore.getState().items).toEqual(customItems);
+  });
+
+  it('calculates totals correctly', () => {
     const item1 = {
       productId: 'p1',
       title: 'Shoe',
@@ -165,90 +175,50 @@ describe('useCartStore', () => {
       color: 'Blue',
     };
 
-    await useCartStore.getState().addItem(item1);
-    await useCartStore.getState().addItem(item2);
+    useCartStore.getState().addItem(item1);
+    useCartStore.getState().addItem(item2);
 
     const state = useCartStore.getState();
     expect(state.getTotalItems()).toBe(5);
-    expect(state.getTotalPrice()).toBe(200 + 150); // 350
+    expect(state.getTotalPrice()).toBe(350);
   });
 
-  it('rolls back optimistic addItem update when server sync fails', async () => {
-    mockIsAuthenticated = true;
-    vi.mocked(cartApiService.addCartItem).mockRejectedValueOnce(new Error('Server error'));
+  it('mapServerToLocal maps server items accurately', () => {
+    const serverItems: ServerCartItem[] = [
+      {
+        _id: 'srv-1',
+        product: {
+          _id: 'prod-99',
+          name: 'Pro Cleats',
+          slug: 'pro-cleats',
+          price: 150,
+          quantity: 20,
+          brand: 'Puma',
+          images: [
+            { url: 'https://example.com/alt.jpg', isPrimary: false },
+            { url: 'https://example.com/primary.jpg', isPrimary: true },
+          ],
+        },
+        quantity: 2,
+        priceAtAdd: 140,
+        size: '9',
+        color: 'Yellow',
+      },
+    ];
 
-    const item = {
-      productId: 'p-fail',
-      title: 'Shoe',
-      brand: 'Brand',
-      price: 100,
-      imageUrl: 'img.jpg',
-      quantity: 1,
-      size: 'M',
-      color: 'Red',
-    };
-
-    await useCartStore.getState().addItem(item);
-
-    const state = useCartStore.getState();
-    expect(state.items.length).toBe(0);
-    expect(state.syncError).toBe('Server error');
-    expect(state.syncing).toBe(false);
-  });
-
-  it('rolls back optimistic removeItem update when server sync fails', async () => {
-    mockIsAuthenticated = false;
-    const item = {
-      productId: 'p1',
-      title: 'Shoe',
-      brand: 'Brand',
-      price: 100,
-      imageUrl: 'img.jpg',
-      quantity: 1,
-      size: 'M',
-      color: 'Red',
-    };
-    await useCartStore.getState().addItem(item);
-
-    // Simulate item having serverItemId
-    useCartStore.setState({
-      items: [{ ...item, id: 'p1-M-Red', serverItemId: 'srv-1' }],
-    });
-
-    mockIsAuthenticated = true;
-    vi.mocked(cartApiService.removeCartItem).mockRejectedValueOnce(new Error('Delete error'));
-
-    await useCartStore.getState().removeItem('p1-M-Red');
-
-    const state = useCartStore.getState();
-    expect(state.items.length).toBe(1);
-    expect(state.items[0].id).toBe('p1-M-Red');
-    expect(state.syncError).toBe('Delete error');
-  });
-
-  it('rolls back optimistic updateQuantity update when server sync fails', async () => {
-    const item = {
-      productId: 'p1',
-      title: 'Shoe',
-      brand: 'Brand',
-      price: 100,
-      imageUrl: 'img.jpg',
-      quantity: 2,
-      size: 'M',
-      color: 'Red',
-      id: 'p1-M-Red',
+    const mapped = mapServerToLocal(serverItems);
+    expect(mapped).toHaveLength(1);
+    expect(mapped[0]).toEqual({
+      id: 'prod-99-9-Yellow',
       serverItemId: 'srv-1',
-    };
-
-    useCartStore.setState({ items: [item] });
-
-    mockIsAuthenticated = true;
-    vi.mocked(cartApiService.updateCartItem).mockRejectedValueOnce(new Error('Update error'));
-
-    await useCartStore.getState().updateQuantity('p1-M-Red', 5);
-
-    const state = useCartStore.getState();
-    expect(state.items[0].quantity).toBe(2);
-    expect(state.syncError).toBe('Update error');
+      productId: 'prod-99',
+      title: 'Pro Cleats',
+      brand: 'Puma',
+      price: 140,
+      imageUrl: 'https://example.com/primary.jpg',
+      quantity: 2,
+      size: '9',
+      color: 'Yellow',
+    });
   });
 });

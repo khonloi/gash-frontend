@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService, LoginPayload, RegisterPayload } from '@/services/authService';
 import { userService } from '@/services/userService';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useCartStore } from '@/store/useCartStore';
+import { syncCartOnAuth } from '@/hooks/useCart';
 import { STALE_TIME } from '@/lib/queryDefaults';
 
 export const authKeys = {
@@ -15,10 +15,10 @@ export function useLoginMutation() {
 
   return useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setAuth(data.user, data.tokens);
       queryClient.setQueryData(authKeys.me, data.user);
-      useCartStore.getState().mergeAndSync();
+      await syncCartOnAuth(queryClient);
     },
   });
 }
@@ -29,10 +29,10 @@ export function useRegisterMutation() {
 
   return useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setAuth(data.user, data.tokens);
       queryClient.setQueryData(authKeys.me, data.user);
-      useCartStore.getState().mergeAndSync();
+      await syncCartOnAuth(queryClient);
     },
   });
 }

@@ -6,7 +6,7 @@ import { useLoginMutation, useRegisterMutation, useLogoutMutation, useMeQuery } 
 import { authService } from '@/services/authService';
 import { userService } from '@/services/userService';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useCartStore } from '@/store/useCartStore';
+import { syncCartOnAuth } from '@/hooks/useCart';
 import { UserProfile, AuthTokens } from '@/types/user';
 
 vi.mock('@/services/authService', () => ({
@@ -23,12 +23,8 @@ vi.mock('@/services/userService', () => ({
   },
 }));
 
-vi.mock('@/store/useCartStore', () => ({
-  useCartStore: {
-    getState: vi.fn(() => ({
-      mergeAndSync: vi.fn(),
-    })),
-  },
+vi.mock('@/hooks/useCart', () => ({
+  syncCartOnAuth: vi.fn(),
 }));
 
 function createWrapper() {
@@ -76,11 +72,6 @@ describe('useAuth hooks', () => {
 
   describe('useLoginMutation', () => {
     it('authenticates user and syncs cart on success', async () => {
-      const mergeAndSyncMock = vi.fn();
-      vi.mocked(useCartStore.getState).mockReturnValue({
-        mergeAndSync: mergeAndSyncMock,
-      } as unknown as ReturnType<typeof useCartStore.getState>);
-
       vi.mocked(authService.login).mockResolvedValueOnce({
         user: mockUser,
         tokens: mockTokens,
@@ -106,17 +97,12 @@ describe('useAuth hooks', () => {
       expect(authState.user).toEqual(mockUser);
       expect(authState.accessToken).toBe('at-token-77');
       expect(authState.isAuthenticated).toBe(true);
-      expect(mergeAndSyncMock).toHaveBeenCalledTimes(1);
+      expect(syncCartOnAuth).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('useRegisterMutation', () => {
     it('registers user and updates auth state on success', async () => {
-      const mergeAndSyncMock = vi.fn();
-      vi.mocked(useCartStore.getState).mockReturnValue({
-        mergeAndSync: mergeAndSyncMock,
-      } as unknown as ReturnType<typeof useCartStore.getState>);
-
       vi.mocked(authService.register).mockResolvedValueOnce({
         user: mockUser,
         tokens: mockTokens,
@@ -145,7 +131,7 @@ describe('useAuth hooks', () => {
       const authState = useAuthStore.getState();
       expect(authState.user).toEqual(mockUser);
       expect(authState.isAuthenticated).toBe(true);
-      expect(mergeAndSyncMock).toHaveBeenCalledTimes(1);
+      expect(syncCartOnAuth).toHaveBeenCalledTimes(1);
     });
   });
 
