@@ -15,6 +15,8 @@ export { Divider } from './Divider/Divider';
 export type { DividerProps } from './Divider/Divider';
 export { EmptyState } from './EmptyState/EmptyState';
 export type { EmptyStateProps } from './EmptyState/EmptyState';
+export { ErrorView } from './ErrorView/ErrorView';
+export type { ErrorViewProps, SecondaryAction } from './ErrorView/ErrorView';
 export { FeaturedCollectionCard } from './FeaturedCollectionCard/FeaturedCollectionCard';
 export { FilterSidebar } from './FilterSidebar/FilterSidebar';
 export type { FilterOption, FilterCategory, FilterState } from './FilterSidebar/FilterSidebar';
