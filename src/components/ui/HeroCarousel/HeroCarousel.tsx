@@ -125,15 +125,10 @@ export function HeroCarousel() {
   return (
     <section
       className={styles.heroSection}
-      role="region"
       aria-roledescription="carousel"
       aria-label="Featured promotions"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      onFocus={() => setIsPaused(true)}
-      onBlur={() => setIsPaused(false)}
     >
       <div className={styles.carouselContainer} aria-live={isPaused ? 'polite' : 'off'}>
         <div className={styles.slidesViewport}>
@@ -212,6 +207,7 @@ export function HeroCarousel() {
               aria-selected={index === currentSlide}
               aria-current={index === currentSlide ? 'true' : undefined}
               onClick={() => setCurrentSlide(index)}
+              onKeyDown={handleKeyDown}
               className={`${styles.dot} ${index === currentSlide ? styles.activeDot : ''}`}
               aria-label={`Go to slide ${index + 1}`}
             />

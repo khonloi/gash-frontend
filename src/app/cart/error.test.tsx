@@ -15,9 +15,9 @@ describe('CartError Boundary', () => {
 
     expect(
       screen.getByRole('heading', { level: 2, name: /unable to load your shopping cart/i })
-    ).toBeDefined();
-    expect(screen.getByText(/selections are safely preserved/i)).toBeDefined();
-    expect(screen.getByText('Cart Error')).toBeDefined();
+    ).toBeInTheDocument();
+    expect(screen.getByText(/selections are safely preserved/i)).toBeInTheDocument();
+    expect(screen.getByText('Cart Error')).toBeInTheDocument();
 
     const reloadButton = screen.getByRole('button', { name: /reload cart/i });
     fireEvent.click(reloadButton);

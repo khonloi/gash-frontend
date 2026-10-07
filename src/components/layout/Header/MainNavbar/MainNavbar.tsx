@@ -150,6 +150,7 @@ export function MainNavbar() {
       <div
         className={`${styles.drawerOverlay} ${isDrawerOpen ? styles.overlayVisible : ''}`}
         onClick={closeDrawer}
+        aria-hidden="true"
       />
 
       {/* Mobile Navigation Drawer */}
