@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { useOrderStore } from '@/store/useOrderStore';
+import { useOrderQuery, useCancelOrderMutation } from '@/hooks/useOrders';
 import { useToastStore } from '@/store/useToastStore';
 import { Button, Badge, BadgeProps, EmptyState, Skeleton } from '@/components/ui';
 import { Order } from '@/types/order';
@@ -26,23 +25,9 @@ function getPaymentMethodLabel(method: string) {
 }
 
 export default function OrderDetailClientView({ orderId }: { orderId: string }) {
-  const { currentOrder, loading, error, fetchOrderById, cancelOrder, clearCurrentOrder } =
-    useOrderStore();
+  const { data: currentOrder, isLoading, error } = useOrderQuery(orderId);
+  const cancelOrderMutation = useCancelOrderMutation();
   const { addToast } = useToastStore();
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [isCancelling, setIsCancelling] = useState(false);
-
-  useEffect(() => {
-    fetchOrderById(orderId)
-      .catch(() => {
-        addToast('Failed to load order details', 'error');
-      })
-      .finally(() => setIsInitializing(false));
-
-    return () => {
-      clearCurrentOrder();
-    };
-  }, [orderId, fetchOrderById, clearCurrentOrder, addToast]);
 
   const getStatusVariant = (status: Order['status']): BadgeProps['variant'] => {
     switch (status) {
@@ -66,18 +51,15 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
   const handleCancelOrder = async () => {
     if (!confirm('Are you sure you want to cancel this order?')) return;
 
-    setIsCancelling(true);
     try {
-      await cancelOrder(orderId, 'User requested cancellation');
+      await cancelOrderMutation.mutateAsync({ orderId, reason: 'User requested cancellation' });
       addToast('Order cancelled successfully', 'success');
     } catch {
       addToast('Failed to cancel order', 'error');
-    } finally {
-      setIsCancelling(false);
     }
   };
 
-  if (isInitializing || loading) {
+  if (isLoading) {
     return (
       <main id="main-content" className={`container ${styles.orderDetailPage}`}>
         <Skeleton className={styles.headerSkeleton} />
@@ -133,7 +115,11 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
         </div>
 
         {canCancel && (
-          <Button variant="destructive" onClick={handleCancelOrder} isLoading={isCancelling}>
+          <Button
+            variant="destructive"
+            onClick={handleCancelOrder}
+            isLoading={cancelOrderMutation.isPending}
+          >
             Cancel Order
           </Button>
         )}

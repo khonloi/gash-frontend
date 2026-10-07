@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { useOrderStore } from '@/store/useOrderStore';
+import { usePlaceOrderMutation } from '@/hooks/useOrders';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useToastStore } from '@/store/useToastStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
@@ -18,7 +18,7 @@ import styles from './page.module.css';
 export function CheckoutClientView() {
   const { items, getTotalPrice } = useCartStore();
   const { addToast } = useToastStore();
-  const { placeOrder } = useOrderStore();
+  const placeOrderMutation = usePlaceOrderMutation();
   const { user, isAuthenticated } = useAuthStore();
   const mounted = useIsMounted();
 
@@ -70,7 +70,7 @@ export function CheckoutClientView() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const isEmail = emailRegex.test(formData.contact.trim());
 
-      const createdOrder = await placeOrder({
+      const createdOrder = await placeOrderMutation.mutateAsync({
         shippingAddress: {
           fullName: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
           phone: formData.phone.trim(),

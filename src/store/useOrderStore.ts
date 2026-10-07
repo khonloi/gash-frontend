@@ -28,6 +28,11 @@ interface OrderState {
   clearError: () => void;
 }
 
+/**
+ * @deprecated Prefer using the idiomatic TanStack Query hooks from `@/hooks/useOrders`
+ * (`useMyOrdersQuery`, `useOrderQuery`, `usePlaceOrderMutation`, `useCancelOrderMutation`).
+ * This Zustand store is retained for backwards compatibility.
+ */
 export const useOrderStore = create<OrderState>()(
   persist(
     (set) => ({

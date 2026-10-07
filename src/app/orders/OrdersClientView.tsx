@@ -1,19 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useOrderStore } from '@/store/useOrderStore';
+import { useMyOrdersQuery } from '@/hooks/useOrders';
 import { SectionHeading, Button, Badge, BadgeProps, EmptyState, Skeleton } from '@/components/ui';
 import { Order } from '@/types/order';
 import styles from './page.module.css';
 
 export default function OrdersClientView() {
-  const { orders, loading, fetchMyOrders } = useOrderStore();
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    fetchMyOrders().finally(() => setIsInitialized(true));
-  }, [fetchMyOrders]);
+  const { data, isLoading } = useMyOrdersQuery();
+  const orders = data?.orders ?? [];
 
   const getStatusVariant = (status: Order['status']): BadgeProps['variant'] => {
     switch (status) {
@@ -34,7 +29,7 @@ export default function OrdersClientView() {
     }
   };
 
-  if (loading && !isInitialized) {
+  if (isLoading) {
     return (
       <main id="main-content" className={`container ${styles.ordersPage}`}>
         <SectionHeading as="h1">My Orders</SectionHeading>

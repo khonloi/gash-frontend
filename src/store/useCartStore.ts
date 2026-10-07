@@ -32,7 +32,7 @@ interface CartState {
   mergeAndSync: () => Promise<void>;
 }
 
-const mapServerToLocal = (serverItems: ServerCartItem[]): CartItem[] => {
+export const mapServerToLocal = (serverItems: ServerCartItem[]): CartItem[] => {
   return serverItems.map((sItem) => {
     const product = sItem.product;
     const defaultImage =
