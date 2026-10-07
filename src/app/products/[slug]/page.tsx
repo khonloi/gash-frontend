@@ -40,16 +40,29 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
     ? product.description.replace(/<[^>]*>/g, '').slice(0, 160)
     : `Shop the authentic ${product.title} by ${product.brand} at JOCKSPORT.`;
 
+  const canonicalUrl = `${siteUrl}/products/${product.handle || product.id}`;
+  const pageTitle = `${product.title} | ${product.brand} - JOCKSPORT`;
+  const productImages = product.imageUrl ? [{ url: product.imageUrl, alt: product.title }] : [];
+
   return {
-    title: `${product.title} | ${product.brand} - JOCKSPORT`,
+    title: pageTitle,
     description: plainDescription,
     alternates: {
-      canonical: `/products/${product.handle || product.id}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${product.title} | ${product.brand} - JOCKSPORT`,
+      title: pageTitle,
       description: plainDescription,
-      images: product.imageUrl ? [{ url: product.imageUrl }] : [],
+      url: canonicalUrl,
+      siteName: 'JOCKSPORT',
+      type: 'website',
+      images: productImages,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description: plainDescription,
+      images: product.imageUrl ? [product.imageUrl] : [],
     },
   };
 }
@@ -75,24 +88,51 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.title,
-    image: product.images?.length > 0 ? product.images : [product.imageUrl],
-    description: product.description
-      ? product.description.replace(/<[^>]*>/g, '').slice(0, 300)
-      : undefined,
-    sku: product.sku,
-    brand: {
-      '@type': 'Brand',
-      name: product.brand,
-    },
-    offers: {
-      '@type': 'Offer',
-      price: product.price.toFixed(2),
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: `${siteUrl}/products/${product.handle || product.id}`,
-    },
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: siteUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Products',
+            item: `${siteUrl}/collections/all`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: product.title,
+            item: `${siteUrl}/products/${product.handle || product.id}`,
+          },
+        ],
+      },
+      {
+        '@type': 'Product',
+        name: product.title,
+        image: product.images?.length > 0 ? product.images : [product.imageUrl],
+        description: product.description
+          ? product.description.replace(/<[^>]*>/g, '').slice(0, 300)
+          : undefined,
+        sku: product.sku,
+        brand: {
+          '@type': 'Brand',
+          name: product.brand,
+        },
+        offers: {
+          '@type': 'Offer',
+          price: product.price.toFixed(2),
+          priceCurrency: 'USD',
+          availability: 'https://schema.org/InStock',
+          url: `${siteUrl}/products/${product.handle || product.id}`,
+        },
+      },
+    ],
   };
 
   return (

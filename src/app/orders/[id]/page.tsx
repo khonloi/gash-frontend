@@ -4,6 +4,10 @@ import OrderDetailClientView from './OrderDetailClientView';
 export const metadata: Metadata = {
   title: 'Order Details | JOCKSPORT',
   description: 'View details of your athletic gear order at JOCKSPORT.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {

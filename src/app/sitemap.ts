@@ -5,9 +5,26 @@ import { FrontendProduct } from '@/types/product';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jocksport.com';
 
+  const categorySlugs = ['all', 'men', 'women', 'kids', 'accessories', 'sale'];
+
+  const categoryUrls: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+    url: `${baseUrl}/collections/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: slug === 'all' ? 0.9 : 0.85,
+  }));
+
+  const rootUrl: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+  ];
+
   try {
-    // Fetch top products for the sitemap
-    // Note: We use a larger limit to capture the catalog, but Next.js sitemaps can paginate if needed.
+    // Fetch products for the sitemap
     const products = await fetchProducts({ limit: 100 });
 
     const productUrls: MetadataRoute.Sitemap = products.map((product: FrontendProduct) => ({
@@ -17,39 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    const staticUrls: MetadataRoute.Sitemap = [
-      {
-        url: baseUrl,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 1,
-      },
-      {
-        url: `${baseUrl}/collections/all`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.9,
-      },
-    ];
-
-    return [...staticUrls, ...productUrls];
+    return [...rootUrl, ...categoryUrls, ...productUrls];
   } catch (error) {
-    console.error('Failed to generate sitemap:', error);
-
-    // Fallback to static URLs if API fails
-    return [
-      {
-        url: baseUrl,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 1,
-      },
-      {
-        url: `${baseUrl}/collections/all`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.9,
-      },
-    ];
+    console.error('Failed to generate product sitemap items:', error);
+    return [...rootUrl, ...categoryUrls];
   }
 }

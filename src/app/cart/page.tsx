@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: 'Shopping Cart | JOCKSPORT',
   description:
     'Review your selected performance sportswear, shoes, and training apparel at JOCKSPORT.',
+  robots: {
+    index: false,
+    follow: true,
+  },
   openGraph: {
     title: 'Shopping Cart | JOCKSPORT',
     description:

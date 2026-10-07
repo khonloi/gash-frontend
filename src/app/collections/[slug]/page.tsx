@@ -8,6 +8,8 @@ interface CollectionPageProps {
   searchParams?: Promise<{ q?: string }>;
 }
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jocksport.com';
+
 export const revalidate = 3600; // 1 hour ISR
 
 export async function generateStaticParams() {
@@ -25,17 +27,29 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: CollectionPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const title = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : 'Collection';
+  const normalizedSlug = slug || 'all';
+  const title = normalizedSlug.charAt(0).toUpperCase() + normalizedSlug.slice(1);
+  const pageTitle = `${title} Collection | Official Athletic Footwear & Sportswear - JOCKSPORT`;
+  const pageDescription = `Shop authentic ${title} sportswear, performance gear, running shoes, and athletic equipment from Nike, Adidas, Puma, and more at JOCKSPORT.`;
+  const canonicalUrl = `${siteUrl}/collections/${normalizedSlug}`;
 
   return {
-    title: `${title} Collection | JOCKSPORT`,
-    description: `Shop authentic ${title} sportswear, performance gear, and athletic equipment at JOCKSPORT.`,
+    title: pageTitle,
+    description: pageDescription,
     alternates: {
-      canonical: `/collections/${slug || 'all'}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${title} Collection | JOCKSPORT`,
-      description: `Explore the official ${title} lineup featuring world-class sport performance gear.`,
+      title: pageTitle,
+      description: pageDescription,
+      url: canonicalUrl,
+      siteName: 'JOCKSPORT',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description: pageDescription,
     },
   };
 }
@@ -46,12 +60,56 @@ export default async function CollectionPage({ params, searchParams }: Collectio
   const initialQuery = resolvedSearchParams?.q || '';
   const initialProducts = await fetchProducts();
 
+  const normalizedSlug = slug || 'all';
+  const title = normalizedSlug.charAt(0).toUpperCase() + normalizedSlug.slice(1);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: siteUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Collections',
+            item: `${siteUrl}/collections/all`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: title,
+            item: `${siteUrl}/collections/${normalizedSlug}`,
+          },
+        ],
+      },
+      {
+        '@type': 'CollectionPage',
+        name: `${title} Collection`,
+        description: `Shop authentic ${title} sportswear and athletic equipment at JOCKSPORT.`,
+        url: `${siteUrl}/collections/${normalizedSlug}`,
+      },
+    ],
+  };
+
   return (
-    <CollectionClientView
-      key={`${slug}-${initialQuery}`}
-      initialProducts={initialProducts}
-      slug={slug}
-      initialQuery={initialQuery}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <CollectionClientView
+        key={`${slug}-${initialQuery}`}
+        initialProducts={initialProducts}
+        slug={slug}
+        initialQuery={initialQuery}
+      />
+    </>
   );
 }
