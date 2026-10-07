@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useOrderQuery, useCancelOrderMutation } from '@/hooks/useOrders';
 import { useToastStore } from '@/store/useToastStore';
-import { Button, Badge, BadgeProps, EmptyState, Skeleton } from '@/components/ui';
-import { Order } from '@/types/order';
+import { Button, Badge, EmptyState, Skeleton } from '@/components/ui';
+import { formatPrice, formatDateTime, getOrderStatusVariant } from '@/lib/format';
 import styles from './page.module.css';
 
 function getPaymentMethodLabel(method: string) {
@@ -28,25 +28,6 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
   const { data: currentOrder, isLoading, error } = useOrderQuery(orderId);
   const cancelOrderMutation = useCancelOrderMutation();
   const { addToast } = useToastStore();
-
-  const getStatusVariant = (status: Order['status']): BadgeProps['variant'] => {
-    switch (status) {
-      case 'pending':
-        return 'outline';
-      case 'confirmed':
-      case 'processing':
-        return 'primary';
-      case 'shipped':
-        return 'secondary';
-      case 'delivered':
-        return 'success';
-      case 'cancelled':
-      case 'refunded':
-        return 'destructive';
-      default:
-        return 'default';
-    }
-  };
 
   const handleCancelOrder = async () => {
     if (!confirm('Are you sure you want to cancel this order?')) return;
@@ -105,13 +86,11 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
           </Link>
           <div className={styles.headerTitleRow}>
             <h1 className={styles.orderHeading}>Order #{order.orderNumber}</h1>
-            <Badge variant={getStatusVariant(order.status)} size="md">
+            <Badge variant={getOrderStatusVariant(order.status)} size="md">
               {order.status}
             </Badge>
           </div>
-          <p className={styles.orderDateText}>
-            Placed on {new Date(order.createdAt).toLocaleString()}
-          </p>
+          <p className={styles.orderDateText}>Placed on {formatDateTime(order.createdAt)}</p>
         </div>
 
         {canCancel && (
@@ -159,9 +138,9 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
                       <p className={styles.itemQty}>Qty: {item.quantity}</p>
                     </div>
                     <div className={styles.itemPriceCol}>
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatPrice(item.price * item.quantity)}
                       {item.quantity > 1 && (
-                        <p className={styles.itemUnitPrice}>${item.price.toFixed(2)} each</p>
+                        <p className={styles.itemUnitPrice}>{formatPrice(item.price)} each</p>
                       )}
                     </div>
                   </div>
@@ -186,15 +165,15 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
             <div className={styles.summaryRows}>
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
-                <span>${order.subtotal.toFixed(2)}</span>
+                <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className={styles.summaryRow}>
                 <span>Shipping ({order.shippingMethod})</span>
-                <span>{order.shippingFee > 0 ? `$${order.shippingFee.toFixed(2)}` : 'Free'}</span>
+                <span>{order.shippingFee > 0 ? formatPrice(order.shippingFee) : 'Free'}</span>
               </div>
               <div className={styles.summaryRowTotal}>
                 <span>Total</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span>{formatPrice(order.total)}</span>
               </div>
             </div>
           </div>

@@ -2,32 +2,13 @@
 
 import Link from 'next/link';
 import { useMyOrdersQuery } from '@/hooks/useOrders';
-import { SectionHeading, Button, Badge, BadgeProps, EmptyState, Skeleton } from '@/components/ui';
-import { Order } from '@/types/order';
+import { SectionHeading, Button, Badge, EmptyState, Skeleton } from '@/components/ui';
+import { formatDate, formatPrice, getOrderStatusVariant } from '@/lib/format';
 import styles from './page.module.css';
 
 export default function OrdersClientView() {
   const { data, isLoading } = useMyOrdersQuery();
   const orders = data?.orders ?? [];
-
-  const getStatusVariant = (status: Order['status']): BadgeProps['variant'] => {
-    switch (status) {
-      case 'pending':
-        return 'outline';
-      case 'confirmed':
-      case 'processing':
-        return 'primary';
-      case 'shipped':
-        return 'secondary';
-      case 'delivered':
-        return 'success';
-      case 'cancelled':
-      case 'refunded':
-        return 'destructive';
-      default:
-        return 'default';
-    }
-  };
 
   if (isLoading) {
     return (
@@ -70,15 +51,13 @@ export default function OrdersClientView() {
             <div className={styles.orderInfo}>
               <div className={styles.orderHeaderRow}>
                 <h3 className={styles.orderNumber}>Order #{order.orderNumber}</h3>
-                <Badge variant={getStatusVariant(order.status)} className={styles.statusBadge}>
+                <Badge variant={getOrderStatusVariant(order.status)} className={styles.statusBadge}>
                   {order.status}
                 </Badge>
               </div>
-              <p className={styles.orderDate}>
-                Placed on {new Date(order.createdAt).toLocaleDateString()}
-              </p>
+              <p className={styles.orderDate}>Placed on {formatDate(order.createdAt)}</p>
               <p className={styles.orderMeta}>
-                Total: ${order.total.toFixed(2)} ({order.items.length} items)
+                Total: {formatPrice(order.total)} ({order.items.length} items)
               </p>
             </div>
 

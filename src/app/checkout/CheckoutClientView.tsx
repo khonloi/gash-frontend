@@ -12,6 +12,7 @@ import { PaymentMethod, ShippingMethod } from '@/types/order';
 import { Button, EmptyState, Skeleton } from '@/components/ui';
 import { CheckoutFormData, CheckoutFormErrors, OrderConfirmationData } from '@/constants/checkout';
 import { validateCheckoutForm } from '@/lib/validation';
+import { formatDate } from '@/lib/format';
 import { CheckoutForm, CheckoutSummary, OrderConfirmation } from '@/components/checkout';
 import styles from './page.module.css';
 
@@ -94,11 +95,7 @@ export function CheckoutClientView() {
 
       const confirmedOrder: OrderConfirmationData = {
         orderId: createdOrder.orderNumber,
-        date: new Date(createdOrder.createdAt).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        }),
+        date: formatDate(createdOrder.createdAt),
         customerName: createdOrder.shippingAddress.fullName,
         shippingAddress: `${createdOrder.shippingAddress.addressLine1}${
           createdOrder.shippingAddress.addressLine2

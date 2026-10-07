@@ -41,10 +41,10 @@ export function ProductInfo({
   const addItem = useCartStore((state) => state.addItem);
   const { addToast } = useToastStore();
 
-  const handleAddToCart = () => {
+  const prepareAndAddToCart = () => {
     if (!selectedSize) {
       addToast('Please select a size first.', 'error');
-      return;
+      return false;
     }
     const colorObj = colors.find((c) => c.id === selectedColor);
     addItem({
@@ -57,27 +57,20 @@ export function ProductInfo({
       size: selectedSize,
       color: colorObj?.name,
     });
-    addToast(`Added ${quantity} item(s) to cart successfully!`, 'success');
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (prepareAndAddToCart()) {
+      addToast(`Added ${quantity} item(s) to cart successfully!`, 'success');
+    }
   };
 
   const handleBuyNow = () => {
-    if (!selectedSize) {
-      addToast('Please select a size first.', 'error');
-      return;
+    if (prepareAndAddToCart()) {
+      addToast(`Proceeding to checkout with ${quantity} item(s)...`, 'info');
+      router.push('/checkout');
     }
-    const colorObj = colors.find((c) => c.id === selectedColor);
-    addItem({
-      productId: id,
-      title,
-      brand,
-      price: price,
-      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
-      quantity,
-      size: selectedSize,
-      color: colorObj?.name,
-    });
-    addToast(`Proceeding to checkout with ${quantity} item(s)...`, 'info');
-    router.push('/checkout');
   };
 
   return (
