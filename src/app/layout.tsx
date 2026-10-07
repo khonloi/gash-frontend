@@ -5,6 +5,7 @@ import ReactQueryProvider from '@/components/providers/ReactQueryProvider';
 import { Header } from '@/components/layout/Header/Header';
 import { Footer } from '@/components/layout/Footer/Footer';
 import { ToastContainer } from '@/components/ui/Toast/ToastContainer';
+import { WebVitals } from '@/components/analytics/WebVitals';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -134,6 +135,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <WebVitals />
         <a href="#main-content" className="skip-to-content">
           Skip to main content
         </a>
