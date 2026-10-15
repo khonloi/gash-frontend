@@ -123,7 +123,7 @@
   color: var(--color-white);
   min-width: 20px;
   height: 20px;
-  padding: 0 4px;
+  padding: 0 var(--space-1);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -132,21 +132,21 @@
   font-weight: 600;
   line-height: 1;
   z-index: 2;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .itemDetails {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .itemTitle {
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-text-main);
-  line-height: 1.4;
+  line-height: var(--leading-snug);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -245,17 +245,17 @@
 
 .confirmationContainer {
   max-width: 640px;
-  margin: 3rem auto;
-  background-color: var(--color-white);
-  padding: 3rem 2.5rem;
+  margin: var(--space-12) auto;
+  background-color: var(--color-surface);
+  padding: var(--space-12) var(--space-10);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  box-shadow: 0 10px 32px rgba(12, 28, 48, 0.08);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--space-5);
 }
 
 .confirmBadge {
@@ -273,7 +273,7 @@
   font-family: monospace;
   font-size: var(--text-sm);
   background-color: var(--color-bg-muted);
-  padding: 6px 14px;
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--color-navy);
   font-weight: 700;
@@ -285,11 +285,11 @@
   background-color: var(--color-bg-light);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 1.25rem;
+  padding: var(--space-5);
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
   font-size: var(--text-sm);
 }
 .imagePlaceholder {

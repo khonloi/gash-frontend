@@ -22,6 +22,7 @@ const CartSidebar = dynamic(
   () => import('@/components/ui/CartSidebar/CartSidebar').then((m) => m.CartSidebar),
   { ssr: false }
 );
+import { BrandLogoIcon } from '@/components/ui';
 import styles from './MainNavbar.module.css';
 
 export function MainNavbar() {
@@ -71,7 +72,7 @@ export function MainNavbar() {
         <div className={`container ${styles.navContainer}`}>
           {/* Brand Logo */}
           <Link href="/" className={styles.logo} onClick={closeDrawer}>
-            <Zap className={styles.logoIcon} fill="var(--color-primary-green)" size={28} />
+            <BrandLogoIcon className={styles.logoIcon} size={28} />
             <span className={styles.logoText}>
               JOCK<span className={styles.logoGreen}>SPORTS</span>
             </span>
@@ -164,7 +165,7 @@ export function MainNavbar() {
         {/* Drawer Header */}
         <div className={styles.drawerHeader}>
           <Link href="/" className={styles.logo} onClick={closeDrawer}>
-            <Zap className={styles.logoIcon} fill="var(--color-primary-green)" size={24} />
+            <BrandLogoIcon className={styles.logoIcon} size={24} />
             <span className={styles.logoText}>
               JOCK<span className={styles.logoGreen}>SPORTS</span>
             </span>

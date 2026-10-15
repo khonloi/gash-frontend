@@ -7,7 +7,7 @@
 
 /* Category Section */
 .categorySection {
-  padding: var(--space-12) 0 var(--space-8) 0;
+  padding: var(--section-spacing-compact) 0 var(--space-8) 0;
   background-color: var(--color-surface);
 }
 
@@ -36,7 +36,7 @@
 .productsSection,
 .collectionsSection,
 .featuredGridSection {
-  padding: var(--space-12) 0;
+  padding: var(--section-spacing-compact) 0;
   background-color: var(--color-surface-subtle);
   border-top: 1px solid var(--color-border-default);
   border-bottom: 1px solid var(--color-border-default);
@@ -66,7 +66,7 @@
 .productsGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-5);
+  gap: var(--grid-gap-desktop);
 }
 
 @media (max-width: 1200px) {
@@ -78,13 +78,13 @@
 @media (max-width: 768px) {
   .productsGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
+    gap: var(--grid-gap-mobile);
   }
 }
 
 /* Brands Section */
 .brandsSection {
-  padding: var(--space-12) 0;
+  padding: var(--section-spacing-compact) 0;
   background-color: var(--color-surface);
 }
 
@@ -96,7 +96,7 @@
 }
 
 .brandBox {
-  height: 80px;
+  height: var(--space-20);
   background-color: var(--color-surface-subtle);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
@@ -130,7 +130,7 @@
 
 /* Sports Section */
 .sportsSection {
-  padding: var(--space-12) 0;
+  padding: var(--section-spacing-compact) 0;
   background-color: var(--color-surface);
 }
 
@@ -157,7 +157,7 @@
 
 /* Trust Section */
 .trustSection {
-  padding: var(--space-12) 0;
+  padding: var(--section-spacing-compact) 0;
   background-color: var(--color-secondary);
   color: var(--color-surface);
 }

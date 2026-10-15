@@ -8,6 +8,7 @@ import {
   ApplePayLogo,
   PayPalLogo,
   CodLogo,
+  BrandLogoIcon,
 } from '@/components/ui';
 import styles from './Footer.module.css';
 
@@ -21,6 +22,7 @@ export function Footer() {
           <div className={styles.column}>
             <div className={styles.brandGroup}>
               <div className={styles.logoBadge}>
+                <BrandLogoIcon size={22} className={styles.footerLogoIcon} />
                 <span className={styles.logoText}>JOCK</span>
                 <span className={styles.logoAccent}>SPORT</span>
               </div>

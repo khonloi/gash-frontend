@@ -73,11 +73,11 @@
 }
 
 .withLeftIcon {
-  padding-left: 2.25rem !important;
+  padding-left: var(--space-9) !important;
 }
 
 .withRightIcon {
-  padding-right: 2.25rem !important;
+  padding-right: var(--space-9) !important;
 }
 
 .input::placeholder {

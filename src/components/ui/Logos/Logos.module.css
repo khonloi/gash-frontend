@@ -10,18 +10,18 @@
 .moreBrands {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   font-weight: 800;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
   color: var(--color-secondary);
   text-transform: uppercase;
 }
 
 .fallbackBrand {
   font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
   color: var(--color-secondary);
   text-transform: uppercase;
   text-align: center;

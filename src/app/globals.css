@@ -181,12 +181,24 @@
   --space-4: 1rem; /* 16px */
   --space-5: 1.25rem; /* 20px */
   --space-6: 1.5rem; /* 24px */
+  --space-7: 1.75rem; /* 28px */
   --space-8: 2rem; /* 32px */
+  --space-9: 2.25rem; /* 36px */
   --space-10: 2.5rem; /* 40px */
   --space-12: 3rem; /* 48px */
+  --space-14: 3.5rem; /* 56px */
   --space-16: 4rem; /* 64px */
   --space-20: 5rem; /* 80px */
   --space-24: 6rem; /* 96px */
+
+  /* Layout Rhythm & Spacing Tokens */
+  --layout-gutter-mobile: var(--space-4);
+  --layout-gutter-desktop: var(--space-6);
+  --section-spacing-desktop: var(--space-16);
+  --section-spacing-compact: var(--space-12);
+  --section-spacing-mobile: var(--space-8);
+  --grid-gap-desktop: var(--space-5);
+  --grid-gap-mobile: var(--space-3);
 
   /* ==========================================================================
    * 8. Border Radius
@@ -202,17 +214,18 @@
   --radius-full: 9999px;
 
   /* ==========================================================================
-   * 9. Elevation & Shadows
+   * 9. Elevation & Shadows (Neutral Architectural Shadows, No Glow)
    * ========================================================================== */
-  --shadow-xs: 0 1px 2px 0 rgba(12, 28, 48, 0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(12, 28, 48, 0.08), 0 1px 2px -1px rgba(12, 28, 48, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(12, 28, 48, 0.1), 0 2px 4px -2px rgba(12, 28, 48, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(12, 28, 48, 0.1), 0 4px 6px -4px rgba(12, 28, 48, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(12, 28, 48, 0.1), 0 8px 10px -6px rgba(12, 28, 48, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(12, 28, 48, 0.25);
-  --shadow-inner: inset 0 2px 4px 0 rgba(12, 28, 48, 0.06);
-  --shadow-glow-primary: 0 0 20px rgba(0, 229, 201, 0.35);
-  --shadow-glow-secondary: 0 8px 24px rgba(12, 28, 48, 0.25);
+  --shadow-xs: 0 1px 2px 0 rgba(12, 28, 48, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(12, 28, 48, 0.06), 0 1px 2px -1px rgba(12, 28, 48, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(12, 28, 48, 0.07), 0 2px 4px -2px rgba(12, 28, 48, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(12, 28, 48, 0.08), 0 4px 6px -4px rgba(12, 28, 48, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(12, 28, 48, 0.09), 0 8px 10px -6px rgba(12, 28, 48, 0.03);
+  --shadow-2xl: 0 25px 50px -12px rgba(12, 28, 48, 0.18);
+  --shadow-inner: inset 0 2px 4px 0 rgba(12, 28, 48, 0.05);
+  /* Non-glowing legacy aliases for clean fallback */
+  --shadow-glow-primary: var(--shadow-md);
+  --shadow-glow-secondary: var(--shadow-lg);
 
   /* ==========================================================================
    * 10. Motion & Transitions
@@ -399,35 +412,42 @@ h6 {
 }
 
 h1 {
-  font-size: var(--text-4xl);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
 }
 
 h2 {
   font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
 }
 
 h3 {
   font-size: var(--text-xl);
+  line-height: var(--leading-snug);
 }
 
 h4 {
   font-size: var(--text-lg);
+  line-height: var(--leading-snug);
 }
 
 h5 {
   font-size: var(--text-base);
+  line-height: var(--leading-normal);
 }
 
 h6 {
   font-size: var(--text-sm);
+  line-height: var(--leading-normal);
 }
 
 .heading-section {
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-primary);
+  line-height: var(--leading-snug);
   margin-bottom: var(--space-6);
   display: flex;
   align-items: center;
@@ -437,8 +457,8 @@ h6 {
 .heading-section::before {
   content: '';
   display: inline-block;
-  width: 6px;
-  height: 24px;
+  width: 4px;
+  height: 20px;
   background-color: var(--color-primary);
   border-radius: var(--radius-xs);
 }
@@ -619,7 +639,7 @@ h6 {
   font-size: var(--text-base);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  padding: var(--space-3) var(--space-7, 1.75rem);
+  padding: var(--space-3) var(--space-7);
   border-radius: var(--radius-none);
   display: inline-flex;
   align-items: center;
@@ -632,7 +652,7 @@ h6 {
   background-color: var(--color-primary);
   color: var(--color-secondary);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glow-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-pill-green {

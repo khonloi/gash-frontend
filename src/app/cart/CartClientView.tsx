@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Trash2 } from 'lucide-react';
+import { ShoppingBag, Trash2, ShieldCheck, Zap } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { Button, QuantitySelector, EmptyState, Skeleton } from '@/components/ui';
@@ -147,17 +147,19 @@ export function CartClientView() {
                 </div>
 
                 <Link href="/checkout" className={styles.checkoutLink}>
-                  <Button variant="primary" size="lg" fullWidth>
+                  <Button variant="primary" shape="rounded" size="lg" fullWidth>
                     Proceed to Checkout
                   </Button>
                 </Link>
 
                 <div className={styles.trustBadges}>
                   <div className={styles.badgeItem}>
-                    <span>🔒</span> 100% Secure Checkout
+                    <ShieldCheck size={16} className={styles.badgeIcon} />
+                    <span>100% Secure Checkout</span>
                   </div>
                   <div className={styles.badgeItem}>
-                    <span>⚡</span> Express Delivery Available
+                    <Zap size={16} className={styles.badgeIcon} />
+                    <span>Express Delivery Available</span>
                   </div>
                 </div>
               </div>

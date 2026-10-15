@@ -131,7 +131,9 @@
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 2.4em;
+  min-height: calc(2 * 1em * var(--leading-snug));
+  padding-bottom: 4px;
+  box-sizing: content-box;
   transition: color var(--transition-fast);
 }
 

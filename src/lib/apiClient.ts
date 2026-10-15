@@ -1,14 +1,7 @@
-export class ApiError extends Error {
-  status: number;
-  data?: unknown;
+import { ApiError } from './errors';
+import { handleMockRequest } from '@/demo/mockApiHandler';
 
-  constructor(message: string, status: number, data?: unknown) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.data = data;
-  }
-}
+export { ApiError };
 
 export type QueryParams = Record<string, string | number | boolean | undefined | null>;
 
@@ -17,6 +10,7 @@ export interface RequestOptions extends RequestInit {
   params?: QueryParams;
   timeoutMs?: number;
   retries?: number;
+  demoMode?: boolean;
 }
 
 export type TokenRefreshHandler = () => Promise<string | null>;
@@ -25,6 +19,43 @@ let tokenRefreshHandler: TokenRefreshHandler | null = null;
 
 export function setTokenRefreshHandler(handler: TokenRefreshHandler | null): void {
   tokenRefreshHandler = handler;
+}
+
+/**
+ * Determine whether Demo Mode is active.
+ * Checked via:
+ * 1. Environment variable NEXT_PUBLIC_DEMO_MODE=true
+ * 2. Client-side localStorage override 'jocksport-demo-mode'
+ */
+export function isDemoModeActive(): boolean {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || process.env.DEMO_MODE === 'true') {
+    return true;
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('jocksport-demo-mode');
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    } catch {
+      // Ignore browser storage access errors
+    }
+  }
+  // In development, default to active demo mode if backend is not explicitly targeted
+  return process.env.NODE_ENV === 'development';
+}
+
+/**
+ * Manually toggle or override demo mode in browser storage
+ */
+export function setDemoMode(enabled: boolean): void {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('jocksport-demo-mode', String(enabled));
+    } catch {
+      // Ignore
+    }
+  }
 }
 
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -63,8 +94,18 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     headers,
     timeoutMs = DEFAULT_TIMEOUT_MS,
     retries,
+    demoMode,
     ...customConfig
   } = options;
+
+  // Intercept and route to in-memory mock handler when demo mode is active
+  const shouldUseDemo = demoMode !== undefined ? demoMode : isDemoModeActive();
+  if (shouldUseDemo) {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const method = (customConfig.method || 'GET').toUpperCase();
+    return handleMockRequest<T>(method, cleanEndpoint, customConfig.body, params);
+  }
+
   const baseUrl = getBaseUrl().replace(/\/$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 

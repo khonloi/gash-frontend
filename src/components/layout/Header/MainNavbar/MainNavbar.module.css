@@ -26,10 +26,10 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   text-decoration: none;
   font-weight: 900;
-  font-size: 1.6rem;
+  font-size: var(--text-2xl);
   letter-spacing: -0.04em;
   color: var(--color-white);
 }
@@ -53,7 +53,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-white);
   white-space: nowrap;
@@ -82,12 +82,12 @@
 
 .searchInput {
   width: 100%;
-  padding: 0.55rem 2.5rem 0.55rem 1.1rem;
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   background-color: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--color-white);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   transition: all var(--transition-fast);
 }
 
@@ -123,16 +123,16 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 1.1rem;
+  gap: var(--space-4);
 }
 
 .memberBadge {
   background: linear-gradient(135deg, #ff1e1e, #990000);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   color: white;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
 .memberText strong {
@@ -168,7 +168,7 @@
   right: -8px;
   background-color: var(--color-primary-green);
   color: var(--color-navy);
-  font-size: 0.7rem;
+  font-size: var(--text-2xs);
   font-weight: 800;
   width: 18px;
   height: 18px;
@@ -182,9 +182,9 @@
 .countryFlag {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: var(--text-base);
 }
 
 /* Mobile Menu Button */
@@ -193,8 +193,8 @@
   align-items: center;
   justify-content: center;
   color: var(--color-white);
-  padding: 0.5rem;
-  margin-right: -0.5rem;
+  padding: var(--space-2);
+  margin-right: calc(-1 * var(--space-2));
   transition: color var(--transition-fast);
 }
 
@@ -239,7 +239,7 @@
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-2xl);
   overflow-y: auto;
 }
 
@@ -252,7 +252,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--color-border-dark);
 }
 
@@ -261,7 +261,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem;
+  padding: var(--space-2);
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.08);
   transition: all var(--transition-fast);
@@ -275,18 +275,18 @@
 /* Drawer Search */
 .drawerSearch {
   position: relative;
-  padding: 1.25rem 1.5rem;
+  padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--color-border-dark);
 }
 
 .drawerSearchInput {
   width: 100%;
-  padding: 0.65rem 2.5rem 0.65rem 1.1rem;
-  border-radius: 9999px;
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--color-white);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .drawerSearchInput:focus {
@@ -296,7 +296,7 @@
 
 .drawerSearchBtn {
   position: absolute;
-  right: 2rem;
+  right: var(--space-8);
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.7);
@@ -312,7 +312,7 @@
 .drawerNav {
   display: flex;
   flex-direction: column;
-  padding: 0.75rem 0;
+  padding: var(--space-3) 0;
   flex: 1;
 }
 
@@ -320,8 +320,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.5rem;
-  font-size: 1rem;
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-base);
   font-weight: 700;
   color: var(--color-white);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
@@ -331,7 +331,7 @@
 .drawerNavItem:hover {
   background-color: rgba(255, 255, 255, 0.06);
   color: var(--color-primary-green);
-  padding-left: 1.75rem;
+  padding-left: var(--space-7);
 }
 
 .drawerHighlightItem {
@@ -344,20 +344,20 @@
 
 /* Drawer Footer Actions */
 .drawerFooter {
-  padding: 1.25rem 1.5rem;
+  padding: var(--space-5) var(--space-6);
   border-top: 1px solid var(--color-border-dark);
   background-color: var(--color-navy-dark);
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: var(--space-3);
 }
 
 .drawerActionItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   transition: color var(--transition-fast);
 }
@@ -378,7 +378,7 @@
   right: -8px;
   background-color: var(--color-primary-green);
   color: var(--color-navy);
-  font-size: 0.65rem;
+  font-size: var(--text-2xs);
   font-weight: 800;
   width: 16px;
   height: 16px;
@@ -391,10 +391,10 @@
 .drawerLanguageItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
   color: rgba(255, 255, 255, 0.6);
-  padding-top: 0.5rem;
+  padding-top: var(--space-2);
 }
 
 /* Responsive Media Queries */

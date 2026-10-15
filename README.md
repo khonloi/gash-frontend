@@ -591,9 +591,17 @@ export function mapProductToFrontend(raw: Record<string, unknown>): FrontendProd
 
 ---
 
-### Resilient Fallback Mode
+### Stateful Offline Demo Mode
 
-If the backend service is offline during local UI development or testing, `productService.ts` seamlessly falls back to mock catalog collections, allowing frontend styling and layout validation to proceed without interruption.
+The storefront includes a zero-dependency **Offline Demo Mode** allowing frontend UI development, styling, and checkout flow validation to proceed completely decoupled from the `gash-backend-v2` service:
+
+- **Stateful Mock API Routing (`src/demo/mockApiHandler.ts`)**:
+  - Intercepts requests transparently at the `apiClient` layer without modifying UI components or service classes.
+  - Simulates products catalog (`/products`, `/products/slug/:slug`, `/products/featured`, `/products/stats`), authentication (`/auth/login`, `/auth/register`, `/auth/refresh-token`), user profiles & saved addresses (`/users/me`), cart state mutations (`/cart/items`), and complete checkout order placement (`/orders`).
+  - Realistic latency simulation (150ms) ensures skeleton loaders, spinners, and async UI states render authentically.
+- **Activation & Toggling**:
+  - Configure via `.env.local`: `NEXT_PUBLIC_DEMO_MODE=true`.
+  - Or toggle live directly in the browser via the floating **Demo Mode Control Panel** in the bottom-right corner, which persists preference in `localStorage` and provides an instant **Reset Fixtures** action.
 
 ---
 

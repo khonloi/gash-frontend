@@ -1,11 +1,11 @@
 .pageContainer {
-  padding-bottom: 80px;
+  padding-bottom: var(--space-20);
 }
 
 .productTopSection {
   display: flex;
-  gap: 48px;
-  margin-top: 16px;
+  gap: var(--space-12);
+  margin-top: var(--space-4);
 }
 
 .galleryWrapper {
@@ -29,15 +29,15 @@
 }
 
 .relatedSection {
-  margin-top: 80px;
-  padding-top: 64px;
+  margin-top: var(--space-20);
+  padding-top: var(--space-16);
   border-top: 1px solid var(--color-border);
 }
 
 .relatedGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  gap: var(--grid-gap-desktop);
 }
 
 @media (max-width: 1200px) {
@@ -49,7 +49,7 @@
 @media (max-width: 992px) {
   .productTopSection {
     flex-direction: column;
-    gap: 32px;
+    gap: var(--space-8);
   }
 
   .infoWrapper {
@@ -63,20 +63,20 @@
 
 @media (max-width: 768px) {
   .relatedSection {
-    margin-top: 40px;
-    padding-top: 32px;
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
   }
 
   .relatedGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: var(--grid-gap-mobile);
   }
 }
 
 @media (max-width: 480px) {
   .relatedGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: var(--space-2);
   }
 }
 

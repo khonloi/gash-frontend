@@ -109,14 +109,14 @@
 
   .paginationNav {
     gap: 2px;
-    padding: 4px;
+    padding: var(--space-1);
   }
 
   .pageBtn {
     min-width: 32px;
     height: 32px;
     font-size: var(--text-xs);
-    padding: 0 4px;
+    padding: 0 var(--space-1);
   }
 
   .ellipsis {

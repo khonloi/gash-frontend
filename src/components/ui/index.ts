@@ -45,3 +45,4 @@ export { SportCard } from './SportCard/SportCard';
 export { Toast } from './Toast/Toast';
 export { ToastContainer } from './Toast/ToastContainer';
 export * from './Logos';
+export * from './BrandLogo';

@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header/Header';
 import { Footer } from '@/components/layout/Footer/Footer';
 import { ToastContainer } from '@/components/ui/Toast/ToastContainer';
 import { WebVitals } from '@/components/analytics/WebVitals';
+import { DemoModeBanner } from '@/components/common';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -77,6 +78,13 @@ export const metadata: Metadata = {
       'Leading authentic sports retail destination - 100% genuine athletic footwear, apparel and equipment.',
     creator: '@jocksport',
   },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
 };
 
 export default function RootLayout({
@@ -92,7 +100,7 @@ export default function RootLayout({
         '@id': `${siteUrl}/#organization`,
         name: 'JOCKSPORT',
         url: siteUrl,
-        logo: `${siteUrl}/favicon.ico`,
+        logo: `${siteUrl}/logo.png`,
         sameAs: [
           'https://facebook.com/jocksport',
           'https://instagram.com/jocksport',
@@ -144,6 +152,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <ToastContainer />
+          <DemoModeBanner />
         </ReactQueryProvider>
       </body>
     </html>

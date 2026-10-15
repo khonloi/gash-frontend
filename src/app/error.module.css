@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1.5rem;
+  padding: var(--space-12) var(--space-6);
   background-color: var(--color-bg-light);
 }
 
@@ -11,15 +11,15 @@
   max-width: 520px;
   width: 100%;
   background-color: var(--color-white);
-  padding: 2.5rem 2rem;
+  padding: var(--space-10) var(--space-8);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  box-shadow: 0 8px 30px rgba(12, 28, 48, 0.08);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .iconWrapper {
@@ -31,36 +31,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }
 
 .errorTitle {
-  font-size: 1.6rem;
+  font-size: var(--text-2xl);
   font-weight: 800;
   color: var(--color-navy);
-  line-height: 1.2;
+  line-height: var(--leading-tight);
 }
 
 .errorDescription {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: var(--leading-normal);
   margin: 0;
 }
 
 .errorDigest {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
   background-color: var(--color-bg-muted);
-  padding: 4px 10px;
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   font-family: monospace;
 }
 
 .errorActions {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
   width: 100%;
   justify-content: center;
   flex-wrap: wrap;

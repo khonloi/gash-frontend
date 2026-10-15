@@ -2,15 +2,15 @@
   background-color: var(--color-white);
   border-top: 2px solid var(--color-navy);
   color: var(--color-navy);
-  padding-top: 3.5rem;
-  font-size: 0.875rem;
+  padding-top: var(--space-14);
+  font-size: var(--text-sm);
 }
 
 .footerGrid {
   display: grid;
   grid-template-columns: 1.35fr 1fr 1.15fr 0.9fr 1.1fr;
-  gap: 2rem;
-  padding-bottom: 3.5rem;
+  gap: var(--space-8);
+  padding-bottom: var(--space-14);
 }
 
 .column {
@@ -19,16 +19,22 @@
 }
 
 .brandGroup {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-5);
 }
 
 .logoBadge {
   display: inline-flex;
   align-items: center;
   font-weight: 900;
-  font-size: 1.35rem;
+  font-size: var(--text-xl);
   letter-spacing: -0.03em;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
+}
+
+.footerLogoIcon {
+  color: var(--color-primary-turquoise);
+  margin-right: var(--space-2);
+  flex-shrink: 0;
 }
 
 .logoText {
@@ -38,33 +44,33 @@
 .logoAccent {
   color: var(--color-primary-turquoise);
   background-color: var(--color-navy);
-  padding: 0 4px;
-  border-radius: 2px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-xs);
   margin-left: 2px;
 }
 
 .companyName {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-weight: 900;
   color: var(--color-navy);
-  line-height: 1.35;
-  letter-spacing: 0.02em;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
 }
 
 .infoList {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: var(--space-3);
 }
 
 .infoItem {
   display: flex;
   align-items: flex-start;
-  gap: 0.65rem;
-  font-size: 0.85rem;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
   color: var(--color-text-body);
-  line-height: 1.45;
+  line-height: var(--leading-normal);
 }
 
 .infoIcon {
@@ -79,14 +85,14 @@
 }
 
 .columnTitle {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-weight: 900;
   color: var(--color-navy);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 1.25rem;
+  letter-spacing: var(--tracking-wider);
+  margin-bottom: var(--space-5);
   position: relative;
-  padding-bottom: 0.4rem;
+  padding-bottom: var(--space-2);
 }
 
 .columnTitle::after {
@@ -105,13 +111,13 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--space-2);
 }
 
 .link {
   color: var(--color-text-body);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   transition: all var(--transition-fast);
   display: inline-block;
 }
@@ -126,20 +132,20 @@
 .paymentGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
 }
 
 .paymentCard {
   height: 38px;
   background-color: var(--color-bg-gray);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
   font-weight: 800;
   text-transform: uppercase;
   color: var(--color-navy);
@@ -149,14 +155,14 @@
 .paymentCard:hover {
   border-color: var(--color-navy);
   background-color: var(--color-white);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .payVisa {
   color: #1a1f71;
   font-weight: 900;
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .payMaster {
@@ -167,7 +173,7 @@
 .payAmex {
   color: #006fcf;
   font-weight: 800;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
 .payApple {
@@ -190,17 +196,17 @@
 .certificationsGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--space-2);
 }
 
 .govBadge {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-2);
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
 }
 
 .govIcon {
@@ -210,28 +216,28 @@
 
 .govTop {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 900;
   color: #15803d;
-  line-height: 1.2;
+  line-height: var(--leading-tight);
 }
 
 .govSub {
   display: block;
-  font-size: 0.65rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   color: #166534;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wider);
 }
 
 .dmcaBadge {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-2);
   background-color: #eff6ff;
   border: 1px solid #bfdbfe;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
 }
 
 .dmcaIcon {
@@ -241,25 +247,25 @@
 
 .dmcaTop {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   color: #1e40af;
-  line-height: 1.2;
+  line-height: var(--leading-tight);
 }
 
 .dmcaSub {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 900;
   color: #1d4ed8;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wider);
 }
 
 /* Sub-Footer Bottom Bar */
 .bottomBar {
   background-color: var(--color-navy);
   color: var(--color-white);
-  padding: 1.25rem 0;
+  padding: var(--space-5) 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -267,11 +273,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .copyright {
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
 }
@@ -279,7 +285,7 @@
 .socials {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .socialLink {
@@ -298,20 +304,20 @@
 @media (max-width: 1200px) {
   .footerGrid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2.5rem;
+    gap: var(--space-10);
   }
 }
 
 @media (max-width: 768px) {
   .footerGrid {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-bottom: 2.5rem;
+    gap: var(--space-8);
+    padding-bottom: var(--space-10);
   }
 
   .bottomContainer {
     flex-direction: column;
     text-align: center;
-    gap: 1rem;
+    gap: var(--space-4);
   }
 }

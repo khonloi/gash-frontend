@@ -18,7 +18,7 @@
   height: 140px;
   border-radius: var(--radius-full);
   overflow: visible;
-  padding: 4px;
+  padding: var(--space-1);
   background: linear-gradient(135deg, var(--color-border-default), var(--color-surface));
   box-shadow: var(--shadow-sm);
   transition:
@@ -28,7 +28,7 @@
 
 .categoryItem:hover .circleContainer {
   transform: translateY(-4px) scale(1.03);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-md);
 }
 
 .image {
@@ -41,8 +41,8 @@
 
 .iconBadge {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: var(--space-1);
+  right: var(--space-1);
   width: 36px;
   height: 36px;
   border-radius: var(--radius-full);

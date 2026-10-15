@@ -159,7 +159,7 @@
   background-color: var(--color-primary);
   color: var(--color-secondary);
   transform: translateX(4px);
-  box-shadow: 0 6px 20px rgba(115, 209, 0, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
 .sharpCta:focus-visible {
@@ -315,49 +315,49 @@
     height: 350px;
   }
   .contentContainer {
-    padding: 0 1.25rem;
+    padding: 0 var(--space-5);
   }
   .content {
     max-width: 100%;
-    gap: 0.65rem;
+    gap: var(--space-2);
   }
   .highlightBadge {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.65rem;
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
   }
   .title {
-    font-size: 1.35rem;
-    line-height: 1.25;
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
   }
   .subtitle {
-    font-size: 0.85rem;
-    line-height: 1.5;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
     max-width: 95%;
   }
   .dateRange {
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
   }
   .ctaWrapper {
-    margin-top: 0.5rem;
+    margin-top: var(--space-2);
   }
   .sharpCta {
-    font-size: 0.85rem;
-    padding: 0.55rem 1.35rem;
-    gap: 0.45rem;
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-5);
+    gap: var(--space-2);
   }
   .arrowBtn {
     width: 34px;
     height: 34px;
   }
   .prevBtn {
-    left: 0.4rem;
+    left: var(--space-2);
   }
   .nextBtn {
-    right: 0.4rem;
+    right: var(--space-2);
   }
   .dots {
-    bottom: 0.85rem;
-    gap: 0.35rem;
+    bottom: var(--space-3);
+    gap: var(--space-1);
   }
   .dot {
     width: 7px;
@@ -376,16 +376,16 @@
     height: 320px;
   }
   .title {
-    font-size: 1.2rem;
-    line-height: 1.25;
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
   }
   .subtitle {
-    font-size: 0.8rem;
-    line-height: 1.45;
+    font-size: var(--text-xs);
+    line-height: var(--leading-normal);
   }
   .sharpCta {
-    font-size: 0.8rem;
-    padding: 0.45rem 1.15rem;
+    font-size: var(--text-xs);
+    padding: var(--space-2) var(--space-4);
   }
 }
 

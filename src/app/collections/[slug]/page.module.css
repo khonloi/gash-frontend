@@ -1,35 +1,36 @@
 .pageContainer {
-  padding-bottom: 80px;
+  padding-bottom: var(--space-20);
 }
 
 .hero {
-  margin-bottom: 40px;
-  padding: 48px;
+  margin-bottom: var(--space-10);
+  padding: var(--space-12);
   background-color: var(--color-bg-gray);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   text-align: center;
   background-image: linear-gradient(135deg, rgba(0, 229, 201, 0.05) 0%, rgba(0, 229, 201, 0) 100%);
 }
 
 .heroTitle {
-  font-size: 36px;
+  font-size: var(--text-3xl);
   font-weight: 700;
   color: var(--color-text-main);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
   text-transform: uppercase;
+  line-height: var(--leading-tight);
 }
 
 .heroDescription {
-  font-size: 16px;
+  font-size: var(--text-base);
   color: var(--color-text-body);
   max-width: 600px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: var(--leading-relaxed);
 }
 
 .contentLayout {
   display: flex;
-  gap: 32px;
+  gap: var(--space-8);
 }
 
 .sidebarWrapper {
@@ -44,7 +45,7 @@
 .productGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: var(--grid-gap-desktop);
 }
 
 .listMode {
@@ -59,29 +60,29 @@
 
 .noResults {
   text-align: center;
-  padding: 64px 0;
+  padding: var(--space-16) 0;
   background-color: var(--color-bg-light);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   border: 1px dashed var(--color-border);
 }
 
 .noResults h3 {
-  font-size: 20px;
-  margin-bottom: 8px;
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2);
   color: var(--color-text-main);
 }
 
 .noResults p {
   color: var(--color-text-muted);
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 }
 
 .clearBtn {
   background-color: var(--color-primary-turquoise);
   color: var(--color-white);
   border: none;
-  padding: 12px 24px;
-  border-radius: 4px;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-sm);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -100,18 +101,18 @@
 
 @media (max-width: 992px) {
   .hero {
-    padding: 24px 16px;
-    margin-bottom: 20px;
+    padding: var(--space-6) var(--space-4);
+    margin-bottom: var(--space-5);
   }
 
   .heroTitle {
-    font-size: 24px;
-    margin-bottom: 8px;
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-2);
   }
 
   .contentLayout {
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
   }
 
   .sidebarWrapper {
@@ -120,14 +121,14 @@
 
   .productGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: var(--grid-gap-mobile);
   }
 }
 
 @media (max-width: 480px) {
   .productGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: var(--space-2);
   }
 }
 
