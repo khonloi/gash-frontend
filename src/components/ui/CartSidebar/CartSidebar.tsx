@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
-import { useCartStore } from '@/store/useCartStore';
+import { useCart } from '@/hooks/useCart';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { Button, QuantitySelector, EmptyState } from '@/components/ui';
@@ -17,7 +17,7 @@ interface CartSidebarProps {
 }
 
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
-  const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
+  const { items, removeItem, updateQuantity, totalPrice } = useCart();
   const mounted = useIsMounted();
   const sidebarRef = useFocusTrap<HTMLElement>(isOpen, onClose);
   const totalItemCount = items.reduce((acc, i) => acc + i.quantity, 0);
@@ -145,7 +145,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           <div className={styles.footer}>
             <div className={styles.subtotalRow}>
               <span className={styles.subtotalLabel}>Subtotal</span>
-              <span className={styles.subtotalValue}>{formatPrice(getTotalPrice())}</span>
+              <span className={styles.subtotalValue}>{formatPrice(totalPrice)}</span>
             </div>
 
             <div className={styles.actions}>

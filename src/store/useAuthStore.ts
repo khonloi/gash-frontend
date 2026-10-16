@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { UserProfile, AuthTokens } from '@/types/user';
+import { STORAGE_KEYS } from '@/constants/site';
 import '@/lib/tokenRefresher';
 
 interface AuthState {
@@ -52,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
         }),
     }),
     {
-      name: 'jocksport-auth-storage',
+      name: STORAGE_KEYS.AUTH,
     }
   )
 );

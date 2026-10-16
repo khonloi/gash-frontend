@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingBag } from 'lucide-react';
-import { useCartStore } from '@/store/useCartStore';
+import { useCart } from '@/hooks/useCart';
 import { useToastStore } from '@/store/useToastStore';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Button } from '@/components/ui/Button/Button';
@@ -34,7 +34,7 @@ export function ProductCard({
   discountPercent,
   imageUrl,
 }: ProductCardProps) {
-  const addItem = useCartStore((state) => state.addItem);
+  const { addItem } = useCart();
   const addToast = useToastStore((state) => state.addToast);
   const [imageError, setImageError] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
@@ -44,18 +44,23 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     setIsAdding(true);
-    addItem({
-      productId: id,
-      title,
-      brand,
-      price: salePrice || originalPrice,
-      imageUrl: imageUrl || '',
-      quantity: 1,
-    });
-    addToast(`Added "${title}" to your cart`, 'success');
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 450);
+    try {
+      addItem({
+        productId: id,
+        title,
+        brand,
+        price: salePrice || originalPrice,
+        imageUrl: imageUrl || '',
+        quantity: 1,
+      });
+      addToast(`Added "${title}" to your cart`, 'success');
+    } catch {
+      addToast(`Failed to add "${title}" to your cart. Please try again.`, 'error');
+    } finally {
+      setTimeout(() => {
+        setIsAdding(false);
+      }, 450);
+    }
   };
 
   return (

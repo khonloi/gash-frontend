@@ -1,19 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { ServerCartItem } from '@/types/cart';
+import { CartItem, ServerCartItem, getCartItemId } from '@/types/cart';
+import { STORAGE_KEYS } from '@/constants/site';
 
-export interface CartItem {
-  id: string; // Unique identifier (productId + size + color)
-  serverItemId?: string; // The subdocument _id from backend
-  productId: string;
-  title: string;
-  brand: string;
-  price: number;
-  imageUrl: string;
-  quantity: number;
-  size?: string;
-  color?: string;
-}
+export type { CartItem };
+export { getCartItemId };
 
 export interface CartState {
   items: CartItem[];
@@ -33,7 +24,7 @@ export const mapServerToLocal = (serverItems: ServerCartItem[]): CartItem[] => {
       product.images?.find((img) => img.isPrimary)?.url || product.images?.[0]?.url || '';
 
     return {
-      id: `${product._id}-${sItem.size || 'default'}-${sItem.color || 'default'}`,
+      id: getCartItemId(product._id, sItem.size, sItem.color),
       serverItemId: sItem._id,
       productId: product._id,
       title: product.name,
@@ -53,7 +44,7 @@ export const useCartStore = create<CartState>()(
       items: [],
 
       addItem: (item) => {
-        const id = `${item.productId}-${item.size || 'default'}-${item.color || 'default'}`;
+        const id = getCartItemId(item.productId, item.size, item.color);
         set((state) => {
           const existingItem = state.items.find((i) => i.id === id);
           if (existingItem) {
@@ -99,7 +90,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: 'jocksport-cart-storage',
+      name: STORAGE_KEYS.CART,
       partialize: (state) => ({ items: state.items }),
     }
   )

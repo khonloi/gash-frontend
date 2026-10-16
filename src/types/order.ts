@@ -94,3 +94,35 @@ export interface OrderQueryParams {
   status?: OrderStatus;
   sort?: string;
 }
+
+export interface CheckoutFormData {
+  contact: string;
+  country: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  apartment: string;
+  city: string;
+  postalCode: string;
+  phone: string;
+  keepUpdated: boolean;
+}
+
+export interface CheckoutFormErrors {
+  contact?: string;
+  firstName?: string;
+  lastName?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  phone?: string;
+}
+
+export interface OrderConfirmationData {
+  orderId: string;
+  date: string;
+  customerName: string;
+  shippingAddress: string;
+  total: number;
+  itemCount: number;
+}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Ruler, MapPin, ShoppingBag, Zap } from 'lucide-react';
-import { useCartStore } from '@/store/useCartStore';
+import { useCart } from '@/hooks/useCart';
 import { useToastStore } from '@/store/useToastStore';
 import { Button, QuantitySelector, Divider } from '@/components/ui';
 import { formatPrice } from '@/lib/format';
@@ -38,36 +38,41 @@ export function ProductInfo({
   const [selectedColor, setSelectedColor] = useState(colors[0]?.id);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const addItem = useCartStore((state) => state.addItem);
-  const { addToast } = useToastStore();
+  const { addItem } = useCart();
+  const addToast = useToastStore((state) => state.addToast);
 
-  const prepareAndAddToCart = () => {
+  const prepareAndAddToCart = async () => {
     if (!selectedSize) {
       addToast('Please select a size first.', 'error');
       return false;
     }
     const colorObj = colors.find((c) => c.id === selectedColor);
-    addItem({
-      productId: id,
-      title,
-      brand,
-      price: price,
-      imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
-      quantity,
-      size: selectedSize,
-      color: colorObj?.name,
-    });
-    return true;
+    try {
+      await addItem({
+        productId: id,
+        title,
+        brand,
+        price: price,
+        imageUrl: colorObj?.imageUrl || colors[0]?.imageUrl || '',
+        quantity,
+        size: selectedSize,
+        color: colorObj?.name,
+      });
+      return true;
+    } catch {
+      addToast('Failed to add item to cart. Please try again.', 'error');
+      return false;
+    }
   };
 
-  const handleAddToCart = () => {
-    if (prepareAndAddToCart()) {
+  const handleAddToCart = async () => {
+    if (await prepareAndAddToCart()) {
       addToast(`Added ${quantity} item(s) to cart successfully!`, 'success');
     }
   };
 
-  const handleBuyNow = () => {
-    if (prepareAndAddToCart()) {
+  const handleBuyNow = async () => {
+    if (await prepareAndAddToCart()) {
       addToast(`Proceeding to checkout with ${quantity} item(s)...`, 'info');
       router.push('/checkout');
     }

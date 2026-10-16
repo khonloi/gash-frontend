@@ -203,5 +203,28 @@ describe('useCart hooks', () => {
       expect(typeof result.current.removeItem).toBe('function');
       expect(typeof result.current.updateQuantity).toBe('function');
     });
+
+    it('rolls back optimistic add if server mutation fails for authenticated user', async () => {
+      useAuthStore.setState({ isAuthenticated: true });
+      vi.mocked(cartApiService.addCartItem).mockRejectedValueOnce(new Error('Network failure'));
+
+      const { result } = renderHook(() => useCart(), {
+        wrapper: createWrapper(),
+      });
+
+      await expect(
+        result.current.addItem({
+          productId: 'prod-fail',
+          title: 'Failed Shoe',
+          brand: 'Nike',
+          price: 100,
+          imageUrl: '',
+          quantity: 1,
+        })
+      ).rejects.toThrow('Network failure');
+
+      expect(useCartStore.getState().items).toHaveLength(0);
+      useAuthStore.setState({ isAuthenticated: false });
+    });
   });
 });

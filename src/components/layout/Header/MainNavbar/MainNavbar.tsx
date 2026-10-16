@@ -10,7 +10,6 @@ import {
   ChevronDown,
   ChevronRight,
   User,
-  Zap,
   Menu,
   X,
 } from 'lucide-react';
@@ -27,7 +26,9 @@ import styles from './MainNavbar.module.css';
 
 export function MainNavbar() {
   const router = useRouter();
-  const items = useCartStore((state) => state.getTotalItems());
+  const totalCartItems = useCartStore((state) =>
+    state.items.reduce((acc, item) => acc + item.quantity, 0)
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false);
@@ -126,7 +127,9 @@ export function MainNavbar() {
               aria-label="Open cart"
             >
               <ShoppingBag size={22} className={styles.icon} />
-              {mounted && items > 0 && <span className={styles.cartBadge}>{items}</span>}
+              {mounted && totalCartItems > 0 && (
+                <span className={styles.cartBadge}>{totalCartItems}</span>
+              )}
             </button>
 
             {/* Flag / Language */}
@@ -216,10 +219,13 @@ export function MainNavbar() {
           >
             <div className={styles.drawerActionIconWrap}>
               <ShoppingBag size={20} />
-              {mounted && items > 0 && <span className={styles.drawerCartBadge}>{items}</span>}
+              {mounted && totalCartItems > 0 && (
+                <span className={styles.drawerCartBadge}>{totalCartItems}</span>
+              )}
             </div>
             <span>
-              Shopping Cart ({mounted ? items : 0} {(mounted ? items : 0) === 1 ? 'item' : 'items'})
+              Shopping Cart ({mounted ? totalCartItems : 0}{' '}
+              {(mounted ? totalCartItems : 0) === 1 ? 'item' : 'items'})
             </span>
           </button>
 

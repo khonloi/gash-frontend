@@ -1,3 +1,23 @@
+export interface CartItem {
+  id: string; // Unique identifier (productId + size + color)
+  serverItemId?: string; // The subdocument _id from backend
+  productId: string;
+  title: string;
+  brand: string;
+  price: number;
+  imageUrl: string;
+  quantity: number;
+  size?: string;
+  color?: string;
+}
+
+/**
+ * Generate a consistent unique identifier for client cart items.
+ */
+export function getCartItemId(productId: string, size?: string, color?: string): string {
+  return `${productId}-${size || 'default'}-${color || 'default'}`;
+}
+
 export interface CartItemPayload {
   productId: string;
   quantity: number;

@@ -10,17 +10,24 @@ import { useToastStore } from '@/store/useToastStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { PaymentMethod, ShippingMethod } from '@/types/order';
 import { Button, EmptyState, Skeleton } from '@/components/ui';
-import { CheckoutFormData, CheckoutFormErrors, OrderConfirmationData } from '@/constants/checkout';
-import { validateCheckoutForm } from '@/lib/validation';
+import {
+  CheckoutFormData,
+  CheckoutFormErrors,
+  OrderConfirmationData,
+  SHIPPING_METHODS,
+} from '@/constants/checkout';
+import { validateCheckoutForm, isValidEmail } from '@/lib/validation';
 import { formatDate } from '@/lib/format';
 import { CheckoutForm, CheckoutSummary, OrderConfirmation } from '@/components/checkout';
 import styles from './page.module.css';
 
 export function CheckoutClientView() {
-  const { items, getTotalPrice } = useCartStore();
-  const { addToast } = useToastStore();
+  const items = useCartStore((state) => state.items);
+  const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+  const addToast = useToastStore((state) => state.addToast);
   const placeOrderMutation = usePlaceOrderMutation();
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const mounted = useIsMounted();
 
   const [formData, setFormData] = useState<CheckoutFormData>(() => ({
@@ -43,8 +50,8 @@ export function CheckoutClientView() {
   const [completedOrder, setCompletedOrder] = useState<OrderConfirmationData | null>(null);
 
   const subtotal = getTotalPrice();
-  const shippingFee =
-    subtotal > 0 && shippingMethod === 'standard' ? 30 : shippingMethod === 'express' ? 50 : 0;
+  const selectedShipping = SHIPPING_METHODS[shippingMethod as keyof typeof SHIPPING_METHODS];
+  const shippingFee = subtotal > 0 && selectedShipping ? selectedShipping.price : 0;
   const total = subtotal + shippingFee;
 
   const handleInputChange = (field: keyof CheckoutFormData, value: string | boolean) => {
@@ -68,8 +75,7 @@ export function CheckoutClientView() {
     setIsSubmitting(true);
 
     try {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const isEmail = emailRegex.test(formData.contact.trim());
+      const isEmail = isValidEmail(formData.contact);
 
       const createdOrder = await placeOrderMutation.mutateAsync({
         shippingAddress: {

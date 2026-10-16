@@ -2,18 +2,15 @@ import { setTokenRefreshHandler } from './apiClient';
 import { useAuthStore } from '@/store/useAuthStore';
 import { AuthTokens } from '@/types/user';
 import { ApiResponse } from '@/types/api';
+import { SITE_CONFIG } from '@/constants/site';
 
 let refreshPromise: Promise<string | null> | null = null;
 
 function getApiBaseUrl(): string {
   if (typeof window === 'undefined') {
-    return (
-      process.env.INTERNAL_API_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      'http://localhost:5000/api/v1'
-    );
+    return process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || SITE_CONFIG.apiUrl;
   }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+  return process.env.NEXT_PUBLIC_API_URL || SITE_CONFIG.apiUrl;
 }
 
 /**

@@ -5,9 +5,21 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { syncCartOnAuth } from '@/hooks/useCart';
 import { STALE_TIME } from '@/lib/queryDefaults';
 
+import { AuthTokens, UserProfile } from '@/types/user';
+
 export const authKeys = {
   me: ['auth', 'me'] as const,
 };
+
+async function handleAuthSuccess(
+  data: { user: UserProfile; tokens: AuthTokens },
+  queryClient: ReturnType<typeof useQueryClient>,
+  setAuth: (user: UserProfile, tokens: AuthTokens) => void
+) {
+  setAuth(data.user, data.tokens);
+  queryClient.setQueryData(authKeys.me, data.user);
+  await syncCartOnAuth(queryClient);
+}
 
 export function useLoginMutation() {
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -15,11 +27,7 @@ export function useLoginMutation() {
 
   return useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
-    onSuccess: async (data) => {
-      setAuth(data.user, data.tokens);
-      queryClient.setQueryData(authKeys.me, data.user);
-      await syncCartOnAuth(queryClient);
-    },
+    onSuccess: (data) => handleAuthSuccess(data, queryClient, setAuth),
   });
 }
 
@@ -29,11 +37,7 @@ export function useRegisterMutation() {
 
   return useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
-    onSuccess: async (data) => {
-      setAuth(data.user, data.tokens);
-      queryClient.setQueryData(authKeys.me, data.user);
-      await syncCartOnAuth(queryClient);
-    },
+    onSuccess: (data) => handleAuthSuccess(data, queryClient, setAuth),
   });
 }
 

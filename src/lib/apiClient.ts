@@ -1,5 +1,5 @@
 import { ApiError } from './errors';
-import { handleMockRequest } from '@/demo/mockApiHandler';
+import { STORAGE_KEYS, SITE_CONFIG } from '@/constants/site';
 
 export { ApiError };
 
@@ -33,7 +33,7 @@ export function isDemoModeActive(): boolean {
   }
   if (typeof window !== 'undefined') {
     try {
-      const stored = localStorage.getItem('jocksport-demo-mode');
+      const stored = localStorage.getItem(STORAGE_KEYS.DEMO_MODE);
       if (stored !== null) {
         return stored === 'true';
       }
@@ -51,7 +51,7 @@ export function isDemoModeActive(): boolean {
 export function setDemoMode(enabled: boolean): void {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem('jocksport-demo-mode', String(enabled));
+      localStorage.setItem(STORAGE_KEYS.DEMO_MODE, String(enabled));
     } catch {
       // Ignore
     }
@@ -63,20 +63,16 @@ const DEFAULT_TIMEOUT_MS = 15000;
 function getBaseUrl(): string {
   if (typeof window === 'undefined') {
     // Server-side: use internal backend URL or Next rewrite target
-    return (
-      process.env.INTERNAL_API_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      'http://localhost:5000/api/v1'
-    );
+    return process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || SITE_CONFIG.apiUrl;
   }
   // Client-side: can call direct backend URL or relative proxy path
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+  return process.env.NEXT_PUBLIC_API_URL || SITE_CONFIG.apiUrl;
 }
 
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    const rawAuth = localStorage.getItem('jocksport-auth-storage');
+    const rawAuth = localStorage.getItem(STORAGE_KEYS.AUTH);
     if (rawAuth) {
       const parsed = JSON.parse(rawAuth);
       return parsed?.state?.accessToken || null;
@@ -103,6 +99,7 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
   if (shouldUseDemo) {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const method = (customConfig.method || 'GET').toUpperCase();
+    const { handleMockRequest } = await import('@/demo/mockApiHandler');
     return handleMockRequest<T>(method, cleanEndpoint, customConfig.body, params);
   }
 

@@ -4,14 +4,14 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, Trash2, ShieldCheck, Zap } from 'lucide-react';
-import { useCartStore } from '@/store/useCartStore';
+import { useCart } from '@/hooks/useCart';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { Button, QuantitySelector, EmptyState, Skeleton } from '@/components/ui';
 import { formatPrice } from '@/lib/format';
 import styles from './page.module.css';
 
 export function CartClientView() {
-  const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } = useCartStore();
+  const { items, removeItem, updateQuantity, totalPrice: subtotal, totalItems } = useCart();
   const mounted = useIsMounted();
 
   // SSR & Hydration Loading Skeleton
@@ -45,9 +45,6 @@ export function CartClientView() {
       </div>
     );
   }
-
-  const subtotal = getTotalPrice();
-  const totalItems = getTotalItems();
 
   return (
     <main id="main-content" className={styles.cartPage}>

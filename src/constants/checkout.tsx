@@ -9,50 +9,37 @@ import {
   CodLogo,
 } from '@/components/ui';
 
-export interface CheckoutFormData {
-  contact: string;
-  country: string;
-  firstName: string;
-  lastName: string;
-  address: string;
-  apartment: string;
-  city: string;
-  postalCode: string;
-  phone: string;
-  keepUpdated: boolean;
-}
+import { CheckoutFormData, CheckoutFormErrors, OrderConfirmationData } from '@/types/order';
 
-export interface CheckoutFormErrors {
-  contact?: string;
-  firstName?: string;
-  lastName?: string;
-  address?: string;
-  city?: string;
-  postalCode?: string;
-  phone?: string;
-}
+export type { CheckoutFormData, CheckoutFormErrors, OrderConfirmationData };
 
-export interface OrderConfirmationData {
-  orderId: string;
-  date: string;
-  customerName: string;
-  shippingAddress: string;
-  total: number;
-  itemCount: number;
-}
+export const SHIPPING_METHODS = {
+  standard: {
+    id: 'standard',
+    title: 'Standard Shipping',
+    description: '3-5 business days',
+    price: 30,
+  },
+  express: {
+    id: 'express',
+    title: 'Express Shipping',
+    description: '1-2 business days',
+    price: 50,
+  },
+} as const;
 
 export const SHIPPING_OPTIONS: RadioOption[] = [
   {
-    value: 'standard',
-    title: 'Standard Shipping',
-    description: '3-5 business days',
-    rightElement: <span>$30.00</span>,
+    value: SHIPPING_METHODS.standard.id,
+    title: SHIPPING_METHODS.standard.title,
+    description: SHIPPING_METHODS.standard.description,
+    rightElement: <span>${SHIPPING_METHODS.standard.price.toFixed(2)}</span>,
   },
   {
-    value: 'express',
-    title: 'Express Shipping',
-    description: '1-2 business days',
-    rightElement: <span>$50.00</span>,
+    value: SHIPPING_METHODS.express.id,
+    title: SHIPPING_METHODS.express.title,
+    description: SHIPPING_METHODS.express.description,
+    rightElement: <span>${SHIPPING_METHODS.express.price.toFixed(2)}</span>,
   },
 ];
 
