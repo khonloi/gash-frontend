@@ -14,7 +14,7 @@ export function CategoryCircle({ title, href, imageUrl, icon }: CategoryCirclePr
   return (
     <Link href={href} className={styles.categoryItem} aria-label={`Shop ${title} category`}>
       <div className={styles.circleContainer}>
-        <Image src={imageUrl} alt={title} width={140} height={140} className={styles.image} />
+        <Image src={imageUrl} alt={title} width={160} height={160} className={styles.image} />
         {icon && <div className={styles.iconBadge}>{icon}</div>}
       </div>
       <span className={styles.title}>{title}</span>

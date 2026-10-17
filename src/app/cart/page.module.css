@@ -12,16 +12,27 @@
 }
 
 .continueShopping {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-navy);
   margin-bottom: var(--space-6);
   text-transform: none;
+  transition: color var(--transition-fast);
 }
 
 .continueShopping:hover {
   color: var(--color-royal-blue);
+}
+
+.continueShopping svg {
+  transition: transform var(--transition-fast);
+}
+
+.continueShopping:hover svg {
+  transform: translateX(-3px);
 }
 
 .content {

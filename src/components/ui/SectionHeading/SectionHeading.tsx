@@ -23,34 +23,22 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   const isCentered = align === 'center';
 
-  const headingContent = (
-    <div className={cn(styles.textGroup, isCentered && styles.centered)}>
-      <Component className={cn(styles.heading, isCentered && styles.centeredHeading)}>
-        {children}
-      </Component>
-      {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
-    </div>
-  );
-
-  if (action || subtitle || isCentered) {
-    return (
-      <div
-        className={cn(
-          styles.wrapper,
-          isCentered && styles.wrapperCentered,
-          noMargin && styles.noMargin,
-          className
-        )}
-      >
-        {headingContent}
-        {action && <div className={styles.action}>{action}</div>}
-      </div>
-    );
-  }
-
   return (
-    <Component className={cn(styles.heading, noMargin && styles.noMargin, className)}>
-      {children}
-    </Component>
+    <div
+      className={cn(
+        styles.wrapper,
+        isCentered && styles.wrapperCentered,
+        noMargin && styles.noMargin,
+        className
+      )}
+    >
+      <div className={cn(styles.textGroup, isCentered && styles.centered)}>
+        <Component className={cn(styles.heading, isCentered && styles.centeredHeading)}>
+          {children}
+        </Component>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      </div>
+      {action && <div className={styles.action}>{action}</div>}
+    </div>
   );
 }

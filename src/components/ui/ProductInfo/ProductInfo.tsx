@@ -95,7 +95,7 @@ export function ProductInfo({
         )}
       </div>
 
-      <Divider />
+      <Divider className={styles.pricingDivider} />
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>

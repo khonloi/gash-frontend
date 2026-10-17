@@ -29,14 +29,14 @@
 }
 
 .relatedSection {
-  margin-top: var(--space-20);
-  padding-top: var(--space-16);
-  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-10);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--color-border-default);
 }
 
 .relatedGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--grid-gap-desktop);
 }
 
@@ -63,8 +63,8 @@
 
 @media (max-width: 768px) {
   .relatedSection {
-    margin-top: var(--space-10);
-    padding-top: var(--space-8);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
   }
 
   .relatedGrid {

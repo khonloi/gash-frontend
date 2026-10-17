@@ -13,7 +13,7 @@
 
 .categoryGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--space-6);
   justify-items: center;
   margin-top: var(--space-6);
@@ -208,15 +208,15 @@
 
 /* Home Skeletons */
 .categorySkeletonBox {
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   border-radius: var(--radius-full);
 }
 
 @media (max-width: 768px) {
   .categorySkeletonBox {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
   }
 }
 

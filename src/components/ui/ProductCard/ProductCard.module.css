@@ -6,7 +6,8 @@
 .imageWrapper {
   position: relative;
   width: 100%;
-  padding-top: 100%; /* 1:1 Aspect Ratio */
+  padding-top: 100%;
+  /* 1:1 Aspect Ratio */
   background-color: var(--color-surface-subtle);
   overflow: hidden;
 }
@@ -38,7 +39,6 @@
 
 .image {
   object-fit: contain;
-  padding: 5%;
   box-sizing: border-box;
   transition: transform 0.4s var(--ease-spring);
 }

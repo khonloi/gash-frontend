@@ -1,6 +1,6 @@
 .container {
   width: 100%;
-  margin-top: var(--space-16);
+  margin-top: var(--space-8);
 }
 
 .tabList {
@@ -46,7 +46,7 @@
 }
 
 .tabContent {
-  padding: var(--space-8) 0;
+  padding: var(--space-5) 0 var(--space-8) 0;
 }
 
 .contentPane {
@@ -155,6 +155,12 @@
   color: var(--color-text-secondary);
   width: 70%;
   line-height: var(--leading-normal);
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin-top: var(--space-6);
+  }
 }
 
 @media (max-width: 576px) {

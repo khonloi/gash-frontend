@@ -50,24 +50,30 @@ export default function Home() {
         {
           '@type': 'SiteNavigationElement',
           position: 1,
+          name: 'Climbing Collection',
+          url: `${siteUrl}/collections/climbing`,
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 2,
+          name: 'Football Collection',
+          url: `${siteUrl}/collections/football`,
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 3,
           name: 'Running Collection',
           url: `${siteUrl}/collections/running`,
         },
         {
           '@type': 'SiteNavigationElement',
-          position: 2,
-          name: 'Footwear Collection',
-          url: `${siteUrl}/collections/footwear`,
-        },
-        {
-          '@type': 'SiteNavigationElement',
-          position: 3,
-          name: 'Apparel Collection',
-          url: `${siteUrl}/collections/apparel`,
-        },
-        {
-          '@type': 'SiteNavigationElement',
           position: 4,
+          name: 'Swimming Collection',
+          url: `${siteUrl}/collections/swimming`,
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 5,
           name: 'Training Collection',
           url: `${siteUrl}/collections/training`,
         },

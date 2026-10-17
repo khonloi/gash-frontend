@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Trash2, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Trash2, ShieldCheck, Zap } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { Button, QuantitySelector, EmptyState, Skeleton } from '@/components/ui';
@@ -50,7 +50,8 @@ export function CartClientView() {
     <main id="main-content" className={styles.cartPage}>
       <div className="container">
         <Link href="/" className={styles.continueShopping}>
-          ← Continue Shopping
+          <ArrowLeft size={16} aria-hidden="true" />
+          <span>Continue Shopping</span>
         </Link>
         <h1 className={styles.title}>Shopping Cart</h1>
 
