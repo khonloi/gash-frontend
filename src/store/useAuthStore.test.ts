@@ -84,4 +84,13 @@ describe('useAuthStore', () => {
     expect(state.refreshToken).toBeNull();
     expect(state.isAuthenticated).toBe(false);
   });
+
+  it('synchronizes jocksport_session cookie on setAuth and clearAuth', () => {
+    useAuthStore.getState().setAuth(mockUser, mockTokens);
+    expect(document.cookie).toContain('jocksport_session=1');
+
+    useAuthStore.getState().clearAuth();
+    // After clearing, the session cookie is expired
+    expect(document.cookie).not.toContain('jocksport_session=1');
+  });
 });

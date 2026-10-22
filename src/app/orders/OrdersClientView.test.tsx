@@ -4,13 +4,32 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import OrdersClientView from './OrdersClientView';
 import { orderApiService } from '@/services/orderService';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Order } from '@/types/order';
+import { UserProfile } from '@/types/user';
 
 vi.mock('@/services/orderService', () => ({
   orderApiService: {
     getMyOrders: vi.fn(),
   },
 }));
+
+const mockUser: UserProfile = {
+  _id: 'user-1',
+  email: 'john@example.com',
+  firstName: 'John',
+  lastName: 'Doe',
+  role: 'customer',
+  isActive: true,
+  isEmailVerified: true,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+};
+
+const mockTokens = {
+  accessToken: 'valid-access-token',
+  refreshToken: 'valid-refresh-token',
+};
 
 function renderWithClient(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -59,9 +78,21 @@ describe('OrdersClientView', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthStore.getState().clearAuth();
   });
 
-  it('renders loading skeletons while fetching orders', () => {
+  it('renders sign in required when unauthenticated', async () => {
+    renderWithClient(<OrdersClientView />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign In Required')).toBeDefined();
+    });
+    expect(screen.getByText('Please sign in to view and track your orders.')).toBeDefined();
+    expect(screen.getByRole('link', { name: 'Return to Home' })).toBeDefined();
+  });
+
+  it('renders loading skeletons while fetching orders for authenticated user', () => {
+    useAuthStore.getState().setAuth(mockUser, mockTokens);
     // Return a never-resolving promise to test loading state
     vi.mocked(orderApiService.getMyOrders).mockReturnValue(new Promise(() => {}));
 
@@ -73,6 +104,7 @@ describe('OrdersClientView', () => {
   });
 
   it('renders empty state when user has no orders', async () => {
+    useAuthStore.getState().setAuth(mockUser, mockTokens);
     vi.mocked(orderApiService.getMyOrders).mockResolvedValueOnce({
       orders: [],
       pagination: { page: 1, limit: 10, totalPages: 0, totalResults: 0 },
@@ -90,6 +122,7 @@ describe('OrdersClientView', () => {
   });
 
   it('renders list of orders when orders are loaded', async () => {
+    useAuthStore.getState().setAuth(mockUser, mockTokens);
     vi.mocked(orderApiService.getMyOrders).mockResolvedValueOnce({
       orders: [mockOrder],
       pagination: { page: 1, limit: 10, totalPages: 1, totalResults: 1 },

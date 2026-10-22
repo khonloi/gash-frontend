@@ -7,13 +7,45 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
+function getApiOrigin(): string {
+  const url = process.env.NEXT_PUBLIC_API_URL || process.env.INTERNAL_API_URL;
+  if (!url) return '';
+  try {
+    return new URL(url).origin;
+  } catch {
+    return '';
+  }
+}
+
+const apiOrigin = getApiOrigin();
+const connectSrc = isProd ? `'self' ${apiOrigin}`.trim() : "'self' http://localhost:* https://*";
+
+const imgSrc = [
+  "'self'",
+  'data:',
+  'blob:',
+  'https://images.unsplash.com',
+  'https://plus.unsplash.com',
+  'https://cdn.shopify.com',
+  'https://res.cloudinary.com',
+  ...(isProd
+    ? []
+    : [
+        'https://example.com',
+        'http://example.com',
+        'https://*.example.com',
+        'https://via.placeholder.com',
+        'https://placehold.co',
+      ]),
+].join(' ');
+
 const cspDirectives = [
   "default-src 'self'",
   `script-src 'self' ${isProd ? '' : "'unsafe-eval'"} 'unsafe-inline'`.trim(),
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://cdn.shopify.com https://res.cloudinary.com https://example.com http://example.com https://*.example.com https://via.placeholder.com https://placehold.co",
+  `img-src ${imgSrc}`,
   "font-src 'self'",
-  "connect-src 'self' http://localhost:* https://*",
+  `connect-src ${connectSrc}`,
   "frame-ancestors 'none'",
 ].join('; ');
 
@@ -28,7 +60,7 @@ const securityHeaders = [
   },
   {
     key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
+    value: 'DENY',
   },
   {
     key: 'X-Content-Type-Options',
@@ -57,7 +89,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ['@tanstack/react-query', 'isomorphic-dompurify'],
-    webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'INP', 'TTFB'],
+    webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'INP', 'TTFB'],
   },
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -78,34 +110,38 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
-      {
-        protocol: 'https',
-        hostname: 'example.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.example.com',
-      },
-      {
-        protocol: 'http',
-        hostname: 'example.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'via.placeholder.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-      },
-      {
-        protocol: 'http',
-        hostname: '127.0.0.1',
-      },
+      ...(!isProd
+        ? [
+            {
+              protocol: 'https' as const,
+              hostname: 'example.com',
+            },
+            {
+              protocol: 'https' as const,
+              hostname: '**.example.com',
+            },
+            {
+              protocol: 'http' as const,
+              hostname: 'example.com',
+            },
+            {
+              protocol: 'https' as const,
+              hostname: 'via.placeholder.com',
+            },
+            {
+              protocol: 'https' as const,
+              hostname: 'placehold.co',
+            },
+            {
+              protocol: 'http' as const,
+              hostname: 'localhost',
+            },
+            {
+              protocol: 'http' as const,
+              hostname: '127.0.0.1',
+            },
+          ]
+        : []),
     ],
   },
   async headers() {

@@ -45,4 +45,18 @@ describe('apiClient demo mode integration', () => {
     expect(products[0].title).toBeDefined();
     expect(products[0].price).toBeGreaterThan(0);
   });
+
+  it('strictly disallows localStorage demo mode override in production', () => {
+    const originalEnv = process.env.NODE_ENV;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = 'production';
+      localStorage.setItem('jocksport-demo-mode', 'true');
+      expect(isDemoModeActive()).toBe(false);
+
+      setDemoMode(true);
+      expect(isDemoModeActive()).toBe(false);
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = originalEnv;
+    }
+  });
 });

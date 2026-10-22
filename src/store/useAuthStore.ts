@@ -16,6 +16,20 @@ interface AuthState {
   clearAuth: () => void;
 }
 
+function syncSessionCookie(active: boolean): void {
+  if (typeof document === 'undefined') return;
+  try {
+    if (active) {
+      document.cookie = 'jocksport_session=1; path=/; SameSite=Lax; Secure';
+    } else {
+      document.cookie =
+        'jocksport_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure';
+    }
+  } catch {
+    // Ignore browser cookie manipulation errors
+  }
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -24,36 +38,47 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
 
-      setAuth: (user, tokens) =>
+      setAuth: (user, tokens) => {
+        syncSessionCookie(true);
         set({
           user,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
           isAuthenticated: true,
-        }),
+        });
+      },
 
-      setTokens: (tokens) =>
+      setTokens: (tokens) => {
+        syncSessionCookie(true);
         set({
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
           isAuthenticated: true,
-        }),
+        });
+      },
 
       updateUser: (updatedFields) =>
         set((state) => ({
           user: state.user ? { ...state.user, ...updatedFields } : null,
         })),
 
-      clearAuth: () =>
+      clearAuth: () => {
+        syncSessionCookie(false);
         set({
           user: null,
           accessToken: null,
           refreshToken: null,
           isAuthenticated: false,
-        }),
+        });
+      },
     }),
     {
       name: STORAGE_KEYS.AUTH,
+      onRehydrateStorage: () => (state) => {
+        if (state?.isAuthenticated) {
+          syncSessionCookie(true);
+        }
+      },
     }
   )
 );

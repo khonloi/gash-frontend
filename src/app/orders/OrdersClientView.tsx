@@ -2,13 +2,40 @@
 
 import Link from 'next/link';
 import { useMyOrdersQuery } from '@/hooks/useOrders';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useIsMounted } from '@/hooks/useIsMounted';
+import { isDemoModeActive } from '@/lib/apiClient';
 import { SectionHeading, Button, Badge, EmptyState, Skeleton } from '@/components/ui';
 import { formatDate, formatPrice, getOrderStatusVariant } from '@/lib/format';
 import styles from './page.module.css';
 
 export default function OrdersClientView() {
-  const { data, isLoading } = useMyOrdersQuery();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const mounted = useIsMounted();
+  const demoActive = isDemoModeActive();
+  const shouldEnable = isAuthenticated || demoActive;
+
+  const { data, isLoading } = useMyOrdersQuery(undefined, {
+    enabled: shouldEnable,
+  });
   const orders = data?.orders ?? [];
+
+  if (mounted && !shouldEnable) {
+    return (
+      <main id="main-content" className={`container ${styles.ordersPage}`}>
+        <SectionHeading as="h1">My Orders</SectionHeading>
+        <EmptyState
+          title="Sign In Required"
+          description="Please sign in to view and track your orders."
+          action={
+            <Button as={Link} href="/" variant="primary">
+              Return to Home
+            </Button>
+          }
+        />
+      </main>
+    );
+  }
 
   if (isLoading) {
     return (

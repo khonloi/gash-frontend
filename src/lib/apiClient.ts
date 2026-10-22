@@ -25,11 +25,15 @@ export function setTokenRefreshHandler(handler: TokenRefreshHandler | null): voi
  * Determine whether Demo Mode is active.
  * Checked via:
  * 1. Environment variable NEXT_PUBLIC_DEMO_MODE=true
- * 2. Client-side localStorage override 'jocksport-demo-mode'
+ * 2. Client-side localStorage override 'jocksport-demo-mode' (only allowed in non-production environments)
  */
 export function isDemoModeActive(): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || process.env.DEMO_MODE === 'true') {
     return true;
+  }
+  // In production, strictly prevent client-side localStorage overrides
+  if (process.env.NODE_ENV === 'production') {
+    return false;
   }
   if (typeof window !== 'undefined') {
     try {
@@ -46,12 +50,18 @@ export function isDemoModeActive(): boolean {
 }
 
 /**
- * Manually toggle or override demo mode in browser storage
+ * Manually toggle or override demo mode in browser storage (development/preview only)
  */
 export function setDemoMode(enabled: boolean): void {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEYS.DEMO_MODE, String(enabled));
+      document.cookie = `jocksport_demo_mode=${enabled ? '1' : ''}; path=/; SameSite=Lax; ${
+        enabled ? '' : 'expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      }`;
     } catch {
       // Ignore
     }
