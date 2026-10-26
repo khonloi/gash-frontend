@@ -396,7 +396,7 @@ export const mockProducts: BackendProduct[] = [
     _id: 'prod_ss_15202476523888',
     id: 'prod_ss_15202476523888',
     name: "Columbia Women's Konos™ Featherweight™ Trail Running Shoes - White",
-    slug: 'giay-chay-trail-nu-columbia-konos™-featherweight™-2141621100-white',
+    slug: 'giay-chay-trail-nu-columbia-konos-featherweight-2141621100-white',
     description:
       "<h4><strong>COLUMBIA WOMEN'S KONOS™ FEATHERWEIGHT™ TRAIL SHOES</strong></h4><p>Fly over technical single-tracks. The Konos™ Featherweight combines an Omni-Max™ energy system with TechLite+™ cushioning and an Adapt Trax™ outsole for supreme grip on wet and dry terrain.</p><h4><strong>SPECIFICATIONS</strong></h4><ul><li>TechLite+™ Midsole: Pinnacle lightweight cushioning for sustained mountain running</li><li>Adapt Trax™ Outsole: Exceptional wet-or-dry traction on loose dirt and rocky ridges</li><li>Seamless Mesh Upper: Breathable, debris-resistant mesh with haptic overlays</li><li>Navic Fit System™: Natural midfoot lockdown prevents heel slip</li><li>Product SKU: 2141621100</li></ul>",
     price: 128,
@@ -463,7 +463,7 @@ export const mockProducts: BackendProduct[] = [
     createdAt: '2026-08-03T10:30:41+07:00',
     updatedAt: '2026-10-15T15:39:56+07:00',
     title: "Columbia Women's Konos™ Featherweight™ Trail Running Shoes - White",
-    handle: 'giay-chay-trail-nu-columbia-konos™-featherweight™-2141621100-white',
+    handle: 'giay-chay-trail-nu-columbia-konos-featherweight-2141621100-white',
     vendor: 'COLUMBIA',
     productType: 'Giày Chạy Bộ',
     bodyHtml:

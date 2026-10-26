@@ -10,6 +10,7 @@ import {
   SectionHeading,
 } from '@/components/ui';
 import { fetchProductByHandle, fetchProducts } from '@/services/productService';
+import { safeJsonLdStringify } from '@/lib/jsonLd';
 import styles from './page.module.css';
 
 interface ProductDetailPageProps {
@@ -139,7 +140,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     <main id="main-content" className={styles.pageContainer}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(jsonLd) }}
       />
       <div className="container">
         <Breadcrumb items={breadcrumbItems} />

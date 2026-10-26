@@ -22,7 +22,7 @@ export async function refreshAuthToken(): Promise<string | null> {
   const authState = useAuthStore.getState();
   const refreshTokenStr = authState.refreshToken;
 
-  if (!refreshTokenStr) {
+  if (!refreshTokenStr && !authState.isAuthenticated) {
     authState.clearAuth();
     return null;
   }
@@ -36,7 +36,8 @@ export async function refreshAuthToken(): Promise<string | null> {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ refreshToken: refreshTokenStr }),
+          credentials: 'include',
+          body: JSON.stringify(refreshTokenStr ? { refreshToken: refreshTokenStr } : {}),
         });
 
         if (!res.ok) {

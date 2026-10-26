@@ -124,7 +124,11 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     urlString = `${rootUrl}${cleanEndpoint}`;
   }
 
-  const url = new URL(urlString);
+  const defaultOrigin =
+    typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const url = new URL(urlString, defaultOrigin);
 
   if (params) {
     Object.entries(params).forEach(([key, val]) => {

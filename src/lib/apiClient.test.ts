@@ -167,4 +167,19 @@ describe('apiClient', () => {
 
     setTokenRefreshHandler(null);
   });
+
+  it('correctly handles relative endpoint paths with default origin', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await apiClient.get<{ ok: boolean }>('/orders');
+    expect(result).toEqual({ ok: true });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const calledUrl = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+    expect(calledUrl).toContain('/orders');
+  });
 });

@@ -11,6 +11,7 @@ import {
   DynamicSportsSection,
   TrustSection,
 } from '@/components/home';
+import { safeJsonLdStringify } from '@/lib/jsonLd';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -85,7 +86,7 @@ export default function Home() {
     <main id="main-content" className={styles.main}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(homeJsonLd) }}
       />
       {/* 1. Hero Section Carousel */}
       <HeroCarousel />

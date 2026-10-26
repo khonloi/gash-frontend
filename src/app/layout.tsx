@@ -8,6 +8,8 @@ import { ToastContainer } from '@/components/ui/Toast/ToastContainer';
 import { WebVitals } from '@/components/analytics/WebVitals';
 import { DemoModeBanner } from '@/components/common';
 
+import { safeJsonLdStringify } from '@/lib/jsonLd';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -139,7 +141,7 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(jsonLd) }}
         />
       </head>
       <body>

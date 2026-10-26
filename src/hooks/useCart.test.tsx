@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   useServerCartQuery,
@@ -208,22 +208,27 @@ describe('useCart hooks', () => {
       useAuthStore.setState({ isAuthenticated: true });
       vi.mocked(cartApiService.addCartItem).mockRejectedValueOnce(new Error('Network failure'));
 
-      const { result } = renderHook(() => useCart(), {
+      const { result, unmount } = renderHook(() => useCart(), {
         wrapper: createWrapper(),
       });
 
-      await expect(
-        result.current.addItem({
-          productId: 'prod-fail',
-          title: 'Failed Shoe',
-          brand: 'Nike',
-          price: 100,
-          imageUrl: '',
-          quantity: 1,
-        })
-      ).rejects.toThrow('Network failure');
+      await act(async () => {
+        await expect(
+          result.current.addItem({
+            productId: 'prod-fail',
+            title: 'Failed Shoe',
+            brand: 'Nike',
+            price: 100,
+            imageUrl: '',
+            quantity: 1,
+          })
+        ).rejects.toThrow('Network failure');
+      });
 
-      expect(useCartStore.getState().items).toHaveLength(0);
+      expect(result.current.items).toHaveLength(0);
+      expect(result.current.isSyncing).toBe(false);
+
+      unmount();
       useAuthStore.setState({ isAuthenticated: false });
     });
   });

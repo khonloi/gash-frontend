@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { fetchProducts, fetchProductStats } from '@/services/productService';
 import { CollectionClientView } from '@/components/collection/CollectionClientView';
+import { safeJsonLdStringify } from '@/lib/jsonLd';
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
@@ -102,7 +103,7 @@ export default async function CollectionPage({ params, searchParams }: Collectio
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(jsonLd) }}
       />
       <CollectionClientView
         key={`${slug}-${initialQuery}`}
