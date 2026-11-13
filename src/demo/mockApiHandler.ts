@@ -705,6 +705,143 @@ export async function handleMockRequest<T>(
     } as T;
   }
 
+  // ==========================================
+  // 6. CHAT OPERATIONS
+  // ==========================================
+  if (cleanPath.startsWith('/chat')) {
+    const demoConvId = 'conv_demo_active_1';
+    const demoMessages = [
+      {
+        _id: 'msg_demo_1',
+        conversation: demoConvId,
+        senderType: 'ai',
+        content:
+          'Hello! I am your GASH AI Shopping Assistant. How can I help you today? Ask about product recommendations, sizes, or live order tracking.',
+        contextCards: [],
+        isRead: true,
+        createdAt: new Date(Date.now() - 60000).toISOString(),
+      },
+    ];
+
+    if (method === 'POST' && cleanPath === '/chat/conversations') {
+      const payload = body as Record<string, unknown>;
+      const initialMessage = payload.initialMessage ? String(payload.initialMessage) : undefined;
+      return {
+        status: 'success',
+        data: {
+          conversation: {
+            _id: demoConvId,
+            mode: (payload.mode as string) || 'ai',
+            status: 'bot_active',
+            subject: (payload.subject as string) || 'Shopping Assistant',
+            unreadCountCustomer: 0,
+            unreadCountAgent: 0,
+            lastMessageAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          initialMessage: initialMessage
+            ? {
+                _id: `msg_user_${Date.now()}`,
+                conversation: demoConvId,
+                senderType: 'customer',
+                content: initialMessage,
+                contextCards: [],
+                isRead: true,
+                createdAt: new Date().toISOString(),
+              }
+            : undefined,
+        },
+      } as T;
+    }
+
+    if (method === 'GET' && cleanPath === '/chat/conversations') {
+      return {
+        status: 'success',
+        data: {
+          conversations: [
+            {
+              _id: demoConvId,
+              mode: 'ai',
+              status: 'bot_active',
+              subject: 'Shopping Assistant',
+              unreadCountCustomer: 0,
+              unreadCountAgent: 0,
+              lastMessageAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+          ],
+        },
+      } as T;
+    }
+
+    if (method === 'GET' && cleanPath.includes('/messages')) {
+      return {
+        status: 'success',
+        data: { messages: demoMessages },
+        pagination: { page: 1, limit: 50, totalPages: 1, totalResults: demoMessages.length },
+      } as T;
+    }
+
+    if (method === 'POST' && cleanPath.includes('/messages')) {
+      const payload = body as Record<string, unknown>;
+      const content = String(payload.content || '');
+      const userMsg = {
+        _id: `msg_user_${Date.now()}`,
+        conversation: demoConvId,
+        senderType: 'customer',
+        content,
+        contextCards: [],
+        isRead: true,
+        createdAt: new Date().toISOString(),
+      };
+
+      const aiMsg = {
+        _id: `msg_ai_${Date.now() + 1}`,
+        conversation: demoConvId,
+        senderType: 'ai',
+        content: `I've noted that! Our store features top quality athletic gear. Let me know if you would like me to connect you with a live human support specialist.`,
+        contextCards: [],
+        isRead: false,
+        createdAt: new Date(Date.now() + 100).toISOString(),
+      };
+
+      return {
+        status: 'success',
+        data: {
+          message: userMsg,
+          aiReply: aiMsg,
+        },
+      } as T;
+    }
+
+    if (method === 'POST' && cleanPath.includes('/handoff')) {
+      return {
+        status: 'success',
+        data: {
+          conversation: {
+            _id: demoConvId,
+            mode: 'support',
+            status: 'queued',
+            unreadCountCustomer: 0,
+            unreadCountAgent: 1,
+            lastMessageAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        },
+      } as T;
+    }
+
+    if (cleanPath === '/chat/merge') {
+      return {
+        status: 'success',
+        data: { mergedConversations: 1 },
+      } as T;
+    }
+  }
+
   // Fallback for unhandled demo routes: return generic success envelope
   return {
     status: 'success',

@@ -40,6 +40,16 @@ export const useAuthStore = create<AuthState>()(
 
       setAuth: (user, tokens) => {
         syncSessionCookie(true);
+        if (typeof window !== 'undefined') {
+          import('@/services/chatService')
+            .then(({ chatService }) => {
+              const guestId = localStorage.getItem(STORAGE_KEYS.GUEST_ID);
+              if (guestId) {
+                chatService.mergeGuestChat(guestId).catch(() => {});
+              }
+            })
+            .catch(() => {});
+        }
         set({
           user,
           accessToken: tokens.accessToken,

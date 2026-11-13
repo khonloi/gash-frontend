@@ -6,7 +6,7 @@ import { Header } from '@/components/layout/Header/Header';
 import { Footer } from '@/components/layout/Footer/Footer';
 import { ToastContainer } from '@/components/ui/Toast/ToastContainer';
 import { WebVitals } from '@/components/analytics/WebVitals';
-import { DemoModeBanner } from '@/components/common';
+import { ChatWidget } from '@/components/chat';
 
 import { safeJsonLdStringify } from '@/lib/jsonLd';
 
@@ -154,7 +154,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <ToastContainer />
-          <DemoModeBanner />
+          <ChatWidget />
         </ReactQueryProvider>
       </body>
     </html>

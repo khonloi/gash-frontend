@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   AUTH: 'jocksport-auth-storage',
   CART: 'jocksport-cart-storage',
   DEMO_MODE: 'jocksport-demo-mode',
+  GUEST_ID: 'jocksport-guest-id',
 } as const;
 
 export const SITE_CONFIG = {

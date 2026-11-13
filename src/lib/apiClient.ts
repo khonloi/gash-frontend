@@ -24,11 +24,17 @@ export function setTokenRefreshHandler(handler: TokenRefreshHandler | null): voi
 /**
  * Determine whether Demo Mode is active.
  * Checked via:
- * 1. Environment variable NEXT_PUBLIC_DEMO_MODE=true
+ * 1. Environment variable NEXT_PUBLIC_DEMO_MODE / DEMO_MODE ('true' forces on)
  * 2. Client-side localStorage override 'jocksport-demo-mode' (only allowed in non-production environments)
+ * 3. Environment variable explicitly set to 'false' disables demo mode in development (SSR & client)
+ * 4. Otherwise defaults to true in development when unset
  */
 export function isDemoModeActive(): boolean {
-  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || process.env.DEMO_MODE === 'true') {
+  const envDemo = (process.env.NEXT_PUBLIC_DEMO_MODE ?? process.env.DEMO_MODE ?? '')
+    .trim()
+    .toLowerCase();
+
+  if (envDemo === 'true') {
     return true;
   }
   // In production, strictly prevent client-side localStorage overrides
@@ -45,7 +51,10 @@ export function isDemoModeActive(): boolean {
       // Ignore browser storage access errors
     }
   }
-  // In development, default to active demo mode if backend is not explicitly targeted
+  if (envDemo === 'false') {
+    return false;
+  }
+  // In development, default to active demo mode only if not explicitly configured otherwise
   return process.env.NODE_ENV === 'development';
 }
 
@@ -91,6 +100,24 @@ function getAuthToken(): string | null {
     // Ignore JSON parse / storage errors
   }
   return null;
+}
+
+export function getOrCreateGuestId(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    let guestId = localStorage.getItem(STORAGE_KEYS.GUEST_ID);
+    if (!guestId) {
+      guestId =
+        'guest_' +
+        (typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : Math.random().toString(36).substring(2, 15) + Date.now().toString(36));
+      localStorage.setItem(STORAGE_KEYS.GUEST_ID, guestId);
+    }
+    return guestId;
+  } catch {
+    return 'guest_fallback_storage_disabled';
+  }
 }
 
 export async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
@@ -147,6 +174,11 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
 
   if (activeToken) {
     reqHeaders['Authorization'] = `Bearer ${activeToken}`;
+  } else {
+    const guestId = getOrCreateGuestId();
+    if (guestId) {
+      reqHeaders['x-guest-id'] = guestId;
+    }
   }
 
   const method = (customConfig.method || 'GET').toUpperCase();

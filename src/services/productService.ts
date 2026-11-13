@@ -11,11 +11,12 @@ import { mapProductToFrontend } from './productMapper';
  */
 export const fetchProducts = cache(async (params?: QueryParams): Promise<FrontendProduct[]> => {
   try {
+    const queryParams: QueryParams = { limit: 100, ...params };
     const response = await apiClient.get<
       | ApiResponse<{ products: BackendProduct[] }>
       | PaginatedApiResponse<{ products: BackendProduct[] }>
       | BackendProduct[]
-    >('/products', { params });
+    >('/products', { params: queryParams });
 
     let products: BackendProduct[] = [];
     if (response && 'data' in response && response.data && 'products' in response.data) {
