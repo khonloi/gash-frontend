@@ -3,48 +3,67 @@ import { SectionHeading, SportCard } from '@/components/ui';
 import { fetchProductStats } from '@/services/productService';
 import styles from '@/app/page.module.css';
 
+export const SPORT_IMAGES: Record<string, string> = {
+  RUNNING: '/images/sports/sport-running.png',
+  FOOTBALL: '/images/sports/sport-football.png',
+  BASKETBALL: '/images/sports/sport-basketball.png',
+  TRAINING: '/images/sports/sport-training.png',
+  TENNIS: '/images/sports/sport-tennis.png',
+  SWIMMING: '/images/sports/sport-swimming.png',
+  OUTDOOR: '/images/sports/sport-outdoor.png',
+  CLIMBING: '/images/climbing.png',
+  APPAREL: '/images/sports/sport-apparel.png',
+  FOOTWEAR: '/images/sports/sport-footwear.png',
+  ACCESSORIES: '/images/sports/sport-accessories.png',
+};
+
 export const DEFAULT_SPORTS = [
   {
     title: 'RUNNING',
     href: '/collections/running',
-    imageUrl:
-      'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=600&q=80',
+    imageUrl: SPORT_IMAGES.RUNNING,
   },
   {
     title: 'FOOTBALL',
     href: '/collections/football',
-    imageUrl:
-      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80',
+    imageUrl: SPORT_IMAGES.FOOTBALL,
   },
   {
     title: 'BASKETBALL',
     href: '/collections/basketball',
-    imageUrl:
-      'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80',
+    imageUrl: SPORT_IMAGES.BASKETBALL,
   },
   {
     title: 'TRAINING',
     href: '/collections/training',
-    imageUrl:
-      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80',
+    imageUrl: SPORT_IMAGES.TRAINING,
   },
   {
     title: 'TENNIS',
     href: '/collections/tennis',
-    imageUrl:
-      'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80',
+    imageUrl: SPORT_IMAGES.TENNIS,
   },
   {
     title: 'SWIMMING',
     href: '/collections/swimming',
-    imageUrl:
-      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+    imageUrl: SPORT_IMAGES.SWIMMING,
   },
 ];
 
+const SPORT_DISCIPLINES = new Set([
+  'RUNNING',
+  'FOOTBALL',
+  'SWIMMING',
+  'TRAINING',
+  'OUTDOOR',
+  'CLIMBING',
+  'BASKETBALL',
+  'TENNIS',
+]);
+
 export async function DynamicSportsSection() {
   const stats = await fetchProductStats();
-  let sports = stats
+  const mappedStats = stats
     .map((s) => {
       const title = (s.category || '').toUpperCase();
       const slug = s.category?.toLowerCase().replace(/\s+/g, '-') || 'all';
@@ -52,14 +71,24 @@ export async function DynamicSportsSection() {
       return {
         title,
         href: `/collections/${slug}`,
-        imageUrl: defaultMatch?.imageUrl || DEFAULT_SPORTS[0].imageUrl,
+        imageUrl: SPORT_IMAGES[title] || defaultMatch?.imageUrl || DEFAULT_SPORTS[0].imageUrl,
       };
     })
     .filter((s) => Boolean(s.title));
 
-  if (sports.length === 0) {
-    sports = DEFAULT_SPORTS;
+  const sportDisciplines = mappedStats.filter((s) => SPORT_DISCIPLINES.has(s.title));
+  const seenTitles = new Set(sportDisciplines.map((s) => s.title));
+  const backfilled = [...sportDisciplines];
+
+  for (const fallback of DEFAULT_SPORTS) {
+    if (backfilled.length >= 6) break;
+    if (!seenTitles.has(fallback.title)) {
+      backfilled.push(fallback);
+      seenTitles.add(fallback.title);
+    }
   }
+
+  const sports = backfilled.slice(0, 6);
 
   return (
     <section className={styles.sportsSection}>

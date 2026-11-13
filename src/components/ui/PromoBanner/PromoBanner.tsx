@@ -18,6 +18,8 @@ export interface PromoBannerProps {
   reverse?: boolean;
 }
 
+const DEFAULT_PROMO_IMAGE = '/images/promos/promo-swimming.png';
+
 export function PromoBanner({
   badge,
   title,
@@ -29,6 +31,8 @@ export function PromoBanner({
   imageUrl,
   reverse = false,
 }: PromoBannerProps) {
+  const safeImage = imageUrl && imageUrl.trim().length > 0 ? imageUrl : DEFAULT_PROMO_IMAGE;
+
   return (
     <section className={styles.bannerSection}>
       <div className="container">
@@ -36,9 +40,7 @@ export function PromoBanner({
           className={`${styles.bannerCard} ${reverse ? styles.reverse : ''}`}
           style={{ background: bgGradient }}
         >
-          {imageUrl && (
-            <Image src={imageUrl} alt={title} fill sizes="100vw" className={styles.bgImage} />
-          )}
+          <Image src={safeImage} alt={title} fill sizes="100vw" className={styles.bgImage} />
           <div className={styles.overlay} />
 
           <div className={`${styles.content} animate-fade-in`}>

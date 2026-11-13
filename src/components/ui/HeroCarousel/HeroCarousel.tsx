@@ -28,8 +28,7 @@ const slides: SlideData[] = [
     ctaText: 'SHOP NOW',
     href: '/collections/all',
     bgGradient: 'linear-gradient(135deg, #003CD6 0%, #001B6B 100%)',
-    image:
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/heroes/hero-routine.png',
   },
   {
     id: 2,
@@ -40,8 +39,7 @@ const slides: SlideData[] = [
     ctaText: 'EXPLORE NOW',
     href: '/collections/running',
     bgGradient: 'linear-gradient(135deg, #0C1C30 0%, #1A365D 100%)',
-    image:
-      'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/heroes/hero-running.png',
   },
   {
     id: 3,
@@ -52,8 +50,7 @@ const slides: SlideData[] = [
     ctaText: 'VIEW COLLECTION',
     href: '/collections/training',
     bgGradient: 'linear-gradient(135deg, #005F73 0%, #0A9396 100%)',
-    image:
-      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/heroes/hero-training.png',
   },
 ];
 

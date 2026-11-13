@@ -118,7 +118,7 @@ export default function Home() {
         ctaText="EXPLORE SPEEDO"
         href="/collections/all"
         bgGradient="linear-gradient(135deg, #0052CC 0%, #001B6B 100%)"
-        imageUrl="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1200&q=80"
+        imageUrl="/images/promos/promo-swimming.png"
       />
 
       {/* 5. New Collections */}
@@ -165,7 +165,7 @@ export default function Home() {
         href="/collections/all"
         reverse={true}
         bgGradient="linear-gradient(135deg, #0C1C30 0%, #153258 100%)"
-        imageUrl="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80"
+        imageUrl="/images/promos/promo-football-kits.png"
       />
 
       {/* 9. Favorite Sports */}
