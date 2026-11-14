@@ -162,7 +162,7 @@
   background-color: var(--color-primary-green);
   color: var(--color-navy);
   font-size: var(--text-2xs);
-  font-weight: 800;
+  font-weight: var(--font-weight-bold);
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -372,7 +372,7 @@
   background-color: var(--color-primary-green);
   color: var(--color-navy);
   font-size: var(--text-2xs);
-  font-weight: 800;
+  font-weight: var(--font-weight-bold);
   width: 16px;
   height: 16px;
   border-radius: 50%;

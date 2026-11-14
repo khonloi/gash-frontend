@@ -1,7 +1,7 @@
 .checkoutPage {
   width: 100%;
   min-height: 80vh;
-  padding: 2.5rem 0;
+  padding: var(--section-spacing-compact) 0;
   box-sizing: border-box;
 }
 
@@ -10,14 +10,14 @@
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: 40px;
+  gap: var(--space-10);
   box-sizing: border-box;
 }
 
 .leftColumn {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: var(--space-8);
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
@@ -25,7 +25,7 @@
 
 .rightColumn {
   background-color: var(--color-bg-light);
-  padding: 32px;
+  padding: var(--space-6);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   position: sticky;
@@ -87,9 +87,9 @@
   margin-bottom: var(--space-6);
   max-height: 400px;
   overflow-y: auto;
-  padding: 12px 10px 4px 4px;
-  margin-top: -12px;
-  margin-left: -4px;
+  padding: var(--space-3) var(--space-2-5) var(--space-1) var(--space-1);
+  margin-top: calc(-1 * var(--space-3));
+  margin-left: calc(-1 * var(--space-1));
 }
 
 .summaryItem {
@@ -212,7 +212,7 @@
 
 .totalCurrency {
   font-size: var(--text-xs);
-  margin-right: 4px;
+  margin-right: var(--space-1);
   color: var(--color-text-muted);
   font-weight: normal;
 }
@@ -220,26 +220,26 @@
 @media (max-width: 1024px) {
   .checkoutContainer {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: var(--space-8);
   }
 }
 
 @media (max-width: 640px) {
   .rightColumn {
-    padding: 20px 16px;
+    padding: var(--space-5) var(--space-4);
     position: static;
   }
 
   .formGrid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: var(--space-3);
   }
 }
 
 .fieldError {
   font-size: var(--text-xs);
   color: var(--color-sale-red);
-  margin-top: 4px;
+  margin-top: var(--space-1);
   font-weight: 500;
 }
 
@@ -312,7 +312,7 @@
   display: flex;
   justify-content: space-between;
   border-top: 1px solid var(--color-border);
-  padding-top: 0.5rem;
+  padding-top: var(--space-2);
 }
 
 .summaryTotalLabel {
@@ -326,8 +326,8 @@
 
 .confirmationActions {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
   flex-wrap: wrap;
 }
 
@@ -352,7 +352,7 @@
 .skeletonColumn {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-8);
 }
 
 /* Checkout Skeleton Styles */

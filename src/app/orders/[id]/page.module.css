@@ -1,5 +1,5 @@
 .orderDetailPage {
-  padding: var(--space-8) var(--space-4);
+  padding: var(--section-spacing-compact) var(--space-5);
   max-width: 1024px;
   margin: 0 auto;
 }
@@ -42,7 +42,7 @@
 
 .orderHeading {
   font-size: var(--text-2xl);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
 }
@@ -232,6 +232,15 @@
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
+}
+
+.recipientName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.capitalizeText {
+  text-transform: capitalize;
 }
 
 /* Skeletons */

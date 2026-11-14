@@ -79,7 +79,7 @@
 .title {
   margin: 0;
   font-size: var(--text-3xl);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   line-height: var(--leading-tight);
   text-transform: uppercase;
   letter-spacing: var(--tracking-tight);

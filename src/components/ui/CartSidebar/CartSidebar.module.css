@@ -1,84 +1,24 @@
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--color-overlay);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.3s ease,
-    visibility 0.3s ease;
-}
-
-.overlayOpen {
-  opacity: 1;
-  visibility: visible;
-}
-
 .sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
   max-width: 420px;
-  height: 100vh;
-  background-color: var(--color-surface);
-  z-index: 1001;
-  box-shadow: var(--shadow-2xl);
-  display: flex;
-  flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 0.35s var(--ease-spring);
-}
-
-.sidebarOpen {
-  transform: translateX(0);
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--color-border-default);
-  background-color: var(--color-surface);
 }
 
 .headerTitleGroup {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-3);
 }
 
-.title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
 .countBadge {
   background-color: var(--color-surface-subtle);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: var(--text-xs);
   font-weight: var(--font-weight-bold);
-  padding: 2px 8px;
+  padding: var(--space-0-5) var(--space-2);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border-default);
 }
 
-.closeBtn {
-  color: var(--color-text-muted);
-}
-
 .content {
-  flex: 1;
-  overflow-y: auto;
   padding: var(--space-6);
 }
 
@@ -158,14 +98,14 @@
   text-transform: uppercase;
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-wider);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-0-5);
 }
 
 .itemName {
   font-size: var(--text-sm);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-0-5);
   line-height: var(--leading-snug);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -223,10 +163,15 @@
 }
 
 .footer {
-  padding: var(--space-6);
+  display: block;
+  padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--color-border-default);
   background-color: var(--color-surface);
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.footerContent {
+  width: 100%;
 }
 
 .subtotalRow {

@@ -97,8 +97,7 @@ describe('OrderDetailClientView', () => {
       status: 'cancelled',
     });
 
-    // Mock confirm dialog
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    // Mock toast store
     const addToastSpy = vi.spyOn(useToastStore.getState(), 'addToast');
 
     renderWithClient(<OrderDetailClientView orderId="ord-101" />);
@@ -112,15 +111,15 @@ describe('OrderDetailClientView', () => {
     expect(screen.getByText('$290.00')).toBeDefined();
     expect(screen.getByRole('button', { name: 'Cancel Order' })).toBeDefined();
 
-    // Click Cancel Order
+    // Open confirm dialog and confirm cancellation
     fireEvent.click(screen.getByRole('button', { name: 'Cancel Order' }));
+    const confirmBtn = screen.getByRole('button', { name: 'Yes, Cancel Order' });
+    fireEvent.click(confirmBtn);
 
     await waitFor(() => {
       expect(cancelMock).toHaveBeenCalledWith('ord-101', 'User requested cancellation');
     });
 
     expect(addToastSpy).toHaveBeenCalledWith('Order cancelled successfully', 'success');
-
-    confirmSpy.mockRestore();
   });
 });

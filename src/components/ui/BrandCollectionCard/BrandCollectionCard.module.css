@@ -3,7 +3,7 @@
 }
 
 .header {
-  padding: var(--space-6) var(--space-5) var(--space-2) var(--space-5);
+  padding: var(--space-5) var(--space-5) var(--space-2) var(--space-5);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -17,7 +17,7 @@
 
 .brand {
   font-size: var(--text-2xs);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -25,7 +25,7 @@
 
 .title {
   font-size: var(--text-lg);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   color: var(--color-text-primary);
   letter-spacing: var(--tracking-tight);
@@ -62,7 +62,7 @@
   justify-content: center;
   gap: var(--space-2);
   font-size: var(--text-xs);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-wider);
   transition:
     background-color var(--transition-fast),

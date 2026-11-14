@@ -2,7 +2,16 @@
 
 import React from 'react';
 import { LayoutGrid, List } from 'lucide-react';
+import { Select, SelectOption } from '@/components/ui/Select/Select';
 import styles from './CollectionControlBar.module.css';
+
+const SORT_OPTIONS: SelectOption[] = [
+  { value: 'featured', label: 'Featured' },
+  { value: 'price_asc', label: 'Price: Low to High' },
+  { value: 'price_desc', label: 'Price: High to Low' },
+  { value: 'newest', label: 'Newest Arrivals' },
+  { value: 'best_selling', label: 'Best Selling' },
+];
 
 export interface CollectionControlBarProps {
   totalCount: number;
@@ -24,7 +33,7 @@ export function CollectionControlBar({
   return (
     <div className={`${styles.controlBar} ${className}`}>
       <div className={styles.left}>
-        <span className={styles.productCount}>
+        <span className={`${styles.productCount} tabular-nums`}>
           <strong className={styles.countNumber}>{totalCount}</strong> Products
         </span>
       </div>
@@ -34,20 +43,14 @@ export function CollectionControlBar({
           <label htmlFor="sort-select" className={styles.sortLabel}>
             Sort by:
           </label>
-          <div className={styles.selectWrapper}>
-            <select
-              id="sort-select"
-              className={styles.sortSelect}
-              value={sortValue}
-              onChange={(e) => onSortChange(e.target.value)}
-            >
-              <option value="featured">Featured</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="newest">Newest Arrivals</option>
-              <option value="best_selling">Best Selling</option>
-            </select>
-          </div>
+          <Select
+            id="sort-select"
+            selectSize="md"
+            containerClassName={styles.selectContainer}
+            value={sortValue}
+            onChange={(e) => onSortChange(e.target.value)}
+            options={SORT_OPTIONS}
+          />
         </div>
 
         <div className={styles.viewToggle} role="group" aria-label="View mode">

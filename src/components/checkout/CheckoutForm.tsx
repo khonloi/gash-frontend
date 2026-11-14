@@ -60,9 +60,8 @@ export function CheckoutForm({
             inputSize="lg"
             value={formData.contact}
             onChange={(e) => onInputChange('contact', e.target.value)}
-            hasError={Boolean(errors.contact)}
+            errorText={errors.contact}
           />
-          {errors.contact && <span className={styles.fieldError}>{errors.contact}</span>}
           <div className={styles.checkboxWrap}>
             <Checkbox
               checked={formData.keepUpdated}
@@ -101,9 +100,8 @@ export function CheckoutForm({
               inputSize="lg"
               value={formData.firstName}
               onChange={(e) => onInputChange('firstName', e.target.value)}
-              hasError={Boolean(errors.firstName)}
+              errorText={errors.firstName}
             />
-            {errors.firstName && <span className={styles.fieldError}>{errors.firstName}</span>}
           </div>
           <div>
             <label htmlFor="lastName" className="sr-only">
@@ -116,9 +114,8 @@ export function CheckoutForm({
               inputSize="lg"
               value={formData.lastName}
               onChange={(e) => onInputChange('lastName', e.target.value)}
-              hasError={Boolean(errors.lastName)}
+              errorText={errors.lastName}
             />
-            {errors.lastName && <span className={styles.fieldError}>{errors.lastName}</span>}
           </div>
           <div className="grid-full-span">
             <label htmlFor="address" className="sr-only">
@@ -131,9 +128,8 @@ export function CheckoutForm({
               inputSize="lg"
               value={formData.address}
               onChange={(e) => onInputChange('address', e.target.value)}
-              hasError={Boolean(errors.address)}
+              errorText={errors.address}
             />
-            {errors.address && <span className={styles.fieldError}>{errors.address}</span>}
           </div>
           <div className="grid-full-span">
             <label htmlFor="apartment" className="sr-only">
@@ -159,9 +155,8 @@ export function CheckoutForm({
               inputSize="lg"
               value={formData.city}
               onChange={(e) => onInputChange('city', e.target.value)}
-              hasError={Boolean(errors.city)}
+              errorText={errors.city}
             />
-            {errors.city && <span className={styles.fieldError}>{errors.city}</span>}
           </div>
           <div>
             <label htmlFor="postalCode" className="sr-only">
@@ -187,9 +182,8 @@ export function CheckoutForm({
               inputSize="lg"
               value={formData.phone}
               onChange={(e) => onInputChange('phone', e.target.value)}
-              hasError={Boolean(errors.phone)}
+              errorText={errors.phone}
             />
-            {errors.phone && <span className={styles.fieldError}>{errors.phone}</span>}
           </div>
         </div>
       </section>

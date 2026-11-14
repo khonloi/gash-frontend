@@ -5,8 +5,8 @@ import { useMyOrdersQuery } from '@/hooks/useOrders';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { isDemoModeActive } from '@/lib/apiClient';
-import { SectionHeading, Button, Badge, EmptyState, Skeleton } from '@/components/ui';
-import { formatDate, formatPrice, getOrderStatusVariant } from '@/lib/format';
+import { SectionHeading, Button, StatusBadge, EmptyState, Skeleton } from '@/components/ui';
+import { formatDate, formatPrice } from '@/lib/format';
 import styles from './page.module.css';
 
 export default function OrdersClientView() {
@@ -78,12 +78,10 @@ export default function OrdersClientView() {
             <div className={styles.orderInfo}>
               <div className={styles.orderHeaderRow}>
                 <h3 className={styles.orderNumber}>Order #{order.orderNumber}</h3>
-                <Badge variant={getOrderStatusVariant(order.status)} className={styles.statusBadge}>
-                  {order.status}
-                </Badge>
+                <StatusBadge status={order.status} className={styles.statusBadge} />
               </div>
               <p className={styles.orderDate}>Placed on {formatDate(order.createdAt)}</p>
-              <p className={styles.orderMeta}>
+              <p className={`${styles.orderMeta} tabular-nums`}>
                 Total: {formatPrice(order.total)} ({order.items.length} items)
               </p>
             </div>

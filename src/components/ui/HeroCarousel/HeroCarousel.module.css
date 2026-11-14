@@ -102,7 +102,7 @@
 .highlightBadge {
   background-color: var(--color-primary);
   color: var(--color-secondary);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   font-size: var(--text-lg);
   padding: var(--space-1) var(--space-4);
   border-radius: var(--radius-sm);
@@ -113,7 +113,7 @@
 
 .title {
   font-size: var(--text-4xl);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   line-height: var(--leading-tight);
   text-transform: uppercase;
   letter-spacing: var(--tracking-tight);
@@ -143,7 +143,7 @@
   background-color: var(--color-surface);
   color: var(--color-secondary);
   font-size: var(--text-base);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   padding: var(--space-3) var(--space-8);
@@ -278,7 +278,7 @@
   justify-content: center;
   color: var(--color-primary);
   text-align: center;
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   cursor: pointer;
   transition: transform var(--transition-normal);
@@ -302,7 +302,7 @@
   background-color: var(--color-primary);
   color: var(--color-secondary);
   font-size: var(--text-2xs);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
   display: flex;

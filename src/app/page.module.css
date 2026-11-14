@@ -181,7 +181,7 @@
 
 .trustItem h4 {
   font-size: var(--text-sm);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   margin-bottom: var(--space-1);
   color: var(--color-surface);
 }

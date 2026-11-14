@@ -1,12 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useOrderQuery, useCancelOrderMutation } from '@/hooks/useOrders';
 import { useToastStore } from '@/store/useToastStore';
-import { Button, Badge, EmptyState, Skeleton } from '@/components/ui';
-import { formatPrice, formatDateTime, getOrderStatusVariant } from '@/lib/format';
+import { Button, StatusBadge, ConfirmDialog, EmptyState, Skeleton } from '@/components/ui';
+import { formatPrice, formatDateTime } from '@/lib/format';
 import styles from './page.module.css';
 
 function getPaymentMethodLabel(method: string) {
@@ -28,13 +29,13 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
   const { data: currentOrder, isLoading, error } = useOrderQuery(orderId);
   const cancelOrderMutation = useCancelOrderMutation();
   const { addToast } = useToastStore();
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
 
-  const handleCancelOrder = async () => {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
-
+  const handleConfirmCancelOrder = async () => {
     try {
       await cancelOrderMutation.mutateAsync({ orderId, reason: 'User requested cancellation' });
       addToast('Order cancelled successfully', 'success');
+      setIsCancelConfirmOpen(false);
     } catch {
       addToast('Failed to cancel order', 'error');
     }
@@ -86,9 +87,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
           </Link>
           <div className={styles.headerTitleRow}>
             <h1 className={styles.orderHeading}>Order #{order.orderNumber}</h1>
-            <Badge variant={getOrderStatusVariant(order.status)} size="md">
-              {order.status}
-            </Badge>
+            <StatusBadge status={order.status} />
           </div>
           <p className={styles.orderDateText}>Placed on {formatDateTime(order.createdAt)}</p>
         </div>
@@ -96,7 +95,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
         {canCancel && (
           <Button
             variant="destructive"
-            onClick={handleCancelOrder}
+            onClick={() => setIsCancelConfirmOpen(true)}
             isLoading={cancelOrderMutation.isPending}
           >
             Cancel Order
@@ -162,7 +161,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
           {/* Summary */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Order Summary</h2>
-            <div className={styles.summaryRows}>
+            <div className={`${styles.summaryRows} tabular-nums`}>
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
                 <span>{formatPrice(order.subtotal)}</span>
@@ -183,9 +182,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
             <div className={styles.infoSection}>
               <h2 className={styles.infoTitle}>Shipping Details</h2>
               <div className={styles.infoText}>
-                <p style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                  {order.shippingAddress.fullName}
-                </p>
+                <p className={styles.recipientName}>{order.shippingAddress.fullName}</p>
                 <p>{order.shippingAddress.phone}</p>
                 <p>{order.shippingAddress.addressLine1}</p>
                 {order.shippingAddress.addressLine2 && <p>{order.shippingAddress.addressLine2}</p>}
@@ -203,7 +200,7 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
               <div className={styles.infoText}>
                 <p>Method: {getPaymentMethodLabel(order.paymentMethod)}</p>
                 <p>
-                  Status: <span style={{ textTransform: 'capitalize' }}>{order.paymentStatus}</span>
+                  Status: <span className={styles.capitalizeText}>{order.paymentStatus}</span>
                 </p>
               </div>
             </div>
@@ -227,6 +224,18 @@ export default function OrderDetailClientView({ orderId }: { orderId: string }) 
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isCancelConfirmOpen}
+        onClose={() => setIsCancelConfirmOpen(false)}
+        onConfirm={handleConfirmCancelOrder}
+        title="Cancel Order"
+        description={`Are you sure you want to cancel order #${order.orderNumber}? This action cannot be undone.`}
+        confirmLabel="Yes, Cancel Order"
+        cancelLabel="Keep Order"
+        variant="danger"
+        isLoading={cancelOrderMutation.isPending}
+      />
     </main>
   );
 }
